@@ -1,4 +1,5 @@
-﻿using Playnite.SDK;
+﻿using BackgroundChanger.Views;
+using Playnite.SDK;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using System;
