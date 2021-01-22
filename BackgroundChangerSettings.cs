@@ -12,9 +12,13 @@ namespace BackgroundChanger
     {
         private readonly BackgroundChanger plugin;
 
-        public string Option1 { get; set; } = string.Empty;
+        public bool EnableCheckVersion { get; set; } = true;
 
-        public bool Option2 { get; set; } = false;
+        public bool EnableRandomSelect { get; set; } = false;
+
+        public bool EnableAutoChanger { get; set; } = false;
+        public int AutoChangerTimer { get; set; } = 10;
+
 
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonIgnore` ignore attribute.
@@ -37,8 +41,12 @@ namespace BackgroundChanger
             // LoadPluginSettings returns null if not saved data is available.
             if (savedSettings != null)
             {
-                Option1 = savedSettings.Option1;
-                Option2 = savedSettings.Option2;
+                EnableCheckVersion = savedSettings.EnableCheckVersion;
+
+                EnableRandomSelect = savedSettings.EnableRandomSelect;
+
+                EnableAutoChanger = savedSettings.EnableAutoChanger;
+                AutoChangerTimer = savedSettings.AutoChangerTimer;
             }
         }
 
