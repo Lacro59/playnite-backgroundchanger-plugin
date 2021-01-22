@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonPluginsResources", "p
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CommonPluginsShared", "playnite-plugincommon\CommonPluginsShared\CommonPluginsShared.shproj", "{27E5D35B-F3CE-4A3F-9705-4564674615A5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QAnimatedPNG", "APNG\QAnimatedPNG\QAnimatedPNG.csproj", "{E45EAD4E-AEAA-47A6-95BE-544B59BA0BD1}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		playnite-plugincommon\CommonPlayniteShared\CommonPlayniteShared.projitems*{0d7dbc82-26af-49ad-8ed5-0e11aa56bce0}*SharedItemsImports = 13
@@ -31,6 +33,10 @@ Global
 		{4EFFE926-9C64-4750-A399-F344710EDC09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EFFE926-9C64-4750-A399-F344710EDC09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EFFE926-9C64-4750-A399-F344710EDC09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E45EAD4E-AEAA-47A6-95BE-544B59BA0BD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E45EAD4E-AEAA-47A6-95BE-544B59BA0BD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E45EAD4E-AEAA-47A6-95BE-544B59BA0BD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E45EAD4E-AEAA-47A6-95BE-544B59BA0BD1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

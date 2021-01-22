@@ -42,6 +42,7 @@ namespace BackgroundChanger.Views
 
             InitializeComponent();
 
+            PART_BackgroundImage.ImgWidth = 600;
 
             PART_LbBackgroundImages.ItemsSource = null;
             PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
@@ -160,7 +161,9 @@ namespace BackgroundChanger.Views
 
                 if (File.Exists(FilePath))
                 {
-                    PART_BackgroundImage.Source = BitmapExtensions.BitmapFromFile(FilePath);
+                    //PART_BackgroundImage.Source = BitmapExtensions.BitmapFromFile(FilePath);
+
+                    PART_BackgroundImage.Source = FilePath;
                 }
             }
             catch

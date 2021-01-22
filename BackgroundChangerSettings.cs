@@ -19,6 +19,9 @@ namespace BackgroundChanger
         public bool EnableAutoChanger { get; set; } = false;
         public int AutoChangerTimer { get; set; } = 10;
 
+        public bool EnableImageAnimatedBackground { get; set; } = false;
+        public bool EnableImageAnimatedCover { get; set; } = false;
+
 
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonIgnore` ignore attribute.
@@ -47,6 +50,9 @@ namespace BackgroundChanger
 
                 EnableAutoChanger = savedSettings.EnableAutoChanger;
                 AutoChangerTimer = savedSettings.AutoChangerTimer;
+
+                EnableImageAnimatedBackground = savedSettings.EnableImageAnimatedBackground;
+                EnableImageAnimatedCover = savedSettings.EnableImageAnimatedCover;
             }
         }
 

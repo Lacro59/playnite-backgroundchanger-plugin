@@ -10,6 +10,9 @@
             <RowDefinition Height="35" />
             <RowDefinition Height="35" />
             <RowDefinition Height="35" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="35" />
+            <RowDefinition Height="35" />
         </Grid.RowDefinitions>
 
         <CheckBox IsChecked="{Binding EnableRandomSelect}" VerticalAlignment="Center" Grid.Row="0">
@@ -18,7 +21,7 @@
 
         <CheckBox Name="CbAutoChanger" IsChecked="{Binding EnableAutoChanger}" VerticalAlignment="Center" Grid.Row="1">
             <Label Content="{DynamicResource LOCBcEnableAutoChanger}" />
-        </CheckBox>
+        </CheckBox> 
 
         <StackPanel Grid.Row="2" Margin="0,15,0,0" Orientation="Horizontal" 
                     IsEnabled="{Binding ElementName=CbAutoChanger, Path=IsChecked, TargetNullValue=false}">
@@ -28,5 +31,15 @@
             <Label x:Name="labelIntervalLabel_text" VerticalAlignment="Center"
                    Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
         </StackPanel>
+
+
+        <Label Grid.Row="3" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
+
+        <CheckBox IsChecked="{Binding EnableImageAnimatedBackground}" VerticalAlignment="Center" Grid.Row="4">
+            <Label Content="{DynamicResource LOCBcEnableImageAnimatedBackground}" />
+        </CheckBox>
+        <CheckBox IsChecked="{Binding EnableImageAnimatedCover}" VerticalAlignment="Center" Grid.Row="5">
+            <Label Content="{DynamicResource LOCBcEnableImageAnimatedCover}" />
+        </CheckBox> 
     </Grid>
 </UserControl>

@@ -1,5 +1,6 @@
 ﻿using BackgroundChanger.Services;
 using BackgroundChanger.Views;
+using BackgroundChanger2.Controls;
 using CommonPluginsShared;
 using Playnite.SDK;
 using Playnite.SDK.Events;
@@ -15,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace BackgroundChanger
@@ -33,6 +35,7 @@ namespace BackgroundChanger
         public static BackgroundChangerDatabase PluginDatabase;
         public static string pluginFolder;
         public static FrameworkElement PART_ImageBackground = null;
+        public static FrameworkElement PART_ImageCover= null;
 
 
         public BackgroundChanger(IPlayniteAPI api) : base(api)
@@ -112,13 +115,83 @@ namespace BackgroundChanger
                         {
                             System.Threading.SpinWait.SpinUntil(() => {
                                 PART_ImageBackground = IntegrationUI.SearchElementByName("ControlRoot", true, false, 2);
+                                if (settings.EnableImageAnimatedCover)
+                                {
+                                    PART_ImageCover = IntegrationUI.SearchElementByName("PART_ImageCover", true, false);
+                                }
                                 return PART_ImageBackground != null;
                             }
                             , 5000);
                         })).Wait();
                         IsFirstLoad = false;
+
+                        if (settings.EnableImageAnimatedBackground)
+                        {
+                            try
+                            {
+                                var GridParent = PART_ImageBackground.Parent;
+                                if (GridParent is Grid)
+                                {
+                                    Application.Current.Dispatcher.BeginInvoke((Action)delegate
+                                    {
+                                        int index = ((Grid)GridParent).Children.IndexOf(PART_ImageBackground);
+                                        ((Grid)GridParent).Children.RemoveAt(index);
+
+                                        PART_ImageBackground = new ImageAnimated();
+                                        ((ImageAnimated)PART_ImageBackground).ImgWidth = 600;
+                                        PART_ImageBackground.VerticalAlignment = VerticalAlignment.Top;
+                                        PART_ImageBackground.HorizontalAlignment = HorizontalAlignment.Center;
+                                        ((ImageAnimated)PART_ImageBackground).UseOpacityMask = true;
+                                        RenderOptions.SetBitmapScalingMode(PART_ImageBackground, BitmapScalingMode.Fant);
+
+                                        ((Grid)GridParent).Children.Insert(index, PART_ImageBackground);
+                                    });
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Common.LogError(ex, "BackgroundChanger");
+                            }
+                        }
+
+                        if (settings.EnableImageAnimatedCover)
+                        {
+                            try
+                            {                               
+                                if (PART_ImageCover != null)
+                                {
+                                    double CoverHeight = PART_ImageCover.ActualHeight;
+
+                                    var DockPanelParent = PART_ImageCover.Parent;
+                                    if (DockPanelParent is DockPanel)
+                                    {
+                                        Application.Current.Dispatcher.BeginInvoke((Action)delegate
+                                        {
+                                            int index = ((DockPanel)DockPanelParent).Children.IndexOf(PART_ImageCover);
+                                            ((DockPanel)DockPanelParent).Children.RemoveAt(index);
+
+                                            PART_ImageCover = new ImageAnimated();
+                                            ((ImageAnimated)PART_ImageCover).Stretch = Stretch.Uniform;
+                                            ((ImageAnimated)PART_ImageCover).StretchDirection = StretchDirection.Both;
+                                            PART_ImageCover.VerticalAlignment = VerticalAlignment.Bottom;
+                                            DockPanel.SetDock(PART_ImageCover, Dock.Right);
+                                            RenderOptions.SetBitmapScalingMode(PART_ImageCover, BitmapScalingMode.Fant);
+                                            PART_ImageCover.Height = CoverHeight;
+                                            ((DockPanel)DockPanelParent).Children.Insert(index, PART_ImageCover);
+
+                                            //DockPanel.SetDock(((DockPanel)DockPanelParent).Children[1], Dock.Left);
+                                        });
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Common.LogError(ex, "BackgroundChanger");
+                            }
+                        }
                     }
 
+                    
                     if (PART_ImageBackground == null)
                     {
                         PART_ImageBackground = IntegrationUI.SearchElementByName("ControlRoot", true, false, 2);
@@ -126,7 +199,22 @@ namespace BackgroundChanger
 
                     if (PART_ImageBackground != null)
                     {
-                        BackgroundChangerUI.SetBackground(PlayniteApi, BackgroundChangerDatabase.GameSelected, PART_ImageBackground);
+                        Application.Current.Dispatcher.BeginInvoke((Action)delegate
+                        {
+                            BackgroundChangerUI.SetBackground(PlayniteApi, BackgroundChangerDatabase.GameSelected, PART_ImageBackground);
+                        });
+                            
+                    }
+
+                    if (PART_ImageCover != null)
+                    {
+                        if (PART_ImageCover is ImageAnimated)
+                        {
+                            Application.Current.Dispatcher.BeginInvoke((Action)delegate
+                            {
+                                ((ImageAnimated)PART_ImageCover).Source = PlayniteApi.Database.GetFullFilePath(BackgroundChangerDatabase.GameSelected.CoverImage);
+                            });
+                        }
                     }
                 });
             }

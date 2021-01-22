@@ -1,4 +1,5 @@
 ﻿using BackgroundChanger.Models;
+using BackgroundChanger2.Controls;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
@@ -99,7 +100,6 @@ namespace BackgroundChanger.Services
                 {
                     PathImage = null;
                 }
-
                 ((dynamic)PART_ImageBackground).Source = PathImage;
             });
         }
@@ -135,6 +135,5 @@ namespace BackgroundChanger.Services
                 SetBackgroundImage(BackgroundChanger.PART_ImageBackground, PathImage);
             }
         }
-
     }
 }
