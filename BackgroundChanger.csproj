@@ -72,6 +72,9 @@
     <Compile Include="Models\BackgroundImage.cs" />
     <Compile Include="Models\BackgroundImagesCollection.cs" />
     <Compile Include="Models\GameBackgroundImages.cs" />
+    <Compile Include="playnite-plugincommon\CommonPluginsControls\Views\OptionsDownloadData.xaml.cs">
+      <DependentUpon>OptionsDownloadData.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Services\BackgroundChangerDatabase.cs" />
     <Compile Include="Services\BackgroundChangerUI.cs" />
     <Compile Include="Views\BackgroudImagesManager.xaml.cs">
@@ -103,6 +106,10 @@
     <Page Include="Controls\ImageAnimated.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="playnite-plugincommon\CommonPluginsControls\Views\OptionsDownloadData.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\BackgroudImagesManager.xaml">
       <SubType>Designer</SubType>
