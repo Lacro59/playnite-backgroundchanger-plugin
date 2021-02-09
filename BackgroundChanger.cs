@@ -61,6 +61,13 @@ namespace BackgroundChanger
                 CheckVersion cv = new CheckVersion();
                 cv.Check("BackgroundChanger", pluginFolder, api);
             }
+
+            PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
+        }
+
+        private void Games_ItemUpdated(object sender, ItemUpdatedEventArgs<Game> e)
+        {
+            SetImage();
         }
 
 
@@ -191,34 +198,41 @@ namespace BackgroundChanger
                         }
                     }
 
-                    
-                    if (PART_ImageBackground == null)
-                    {
-                        PART_ImageBackground = IntegrationUI.SearchElementByName("ControlRoot", true, false, 2);
-                    }
-
-                    if (PART_ImageBackground != null)
-                    {
-                        Application.Current.Dispatcher.BeginInvoke((Action)delegate
-                        {
-                            BackgroundChangerUI.SetBackground(PlayniteApi, BackgroundChangerDatabase.GameSelected, PART_ImageBackground);
-                        });
-                            
-                    }
-
-                    if (PART_ImageCover != null)
-                    {
-                        if (PART_ImageCover is ImageAnimated)
-                        {
-                            Application.Current.Dispatcher.BeginInvoke((Action)delegate
-                            {
-                                ((ImageAnimated)PART_ImageCover).Source = PlayniteApi.Database.GetFullFilePath(BackgroundChangerDatabase.GameSelected.CoverImage);
-                            });
-                        }
-                    }
+                    SetImage();
                 });
             }
         }
+
+
+        private void SetImage()
+        {
+            if (PART_ImageBackground == null)
+            {
+                PART_ImageBackground = IntegrationUI.SearchElementByName("ControlRoot", true, false, 2);
+            }
+
+            if (PART_ImageBackground != null)
+            {
+                Application.Current.Dispatcher.BeginInvoke((Action)delegate
+                {
+                    BackgroundChangerUI.SetBackground(PlayniteApi, BackgroundChangerDatabase.GameSelected, PART_ImageBackground);
+                });
+
+            }
+
+            if (PART_ImageCover != null)
+            {
+                if (PART_ImageCover is ImageAnimated)
+                {
+                    Application.Current.Dispatcher.BeginInvoke((Action)delegate
+                    {
+                        ((ImageAnimated)PART_ImageCover).Source = PlayniteApi.Database.GetFullFilePath(BackgroundChangerDatabase.GameSelected.CoverImage);
+                    });
+                }
+            }
+        }
+
+
 
         // Add code to be executed when game is finished installing.
         public override void OnGameInstalled(Game game)
