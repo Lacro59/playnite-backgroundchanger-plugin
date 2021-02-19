@@ -1,5 +1,4 @@
 ﻿using BackgroundChanger.Models;
-using BackgroundChanger2.Controls;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
@@ -35,11 +34,9 @@ namespace BackgroundChanger.Services
             {
                 if (gameBackgroundImages.HasData)
                 {
-                    if (PluginDatabase.PluginSettings.EnableAutoChanger)
+                    if (PluginDatabase.PluginSettings.Settings.EnableAutoChanger)
                     {
-                        PluginDatabase.SetCurrent(game);
-
-                        if (PluginDatabase.PluginSettings.EnableRandomSelect)
+                        if (PluginDatabase.PluginSettings.Settings.EnableRandomSelect)
                         {
                             Random rnd = new Random();
                             int ImgSelected = rnd.Next(0, (gameBackgroundImages.Items.Count));
@@ -47,17 +44,17 @@ namespace BackgroundChanger.Services
                         }
                         else
                         {
-                            PathImage = PluginDatabase.GameSelectedData.Items[Counter].FullPath;
+                            PathImage = gameBackgroundImages.Items[Counter].FullPath;
                         }
 
                         SetBackgroundImage(BackgroundChanger.PART_ImageBackground, PathImage);
 
-                        BcTimer = new Timer(PluginDatabase.PluginSettings.AutoChangerTimer * 1000);
+                        BcTimer = new Timer(PluginDatabase.PluginSettings.Settings.AutoChangerTimer * 1000);
                         BcTimer.AutoReset = true;
                         BcTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
                         BcTimer.Start();
                     }
-                    else if (PluginDatabase.PluginSettings.EnableRandomSelect)
+                    else if (PluginDatabase.PluginSettings.Settings.EnableRandomSelect)
                     {
                         Random rnd = new Random();
                         int ImgSelected = rnd.Next(0, (gameBackgroundImages.Items.Count));
@@ -107,31 +104,33 @@ namespace BackgroundChanger.Services
 
         private static void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
-            if (PluginDatabase.PluginSettings.EnableRandomSelect)
+            GameBackgroundImages gameBackgroundImages = PluginDatabase.Get(PluginDatabase.GameContext);
+
+            if (PluginDatabase.PluginSettings.Settings.EnableRandomSelect)
             {
-                Random rnd = new Random();
-                int ImgSelected = rnd.Next(0, (PluginDatabase.GameSelectedData.Items.Count));
-                while (ImgSelected == Counter)
-                {
-                    ImgSelected = rnd.Next(0, (PluginDatabase.GameSelectedData.Items.Count));
-                }
-                Counter = ImgSelected;
-
-                string PathImage = PluginDatabase.GameSelectedData.Items[ImgSelected].FullPath;
-
-                SetBackgroundImage(BackgroundChanger.PART_ImageBackground, PathImage);
+               Random rnd = new Random();
+               int ImgSelected = rnd.Next(0, (gameBackgroundImages.Items.Count));
+               while (ImgSelected == Counter)
+               {
+                   ImgSelected = rnd.Next(0, (gameBackgroundImages.Items.Count));
+               }
+               Counter = ImgSelected;
+               
+               string PathImage = gameBackgroundImages.Items[ImgSelected].FullPath;
+               
+               SetBackgroundImage(BackgroundChanger.PART_ImageBackground, PathImage);
             }
             else
             {
                 Counter++;
 
-                if (Counter == PluginDatabase.GameSelectedData.Items.Count)
+                if (Counter == gameBackgroundImages.Items.Count)
                 {
                     Counter = 0;
                 }
-
-                string PathImage = PluginDatabase.GameSelectedData.Items[Counter].FullPath;
-
+                
+                string PathImage = gameBackgroundImages.Items[Counter].FullPath;
+                
                 SetBackgroundImage(BackgroundChanger.PART_ImageBackground, PathImage);
             }
         }

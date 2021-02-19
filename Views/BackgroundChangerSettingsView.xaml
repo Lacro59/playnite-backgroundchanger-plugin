@@ -7,39 +7,29 @@
     
     <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="35" />
-            <RowDefinition Height="35" />
-            <RowDefinition Height="35" />
-            <RowDefinition Height="50" />
-            <RowDefinition Height="35" />
-            <RowDefinition Height="35" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <CheckBox IsChecked="{Binding EnableRandomSelect}" VerticalAlignment="Center" Grid.Row="0">
+        <CheckBox IsChecked="{Binding Settings.EnableRandomSelect}" VerticalAlignment="Center" Grid.Row="0">
             <Label Content="{DynamicResource LOCBcEnableRandomSelect}" />
         </CheckBox>
 
-        <CheckBox Name="CbAutoChanger" IsChecked="{Binding EnableAutoChanger}" VerticalAlignment="Center" Grid.Row="1">
+        <CheckBox Name="CbAutoChanger" IsChecked="{Binding Settings.EnableAutoChanger}" VerticalAlignment="Center" Grid.Row="2">
             <Label Content="{DynamicResource LOCBcEnableAutoChanger}" />
-        </CheckBox> 
+        </CheckBox>
 
-        <StackPanel Grid.Row="2" Margin="0,15,0,0" Orientation="Horizontal" 
+        <StackPanel Grid.Row="4" Margin="30,0,0,0" Orientation="Horizontal" 
                     IsEnabled="{Binding ElementName=CbAutoChanger, Path=IsChecked, TargetNullValue=false}">
             <Label Content="{DynamicResource LOCBcTimeInterval}" Width="auto" Margin="0,0,20,0" VerticalAlignment="Center" />
-            <Slider x:Name="hwSlider" Width="300" Minimum="10" Maximum="600" Value="{Binding AutoChangerTimer}" 
-                    ValueChanged="HwSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" IsSnapToTickEnabled="True" />
-            <Label x:Name="labelIntervalLabel_text" VerticalAlignment="Center"
+            <Slider Name="hwSlider" Width="300" Minimum="10" Maximum="600" Value="{Binding Settings.AutoChangerTimer}" 
+                    ValueChanged="HwSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
+                    IsSnapToTickEnabled="True" />
+            <Label Name="labelIntervalLabel_text" VerticalAlignment="Center"
                    Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
         </StackPanel>
-
-
-        <Label Grid.Row="3" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
-
-        <CheckBox IsChecked="{Binding EnableImageAnimatedBackground}" VerticalAlignment="Center" Grid.Row="4">
-            <Label Content="{DynamicResource LOCBcEnableImageAnimatedBackground}" />
-        </CheckBox>
-        <CheckBox IsChecked="{Binding EnableImageAnimatedCover}" VerticalAlignment="Center" Grid.Row="5">
-            <Label Content="{DynamicResource LOCBcEnableImageAnimatedCover}" />
-        </CheckBox> 
     </Grid>
 </UserControl>

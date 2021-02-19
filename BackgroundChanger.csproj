@@ -30,13 +30,22 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug9|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\..\Dropbox\Playnite\Playnite9\Extensions\playnite-backgroundchanger-plugin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Playnite.SDK, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\PlayniteSDK.5.5.0\lib\net462\Playnite.SDK.dll</HintPath>
+    <Reference Include="Playnite.SDK">
+      <HintPath>..\..\..\Dropbox\Playnite\Playnite9\Playnite.SDK.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -66,8 +75,8 @@
   <ItemGroup>
     <Compile Include="BackgroundChanger.cs" />
     <Compile Include="BackgroundChangerSettings.cs" />
-    <Compile Include="Controls\ImageAnimated.xaml.cs">
-      <DependentUpon>ImageAnimated.xaml</DependentUpon>
+    <Compile Include="Controls\BackChangerImage.xaml.cs">
+      <DependentUpon>BackChangerImage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\BackgroundImage.cs" />
     <Compile Include="Models\BackgroundImagesCollection.cs" />
@@ -103,7 +112,7 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Page Include="Controls\ImageAnimated.xaml">
+    <Page Include="Controls\BackChangerImage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -126,15 +135,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="APNG\QAnimatedPNG\QAnimatedPNG.csproj">
-      <Project>{e45ead4e-aeaa-47a6-95be-544b59ba0bd1}</Project>
-      <Name>QAnimatedPNG</Name>
-    </ProjectReference>
     <ProjectReference Include="playnite-plugincommon\CommonPluginsResources\CommonPluginsResources.csproj">
       <Project>{4effe926-9c64-4750-a399-f344710edc09}</Project>
       <Name>CommonPluginsResources</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="playnite-plugincommon\CommonPlayniteShared\CommonPlayniteShared.projitems" Label="Shared" />
   <Import Project="playnite-plugincommon\CommonPluginsShared\CommonPluginsShared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

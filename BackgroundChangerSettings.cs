@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Playnite.SDK;
+using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,35 +9,46 @@ using System.Threading.Tasks;
 
 namespace BackgroundChanger
 {
-    public class BackgroundChangerSettings : ISettings
+    public class BackgroundChangerSettings : ObservableObject
     {
-        private readonly BackgroundChanger plugin;
-
-        public bool EnableCheckVersion { get; set; } = true;
+        #region Settings variables
+        public bool MenuInExtensions { get; set; } = true;
 
         public bool EnableRandomSelect { get; set; } = false;
 
         public bool EnableAutoChanger { get; set; } = false;
         public int AutoChangerTimer { get; set; } = 10;
-
-        public bool EnableImageAnimatedBackground { get; set; } = false;
-        public bool EnableImageAnimatedCover { get; set; } = false;
-
+        #endregion
 
         // Playnite serializes settings object to a JSON object and saves it as text file.
-        // If you want to exclude some property from being saved then use `JsonIgnore` ignore attribute.
-        [JsonIgnore]
-        public bool OptionThatWontBeSaved { get; set; } = false;
+        // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
+        #region Variables exposed
 
-        // Parameterless constructor must exist if you want to use LoadPluginSettings method.
-        public BackgroundChangerSettings()
+        #endregion  
+    }
+
+
+    public class BackgroundChangerSettingsViewModel : ObservableObject, ISettings
+    {
+        private readonly BackgroundChanger Plugin;
+        private BackgroundChangerSettings EditingClone { get; set; }
+
+        private BackgroundChangerSettings _Settings;
+        public BackgroundChangerSettings Settings
         {
+            get => _Settings;
+            set
+            {
+                _Settings = value;
+                OnPropertyChanged();
+            }
         }
 
-        public BackgroundChangerSettings(BackgroundChanger plugin)
+
+        public BackgroundChangerSettingsViewModel(BackgroundChanger plugin)
         {
             // Injecting your plugin instance is required for Save/Load method because Playnite saves data to a location based on what plugin requested the operation.
-            this.plugin = plugin;
+            Plugin = plugin;
 
             // Load saved settings.
             var savedSettings = plugin.LoadPluginSettings<BackgroundChangerSettings>();
@@ -44,41 +56,41 @@ namespace BackgroundChanger
             // LoadPluginSettings returns null if not saved data is available.
             if (savedSettings != null)
             {
-                EnableCheckVersion = savedSettings.EnableCheckVersion;
-
-                EnableRandomSelect = savedSettings.EnableRandomSelect;
-
-                EnableAutoChanger = savedSettings.EnableAutoChanger;
-                AutoChangerTimer = savedSettings.AutoChangerTimer;
-
-                EnableImageAnimatedBackground = savedSettings.EnableImageAnimatedBackground;
-                EnableImageAnimatedCover = savedSettings.EnableImageAnimatedCover;
+                Settings = savedSettings;
+            }
+            else
+            {
+                Settings = new BackgroundChangerSettings();
             }
         }
 
+        // Code executed when settings view is opened and user starts editing values.
         public void BeginEdit()
         {
-            // Code executed when settings view is opened and user starts editing values.
+            EditingClone = Serialization.GetClone(Settings);
         }
 
+        // Code executed when user decides to cancel any changes made since BeginEdit was called.
+        // This method should revert any changes made to Option1 and Option2.
         public void CancelEdit()
         {
-            // Code executed when user decides to cancel any changes made since BeginEdit was called.
-            // This method should revert any changes made to Option1 and Option2.
+            Settings = EditingClone;
         }
 
+        // Code executed when user decides to confirm changes made since BeginEdit was called.
+        // This method should save settings made to Option1 and Option2.
         public void EndEdit()
         {
-            // Code executed when user decides to confirm changes made since BeginEdit was called.
-            // This method should save settings made to Option1 and Option2.
-            plugin.SavePluginSettings(this);
+            Plugin.SavePluginSettings(Settings);
+            BackgroundChanger.PluginDatabase.PluginSettings = this;
+            this.OnPropertyChanged();
         }
 
+        // Code execute when user decides to confirm changes made since BeginEdit was called.
+        // Executed before EndEdit is called and EndEdit is not called if false is returned.
+        // List of errors is presented to user if verification fails.
         public bool VerifySettings(out List<string> errors)
         {
-            // Code execute when user decides to confirm changes made since BeginEdit was called.
-            // Executed before EndEdit is called and EndEdit is not called if false is returned.
-            // List of errors is presented to user if verification fails.
             errors = new List<string>();
             return true;
         }

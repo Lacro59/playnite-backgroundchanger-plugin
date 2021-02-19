@@ -1,4 +1,5 @@
-﻿using CommonPluginsPlaynite.Common;
+﻿using BackgroundChanger.Services;
+using CommonPluginsPlaynite.Common;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,9 @@ namespace BackgroundChanger.Models
 {
     public class BackgroundImage
     {
+        private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
+
+
         public string Name { get; set; }
         public string FolderName { get; set; }
         public bool IsDefault { get; set; }
@@ -42,7 +46,7 @@ namespace BackgroundChanger.Models
                 else
                 {
                     return Path.Combine(
-                        BackgroundChanger.PluginDatabase.PluginUserDataPath,
+                        PluginDatabase.Paths.PluginUserDataPath,
                         "Images",
                         FolderName,
                         Name

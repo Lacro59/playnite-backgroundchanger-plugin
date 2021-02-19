@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:BackgroundChanger.Views"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared"
-             xmlns:controls="clr-namespace:BackgroundChanger2.Controls"
              mc:Ignorable="d" Height="600" Width="1024">
 
     <UserControl.Resources>
@@ -87,8 +86,7 @@
         </Grid>
 
         <Grid Grid.Column="2" Grid.Row="0">
-            <!--Image Name="PART_BackgroundImage" Stretch="Uniform" Grid.Row="0" /-->
-            <controls:ImageAnimated x:Name="PART_BackgroundImage" Stretch="Uniform" Grid.Row="0" ImgWidth="600" />
+            <Image Name="PART_BackgroundImage" Stretch="Uniform" Grid.Row="0" />
         </Grid>
 
         <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" BorderThickness="0,1,0,0" BorderBrush="{StaticResource NormalBorderBrush}">

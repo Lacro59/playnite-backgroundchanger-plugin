@@ -1,7 +1,7 @@
 ﻿using BackgroundChanger.Services;
 using BackgroundChanger.Views;
-using BackgroundChanger2.Controls;
 using CommonPluginsShared;
+using CommonPluginsShared.PlayniteExtended;
 using Playnite.SDK;
 using Playnite.SDK.Events;
 using Playnite.SDK.Models;
@@ -21,56 +21,45 @@ using System.Windows.Threading;
 
 namespace BackgroundChanger
 {
-    public class BackgroundChanger : Plugin
+    public class BackgroundChanger : PluginExtended<BackgroundChangerSettingsViewModel, BackgroundChangerDatabase>
     {
-        private static readonly ILogger logger = LogManager.GetLogger();
-        private static IResourceProvider resources = new ResourceProvider();
-
-        private BackgroundChangerSettings settings { get; set; }
-
         public override Guid Id { get; } = Guid.Parse("3afdd02b-db6c-4b60-8faa-2971d6dfad2a");
 
         public bool IsFirstLoad = true;
-
-        public static BackgroundChangerDatabase PluginDatabase;
-        public static string pluginFolder;
         public static FrameworkElement PART_ImageBackground = null;
-        public static FrameworkElement PART_ImageCover= null;
 
 
-        public BackgroundChanger(IPlayniteAPI api) : base(api)
+        public BackgroundChanger(IPlayniteAPI api) : base(api, true)
         {
-            settings = new BackgroundChangerSettings(this);
-
-            // Loading plugin database 
-            PluginDatabase = new BackgroundChangerDatabase(PlayniteApi, settings, this.GetPluginUserDataPath());
-            PluginDatabase.InitializeDatabase();
-
-            // Get plugin's location 
-            pluginFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-            // Add plugin localization in application ressource.
-            PluginLocalization.SetPluginLanguage(pluginFolder, api.ApplicationSettings.Language);
-            // Add common in application ressource.
-            Common.Load(pluginFolder);
-            Common.SetEvent(PlayniteApi);
-
-            // Check version
-            if (settings.EnableCheckVersion)
-            {
-                CheckVersion cv = new CheckVersion();
-                cv.Check("BackgroundChanger", pluginFolder, api);
-            }
-
             PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
         }
+
 
         private void Games_ItemUpdated(object sender, ItemUpdatedEventArgs<Game> e)
         {
             SetImage();
         }
 
+        private void SetImage()
+        {
+            if (PART_ImageBackground == null)
+            {
+                PART_ImageBackground = IntegrationUI.SearchElementByName("ControlRoot", true, false, 2);
+            }
 
+            if (PART_ImageBackground != null)
+            {
+                Application.Current.Dispatcher.BeginInvoke((Action)delegate
+                {
+                    BackgroundChangerUI.SetBackground(PlayniteApi, PluginDatabase.GameContext, PART_ImageBackground);
+                });
+            }
+        }
+
+
+
+
+        #region Menus
         // To add new game menu items override GetGameMenuItems
         public override List<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
@@ -100,139 +89,35 @@ namespace BackgroundChanger
         {
             return null;
         }
+        #endregion
 
 
+        #region Game Event
         public override void OnGameSelected(GameSelectionEventArgs args)
         {
             if (args.NewValue != null && args.NewValue.Count == 1)
             {
-                BackgroundChangerDatabase.GameSelected = args.NewValue[0];
-#if DEBUG
-                logger.Debug($"BackgroundChanger [Ignored] - OnGameSelected() - {BackgroundChangerDatabase.GameSelected.Name} - {BackgroundChangerDatabase.GameSelected.Id.ToString()}");
-#endif
+                PluginDatabase.GameContext = args.NewValue[0];
 
                 Task.Run(() =>
                 {
                     if (IsFirstLoad)
                     {
-#if DEBUG
-                        logger.Debug($"BackgroundChanger - IsFirstLoad");
-#endif
                         Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
                         {
                             System.Threading.SpinWait.SpinUntil(() => {
                                 PART_ImageBackground = IntegrationUI.SearchElementByName("ControlRoot", true, false, 2);
-                                if (settings.EnableImageAnimatedCover)
-                                {
-                                    PART_ImageCover = IntegrationUI.SearchElementByName("PART_ImageCover", true, false);
-                                }
                                 return PART_ImageBackground != null;
                             }
                             , 5000);
                         })).Wait();
                         IsFirstLoad = false;
-
-                        if (settings.EnableImageAnimatedBackground)
-                        {
-                            try
-                            {
-                                var GridParent = PART_ImageBackground.Parent;
-                                if (GridParent is Grid)
-                                {
-                                    Application.Current.Dispatcher.BeginInvoke((Action)delegate
-                                    {
-                                        int index = ((Grid)GridParent).Children.IndexOf(PART_ImageBackground);
-                                        ((Grid)GridParent).Children.RemoveAt(index);
-
-                                        PART_ImageBackground = new ImageAnimated();
-                                        ((ImageAnimated)PART_ImageBackground).ImgWidth = 600;
-                                        PART_ImageBackground.VerticalAlignment = VerticalAlignment.Top;
-                                        PART_ImageBackground.HorizontalAlignment = HorizontalAlignment.Center;
-                                        ((ImageAnimated)PART_ImageBackground).UseOpacityMask = true;
-                                        RenderOptions.SetBitmapScalingMode(PART_ImageBackground, BitmapScalingMode.Fant);
-
-                                        ((Grid)GridParent).Children.Insert(index, PART_ImageBackground);
-                                    });
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Common.LogError(ex, "BackgroundChanger");
-                            }
-                        }
-
-                        if (settings.EnableImageAnimatedCover)
-                        {
-                            try
-                            {                               
-                                if (PART_ImageCover != null)
-                                {
-                                    double CoverHeight = PART_ImageCover.ActualHeight;
-
-                                    var DockPanelParent = PART_ImageCover.Parent;
-                                    if (DockPanelParent is DockPanel)
-                                    {
-                                        Application.Current.Dispatcher.BeginInvoke((Action)delegate
-                                        {
-                                            int index = ((DockPanel)DockPanelParent).Children.IndexOf(PART_ImageCover);
-                                            ((DockPanel)DockPanelParent).Children.RemoveAt(index);
-
-                                            PART_ImageCover = new ImageAnimated();
-                                            ((ImageAnimated)PART_ImageCover).Stretch = Stretch.Uniform;
-                                            ((ImageAnimated)PART_ImageCover).StretchDirection = StretchDirection.Both;
-                                            PART_ImageCover.VerticalAlignment = VerticalAlignment.Bottom;
-                                            DockPanel.SetDock(PART_ImageCover, Dock.Right);
-                                            RenderOptions.SetBitmapScalingMode(PART_ImageCover, BitmapScalingMode.Fant);
-                                            PART_ImageCover.Height = CoverHeight;
-                                            ((DockPanel)DockPanelParent).Children.Insert(index, PART_ImageCover);
-
-                                            //DockPanel.SetDock(((DockPanel)DockPanelParent).Children[1], Dock.Left);
-                                        });
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Common.LogError(ex, "BackgroundChanger");
-                            }
-                        }
                     }
 
                     SetImage();
                 });
             }
         }
-
-
-        private void SetImage()
-        {
-            if (PART_ImageBackground == null)
-            {
-                PART_ImageBackground = IntegrationUI.SearchElementByName("ControlRoot", true, false, 2);
-            }
-
-            if (PART_ImageBackground != null)
-            {
-                Application.Current.Dispatcher.BeginInvoke((Action)delegate
-                {
-                    BackgroundChangerUI.SetBackground(PlayniteApi, BackgroundChangerDatabase.GameSelected, PART_ImageBackground);
-                });
-
-            }
-
-            if (PART_ImageCover != null)
-            {
-                if (PART_ImageCover is ImageAnimated)
-                {
-                    Application.Current.Dispatcher.BeginInvoke((Action)delegate
-                    {
-                        ((ImageAnimated)PART_ImageCover).Source = PlayniteApi.Database.GetFullFilePath(BackgroundChangerDatabase.GameSelected.CoverImage);
-                    });
-                }
-            }
-        }
-
-
 
         // Add code to be executed when game is finished installing.
         public override void OnGameInstalled(Game game)
@@ -263,8 +148,10 @@ namespace BackgroundChanger
         {
 
         }
+        #endregion
 
 
+        #region Application event
         // Add code to be executed when Playnite is initialized.
         public override void OnApplicationStarted()
         {
@@ -276,6 +163,7 @@ namespace BackgroundChanger
         {
 
         }
+        #endregion
 
 
         // Add code to be executed when library is updated.
@@ -285,14 +173,16 @@ namespace BackgroundChanger
         }
 
 
+        #region Settings
         public override ISettings GetSettings(bool firstRunSettings)
         {
-            return settings;
+            return PluginSettings;
         }
 
         public override UserControl GetSettingsView(bool firstRunSettings)
         {
             return new BackgroundChangerSettingsView();
         }
+        #endregion
     }
 }
