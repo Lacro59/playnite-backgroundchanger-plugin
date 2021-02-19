@@ -18,6 +18,7 @@ namespace BackgroundChanger.Services
 
         }
 
+
         protected override bool LoadDatabase()
         {
             Database = new BackgroundImagesCollection(Paths.PluginDatabasePath);
@@ -26,6 +27,7 @@ namespace BackgroundChanger.Services
 
             return true;
         }
+
 
         public override GameBackgroundImages Get(Guid Id, bool OnlyCache = false)
         {
@@ -48,15 +50,6 @@ namespace BackgroundChanger.Services
             }
 
             return gameBackgroundImages;
-        }
-
-
-        public override void Update(GameBackgroundImages itemToUpdate)
-        {
-            BackgroundImage BackgroundDefault = itemToUpdate.Items.Find(x => x.IsDefault);
-            itemToUpdate.Items.Remove(BackgroundDefault);
-
-            base.Update(itemToUpdate);
         }
     }
 }
