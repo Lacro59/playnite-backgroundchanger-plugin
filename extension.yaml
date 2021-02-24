@@ -5,3 +5,10 @@ Version: 1.1
 Module: BackgroundChanger.dll
 Type: GenericPlugin
 Icon: icon.png
+Links:
+  - Name: Plugin forum
+    Url: https://playnite.link/forum/thread-564.html
+  - Name: Plugin Github
+    Url: https://github.com/Lacro59/playnite-backgroundchanger-plugin
+  - Name: Plugin translations
+    Url: https://crowdin.com/project/playnite-extensions

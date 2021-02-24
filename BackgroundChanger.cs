@@ -57,8 +57,6 @@ namespace BackgroundChanger
         }
 
 
-
-
         #region Menus
         // To add new game menu items override GetGameMenuItems
         public override List<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
