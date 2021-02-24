@@ -69,7 +69,7 @@ namespace BackgroundChanger
 
             gameMenuItems.Add(new GameMenuItem
             {
-                // Delete & download localizations data for the selected game
+                // Manage game background
                 MenuSection = resources.GetString("LOCBc"),
                 Description = resources.GetString("LOCBcManageBackground"),
                 Action = (gameMenuItem) =>
