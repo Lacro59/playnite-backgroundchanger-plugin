@@ -29,7 +29,7 @@ namespace BackgroundChanger
         public static FrameworkElement PART_ImageBackground = null;
 
 
-        public BackgroundChanger(IPlayniteAPI api) : base(api, true)
+        public BackgroundChanger(IPlayniteAPI api) : base(api)
         {
             PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
         }
@@ -78,6 +78,17 @@ namespace BackgroundChanger
                 }
             });
 
+#if DEBUG
+            gameMenuItems.Add(new GameMenuItem
+            {
+                MenuSection = resources.GetString("LOCBc"),
+                Description = "Test",
+                Action = (mainMenuItem) =>
+                {
+
+                }
+            });
+#endif
 
             return gameMenuItems;
         }

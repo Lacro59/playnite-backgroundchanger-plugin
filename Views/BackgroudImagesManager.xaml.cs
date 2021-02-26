@@ -100,7 +100,7 @@ namespace BackgroundChanger.Views
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "BackgroundChanger");
+                Common.LogError(ex, false);
             }
         }
 
@@ -120,7 +120,7 @@ namespace BackgroundChanger.Views
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "BackgroundChanger");
+                Common.LogError(ex, false);
             }
         }
 
@@ -146,7 +146,7 @@ namespace BackgroundChanger.Views
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "BackgroundChanger");
+                Common.LogError(ex, false);
             }
         }
 
