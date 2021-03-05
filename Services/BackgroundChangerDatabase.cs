@@ -51,5 +51,14 @@ namespace BackgroundChanger.Services
 
             return gameBackgroundImages;
         }
+
+
+        public override void Games_ItemUpdated(object sender, ItemUpdatedEventArgs<Game> e)
+        {
+            foreach (var GameUpdated in e.UpdatedItems)
+            {
+                Database.SetGameInfo<BackgroundImage>(PlayniteApi, GameUpdated.NewData.Id);
+            }
+        }
     }
 }
