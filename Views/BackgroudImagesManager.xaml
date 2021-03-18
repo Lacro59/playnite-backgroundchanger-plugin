@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:BackgroundChanger.Views"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared"
-             mc:Ignorable="d" Height="600" Width="1024">
+             mc:Ignorable="d" 
+             Height="600" Width="1024">
 
     <UserControl.Resources>
         <commonpluginsshared:InvertedBoolenConverter x:Key="InvertedBoolenConverter"/>
@@ -46,7 +47,7 @@
                                 </Grid.RowDefinitions>
                                 
                                 <Image Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="center"
-                                        Height="128" Width="150">
+                                       Height="128" Width="150">
                                     <Image.Source>
                                         <MultiBinding Converter="{StaticResource ImageConverter}" ConverterParameter="2">
                                             <Binding Path="FullPath" IsAsync="True" />
