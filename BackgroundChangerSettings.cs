@@ -14,17 +14,100 @@ namespace BackgroundChanger
         #region Settings variables
         public bool MenuInExtensions { get; set; } = true;
 
-        public bool EnableRandomSelect { get; set; } = false;
 
-        public bool EnableAutoChanger { get; set; } = false;
-        public int AutoChangerTimer { get; set; } = 10;
+        private bool _EnableBackgroundImage { get; set; } = false;
+        public bool EnableBackgroundImage
+        {
+            get => _EnableBackgroundImage;
+            set
+            {
+                _EnableBackgroundImage = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool EnableBackgroundImageRandomSelect { get; set; } = false;
+        public bool EnableBackgroundImageAutoChanger { get; set; } = false;
+        public int BackgroundImageAutoChangerTimer { get; set; } = 10;
+
+        private bool _EnableImageAnimatedBackground { get; set; } = false;
+        public bool EnableImageAnimatedBackground
+        {
+            get => _EnableImageAnimatedBackground;
+            set
+            {
+                _EnableImageAnimatedBackground = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        private bool _EnableCoverImage { get; set; } = false;
+        public bool EnableCoverImage
+        {
+            get => _EnableCoverImage;
+            set
+            {
+                _EnableCoverImage = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool EnableCoverImageRandomSelect { get; set; } = false;
+        public bool EnableCoverImageAutoChanger { get; set; } = false;
+        public int CoverImageAutoChangerTimer { get; set; } = 10;
+
+        private bool _EnableImageAnimatedCover { get; set; } = false;
+        public bool EnableImageAnimatedCover
+        {
+            get => _EnableImageAnimatedCover;
+            set
+            {
+                _EnableImageAnimatedCover = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
         #region Variables exposed
+        [DontSerialize]
+        private bool _HasData { get; set; } = false;
+        public bool HasData
+        {
+            get => _HasData;
+            set
+            {
+                _HasData = value;
+                OnPropertyChanged();
+            }
+        }
 
-        #endregion  
+        [DontSerialize]
+        private bool _HasDataBackground { get; set; } = false;
+        public bool HasDataBackground
+        {
+            get => _HasDataBackground;
+            set
+            {
+                _HasDataBackground = value;
+                OnPropertyChanged();
+            }
+        }
+
+        [DontSerialize]
+        private bool _HasDataCover { get; set; } = false;
+        public bool HasDataCover
+        {
+            get => _HasDataCover;
+            set
+            {
+                _HasDataCover = value;
+                OnPropertyChanged();
+            }
+        }
+        #endregion
     }
 
 

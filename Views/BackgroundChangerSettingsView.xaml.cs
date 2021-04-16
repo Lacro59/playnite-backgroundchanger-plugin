@@ -25,9 +25,23 @@ namespace BackgroundChanger.Views
         {
             InitializeComponent();
 
+            HwBcSlider_ValueChanged(hwSlider, null);
             HwSlider_ValueChanged(hwSlider, null);
         }
 
+
+        private void HwBcSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            var slider = sender as Slider;
+
+            try
+            {
+                labelBcIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
+            }
+            catch
+            {
+            }
+        }
 
         private void HwSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {

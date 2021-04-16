@@ -1,4 +1,5 @@
-﻿using BackgroundChanger.Services;
+﻿using BackgroundChanger.Controls;
+using BackgroundChanger.Services;
 using BackgroundChanger.Views;
 using CommonPluginsShared;
 using CommonPluginsShared.PlayniteExtended;
@@ -7,7 +8,9 @@ using Playnite.SDK.Events;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -25,36 +28,38 @@ namespace BackgroundChanger
     {
         public override Guid Id { get; } = Guid.Parse("3afdd02b-db6c-4b60-8faa-2971d6dfad2a");
 
-        public bool IsFirstLoad = true;
         public static FrameworkElement PART_ImageBackground = null;
 
 
         public BackgroundChanger(IPlayniteAPI api) : base(api)
         {
-            PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
-        }
-
-
-        private void Games_ItemUpdated(object sender, ItemUpdatedEventArgs<Game> e)
-        {
-            SetImage();
-        }
-
-        private void SetImage()
-        {
-            if (PART_ImageBackground == null)
+            // Custom elements integration
+            AddCustomElementSupport(new AddCustomElementSupportArgs
             {
-                PART_ImageBackground = IntegrationUI.SearchElementByName("ControlRoot", true, false, 2);
+                ElementList = new List<string> { "PluginBackgroundImage", "PluginCoverImage" },
+                SourceName = "BackgroundChanger",
+                SettingsRoot = $"{nameof(PluginSettings)}.{nameof(PluginSettings.Settings)}"
+            });
+        }
+
+
+        #region Theme integration
+        // List custom controls
+        public override Control GetGameViewControl(GetGameViewControlArgs args)
+        {
+            if (args.Name == "PluginBackgroundImage")
+            {
+                return new PluginBackgroundImage();
             }
 
-            if (PART_ImageBackground != null)
+            if (args.Name == "PluginCoverImage")
             {
-                Application.Current.Dispatcher.BeginInvoke((Action)delegate
-                {
-                    BackgroundChangerUI.SetBackground(PlayniteApi, PluginDatabase.GameContext, PART_ImageBackground);
-                });
+                return new PluginCoverImage();
             }
+
+            return null;
         }
+        #endregion
 
 
         #region Menus
@@ -65,18 +70,37 @@ namespace BackgroundChanger
 
             List<GameMenuItem> gameMenuItems = new List<GameMenuItem>();
 
-            gameMenuItems.Add(new GameMenuItem
+            if (PluginSettings.Settings.EnableBackgroundImage)
             {
-                // Manage game background
-                MenuSection = resources.GetString("LOCBc"),
-                Description = resources.GetString("LOCBcManageBackground"),
-                Action = (gameMenuItem) =>
+                gameMenuItems.Add(new GameMenuItem
                 {
-                    var ViewExtension = new BackgroudImagesManager(PlayniteApi, PluginDatabase.Get(GameMenu));
-                    Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, resources.GetString("LOCBc"), ViewExtension);
-                    windowExtension.ShowDialog();
-                }
-            });
+                    // Manage game background
+                    MenuSection = resources.GetString("LOCBc"),
+                    Description = resources.GetString("LOCBcManageBackground"),
+                    Action = (gameMenuItem) =>
+                    {
+                        var ViewExtension = new ImagesManager(PlayniteApi, PluginDatabase.Get(GameMenu), false);
+                        Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, resources.GetString("LOCBc"), ViewExtension);
+                        windowExtension.ShowDialog();
+                    }
+                });
+            }
+
+            if (PluginSettings.Settings.EnableCoverImage)
+            {
+                gameMenuItems.Add(new GameMenuItem
+                {
+                    // Manage game cover
+                    MenuSection = resources.GetString("LOCBc"),
+                    Description = resources.GetString("LOCBcManageCover"),
+                    Action = (gameMenuItem) =>
+                    {
+                        var ViewExtension = new ImagesManager(PlayniteApi, PluginDatabase.Get(GameMenu), true);
+                        Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, resources.GetString("LOCBc"), ViewExtension);
+                        windowExtension.ShowDialog();
+                    }
+                });
+            }
 
 #if DEBUG
             gameMenuItems.Add(new GameMenuItem
@@ -104,27 +128,17 @@ namespace BackgroundChanger
         #region Game Event
         public override void OnGameSelected(GameSelectionEventArgs args)
         {
-            if (args.NewValue != null && args.NewValue.Count == 1)
+            try
             {
-                PluginDatabase.GameContext = args.NewValue[0];
-
-                Task.Run(() =>
+                if (args.NewValue != null && args.NewValue.Count == 1)
                 {
-                    if (IsFirstLoad)
-                    {
-                        Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
-                        {
-                            System.Threading.SpinWait.SpinUntil(() => {
-                                PART_ImageBackground = IntegrationUI.SearchElementByName("ControlRoot", true, false, 2);
-                                return PART_ImageBackground != null;
-                            }
-                            , 5000);
-                        })).Wait();
-                        IsFirstLoad = false;
-                    }
-
-                    SetImage();
-                });
+                    PluginDatabase.GameContext = args.NewValue[0];
+                    PluginDatabase.SetThemesResources(PluginDatabase.GameContext);
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false);
             }
         }
 

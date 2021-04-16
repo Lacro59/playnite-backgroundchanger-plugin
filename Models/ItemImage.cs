@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BackgroundChanger.Models
 {
-    public class BackgroundImage
+    public class ItemImage
     {
         private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
 
@@ -18,6 +18,7 @@ namespace BackgroundChanger.Models
         public string Name { get; set; }
         public string FolderName { get; set; }
         public bool IsDefault { get; set; }
+        public bool IsCover { get; set; }
 
         [JsonIgnore]
         public string ImageSize {

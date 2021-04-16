@@ -6,15 +6,19 @@
     <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">Manage background images</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
+    
     <sys:String x:Key="LOCBcEnableRandomSelect">Enable random selection</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change background</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Time interval</sys:String>
     <sys:String x:Key="LOCBcSeconds">seconds</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background *</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover *</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
 
 </ResourceDictionary>

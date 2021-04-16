@@ -1,4 +1,5 @@
 ﻿using BackgroundChanger.Models;
+using CommonPluginsPlaynite.Common;
 using CommonPluginsShared;
 using Playnite.SDK;
 using System;
@@ -22,23 +23,25 @@ using Path = System.IO.Path;
 namespace BackgroundChanger.Views
 {
     /// <summary>
-    /// Logique d'interaction pour BackgroudImagesManager.xaml
+    /// Logique d'interaction pour ImagesManager.xaml
     /// </summary>
-    public partial class BackgroudImagesManager : UserControl
+    public partial class ImagesManager : UserControl
     {
         private IPlayniteAPI _PlayniteApi;
 
         private GameBackgroundImages _gameBackgroundImages;
-        private List<BackgroundImage> _backgroundImages;
-        private List<BackgroundImage> _backgroundImagesEdited;
+        private List<ItemImage> _backgroundImages;
+        private List<ItemImage> _backgroundImagesEdited;
+        private bool _IsCover;
 
 
-        public BackgroudImagesManager(IPlayniteAPI PlayniteApi, GameBackgroundImages gameBackgroundImages)
+        public ImagesManager(IPlayniteAPI PlayniteApi, GameBackgroundImages gameBackgroundImages, bool IsCover)
         {
             _PlayniteApi = PlayniteApi;
             _gameBackgroundImages = gameBackgroundImages;
-            _backgroundImages = gameBackgroundImages.Items;
-            _backgroundImagesEdited = new List<BackgroundImage>(_backgroundImages);
+            _backgroundImages = gameBackgroundImages.Items.Where(x => x.IsCover == IsCover).ToList().GetClone();
+            _backgroundImagesEdited = _backgroundImages.GetClone();
+            _IsCover = IsCover;
 
             InitializeComponent();
 
@@ -60,40 +63,44 @@ namespace BackgroundChanger.Views
             try
             {
                 // Delete removed
-                foreach (BackgroundImage backgroundImage in _backgroundImages.Where(x => x.IsDefault == false).ToList())
+                var tmpActualList = _backgroundImages.Where(x => !x.IsDefault && x.IsCover == _IsCover).ToList();
+                foreach (ItemImage itemImage in tmpActualList)
                 {
-                    if (_backgroundImagesEdited.IndexOf(backgroundImage) == -1)
+                    if (_backgroundImagesEdited.Where(x => x.FullPath == itemImage.FullPath).FirstOrDefault() == null)
                     {
-                        File.Delete(backgroundImage.FullPath);
+                        FileSystem.DeleteFileSafe(itemImage.FullPath);
                     }
                 }
 
                 // Add newed
                 for (int index = 0; index < _backgroundImagesEdited.Count; index++)
                 {
-                    BackgroundImage backgroundImage = _backgroundImagesEdited[index];
+                    ItemImage itemImage = _backgroundImagesEdited[index];
 
-                    if (backgroundImage.FolderName.IsNullOrEmpty() && !backgroundImage.IsDefault)
+                    if (itemImage.FolderName.IsNullOrEmpty() && !itemImage.IsDefault)
                     {
                         Guid ImageGuid = Guid.NewGuid();
-                        string OriginalPath = backgroundImage.Name;
+                        string OriginalPath = itemImage.Name;
                         string ext = Path.GetExtension(OriginalPath);
 
-                        backgroundImage.Name = ImageGuid.ToString() + ext;
-                        backgroundImage.FolderName = _gameBackgroundImages.Id.ToString();
+                        itemImage.Name = ImageGuid.ToString() + ext;
+                        itemImage.FolderName = _gameBackgroundImages.Id.ToString();
+                        itemImage.IsCover = _IsCover;
 
-                        string Dir = Path.GetDirectoryName(backgroundImage.FullPath);
+                        string Dir = Path.GetDirectoryName(itemImage.FullPath);
                         if (!Directory.Exists(Dir))
                         {
                             Directory.CreateDirectory(Dir);
                         }
 
-                        File.Copy(OriginalPath, backgroundImage.FullPath);
+                        File.Copy(OriginalPath, itemImage.FullPath);
                     }
                 }
 
                 // Saved
-                _gameBackgroundImages.Items = _backgroundImagesEdited;
+                var tmpList = _gameBackgroundImages.Items.Where(x => x.IsCover != _IsCover).ToList().GetClone();
+                tmpList.AddRange(_backgroundImagesEdited);
+                _gameBackgroundImages.Items = tmpList;
                 BackgroundChanger.PluginDatabase.Update(_gameBackgroundImages);
 
                 ((Window)this.Parent).Close();
@@ -134,7 +141,7 @@ namespace BackgroundChanger.Views
                 {
                     foreach(string FilePath in SelectedFiles)
                     {
-                        _backgroundImagesEdited.Add(new BackgroundImage
+                        _backgroundImagesEdited.Add(new ItemImage
                         {
                             Name = FilePath
                         });
@@ -155,7 +162,7 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                string FilePath = ((BackgroundImage)PART_LbBackgroundImages.SelectedItem).FullPath;
+                string FilePath = ((ItemImage)PART_LbBackgroundImages.SelectedItem).FullPath;
 
                 if (File.Exists(FilePath))
                 {

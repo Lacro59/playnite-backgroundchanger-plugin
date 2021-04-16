@@ -80,24 +80,31 @@
   <ItemGroup>
     <Compile Include="BackgroundChanger.cs" />
     <Compile Include="BackgroundChangerSettings.cs" />
-    <Compile Include="Controls\BackChangerImage.xaml.cs">
-      <DependentUpon>BackChangerImage.xaml</DependentUpon>
+    <Compile Include="Controls\PluginCoverImage.xaml.cs">
+      <DependentUpon>PluginCoverImage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\BackgroundImage.cs" />
+    <Compile Include="Controls\PluginBackgroundImage.xaml.cs">
+      <DependentUpon>PluginBackgroundImage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ItemImage.cs" />
     <Compile Include="Models\BackgroundImagesCollection.cs" />
     <Compile Include="Models\GameBackgroundImages.cs" />
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Views\OptionsDownloadData.xaml.cs">
       <DependentUpon>OptionsDownloadData.xaml</DependentUpon>
     </Compile>
     <Compile Include="Services\BackgroundChangerDatabase.cs" />
-    <Compile Include="Services\BackgroundChangerUI.cs" />
-    <Compile Include="Views\BackgroudImagesManager.xaml.cs">
-      <DependentUpon>BackgroudImagesManager.xaml</DependentUpon>
+    <Compile Include="Views\ImagesManager.xaml.cs">
+      <DependentUpon>ImagesManager.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\BackgroundChangerSettingsView.xaml.cs">
       <DependentUpon>BackgroundChangerSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="wpf-animatedimage\Controls\AnimatedImage.xaml.cs">
+      <DependentUpon>AnimatedImage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="wpf-animatedimage\WebP\WebpAnim.cs" />
+    <Compile Include="wpf-animatedimage\WebP\WebPWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="extension.yaml">
@@ -117,7 +124,11 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Page Include="Controls\BackChangerImage.xaml">
+    <Page Include="Controls\PluginCoverImage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\PluginBackgroundImage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -125,13 +136,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\BackgroudImagesManager.xaml">
+    <Page Include="Views\ImagesManager.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\BackgroundChangerSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="wpf-animatedimage\Controls\AnimatedImage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -144,9 +159,13 @@
       <Project>{4effe926-9c64-4750-a399-f344710edc09}</Project>
       <Name>CommonPluginsResources</Name>
     </ProjectReference>
+    <ProjectReference Include="wpf-animatedimage\APNG\QAnimatedPNG\QAnimatedPNG.csproj">
+      <Project>{e45ead4e-aeaa-47a6-95be-544b59ba0bd1}</Project>
+      <Name>QAnimatedPNG</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="playnite-plugincommon\CommonPlayniteShared\CommonPlayniteShared.projitems" Label="Shared" />
   <Import Project="playnite-plugincommon\CommonPluginsShared\CommonPluginsShared.projitems" Label="Shared" />
+  <Import Project="SharedDLL\SharedDLL.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
