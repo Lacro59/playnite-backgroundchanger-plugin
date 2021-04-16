@@ -1,4 +1,5 @@
 ﻿using BackgroundChanger.Models;
+using CommonPlayniteShared;
 using CommonPluginsShared.Collections;
 using Newtonsoft.Json;
 using Playnite.SDK;
@@ -52,9 +53,15 @@ namespace BackgroundChanger.Services
             }
             if (!gameBackgroundImages.BackgroundImage.IsNullOrEmpty() && gameBackgroundImages.Items.Find(x => x.IsDefault && !x.IsCover) == null)
             {
+                string PathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.BackgroundImage);
+                if (PathImage.IsNullOrEmpty())
+                {
+                    PathImage = PlayniteApi.Database.GetFullFilePath(gameBackgroundImages.BackgroundImage);
+                }
+
                 gameBackgroundImages.Items.Insert(0, new ItemImage
                 {
-                    Name = PlayniteApi.Database.GetFullFilePath(gameBackgroundImages.BackgroundImage),
+                    Name = PathImage,
                     IsCover = false,
                     IsDefault = true
                 });
@@ -71,9 +78,15 @@ namespace BackgroundChanger.Services
             }
             if (!gameBackgroundImages.CoverImage.IsNullOrEmpty() && gameBackgroundImages.Items.Find(x => x.IsDefault && x.IsCover) == null)
             {
+                string PathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.CoverImage);
+                if (PathImage.IsNullOrEmpty())
+                {
+                    PathImage = PlayniteApi.Database.GetFullFilePath(gameBackgroundImages.CoverImage);
+                }
+
                 gameBackgroundImages.Items.Insert(0, new ItemImage
                 {
-                    Name = PlayniteApi.Database.GetFullFilePath(gameBackgroundImages.CoverImage),
+                    Name = PathImage,
                     IsCover = true,
                     IsDefault = true
                 });

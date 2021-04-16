@@ -227,7 +227,12 @@ namespace BackgroundChanger.Controls
             }
             else
             {
-                string PathImage = PluginDatabase.PlayniteApi.Database.GetFullFilePath(PluginDatabase.GameContext.CoverImage);
+                string PathImage = ImageSourceManager.GetImagePath(PluginDatabase.GameContext.CoverImage);
+                if (PathImage.IsNullOrEmpty())
+                {
+                    PathImage = PluginDatabase.PlayniteApi.Database.GetFullFilePath(PluginDatabase.GameContext.CoverImage);
+                }
+
                 SetCoverImage(PathImage);
             }
         }
