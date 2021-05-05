@@ -1,4 +1,4 @@
-# playnite-checklocalizations-plugin
+# playnite-backgroundchanger-plugin
 Generic plugin for [Playnite](https://playnite.link).  
 This plugin can show many game background with many options. 
 
