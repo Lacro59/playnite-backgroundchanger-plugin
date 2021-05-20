@@ -129,10 +129,16 @@ namespace BackgroundChanger.Controls
 
                                 try
                                 {
-                                    var value = propImageBackground.GetValue(PART_ImageBackground, null);
-                                    propBackChangerImage.SetValue(this, value, null);
-
-                                }
+                                    if (propBackChangerImage != null)
+                                    {
+                                        var value = propImageBackground.GetValue(PART_ImageBackground, null);
+                                        propBackChangerImage.SetValue(this, value, null);
+                                    }
+                                    else
+                                    {
+                                        logger.Warn($"No property for {propImageBackground.Name}");
+                                    }
+                            }
                                 catch (Exception ex)
                                 {
                                     Common.LogError(ex, false);

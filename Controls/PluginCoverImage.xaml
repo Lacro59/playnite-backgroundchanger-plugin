@@ -8,6 +8,12 @@
         xmlns:local="clr-namespace:BackgroundChanger.Controls"
         xmlns:controlsAnimated="clr-namespace:wpf_animatedimage.Controls"
         mc:Ignorable="d"
+        MinHeight="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MinHeight}"
+        Height="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Height}"
+        MaxHeight="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MaxHeight}"
+        MinWidth="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MinWidth}"
+        Width="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Width}"
+        MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MaxWidth}"
         HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=HorizontalAlignment}"
         VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=VerticalAlignment}">
 
@@ -17,15 +23,17 @@
                      SnapsToDevicePixels="False" />
     </UserControl.CacheMode>
 
-    <Grid Name="ImageHolder" Loaded="ImageHolder_Loaded">
+    <Grid Name="ImageHolder">
         <controlsAnimated:AnimatedImage x:Name="Image1"
                HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
                VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}"
                RenderOptions.BitmapScalingMode="Fant" 
-               Stretch="{Binding Stretch}"
+               Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
+               StretchDirection="{Binding StretchDirection}"
                UseAnimated="{Binding UseAnimated}"
                UseBitmapImage="True" 
-               DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}">
+               Source="{Binding ImageSource, IsAsync=True}"
+               DecodePixelWidth="{Binding ElementName=ImageHolder, Path=ActualWidth}">
         </controlsAnimated:AnimatedImage>
     </Grid>
 </controls:PluginUserControlExtend>

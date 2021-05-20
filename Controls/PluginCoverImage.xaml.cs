@@ -75,7 +75,9 @@ namespace BackgroundChanger.Controls
                 IsActivated = PluginDatabase.PluginSettings.Settings.EnableCoverImage,
                 UseAnimated = PluginDatabase.PluginSettings.Settings.EnableImageAnimatedCover,
                 EnableRandomSelect = PluginDatabase.PluginSettings.Settings.EnableCoverImageRandomSelect,
-                EnableAutoChanger = PluginDatabase.PluginSettings.Settings.EnableCoverImageAutoChanger
+                EnableAutoChanger = PluginDatabase.PluginSettings.Settings.EnableCoverImageAutoChanger,
+
+                ImageSource = null
             };
         }
 
@@ -93,11 +95,12 @@ namespace BackgroundChanger.Controls
             PluginSettings_PropertyChanged(null, null);
         }
 
-        private void GetFadeImageProperties()
+        private void GetCoverProperties()
         {
             System.Threading.SpinWait.SpinUntil(() =>
             {
-                FrameworkElement PART_ImageCover = IntegrationUI.SearchElementByName("PART_ImageCover", false, false);
+                var thisParent = ((FrameworkElement)this.Parent).Parent;
+                FrameworkElement PART_ImageCover = IntegrationUI.SearchElementByName("PART_ImageCover", thisParent, false, false);
 
                 if (PART_ImageCover != null)
                 {
@@ -119,8 +122,15 @@ namespace BackgroundChanger.Controls
 
                                 try
                                 {
-                                    var value = propImageBackground.GetValue(PART_ImageCover, null);
-                                    propBackChangerImage.SetValue(this, value, null);
+                                    if (propBackChangerImage != null)
+                                    {
+                                        var value = propImageBackground.GetValue(PART_ImageCover, null);
+                                        propBackChangerImage.SetValue(this, value, null);
+                                    }
+                                    else
+                                    {
+                                        logger.Warn($"No property for {propImageBackground.Name}");
+                                    }
 
                                 }
                                 catch (Exception ex)
@@ -239,14 +249,22 @@ namespace BackgroundChanger.Controls
 
         public void SetCoverImage(string PathImage = null)
         {
-            this.Dispatcher?.BeginInvoke(DispatcherPriority.Render, (Action)delegate
+            //this.Dispatcher?.BeginInvoke(DispatcherPriority.Render, (Action)delegate
+            //{
+            //    if (!File.Exists(PathImage))
+            //    {
+            //        PathImage = null;
+            //    }
+            //
+            //    this.Source = PathImage;
+            //});
+
+            if (!File.Exists(PathImage))
             {
-                if (!File.Exists(PathImage))
-                {
-                    PathImage = null;
-                }
-                this.Source = PathImage;
-            });
+                PathImage = null;
+            }
+            
+            ControlDataContext.ImageSource = PathImage;
         }
 
 
@@ -278,6 +296,20 @@ namespace BackgroundChanger.Controls
         }
         #endregion Strech
 
+        #region StretchDirection
+        public static readonly DependencyProperty StretchDirectionProperty = DependencyProperty.Register(
+            nameof(StretchDirection),
+            typeof(StretchDirection),
+            typeof(PluginCoverImage),
+            new PropertyMetadata(StretchDirection.Both));
+
+        public StretchDirection StretchDirection
+        {
+            get { return (StretchDirection)GetValue(StretchDirectionProperty); }
+            set { SetValue(StretchDirectionProperty, value); }
+        }
+        #endregion StretchDirection
+
 
         private object currentSource = null;
 
@@ -297,25 +329,8 @@ namespace BackgroundChanger.Controls
             }
 
             currentSource = newSource;
-            //if (newSource != null)
-            //{
-            //    image = await Task.Factory.StartNew(() =>
-            //    {
-            //        if (newSource is string str)
-            //        {
-            //            return ImageSourceManager.GetImage(str, false);
-            //        }
-            //        else if (newSource is BitmapLoadProperties props)
-            //        {
-            //            return ImageSourceManager.GetImage(props.Source, false, props);
-            //        }
-            //        else
-            //        {
-            //            return null;
-            //        }
-            //    });
-            //}
-            if (newSource is string)
+
+            if (newSource != null && newSource is string)
             {
                 image = (string)currentSource;
             }
@@ -366,7 +381,7 @@ namespace BackgroundChanger.Controls
         private void ImageHolder_Loaded(object sender, RoutedEventArgs e)
         {
             // Copy FadeImage properties
-            GetFadeImageProperties();
+            GetCoverProperties();
         }
     }
 
@@ -377,5 +392,7 @@ namespace BackgroundChanger.Controls
         public bool UseAnimated { get; set; }
         public bool EnableRandomSelect { get; set; }
         public bool EnableAutoChanger { get; set; }
+
+        public string ImageSource { get; set; }
     }
 }
