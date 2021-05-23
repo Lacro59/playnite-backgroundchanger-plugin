@@ -31,7 +31,7 @@ namespace BackgroundChanger.Models
         {
             get
             {
-                return Items.Where(x => !x.IsCover).Count() > 0;
+                return Items.Where(x => !x.IsCover && !x.IsDefault).Count() > 0;
             }
         }
 
@@ -50,7 +50,7 @@ namespace BackgroundChanger.Models
         {
             get
             {
-                return Items.Where(x => x.IsCover).Count() > 0;
+                return Items.Where(x => x.IsCover && !x.IsDefault).Count() > 0;
             }
         }
 

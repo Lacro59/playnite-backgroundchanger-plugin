@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\Dropbox\Playnite\PlayniteCurrent\Extensions\playnite-backgroundchanger-plugin\</OutputPath>
+    <OutputPath>..\..\JosefNemec\Playnite\source\Playnite.DesktopApp\bin\x86\Release\Extensions\playnite-backgroundchanger-plugin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -49,7 +49,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Playnite.SDK">
-      <HintPath>..\..\..\Dropbox\Playnite\Playnite9\Playnite.SDK.dll</HintPath>
+      <HintPath>..\..\JosefNemec\Playnite\source\Playnite.DesktopApp\bin\x86\Release\Playnite.SDK.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -155,13 +155,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="APNG\QAnimatedPNG\QAnimatedPNG.csproj">
+      <Project>{e45ead4e-aeaa-47a6-95be-544b59ba0bd1}</Project>
+      <Name>QAnimatedPNG</Name>
+    </ProjectReference>
     <ProjectReference Include="playnite-plugincommon\CommonPluginsResources\CommonPluginsResources.csproj">
       <Project>{4effe926-9c64-4750-a399-f344710edc09}</Project>
       <Name>CommonPluginsResources</Name>
-    </ProjectReference>
-    <ProjectReference Include="wpf-animatedimage\APNG\QAnimatedPNG\QAnimatedPNG.csproj">
-      <Project>{e45ead4e-aeaa-47a6-95be-544b59ba0bd1}</Project>
-      <Name>QAnimatedPNG</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="playnite-plugincommon\CommonPlayniteShared\CommonPlayniteShared.projitems" Label="Shared" />

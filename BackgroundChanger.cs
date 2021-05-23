@@ -37,6 +37,12 @@ namespace BackgroundChanger
             AddCustomElementSupport(new AddCustomElementSupportArgs
             {
                 ElementList = new List<string> { "PluginBackgroundImage", "PluginCoverImage" },
+                SourceName = "BackgroundChanger"
+            });
+
+            // Settings integration
+            AddSettingsSupport(new AddSettingsSupportArgs
+            {
                 SourceName = "BackgroundChanger",
                 SettingsRoot = $"{nameof(PluginSettings)}.{nameof(PluginSettings.Settings)}"
             });
@@ -103,6 +109,11 @@ namespace BackgroundChanger
             }
 
 #if DEBUG
+            gameMenuItems.Add(new GameMenuItem
+            {
+                MenuSection = resources.GetString("LOCBc"),
+                Description = "-"
+            });
             gameMenuItems.Add(new GameMenuItem
             {
                 MenuSection = resources.GetString("LOCBc"),

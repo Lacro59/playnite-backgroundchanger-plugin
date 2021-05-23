@@ -1,5 +1,6 @@
 ﻿using BackgroundChanger.Services;
 using CommonPluginsPlaynite.Common;
+using CommonPluginsShared;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -26,8 +27,15 @@ namespace BackgroundChanger.Models
             {
                 if (File.Exists(FullPath))
                 {
-                    ImageProperties imageProperties = Images.GetImageProperties(FullPath);
-                    return imageProperties.Width + "x" + imageProperties.Height;
+                    if (Path.GetExtension(FullPath).ToLower().Contains("mp4"))
+                    {
+                        return string.Empty;
+                    }
+                    else
+                    {
+                        ImageProperties imageProperties = Images.GetImageProperties(FullPath);
+                        return imageProperties.Width + "x" + imageProperties.Height;
+                    }
                 }
                 else
                 {
@@ -35,6 +43,24 @@ namespace BackgroundChanger.Models
                 }
             }
         }
+
+        [JsonIgnore]
+        public string ImageWeight
+        {
+            get
+            {
+                if (File.Exists(FullPath))
+                {
+                    FileInfo fi = new FileInfo(FullPath);
+                    return Tools.SizeSuffix(fi.Length);
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+        }
+
 
         [JsonIgnore]
         public string FullPath {
@@ -53,6 +79,16 @@ namespace BackgroundChanger.Models
                         Name
                     );
                 }
+            }
+        }
+
+
+        [JsonIgnore]
+        public bool IsVideo
+        {
+            get
+            {
+                return Path.GetExtension(FullPath).ToLower().Contains("mp4");
             }
         }
     }

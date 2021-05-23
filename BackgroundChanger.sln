@@ -11,9 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonPluginsResources", "p
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CommonPluginsShared", "playnite-plugincommon\CommonPluginsShared\CommonPluginsShared.shproj", "{27E5D35B-F3CE-4A3F-9705-4564674615A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QAnimatedPNG", "wpf-animatedimage\APNG\QAnimatedPNG\QAnimatedPNG.csproj", "{E45EAD4E-AEAA-47A6-95BE-544B59BA0BD1}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedDLL", "SharedDLL\SharedDLL.shproj", "{29CA4BCB-4361-4CF2-879E-5F5C66637E11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QAnimatedPNG", "APNG\QAnimatedPNG\QAnimatedPNG.csproj", "{E45EAD4E-AEAA-47A6-95BE-544B59BA0BD1}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

@@ -45,16 +45,20 @@ namespace BackgroundChanger.Services
             // Check default background
             if (gameBackgroundImages.Items.Find(x => x.IsDefault && !x.IsCover) != null)
             {
-                string FullPath = gameBackgroundImages.Items.Find(x => x.IsDefault && !x.IsCover).FullPath;
-                if (!File.Exists(FullPath))
+                int Index = gameBackgroundImages.Items.FindIndex(x => x.IsDefault && !x.IsCover);
+                if (Index != -1)
                 {
-                    gameBackgroundImages.Items.RemoveAt(0);
+                    string FullPath = gameBackgroundImages.Items[Index].FullPath;
+                    if (!File.Exists(FullPath))
+                    {
+                        gameBackgroundImages.Items.RemoveAt(Index);
+                    }
                 }
             }
             if (!gameBackgroundImages.BackgroundImage.IsNullOrEmpty() && gameBackgroundImages.Items.Find(x => x.IsDefault && !x.IsCover) == null)
             {
                 string PathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.BackgroundImage);
-                if (PathImage.IsNullOrEmpty())
+                if (PathImage.IsNullOrEmpty() && File.Exists(PathImage))
                 {
                     PathImage = PlayniteApi.Database.GetFullFilePath(gameBackgroundImages.BackgroundImage);
                 }
@@ -70,16 +74,20 @@ namespace BackgroundChanger.Services
             // Check default cover
             if (gameBackgroundImages.Items.Find(x => x.IsDefault && x.IsCover) != null)
             {
-                string FullPath = gameBackgroundImages.Items.Find(x => x.IsDefault && x.IsCover).FullPath;
-                if (!File.Exists(FullPath))
+                int Index = gameBackgroundImages.Items.FindIndex(x => x.IsDefault && x.IsCover);
+                if (Index != -1)
                 {
-                    gameBackgroundImages.Items.RemoveAt(0);
+                    string FullPath = gameBackgroundImages.Items[Index].FullPath;
+                    if (!File.Exists(FullPath))
+                    {
+                        gameBackgroundImages.Items.RemoveAt(0);
+                    }
                 }
             }
             if (!gameBackgroundImages.CoverImage.IsNullOrEmpty() && gameBackgroundImages.Items.Find(x => x.IsDefault && x.IsCover) == null)
             {
                 string PathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.CoverImage);
-                if (PathImage.IsNullOrEmpty())
+                if (PathImage.IsNullOrEmpty() && File.Exists(PathImage))
                 {
                     PathImage = PlayniteApi.Database.GetFullFilePath(gameBackgroundImages.CoverImage);
                 }
@@ -100,7 +108,7 @@ namespace BackgroundChanger.Services
         {
             GameBackgroundImages gameBackgroundImages = Get(game, true);
 
-            PluginSettings.Settings.HasData = gameBackgroundImages.HasData;
+            //PluginSettings.Settings.HasData = gameBackgroundImages.HasData;
             PluginSettings.Settings.HasDataBackground = gameBackgroundImages.HasDataBackground;
             PluginSettings.Settings.HasDataCover = gameBackgroundImages.HasDataCover;
         }

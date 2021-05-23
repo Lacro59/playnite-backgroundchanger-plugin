@@ -5,6 +5,7 @@ using Playnite.SDK;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -47,10 +48,7 @@ namespace BackgroundChanger.Views
 
             PART_LbBackgroundImages.ItemsSource = null;
             PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
-        }
-
-
-
+        }        
 
 
         private void PART_BtCancel_Click(object sender, RoutedEventArgs e)
@@ -117,6 +115,7 @@ namespace BackgroundChanger.Views
             try
             {
                 PART_BackgroundImage.Source = null;
+                PART_Video.Source = null;
                 PART_LbBackgroundImages.SelectedIndex = -1;
                 PART_LbBackgroundImages.ItemsSource = null;
 
@@ -135,7 +134,7 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                List<string> SelectedFiles = _PlayniteApi.Dialogs.SelectFiles("(*jpg, *.jpeg, *.png)|*jpg; *.jpeg; *.png");
+                List<string> SelectedFiles = _PlayniteApi.Dialogs.SelectFiles("(*.jpg, *.jpeg, *.png)|*.jpg; *.jpeg; *.png|(*.webp)|*.webp|(*.mp4)|*.mp4");
 
                 if (SelectedFiles != null && SelectedFiles.Count > 0)
                 {
@@ -166,7 +165,16 @@ namespace BackgroundChanger.Views
 
                 if (File.Exists(FilePath))
                 {
-                    PART_BackgroundImage.Source = BitmapExtensions.BitmapFromFile(FilePath);
+                    if (Path.GetExtension(FilePath).ToLower().Contains("mp4"))
+                    {
+                        PART_BackgroundImage.Source = null;
+                        PART_Video.Source = new Uri(FilePath);
+                    }
+                    else
+                    {
+                        PART_BackgroundImage.Source = BitmapExtensions.BitmapFromFile(FilePath);
+                        PART_Video.Source = null;
+                    }
                 }
             }
             catch
@@ -202,6 +210,59 @@ namespace BackgroundChanger.Views
                 PART_LbBackgroundImages.ItemsSource = null;
                 PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
             }
+        }
+
+        private void Video_MediaOpened(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                FrameworkElement ElementParent = (FrameworkElement)((FrameworkElement)sender).Parent;
+                var ElementWidth = ElementParent.FindName("PART_Width");
+                var ElementHeight = ElementParent.FindName("PART_Height");
+                ((Label)ElementWidth).Content = ((MediaElement)sender).NaturalVideoWidth;
+                ((Label)ElementHeight).Content = ((MediaElement)sender).NaturalVideoHeight;
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false);
+            }
+        }
+    }
+
+    public class GetMediaTypeConverter : IValueConverter
+    {
+        private static ILogger logger = LogManager.GetLogger();
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            try
+            {
+                if (value is string)
+                {
+                    if (System.IO.Path.GetExtension((string)value).ToLower().Contains("mp4"))
+                    {
+                        return "\ueb13";
+                    }
+
+                    if (System.IO.Path.GetExtension((string)value).ToLower().Contains("webp"))
+                    {
+                        return "\ueb16 \ueb13";
+                    } 
+
+                    return "\ueb16";
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false);
+            }
+
+            return string.Empty;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
         }
     }
 }

@@ -5,13 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:BackgroundChanger.Views"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared"
+             xmlns:converters="clr-namespace:CommonPluginsPlaynite.Converters"
+             xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
              mc:Ignorable="d" 
              Height="600" Width="1024">
 
     <UserControl.Resources>
-        <commonpluginsshared:InvertedBoolenConverter x:Key="InvertedBoolenConverter"/>
-        <commonpluginsshared:IndexConverter x:Key="IndexConverter"/>
-        <commonpluginsshared:ImageConverter x:Key="ImageConverter"/>
+        <commonpluginsshared:InvertedBoolenConverter x:Key="InvertedBoolenConverter" />
+        <commonpluginsshared:IndexConverter x:Key="IndexConverter" />
+        <commonpluginsshared:ImageConverter x:Key="ImageConverter" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" />
+        <local:GetMediaTypeConverter x:Key="GetMediaTypeConverter" />
     </UserControl.Resources>
 
     <Grid Margin="10">
@@ -46,16 +51,38 @@
                                     <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
                                 
-                                <Image Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="center"
-                                       Height="128" Width="150">
+                                <Image Grid.Row="0" Height="128" Width="150" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Stretch="Uniform"
+                                       Visibility="{Binding IsVideo, Converter={StaticResource InvertedBooleanToVisibilityConverter}}">
                                     <Image.Source>
                                         <MultiBinding Converter="{StaticResource ImageConverter}" ConverterParameter="2">
                                             <Binding Path="FullPath" IsAsync="True" />
                                         </MultiBinding>
                                     </Image.Source>
                                 </Image>
+                                <TextBlock Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                           FontFamily="{DynamicResource FontIcoFont}" FontSize="20"
+                                           Text="{Binding FullPath, Converter={StaticResource GetMediaTypeConverter}}">
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect Color="Black" Opacity="0.75" BlurRadius="3" ShadowDepth="0" />
+                                    </TextBlock.Effect>
+                                </TextBlock>
 
-                                <Label Grid.Row="2" Content="{Binding ImageSize}" HorizontalAlignment="Center" />
+                                <MediaElement Grid.Row="0" Height="128" Width="150" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Stretch="Uniform" MediaOpened="Video_MediaOpened"
+                                              Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                              Source="{Binding FullPath}" LoadedBehavior="Stop" Name="Video" />
+
+                                <Label Grid.Row="2" Content="{Binding ImageSize, FallbackValue='1366x768'}" HorizontalAlignment="Left"
+                                       Visibility="{Binding IsVideo, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" />
+                                <StackPanel Grid.Row="2" Orientation="Horizontal"
+                                            Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Label x:Name="PART_Width" />
+                                    <Label Content="x" />
+                                    <Label x:Name="PART_Height" />
+                                </StackPanel>
+                                
+                                <Label Grid.Row="2" Content="{Binding ImageWeight, FallbackValue='78 Mo'}" HorizontalAlignment="Right" />
                             </Grid>
 
                             <Grid Grid.Column="2">
@@ -88,6 +115,7 @@
 
         <Grid Grid.Column="2" Grid.Row="0">
             <Image Name="PART_BackgroundImage" Stretch="Uniform" Grid.Row="0" />
+            <MediaElement Stretch="Uniform" Grid.Row="0" Name="PART_Video" pbeh:MediaElementBehaviors.Repeat="True" />
         </Grid>
 
         <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" BorderThickness="0,1,0,0" BorderBrush="{StaticResource NormalBorderBrush}">

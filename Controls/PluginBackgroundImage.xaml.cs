@@ -102,6 +102,7 @@ namespace BackgroundChanger.Controls
             PluginSettings_PropertyChanged(null, null);
         }
 
+        // TODO Get after settings modification
         private void GetFadeImageProperties()
         {
             System.Threading.SpinWait.SpinUntil(() =>
@@ -397,15 +398,15 @@ namespace BackgroundChanger.Controls
 
         private void Image1FadeOut_Completed(object sender, EventArgs e)
         {
-            Image1.Source = null;
-            Image1.UpdateLayout();
+            AnimatedImage1.Source = null;
+            AnimatedImage1.UpdateLayout();
             GC.Collect();
         }
 
         private void Image2FadeOut_Completed(object sender, EventArgs e)
         {
-            Image2.Source = null;
-            Image2.UpdateLayout();
+            AnimatedImage2.Source = null;
+            AnimatedImage2.UpdateLayout();
         }
 
         private void BorderDarkenOut_Completed(object sender, EventArgs e)
@@ -479,7 +480,14 @@ namespace BackgroundChanger.Controls
             //}
             if (newSource is string)
             {
-                image = (string)currentSource;
+                if (!File.Exists(newSource.ToString()))
+                {
+                    logger.Warn($"File not founs {newSource}");
+                }
+                else
+                {
+                    image = (string)currentSource;
+                }
             }
 
             if (blurEnabled)
@@ -529,7 +537,22 @@ namespace BackgroundChanger.Controls
                     if (currentImage == CurrentImage.None)
                     {
                         Image1FadeOut.Stop();
-                        Image1.Source = image;
+
+                        if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
+                        {
+                            AnimatedImage1.Source = null;
+                            AnimatedImage2.Source = null;
+                            Video1.Source = new Uri(image);
+                            Video2.Source = null;
+                        }
+                        else
+                        {
+                            Video1.Source = null;
+                            Video2.Source = null;
+                            AnimatedImage1.Source = image;
+                            AnimatedImage2.Source = null;
+                        }
+
                         Image1FadeIn.Begin();
                         BorderDarken.Opacity = 1;
                         BorderDarkenFadeOut.Stop();
@@ -538,7 +561,22 @@ namespace BackgroundChanger.Controls
                     else if (currentImage == CurrentImage.Image1)
                     {
                         Image2FadeOut.Stop();
-                        Image2.Source = image;
+
+                        if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
+                        {
+                            AnimatedImage1.Source = null;
+                            AnimatedImage2.Source = null;
+                            Video1.Source = null;
+                            Video2.Source = new Uri(image);
+                        }
+                        else
+                        {
+                            Video1.Source = null;
+                            Video2.Source = null;
+                            AnimatedImage1.Source = null;
+                            AnimatedImage2.Source = image;
+                        }
+
                         Image2FadeIn.Begin();
                         Image1FadeOut.Begin();
                         BorderDarken.Opacity = 1;
@@ -548,7 +586,22 @@ namespace BackgroundChanger.Controls
                     else if (currentImage == CurrentImage.Image2)
                     {
                         Image1FadeOut.Stop();
-                        Image1.Source = image;
+
+                        if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
+                        {
+                            AnimatedImage1.Source = null;
+                            AnimatedImage2.Source = null;
+                            Video1.Source = new Uri(image);
+                            Video2.Source = null;
+                        }
+                        else
+                        {
+                            Video1.Source = null;
+                            Video2.Source = null;
+                            AnimatedImage1.Source = image;
+                            AnimatedImage2.Source = null;
+                        }
+
                         Image1FadeIn.Begin();
                         Image2FadeOut.Begin();
                         BorderDarken.Opacity = 1;
@@ -561,15 +614,55 @@ namespace BackgroundChanger.Controls
             {
                 if (currentImage == CurrentImage.Image1)
                 {
-                    Image1.Source = image;
+                    if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
+                    {
+                        AnimatedImage1.Source = null;
+                        AnimatedImage2.Source = null;
+                        Video1.Source = new Uri(image);
+                        Video2.Source = null;
+                    }
+                    else
+                    {
+                        Video1.Source = null;
+                        Video2.Source = null;
+                        AnimatedImage1.Source = image;
+                        AnimatedImage2.Source = null;
+                    }
                 }
                 else if (currentImage == CurrentImage.Image2)
                 {
-                    Image2.Source = image;
+                    if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
+                    {
+                        AnimatedImage1.Source = null;
+                        AnimatedImage2.Source = null;
+                        Video1.Source = null;
+                        Video2.Source = new Uri(image);
+                    }
+                    else
+                    {
+                        Video1.Source = null;
+                        Video2.Source = null;
+                        AnimatedImage1.Source = null;
+                        AnimatedImage2.Source = image;
+                    }
                 }
                 else
                 {
-                    Image1.Source = image;
+                    if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
+                    {
+                        AnimatedImage1.Source = null;
+                        AnimatedImage2.Source = null;
+                        Video1.Source = new Uri(image);
+                        Video2.Source = null;
+                    }
+                    else
+                    {
+                        Video1.Source = null;
+                        Video2.Source = null;
+                        AnimatedImage1.Source = image;
+                        AnimatedImage2.Source = null;
+                    }
+
                     currentImage = CurrentImage.Image1;
                 }
             }
@@ -619,7 +712,26 @@ namespace BackgroundChanger.Controls
         {
             // Copy FadeImage properties
             GetFadeImageProperties();
+
+            // Activate/Deactivated animation
+            Application.Current.Activated += Application_Activated;
+            Application.Current.Deactivated += Application_Deactivated;
         }
+
+
+        #region Activate/Deactivated animation
+        private void Application_Deactivated(object sender, EventArgs e)
+        {
+            Video1.Stop();
+            Video2.Stop();
+        }
+
+        private void Application_Activated(object sender, EventArgs e)
+        {
+            Video1.Play();
+            Video2.Play();
+        }
+        #endregion
     }
 
 
