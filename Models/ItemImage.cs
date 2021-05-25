@@ -88,6 +88,11 @@ namespace BackgroundChanger.Models
         {
             get
             {
+                if (FullPath.IsNullOrEmpty())
+                {
+                    return false;
+                }
+
                 return Path.GetExtension(FullPath).ToLower().Contains("mp4");
             }
         }

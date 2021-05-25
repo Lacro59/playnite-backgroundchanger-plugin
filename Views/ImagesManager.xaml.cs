@@ -1,4 +1,6 @@
-﻿using BackgroundChanger.Models;
+﻿using APNG;
+using BackgroundChanger.Models;
+using BackgroundChanger.Services;
 using CommonPluginsPlaynite.Common;
 using CommonPluginsShared;
 using Playnite.SDK;
@@ -30,6 +32,8 @@ namespace BackgroundChanger.Views
     {
         private IPlayniteAPI _PlayniteApi;
 
+        private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
+
         private GameBackgroundImages _gameBackgroundImages;
         private List<ItemImage> _backgroundImages;
         private List<ItemImage> _backgroundImagesEdited;
@@ -48,6 +52,15 @@ namespace BackgroundChanger.Views
 
             PART_LbBackgroundImages.ItemsSource = null;
             PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
+
+            if (IsCover)
+            {
+                PART_BackgroundImage.UseAnimated = PluginDatabase.PluginSettings.Settings.EnableImageAnimatedCover;
+            }
+            else
+            {
+                PART_BackgroundImage.UseAnimated = PluginDatabase.PluginSettings.Settings.EnableImageAnimatedBackground;
+            }
         }        
 
 
@@ -172,7 +185,8 @@ namespace BackgroundChanger.Views
                     }
                     else
                     {
-                        PART_BackgroundImage.Source = BitmapExtensions.BitmapFromFile(FilePath);
+                        //PART_BackgroundImage.Source = BitmapExtensions.BitmapFromFile(FilePath);
+                        PART_BackgroundImage.Source = FilePath;
                         PART_Video.Source = null;
                     }
                 }
@@ -247,6 +261,18 @@ namespace BackgroundChanger.Views
                     if (System.IO.Path.GetExtension((string)value).ToLower().Contains("webp"))
                     {
                         return "\ueb16 \ueb13";
+                    } 
+
+                    if (System.IO.Path.GetExtension((string)value).ToLower().Contains("png"))
+                    {
+                        CPng_Reader pngr = new CPng_Reader();
+                        var m_Apng = pngr.Open(File.OpenRead((string)value)).SpltAPng();
+
+                        // Animated
+                        if (pngr.Chunks.Count != 0)
+                        {
+                            return "\ueb16 \ueb13";
+                        }
                     } 
 
                     return "\ueb16";

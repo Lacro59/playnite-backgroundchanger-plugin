@@ -40,7 +40,7 @@ namespace BackgroundChanger.Models
         {
             get
             {
-                return Items.Where(x => !x.IsCover).ToList().GetClone();
+                return Items.Where(x => !x.IsCover).ToList();
             }
         }
 
@@ -59,7 +59,7 @@ namespace BackgroundChanger.Models
         {
             get
             {
-                return Items.Where(x => x.IsCover).ToList().GetClone();
+                return Items.Where(x => x.IsCover).ToList();
             }
         }
     }

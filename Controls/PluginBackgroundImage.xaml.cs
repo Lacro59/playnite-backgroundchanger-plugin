@@ -70,6 +70,8 @@ namespace BackgroundChanger.Controls
 
         public override void SetDefaultDataContext()
         {
+            BcTimer = null;
+
             ControlDataContext = new PluginBackgroundImageDataContext
             {
                 IsActivated = PluginDatabase.PluginSettings.Settings.EnableBackgroundImage,
@@ -167,6 +169,7 @@ namespace BackgroundChanger.Controls
                         if (!gameBackgroundImages.HasDataBackground)
                         {
                             MustDisplay = false;
+                            this.DataContext = ControlDataContext;
                             return;
                         }
 
@@ -673,17 +676,22 @@ namespace BackgroundChanger.Controls
         {
             try
             {
+                string PathImage = string.Empty;
+
                 if (ControlDataContext.EnableRandomSelect)
                 {
-                    Random rnd = new Random();
-                    int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
-                    while (ImgSelected == Counter)
+                    if (gameBackgroundImages.ItemsBackground.Count != 0)
                     {
-                        ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
-                    }
-                    Counter = ImgSelected;
+                        Random rnd = new Random();
+                        int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
+                        while (ImgSelected == Counter && gameBackgroundImages.ItemsBackground.Count != 1)
+                        {
+                            ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
+                        }
+                        Counter = ImgSelected;
 
-                    string PathImage = gameBackgroundImages.ItemsBackground[ImgSelected].FullPath;
+                        PathImage = gameBackgroundImages.ItemsBackground[ImgSelected].FullPath;
+                    }
 
                     SetBackgroundImage(PathImage);
                 }
@@ -691,12 +699,15 @@ namespace BackgroundChanger.Controls
                 {
                     Counter++;
 
-                    if (Counter == gameBackgroundImages.ItemsBackground.Count)
+                    if (gameBackgroundImages.ItemsBackground.Count != 0)
                     {
-                        Counter = 0;
-                    }
+                        if (Counter == gameBackgroundImages.ItemsBackground.Count)
+                        {
+                            Counter = 0;
+                        }
 
-                    string PathImage = gameBackgroundImages.ItemsBackground[Counter].FullPath;
+                        PathImage = gameBackgroundImages.ItemsBackground[Counter].FullPath;
+                    }
 
                     SetBackgroundImage(PathImage);
                 }
@@ -722,14 +733,24 @@ namespace BackgroundChanger.Controls
         #region Activate/Deactivated animation
         private void Application_Deactivated(object sender, EventArgs e)
         {
-            Video1.Stop();
-            Video2.Stop();
+            Video1.LoadedBehavior = MediaState.Pause;
+            Video2.LoadedBehavior = MediaState.Pause;
+
+            if (BcTimer != null)
+            {
+                BcTimer.Stop();
+            }
         }
 
         private void Application_Activated(object sender, EventArgs e)
         {
-            Video1.Play();
-            Video2.Play();
+            Video1.LoadedBehavior = MediaState.Play;
+            Video2.LoadedBehavior = MediaState.Play;
+
+            if (BcTimer != null)
+            {
+                BcTimer.Start();
+            }
         }
         #endregion
     }

@@ -136,7 +136,7 @@
 
                             <Label Grid.Row="6" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
                             <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedCover}" Grid.Column="0" Grid.Row="8">
-                                <Label Content="{DynamicResource LOCBcEnableImageAnimatedBackground}" />
+                                <Label Content="{DynamicResource LOCBcEnableImageAnimatedCover}" />
                             </CheckBox>
                         </Grid>
                     </Border>

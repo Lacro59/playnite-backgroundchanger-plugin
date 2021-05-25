@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:local="clr-namespace:BackgroundChanger.Controls"
+        xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
         xmlns:controlsAnimated="clr-namespace:wpf_animatedimage.Controls"
         mc:Ignorable="d"
         MinHeight="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MinHeight}"
@@ -23,7 +24,7 @@
                      SnapsToDevicePixels="False" />
     </UserControl.CacheMode>
 
-    <Grid Name="ImageHolder">
+    <Grid Name="ImageHolder" Loaded="ImageHolder_Loaded">
         <controlsAnimated:AnimatedImage x:Name="Image1"
                HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
                VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}"
@@ -35,5 +36,13 @@
                Source="{Binding ImageSource, IsAsync=True}"
                DecodePixelWidth="{Binding ElementName=ImageHolder, Path=ActualWidth}">
         </controlsAnimated:AnimatedImage>
+
+        <MediaElement x:Name="Video1" pbeh:MediaElementBehaviors.Repeat="True"
+                      Source="{Binding VideoSource, IsAsync=True}"
+                      Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      StretchDirection="{Binding StretchDirection}"
+                      OpacityMask="{Binding ImageOpacityMask, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
+                      VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}" />
     </Grid>
 </controls:PluginUserControlExtend>
