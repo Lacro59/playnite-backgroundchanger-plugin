@@ -70,6 +70,7 @@
                                 </TextBlock>
 
                                 <MediaElement Grid.Row="0" Height="128" Width="150" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              ScrubbingEnabled="True"
                                               Stretch="Uniform" MediaOpened="Video_MediaOpened"
                                               Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}"
                                               Source="{Binding FullPath}" LoadedBehavior="Stop" Name="Video" />

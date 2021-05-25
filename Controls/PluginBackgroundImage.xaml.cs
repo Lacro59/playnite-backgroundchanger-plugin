@@ -67,6 +67,8 @@ namespace BackgroundChanger.Controls
         private int Counter = 0;
         private GameBackgroundImages gameBackgroundImages;
 
+        private bool WindowsIsActivated = true;
+
 
         public override void SetDefaultDataContext()
         {
@@ -674,6 +676,11 @@ namespace BackgroundChanger.Controls
 
         private void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
+            if (!WindowsIsActivated)
+            {
+                return;
+            }
+
             try
             {
                 string PathImage = string.Empty;
@@ -733,6 +740,7 @@ namespace BackgroundChanger.Controls
         #region Activate/Deactivated animation
         private void Application_Deactivated(object sender, EventArgs e)
         {
+            WindowsIsActivated = false;
             Video1.LoadedBehavior = MediaState.Pause;
             Video2.LoadedBehavior = MediaState.Pause;
 
@@ -744,6 +752,7 @@ namespace BackgroundChanger.Controls
 
         private void Application_Activated(object sender, EventArgs e)
         {
+            WindowsIsActivated = true;
             Video1.LoadedBehavior = MediaState.Play;
             Video2.LoadedBehavior = MediaState.Play;
 

@@ -56,14 +56,14 @@
     <Grid Name="ImageHolder" Loaded="ImageHolder_Loaded">
         <StackPanel x:Name="Image1">
             <controlsAnimated:AnimatedImage x:Name="AnimatedImage1"
-                   HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
-                   VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}"
-                   RenderOptions.BitmapScalingMode="Fant" 
-                   Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                   UseAnimated="{Binding UseAnimated}"
-                   OpacityMask="{Binding ImageOpacityMask, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                   UseBitmapImage="True" 
-                   DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}">
+                                            HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
+                                            VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}"
+                                            RenderOptions.BitmapScalingMode="Fant" 
+                                            Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            UseAnimated="{Binding UseAnimated}"
+                                            OpacityMask="{Binding ImageOpacityMask, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            UseBitmapImage="True" 
+                                            DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}">
             </controlsAnimated:AnimatedImage>
 
             <MediaElement x:Name="Video1" pbeh:MediaElementBehaviors.Repeat="True"
@@ -75,14 +75,14 @@
 
         <StackPanel x:Name="Image2">
             <controlsAnimated:AnimatedImage x:Name="AnimatedImage2"
-               HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
-               VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}"
-               RenderOptions.BitmapScalingMode="Fant" 
-               Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
-               UseAnimated="{Binding UseAnimated}"
-               OpacityMask="{Binding ImageOpacityMask, RelativeSource={RelativeSource AncestorType=UserControl}}"
-               UseBitmapImage="True" 
-               DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}">
+                                            HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
+                                            VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}"
+                                            RenderOptions.BitmapScalingMode="Fant" 
+                                            Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            UseAnimated="{Binding UseAnimated}"
+                                            OpacityMask="{Binding ImageOpacityMask, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            UseBitmapImage="True" 
+                                            DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}">
             </controlsAnimated:AnimatedImage>
 
             <MediaElement x:Name="Video2" pbeh:MediaElementBehaviors.Repeat="True"

@@ -67,6 +67,8 @@ namespace BackgroundChanger.Controls
         private int Counter = 0;
         private GameBackgroundImages gameBackgroundImages;
 
+        private bool WindowsIsActivated = true;
+
 
         public override void SetDefaultDataContext()
         {
@@ -103,7 +105,8 @@ namespace BackgroundChanger.Controls
         {
             System.Threading.SpinWait.SpinUntil(() =>
             {
-                FrameworkElement PART_ImageCover = IntegrationUI.SearchElementByName("PART_ImageCover", false, false);
+                var thisParent = ((FrameworkElement)((FrameworkElement)((FrameworkElement)this.Parent).Parent).Parent).Parent;
+                FrameworkElement PART_ImageCover = IntegrationUI.SearchElementByName("PART_ImageCover", thisParent, false, false);
 
                 if (PART_ImageCover != null)
                 {
@@ -168,6 +171,7 @@ namespace BackgroundChanger.Controls
                         }
 
                         SetCover();
+                        this.DataContext = ControlDataContext;
                     }
                     catch (Exception ex)
                     {
@@ -283,7 +287,8 @@ namespace BackgroundChanger.Controls
 
             this.Dispatcher?.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
             {
-                this.DataContext = ControlDataContext;
+                Image1.Source = ControlDataContext.ImageSource;
+                Video1.Source = (ControlDataContext.VideoSource.IsNullOrEmpty()) ? null : new Uri(ControlDataContext.VideoSource);
             }));
         }
 
@@ -370,13 +375,18 @@ namespace BackgroundChanger.Controls
 
         private void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
+            if (!WindowsIsActivated)
+            {
+                return;
+            }
+
             try
             {
                 string PathImage = string.Empty;
 
                 if (ControlDataContext.EnableRandomSelect)
                 {
-                    if (gameBackgroundImages.ItemsBackground.Count != 0)
+                    if (gameBackgroundImages.ItemsCover.Count != 0)
                     {
                         Random rnd = new Random();
                         int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
@@ -389,13 +399,14 @@ namespace BackgroundChanger.Controls
                         PathImage = gameBackgroundImages.ItemsCover[ImgSelected].FullPath;
                     }
 
+
                     SetCoverImage(PathImage);
                 }
                 else
                 {
                     Counter++;
 
-                    if (gameBackgroundImages.ItemsBackground.Count != 0)
+                    if (gameBackgroundImages.ItemsCover.Count != 0)
                     {
                         if (Counter == gameBackgroundImages.ItemsCover.Count)
                         {
@@ -429,6 +440,7 @@ namespace BackgroundChanger.Controls
         #region Activate/Deactivated animation
         private void Application_Deactivated(object sender, EventArgs e)
         {
+            WindowsIsActivated = false;
             Video1.LoadedBehavior = MediaState.Pause;
 
             if (BcTimer != null)
@@ -439,6 +451,7 @@ namespace BackgroundChanger.Controls
 
         private void Application_Activated(object sender, EventArgs e)
         {
+            WindowsIsActivated = true;
             Video1.LoadedBehavior = MediaState.Play;
 
             if (BcTimer != null)

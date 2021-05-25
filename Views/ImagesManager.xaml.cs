@@ -230,6 +230,14 @@ namespace BackgroundChanger.Views
         {
             try
             {
+                var Video = sender as MediaElement;
+                if (Video.NaturalDuration.HasTimeSpan && Video.NaturalDuration.TimeSpan.TotalSeconds > 2)
+                {
+                    Video.LoadedBehavior = MediaState.Play;
+                    Video.LoadedBehavior = MediaState.Pause;
+                    Video.Position = new TimeSpan(0, 0, ((int)Video.NaturalDuration.TimeSpan.TotalSeconds / 2));
+                }
+
                 FrameworkElement ElementParent = (FrameworkElement)((FrameworkElement)sender).Parent;
                 var ElementWidth = ElementParent.FindName("PART_Width");
                 var ElementHeight = ElementParent.FindName("PART_Height");

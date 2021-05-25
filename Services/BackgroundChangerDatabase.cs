@@ -58,7 +58,7 @@ namespace BackgroundChanger.Services
             if (!gameBackgroundImages.BackgroundImage.IsNullOrEmpty() && gameBackgroundImages.Items.Find(x => x.IsDefault && !x.IsCover) == null)
             {
                 string PathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.BackgroundImage);
-                if (PathImage.IsNullOrEmpty() && File.Exists(PathImage))
+                if (PathImage.IsNullOrEmpty() && !File.Exists(PathImage))
                 {
                     PathImage = PlayniteApi.Database.GetFullFilePath(gameBackgroundImages.BackgroundImage);
                 }
@@ -87,7 +87,7 @@ namespace BackgroundChanger.Services
             if (!gameBackgroundImages.CoverImage.IsNullOrEmpty() && gameBackgroundImages.Items.Find(x => x.IsDefault && x.IsCover) == null)
             {
                 string PathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.CoverImage);
-                if (PathImage.IsNullOrEmpty() && File.Exists(PathImage))
+                if (PathImage.IsNullOrEmpty() && !File.Exists(PathImage))
                 {
                     PathImage = PlayniteApi.Database.GetFullFilePath(gameBackgroundImages.CoverImage);
                 }
