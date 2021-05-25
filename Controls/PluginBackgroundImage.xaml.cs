@@ -109,52 +109,47 @@ namespace BackgroundChanger.Controls
         // TODO Get after settings modification
         private void GetFadeImageProperties()
         {
-            System.Threading.SpinWait.SpinUntil(() =>
+            FrameworkElement PART_ImageBackground = IntegrationUI.SearchElementByName("ControlRoot", false, false, 2);
+
+            if (PART_ImageBackground != null)
             {
-                FrameworkElement PART_ImageBackground = IntegrationUI.SearchElementByName("ControlRoot", false, false, 2);
-
-                if (PART_ImageBackground != null)
-                {
-                    PropertyInfo[] ImageBackgroundProperties = PART_ImageBackground.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                    PropertyInfo[] backChangerImageProperties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                PropertyInfo[] ImageBackgroundProperties = PART_ImageBackground.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                PropertyInfo[] backChangerImageProperties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
                     
-                    List<string> UsedProperties = new List<string>
-                    {
-                        "AnimationEnabled", "ImageOpacityMask", "ImageDarkeningBrush", "Stretch", "StretchDirection",
-                        "IsBlurEnabled", "BlurAmount", "HighQualityBlur"
-                    };
+                List<string> UsedProperties = new List<string>
+                {
+                    "AnimationEnabled", "ImageOpacityMask", "ImageDarkeningBrush", "Stretch", "StretchDirection",
+                    "IsBlurEnabled", "BlurAmount", "HighQualityBlur"
+                };
 
-                    foreach (PropertyInfo propImageBackground in ImageBackgroundProperties)
+                foreach (PropertyInfo propImageBackground in ImageBackgroundProperties)
+                {
+                    if (propImageBackground.CanWrite)
                     {
-                        if (propImageBackground.CanWrite)
+                        if (UsedProperties.Contains(propImageBackground.Name))
                         {
-                            if (UsedProperties.Contains(propImageBackground.Name))
-                            {
-                                var propBackChangerImage = backChangerImageProperties.Where(x => x.Name == propImageBackground.Name).FirstOrDefault();
+                            var propBackChangerImage = backChangerImageProperties.Where(x => x.Name == propImageBackground.Name).FirstOrDefault();
 
-                                try
+                            try
+                            {
+                                if (propBackChangerImage != null)
                                 {
-                                    if (propBackChangerImage != null)
-                                    {
-                                        var value = propImageBackground.GetValue(PART_ImageBackground, null);
-                                        propBackChangerImage.SetValue(this, value, null);
-                                    }
-                                    else
-                                    {
-                                        logger.Warn($"No property for {propImageBackground.Name}");
-                                    }
-                            }
-                                catch (Exception ex)
-                                {
-                                    Common.LogError(ex, false);
+                                    var value = propImageBackground.GetValue(PART_ImageBackground, null);
+                                    propBackChangerImage.SetValue(this, value, null);
                                 }
+                                else
+                                {
+                                    logger.Warn($"No property for {propImageBackground.Name}");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Common.LogError(ex, false);
                             }
                         }
                     }
                 }
-
-                return PART_ImageBackground != null;
-            }, 5000);
+            }
         }
 
 

@@ -103,53 +103,48 @@ namespace BackgroundChanger.Controls
         // TODO Get after settings modification
         private void GetCoverProperties()
         {
-            System.Threading.SpinWait.SpinUntil(() =>
+            var thisParent = ((FrameworkElement)((FrameworkElement)((FrameworkElement)this.Parent).Parent).Parent).Parent;
+            FrameworkElement PART_ImageCover = IntegrationUI.SearchElementByName("PART_ImageCover", thisParent, false, false);
+
+            if (PART_ImageCover != null)
             {
-                var thisParent = ((FrameworkElement)((FrameworkElement)((FrameworkElement)this.Parent).Parent).Parent).Parent;
-                FrameworkElement PART_ImageCover = IntegrationUI.SearchElementByName("PART_ImageCover", thisParent, false, false);
+                PropertyInfo[] ImageCoverProperties = PART_ImageCover.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                PropertyInfo[] backChangerImageProperties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-                if (PART_ImageCover != null)
+                List<string> UsedProperties = new List<string>
                 {
-                    PropertyInfo[] ImageCoverProperties = PART_ImageCover.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                    PropertyInfo[] backChangerImageProperties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                    "Stretch", "StretchDirection"
+                };
 
-                    List<string> UsedProperties = new List<string>
+                foreach (PropertyInfo propImageBackground in ImageCoverProperties)
+                {
+                    if (propImageBackground.CanWrite)
                     {
-                        "Stretch", "StretchDirection"
-                    };
-
-                    foreach (PropertyInfo propImageBackground in ImageCoverProperties)
-                    {
-                        if (propImageBackground.CanWrite)
+                        if (UsedProperties.Contains(propImageBackground.Name))
                         {
-                            if (UsedProperties.Contains(propImageBackground.Name))
+                            var propBackChangerImage = backChangerImageProperties.Where(x => x.Name == propImageBackground.Name).FirstOrDefault();
+
+                            try
                             {
-                                var propBackChangerImage = backChangerImageProperties.Where(x => x.Name == propImageBackground.Name).FirstOrDefault();
-
-                                try
+                                if (propBackChangerImage != null)
                                 {
-                                    if (propBackChangerImage != null)
-                                    {
-                                        var value = propImageBackground.GetValue(PART_ImageCover, null);
-                                        propBackChangerImage.SetValue(this, value, null);
-                                    }
-                                    else
-                                    {
-                                        logger.Warn($"No property for {propImageBackground.Name}");
-                                    }
-
+                                    var value = propImageBackground.GetValue(PART_ImageCover, null);
+                                    propBackChangerImage.SetValue(this, value, null);
                                 }
-                                catch (Exception ex)
+                                else
                                 {
-                                    Common.LogError(ex, false);
+                                    logger.Warn($"No property for {propImageBackground.Name}");
                                 }
+
+                            }
+                            catch (Exception ex)
+                            {
+                                Common.LogError(ex, false);
                             }
                         }
                     }
                 }
-
-                return PART_ImageCover != null;
-            }, 5000);
+            }
         }
 
 
