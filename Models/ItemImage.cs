@@ -20,6 +20,7 @@ namespace BackgroundChanger.Models
         public string FolderName { get; set; }
         public bool IsDefault { get; set; }
         public bool IsCover { get; set; }
+        public bool IsFavorite { get; set; }
 
         [JsonIgnore]
         public string ImageSize {
@@ -60,8 +61,7 @@ namespace BackgroundChanger.Models
                 }
             }
         }
-
-
+        
         [JsonIgnore]
         public string FullPath {
             get
@@ -81,7 +81,6 @@ namespace BackgroundChanger.Models
                 }
             }
         }
-
 
         [JsonIgnore]
         public bool IsVideo

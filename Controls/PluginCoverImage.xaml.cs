@@ -68,11 +68,18 @@ namespace BackgroundChanger.Controls
         private GameBackgroundImages gameBackgroundImages;
 
         private bool WindowsIsActivated = true;
+        private bool IsFirst = true;
 
 
         public override void SetDefaultDataContext()
         {
-            BcTimer = null;
+            if (BcTimer != null)
+            {
+                Counter = 0;
+                BcTimer.Stop();
+                BcTimer.Dispose();
+                BcTimer = null;
+            }
 
             ControlDataContext = new PluginCoverImageDataContext
             {
@@ -165,8 +172,10 @@ namespace BackgroundChanger.Controls
                             return;
                         }
 
+                        IsFirst = true;
                         SetCover();
                         this.DataContext = ControlDataContext;
+                        IsFirst = false;
                     }
                     catch (Exception ex)
                     {
@@ -182,27 +191,38 @@ namespace BackgroundChanger.Controls
         public void SetCover()
         {
             string PathImage = string.Empty;
-
-            if (BcTimer != null)
-            {
-                Counter = 0;
-                BcTimer.Stop();
-                BcTimer = null;
-            }
             
             if (gameBackgroundImages.HasDataCover)
             {
+                var ItemFavorite = gameBackgroundImages.ItemsCover.Where(x => x.IsFavorite).FirstOrDefault();
+
                 if (ControlDataContext.EnableAutoChanger)
                 {
                     if (ControlDataContext.EnableRandomSelect)
                     {
-                        Random rnd = new Random();
-                        int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
-                        PathImage = gameBackgroundImages.ItemsCover[ImgSelected].FullPath;
+                        if (IsFirst && ItemFavorite != null)
+                        {
+                            PathImage = ItemFavorite.FullPath;
+                            Counter = gameBackgroundImages.ItemsCover.FindIndex(x => x.IsFavorite);
+                        }
+                        else
+                        { 
+                            Random rnd = new Random();
+                            Counter = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
+                            PathImage = gameBackgroundImages.ItemsCover[Counter].FullPath;
+                        }
                     }
                     else
                     {
-                        PathImage = gameBackgroundImages.ItemsCover[Counter].FullPath;
+                        if (IsFirst && ItemFavorite != null)
+                        {
+                            PathImage = ItemFavorite.FullPath;
+                            Counter = gameBackgroundImages.ItemsCover.FindIndex(x => x.IsFavorite);
+                        }
+                        else
+                        {
+                            PathImage = gameBackgroundImages.ItemsCover[Counter].FullPath;
+                        }
                     }
 
                     SetCoverImage(PathImage);
@@ -393,7 +413,6 @@ namespace BackgroundChanger.Controls
 
                         PathImage = gameBackgroundImages.ItemsCover[ImgSelected].FullPath;
                     }
-
 
                     SetCoverImage(PathImage);
                 }

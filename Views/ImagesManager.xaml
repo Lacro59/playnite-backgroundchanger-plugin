@@ -51,6 +51,27 @@
                                     <RowDefinition Height="10" />
                                     <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
+
+                                <TextBlock MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
+                                           FontFamily="{DynamicResource CommonFont}" 
+                                           Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsFavorite}" Value="False">
+                                                    <Setter Property="Text" Value="&#xea58;" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                                    <Setter Property="Text" Value="&#xea57;" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect Color="Black" Opacity="0.75" BlurRadius="3" ShadowDepth="0" />
+                                    </TextBlock.Effect>
+                                </TextBlock>
                                 
                                 <Image Grid.Row="0" Height="128" Width="150" HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Stretch="Uniform"

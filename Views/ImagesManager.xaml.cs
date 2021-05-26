@@ -249,6 +249,19 @@ namespace BackgroundChanger.Views
                 Common.LogError(ex, false);
             }
         }
+
+
+        private void TextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            int index = int.Parse(((TextBlock)sender).Tag.ToString());
+
+            bool newValue = !_backgroundImagesEdited[index].IsFavorite;
+            _backgroundImagesEdited.ForEach(c => c.IsFavorite = false);
+            _backgroundImagesEdited[index].IsFavorite = newValue;
+
+            PART_LbBackgroundImages.ItemsSource = null;
+            PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
+        }
     }
 
     public class GetMediaTypeConverter : IValueConverter
