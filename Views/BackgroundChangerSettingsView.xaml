@@ -7,6 +7,21 @@
              mc:Ignorable="d">
     
     <StackPanel Margin="20">
+        <Grid Margin="0,0,0,30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Column="0" Grid.Row="0" Content="{DynamicResource LOCBcSteamGridDbApiKey}" />
+            <TextBox Grid.Column="1" Grid.Row="0" Width="250" Text="{Binding Settings.SteamGridDbApiKey}" />
+        </Grid>
+        
+        
+        
         <Label Content="{DynamicResource LOCCommonControlsAvailable}" />
         <Separator Margin="0,0,0,10" />
 
@@ -80,7 +95,7 @@
                 </Expander.Content>
             </Expander>
 
-            <Expander Grid.Row="4">
+            <Expander Grid.Row="2">
                 <Expander.Style>
                     <Style TargetType="{x:Type Expander}" BasedOn="{StaticResource {x:Type Expander}}">
                         <Setter Property="Background" Value="Transparent" />

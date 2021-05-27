@@ -67,6 +67,9 @@ namespace BackgroundChanger
                 OnPropertyChanged();
             }
         }
+
+
+        public string SteamGridDbApiKey { get; set; } = string.Empty;
         #endregion
 
         // Playnite serializes settings object to a JSON object and saves it as text file.

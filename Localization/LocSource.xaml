@@ -10,6 +10,8 @@
 
     <!-- BackgroundChangerSettingsView -->
 
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api key</sys:String>
+    
     <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
     
@@ -20,5 +22,9 @@
 
     <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
+
+    <!-- ImagesManagerView -->
+
+    <sys:String x:Key="LOCBcSteamGridDbSelecty">Select from SteamGridDB</sys:String>
 
 </ResourceDictionary>

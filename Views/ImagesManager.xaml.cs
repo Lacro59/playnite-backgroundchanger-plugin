@@ -1,6 +1,8 @@
 ﻿using APNG;
 using BackgroundChanger.Models;
 using BackgroundChanger.Services;
+using CommonPlayniteShared;
+using CommonPluginsPlaynite;
 using CommonPluginsPlaynite.Common;
 using CommonPluginsShared;
 using Playnite.SDK;
@@ -31,6 +33,7 @@ namespace BackgroundChanger.Views
     public partial class ImagesManager : UserControl
     {
         private IPlayniteAPI _PlayniteApi;
+        protected static IResourceProvider resources = new ResourceProvider();
 
         private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
 
@@ -162,6 +165,67 @@ namespace BackgroundChanger.Views
 
                 PART_LbBackgroundImages.ItemsSource = null;
                 PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false);
+            }
+        }
+
+        private void PART_BtAddSteamGridDb_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                SteamGridDbType steamGridDbType = SteamGridDbType.heroes;
+                if (_IsCover)
+                {
+                    steamGridDbType = SteamGridDbType.grids;
+                }
+
+                var ViewExtension = new SteamGridDbView(_gameBackgroundImages.Name, steamGridDbType);
+                Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PlayniteApi, "SteamGridDB", ViewExtension);
+                windowExtension.ShowDialog();
+
+                if (ViewExtension.steamGridDbResult != null)
+                {
+                    GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
+                        resources.GetString("LOCCommonGettingData"),
+                        false
+                    );
+                    globalProgressOptions.IsIndeterminate = true;
+
+                    var ProgressDownload = PluginDatabase.PlayniteApi.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+                    {
+                        try
+                        {
+                            var cachedFile = HttpFileCache.GetWebFile(ViewExtension.steamGridDbResult.url);
+                            _backgroundImagesEdited.Add(new ItemImage
+                            {
+                                Name = cachedFile
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            Common.LogError(ex, false);
+                        }
+                    }, globalProgressOptions);
+
+
+                    Task.Run(() =>
+                    {
+                        while (!(bool)ProgressDownload.Result)
+                        {
+
+                        }
+                    }).ContinueWith(antecedant => 
+                    {
+                        this.Dispatcher.BeginInvoke((Action)delegate
+                        {
+                            PART_LbBackgroundImages.ItemsSource = null;
+                            PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
+                        });
+                    });
+                }
             }
             catch (Exception ex)
             {
