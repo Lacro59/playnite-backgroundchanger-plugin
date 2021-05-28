@@ -33,9 +33,6 @@ namespace BackgroundChanger
 
         public BackgroundChanger(IPlayniteAPI api) : base(api)
         {
-            PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
-
-
             // Custom elements integration
             AddCustomElementSupport(new AddCustomElementSupportArgs
             {
@@ -53,10 +50,7 @@ namespace BackgroundChanger
 
 
         #region Custom event
-        private void Games_ItemUpdated(object sender, ItemUpdatedEventArgs<Game> e)
-        {
-            //e.UpdatedItems.ForEach(x => PluginDatabase.Get(x.NewData));
-        }
+
         #endregion
 
 
