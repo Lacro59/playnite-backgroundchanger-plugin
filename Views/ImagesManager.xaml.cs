@@ -351,7 +351,11 @@ namespace BackgroundChanger.Views
                     if (System.IO.Path.GetExtension((string)value).ToLower().Contains("png"))
                     {
                         CPng_Reader pngr = new CPng_Reader();
-                        var m_Apng = pngr.Open(File.OpenRead((string)value)).SpltAPng();
+                        //var m_Apng = pngr.Open(File.OpenRead((string)value)).SpltAPng();
+                        using (var fStream = FileSystem.OpenReadFileStreamSafe((string)value))
+                        {
+                            var m_Apng = pngr.Open(fStream).SpltAPng();
+                        }
 
                         // Animated
                         if (pngr.Chunks.Count != 0)
