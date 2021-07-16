@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Playnite.SDK.Data;
 
 namespace BackgroundChanger.Models
 {
@@ -27,7 +27,7 @@ namespace BackgroundChanger.Models
         public string language { get; set; }
         public string url { get; set; }
         public string thumb { get; set; }
-        [JsonProperty("lock")]
+        [SerializationPropertyName("lock")]
         public bool isLock { get; set; }
         public bool epilepsy { get; set; }
         public int upvotes { get; set; }

@@ -1,7 +1,7 @@
 ﻿using BackgroundChanger.Services;
 using CommonPluginsPlaynite.Common;
 using CommonPluginsShared;
-using Newtonsoft.Json;
+using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +22,7 @@ namespace BackgroundChanger.Models
         public bool IsCover { get; set; }
         public bool IsFavorite { get; set; }
 
-        [JsonIgnore]
+        [DontSerialize]
         public string ImageSize {
             get
             {
@@ -45,7 +45,7 @@ namespace BackgroundChanger.Models
             }
         }
 
-        [JsonIgnore]
+        [DontSerialize]
         public string ImageWeight
         {
             get
@@ -62,7 +62,7 @@ namespace BackgroundChanger.Models
             }
         }
         
-        [JsonIgnore]
+        [DontSerialize]
         public string FullPath {
             get
             {
@@ -82,7 +82,7 @@ namespace BackgroundChanger.Models
             }
         }
 
-        [JsonIgnore]
+        [DontSerialize]
         public bool IsVideo
         {
             get

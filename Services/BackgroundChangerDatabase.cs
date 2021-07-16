@@ -1,9 +1,9 @@
 ﻿using BackgroundChanger.Models;
 using CommonPlayniteShared;
 using CommonPluginsShared.Collections;
-using Newtonsoft.Json;
 using Playnite.SDK;
 using Playnite.SDK.Models;
+using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;

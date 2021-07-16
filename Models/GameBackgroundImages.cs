@@ -1,5 +1,5 @@
 ﻿using CommonPluginsShared.Collections;
-using Newtonsoft.Json;
+using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +26,7 @@ namespace BackgroundChanger.Models
         }
 
 
-        [JsonIgnore]
+        [DontSerialize]
         public bool HasDataBackground
         {
             get
@@ -35,7 +35,7 @@ namespace BackgroundChanger.Models
             }
         }
 
-        [JsonIgnore]
+        [DontSerialize]
         public List<ItemImage> ItemsBackground
         {
             get
@@ -45,7 +45,7 @@ namespace BackgroundChanger.Models
         }
 
 
-        [JsonIgnore]
+        [DontSerialize]
         public bool HasDataCover
         {
             get
@@ -54,7 +54,7 @@ namespace BackgroundChanger.Models
             }
         }
 
-        [JsonIgnore]
+        [DontSerialize]
         public List<ItemImage> ItemsCover
         {
             get
