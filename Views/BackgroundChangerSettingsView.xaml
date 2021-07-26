@@ -11,6 +11,8 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
@@ -18,6 +20,8 @@
 
             <Label Grid.Column="0" Grid.Row="0" Content="{DynamicResource LOCBcSteamGridDbApiKey}" />
             <TextBox Grid.Column="1" Grid.Row="0" Width="250" Text="{Binding Settings.SteamGridDbApiKey}" />
+            <Button Grid.Column="3" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}" HorizontalAlignment="Right"
+                    Click="Button_Click" Tag="https://www.steamgriddb.com/profile/preferences/api" />
         </Grid>
         
         

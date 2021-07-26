@@ -91,7 +91,7 @@ namespace BackgroundChanger
                     Action = (gameMenuItem) =>
                     {
                         var ViewExtension = new ImagesManager(PlayniteApi, PluginDatabase.Get(GameMenu), false);
-                        Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, resources.GetString("LOCBc"), ViewExtension);
+                        Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, resources.GetString("LOCBc") + " - " + resources.GetString("LOCGameBackgroundTitle"), ViewExtension);
                         windowExtension.ShowDialog();
                     }
                 });
@@ -107,7 +107,7 @@ namespace BackgroundChanger
                     Action = (gameMenuItem) =>
                     {
                         var ViewExtension = new ImagesManager(PlayniteApi, PluginDatabase.Get(GameMenu), true);
-                        Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, resources.GetString("LOCBc"), ViewExtension);
+                        Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, resources.GetString("LOCBc") + " - " + resources.GetString("LOCGameCoverImageTitle"), ViewExtension);
                         windowExtension.ShowDialog();
                     }
                 });

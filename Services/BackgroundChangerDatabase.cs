@@ -108,7 +108,6 @@ namespace BackgroundChanger.Services
         {
             GameBackgroundImages gameBackgroundImages = Get(game, true);
 
-            //PluginSettings.Settings.HasData = gameBackgroundImages.HasData;
             PluginSettings.Settings.HasDataBackground = gameBackgroundImages.HasDataBackground;
             PluginSettings.Settings.HasDataCover = gameBackgroundImages.HasDataCover;
         }

@@ -56,14 +56,7 @@ namespace BackgroundChanger.Views
             PART_LbBackgroundImages.ItemsSource = null;
             PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
 
-            if (IsCover)
-            {
-                PART_BackgroundImage.UseAnimated = PluginDatabase.PluginSettings.Settings.EnableImageAnimatedCover;
-            }
-            else
-            {
-                PART_BackgroundImage.UseAnimated = PluginDatabase.PluginSettings.Settings.EnableImageAnimatedBackground;
-            }
+            PART_BackgroundImage.UseAnimated = true;
         }        
 
 

@@ -116,7 +116,7 @@ namespace BackgroundChanger.Controls
         // TODO Get after settings modification
         private void GetFadeImageProperties()
         {
-            FrameworkElement PART_ImageBackground = IntegrationUI.SearchElementByName("ControlRoot", false, false, 2);
+            FrameworkElement PART_ImageBackground = UI.SearchElementByName("ControlRoot", false, false, 2);
 
             if (PART_ImageBackground != null)
             {

@@ -6,8 +6,8 @@
              xmlns:local="clr-namespace:BackgroundChanger.Views"
              xmlns:playnitecontrols="clr-namespace:CommonPluginsControls.PlayniteControls"
              xmlns:converters="clr-namespace:CommonPluginsPlaynite.Converters"
-             xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared"
              xmlns:controls="clr-namespace:wpf_animatedimage.Controls"
+             xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
              mc:Ignorable="d" 
              Height="720" Width="1200">
 

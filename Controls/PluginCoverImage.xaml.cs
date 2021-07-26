@@ -111,7 +111,7 @@ namespace BackgroundChanger.Controls
         private void GetCoverProperties()
         {
             var thisParent = ((FrameworkElement)((FrameworkElement)((FrameworkElement)this.Parent).Parent).Parent).Parent;
-            FrameworkElement PART_ImageCover = IntegrationUI.SearchElementByName("PART_ImageCover", thisParent, false, false);
+            FrameworkElement PART_ImageCover = UI.SearchElementByName("PART_ImageCover", thisParent, false, false);
 
             if (PART_ImageCover != null)
             {
