@@ -74,8 +74,8 @@ namespace BackgroundChanger
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
         #region Variables exposed
-        [DontSerialize]
         private bool _HasData { get; set; } = false;
+        [DontSerialize]
         public bool HasData
         {
             get => _HasData;
@@ -86,8 +86,8 @@ namespace BackgroundChanger
             }
         }
 
-        [DontSerialize]
         private bool _HasDataBackground { get; set; } = false;
+        [DontSerialize]
         public bool HasDataBackground
         {
             get => _HasDataBackground;
@@ -98,8 +98,8 @@ namespace BackgroundChanger
             }
         }
 
-        [DontSerialize]
         private bool _HasDataCover { get; set; } = false;
+        [DontSerialize]
         public bool HasDataCover
         {
             get => _HasDataCover;
