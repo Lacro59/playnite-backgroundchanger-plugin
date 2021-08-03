@@ -38,8 +38,15 @@ namespace BackgroundChanger.Services
             if (gameBackgroundImages == null)
             {
                 Game game = PlayniteApi.Database.Games.Get(Id);
-                gameBackgroundImages = GetDefault(game);
-                Add(gameBackgroundImages);
+                if (game != null)
+                {
+                    gameBackgroundImages = GetDefault(game);
+                    Add(gameBackgroundImages);
+                }
+                else
+                {
+                    return gameBackgroundImages;
+                }
             }
 
             // Check default background
@@ -107,6 +114,11 @@ namespace BackgroundChanger.Services
         public override void SetThemesResources(Game game)
         {
             GameBackgroundImages gameBackgroundImages = Get(game, true);
+
+            if (gameBackgroundImages == null)
+            {
+                return;
+            }
 
             PluginSettings.Settings.HasDataBackground = gameBackgroundImages.HasDataBackground;
             PluginSettings.Settings.HasDataCover = gameBackgroundImages.HasDataCover;
