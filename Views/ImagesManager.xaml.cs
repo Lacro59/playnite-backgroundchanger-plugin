@@ -6,6 +6,7 @@ using CommonPluginsPlaynite;
 using CommonPluginsPlaynite.Common;
 using CommonPluginsShared;
 using Playnite.SDK;
+using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
@@ -47,8 +48,8 @@ namespace BackgroundChanger.Views
         {
             _PlayniteApi = PlayniteApi;
             _gameBackgroundImages = gameBackgroundImages;
-            _backgroundImages = gameBackgroundImages.Items.Where(x => x.IsCover == IsCover).ToList().GetClone();
-            _backgroundImagesEdited = _backgroundImages.GetClone();
+            _backgroundImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == IsCover).ToList());
+            _backgroundImagesEdited = Serialization.GetClone(_backgroundImages);
             _IsCover = IsCover;
 
             InitializeComponent();
@@ -105,7 +106,7 @@ namespace BackgroundChanger.Views
                 }
 
                 // Saved
-                var tmpList = _gameBackgroundImages.Items.Where(x => x.IsCover != _IsCover).ToList().GetClone();
+                var tmpList = Serialization.GetClone(_gameBackgroundImages.Items.Where(x => x.IsCover != _IsCover).ToList());
                 tmpList.AddRange(_backgroundImagesEdited);
                 _gameBackgroundImages.Items = tmpList;
                 BackgroundChanger.PluginDatabase.Update(_gameBackgroundImages);

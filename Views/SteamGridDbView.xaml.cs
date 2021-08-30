@@ -252,7 +252,7 @@ namespace BackgroundChanger.Views
 
             if (DataSearch != null)
             {
-                DataSearchFiltered = DataSearch.data.GetClone();
+                DataSearchFiltered = Serialization.GetClone(DataSearch.data);
 
 
                 List<CheckData> ListDimensions = PART_ComboDimensions.ItemsSource as List<CheckData>;
