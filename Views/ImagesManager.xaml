@@ -8,6 +8,7 @@
              xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
              xmlns:controlsAnimated="clr-namespace:wpf_animatedimage.Controls"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
+             xmlns:converters1="clr-namespace:CommonPlayniteShared.Converters"
              mc:Ignorable="d" 
              Height="720" Width="1200">
 
@@ -17,6 +18,7 @@
         <commonpluginsshared:ImageConverter x:Key="ImageConverter" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" />
+        <converters1:TwoBooleanToBooleanConverter x:Key="TwoBooleanToBooleanConverter" />
         <local:GetMediaTypeConverter x:Key="GetMediaTypeConverter" />
     </UserControl.Resources>
 
@@ -112,8 +114,10 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="5" />
-                                    <RowDefinition Height="auto" />
                                     <RowDefinition Height="*" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="10" />
+                                    <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
 
                                 <Button Name="PART_BtUp" Content="" Click="PART_BtUp_Click" 
@@ -125,9 +129,22 @@
                                         VerticalAlignment="Top" Grid.Row="2" FontFamily="{DynamicResource CommonFont}" 
                                         Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}" />
 
+                                <Button Name="PART_BtConvert" Content="&#xe97b;" Click="PART_BtConvert_Click"
+                                        Grid.Row="3" 
+                                        ToolTip="{DynamicResource LOCBcFTooltTipConvert}" FontFamily="{DynamicResource CommonFont}"
+                                        Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}">
+                                    <Button.IsEnabled>
+                                        <MultiBinding Converter="{StaticResource TwoBooleanToBooleanConverter}">
+                                            <Binding Path="IsConvertable"/>
+                                            <Binding Path="IsDefault" />
+                                            <MultiBinding.ConverterParameter>firsttrue</MultiBinding.ConverterParameter>
+                                        </MultiBinding>
+                                    </Button.IsEnabled>
+                                </Button>
+
                                 <Button Name="PART_BtDelete" Content="" Click="PART_BtDelete_Click"
-                                        Grid.Row="3" IsEnabled="{Binding IsDefault, Converter={StaticResource InvertedBoolenConverter}}"
-                                        ToolTip="{DynamicResource LOCRemoveTitle}" FontFamily="{DynamicResource CommonFont}" VerticalAlignment="Bottom"
+                                        Grid.Row="5" IsEnabled="{Binding IsDefault, Converter={StaticResource InvertedBoolenConverter}}"
+                                        ToolTip="{DynamicResource LOCRemoveTitle}" FontFamily="{DynamicResource CommonFont}"
                                         Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}" />
                             </Grid>
                         </Grid>

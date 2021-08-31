@@ -10,7 +10,7 @@
         <Grid Margin="0,0,0,30">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="10" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
@@ -19,13 +19,30 @@
             </Grid.RowDefinitions>
 
             <Label Grid.Column="0" Grid.Row="0" Content="{DynamicResource LOCBcSteamGridDbApiKey}" />
-            <TextBox Grid.Column="1" Grid.Row="0" Width="250" Text="{Binding Settings.SteamGridDbApiKey}" />
+            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Settings.SteamGridDbApiKey}" />
             <Button Grid.Column="3" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}" HorizontalAlignment="Right"
                     Click="Button_Click" Tag="https://www.steamgriddb.com/profile/preferences/api" />
         </Grid>
-        
-        
-        
+
+
+        <Grid Margin="0,0,0,30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Column="0" Grid.Row="0" Content="{DynamicResource LOCBcFfmpegFile}" />
+            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Settings.ffmpegFile, Mode=TwoWay}" Name="PART_FfmpegFile" />
+            <Button Grid.Column="3" Content="&#xeb12;" FontFamily="{DynamicResource FontIcoFont}" HorizontalAlignment="Right"
+                    Click="ButtonFfmpeg_Click" />
+        </Grid>
+
+
         <Label Content="{DynamicResource LOCCommonControlsAvailable}" />
         <Separator Margin="0,0,0,10" />
 

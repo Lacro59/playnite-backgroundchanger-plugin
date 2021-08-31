@@ -220,7 +220,7 @@ namespace BackgroundChanger
 
         public override UserControl GetSettingsView(bool firstRunSettings)
         {
-            return new BackgroundChangerSettingsView();
+            return new BackgroundChangerSettingsView(PlayniteApi);
         }
         #endregion
     }

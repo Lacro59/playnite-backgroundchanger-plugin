@@ -95,5 +95,19 @@ namespace BackgroundChanger.Models
                 return Path.GetExtension(FullPath).ToLower().Contains("mp4");
             }
         }
+
+        [DontSerialize]
+        public bool IsConvertable
+        {
+            get
+            {
+                if (FullPath.IsNullOrEmpty())
+                {
+                    return false;
+                }
+
+                return Path.GetExtension(FullPath).ToLower().Contains("webp");
+            }
+        }
     }
 }

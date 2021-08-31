@@ -20,10 +20,13 @@ namespace BackgroundChanger.Views
     public partial class BackgroundChangerSettingsView : UserControl
     {
         private static IResourceProvider resources = new ResourceProvider();
+        private IPlayniteAPI PlayniteApi;
 
 
-        public BackgroundChangerSettingsView()
+        public BackgroundChangerSettingsView(IPlayniteAPI PlayniteApi)
         {
+            this.PlayniteApi = PlayniteApi;
+
             InitializeComponent();
 
             HwBcSlider_ValueChanged(hwSlider, null);
@@ -61,6 +64,18 @@ namespace BackgroundChanger.Views
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Process.Start((string)((FrameworkElement)sender).Tag);
+        }
+
+
+        private void ButtonFfmpeg_Click(object sender, RoutedEventArgs e)
+        {
+            string SelectedFile = PlayniteApi.Dialogs.SelectFile("File|ffmpeg.exe");
+
+            if (!SelectedFile.IsNullOrEmpty())
+            {
+                PART_FfmpegFile.Text = SelectedFile;
+                ((BackgroundChangerSettingsViewModel)this.DataContext).Settings.ffmpegFile = SelectedFile;
+            }
         }
     }
 }

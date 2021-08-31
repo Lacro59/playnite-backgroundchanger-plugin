@@ -9,6 +9,7 @@ using Playnite.SDK;
 using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
@@ -24,6 +25,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using wpf_animatedimage;
 using Path = System.IO.Path;
 
 namespace BackgroundChanger.Views
@@ -243,7 +245,6 @@ namespace BackgroundChanger.Views
                     }
                     else
                     {
-                        //PART_BackgroundImage.Source = BitmapExtensions.BitmapFromFile(FilePath);
                         PART_BackgroundImage.Source = FilePath;
                         PART_Video.Source = null;
                     }
@@ -320,6 +321,105 @@ namespace BackgroundChanger.Views
             PART_LbBackgroundImages.ItemsSource = null;
             PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
         }
+
+
+        private string ExtractAnimatedImageAndConvert(string FilePath)
+        {
+            string VideoPath = string.Empty;
+
+            FileSystem.DeleteDirectory(PluginDatabase.Paths.PluginCachePath);
+            FileSystem.CreateDirectory(PluginDatabase.Paths.PluginCachePath);
+
+            try
+            {
+                if (FilePath != null && FilePath != string.Empty)
+                {
+                    if (System.IO.Path.GetExtension(FilePath).ToLower().IndexOf("webp") > -1)
+                    {
+                        WebpAnim webPAnim = new WebpAnim();
+                        webPAnim = new WebpAnim();
+                        webPAnim.Load(FilePath);
+
+                        string FileName = Path.GetFileNameWithoutExtension(FilePath);
+                        int ActualFrame = 0;
+                        while (ActualFrame < webPAnim.FramesCount())
+                        {                            
+                            string PathTemp = Path.Combine(PluginDatabase.Paths.PluginCachePath, $"FileName_{ActualFrame:D4}.png");
+
+                            System.Drawing.Image img = System.Drawing.Image.FromStream(webPAnim.GetFrameStream(ActualFrame));
+                            img.Save(PathTemp, ImageFormat.Png);
+
+                            ActualFrame++;
+                        }
+
+
+                        double Width = webPAnim.GetFrameBitmapSource(0).Width;
+                        double Height = webPAnim.GetFrameBitmapSource(0).Height;
+
+                        var ffmpeg = $"-r 25 -f "
+                            + $"image2 -s {Width}x{Height} -i \"{PluginDatabase.Paths.PluginCachePath}\\FileName_%4d.png\" " 
+                            + $"-vcodec libx264 -crf 25 -pix_fmt yuv420p \"{PluginDatabase.Paths.PluginCachePath}\\{FileName}.mp4\"";
+
+                        var process = new Process();
+                        process.StartInfo.FileName = PluginDatabase.PluginSettings.Settings.ffmpegFile;
+                        process.StartInfo.Arguments = ffmpeg;
+                        process.Start();
+                        process.WaitForExit();
+
+
+                        VideoPath = $"{PluginDatabase.Paths.PluginCachePath}\\{FileName}.mp4";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false);
+            }
+
+            return VideoPath;
+        }
+
+        private void PART_BtConvert_Click(object sender, RoutedEventArgs e)
+        {
+            int index = int.Parse(((Button)sender).Tag.ToString());
+            string FilePath = _backgroundImagesEdited[index].FullPath;
+
+
+            string VideoPath = string.Empty;
+
+            GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
+                resources.GetString("LOCCommonConverting"),
+                false
+            );
+            globalProgressOptions.IsIndeterminate = true;
+
+            var ProgressDownload = PluginDatabase.PlayniteApi.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+            {
+                try
+                {
+                    VideoPath = ExtractAnimatedImageAndConvert(FilePath);
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, false);
+                }
+            }, globalProgressOptions);
+
+
+            if (!VideoPath.IsNullOrEmpty() && File.Exists(VideoPath))
+            {
+                PART_BtDelete_Click(sender, e);
+
+
+                _backgroundImagesEdited.Add(new ItemImage
+                {
+                    Name = VideoPath
+                });
+
+                PART_LbBackgroundImages.ItemsSource = null;
+                PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
+            }
+        }
     }
 
     public class GetMediaTypeConverter : IValueConverter
@@ -345,13 +445,14 @@ namespace BackgroundChanger.Views
                     if (System.IO.Path.GetExtension((string)value).ToLower().Contains("png"))
                     {
                         CPng_Reader pngr = new CPng_Reader();
+                        Dictionary<fcTL, MemoryStream> m_Apng;
                         using (var fStream = FileSystem.OpenReadFileStreamSafe((string)value))
                         {
-                            var m_Apng = pngr.Open(fStream).SpltAPng();
+                            m_Apng = pngr.Open(fStream).SpltAPng();
                         }
 
                         // Animated
-                        if (pngr.Chunks.Count != 0)
+                        if (m_Apng.Count > 0)
                         {
                             return "\ueb16 \ueb13";
                         }
