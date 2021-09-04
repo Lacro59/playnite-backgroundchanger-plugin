@@ -1,0 +1,14 @@
+AddonId: playnite-backgroundchanger-plugin
+Packages:
+  - Version: 2.0
+    RequiredApiVersion: 6.0.0
+    ReleaseDate: 2021-09-04
+    PackageUrl: https://github.com/Lacro59/playnite-backgroundchanger-plugin/releases/download/v1.1/BackgroundChanger_1_1.pext
+    Changelog:
+      - Playnite 9 beta version (not compatible with Playnite 8)
+      - Custom UI Elements for custom theme integration (see wiki on GitHub)
+	  - Adding a favorite system for the first image displayed with a timer
+	  - Added cover image support
+	  - Added MP4 support
+	  - Added WEBP to MP4 converter
+	  - Fixed many bugs

@@ -1,0 +1,14 @@
+﻿Id: playnite-backgroundchanger-plugin
+Name: BackgroundChanger
+Author: Lacro59
+Version: 2.0
+Module: BackgroundChanger.dll
+Type: GenericPlugin
+Icon: icon.png
+Links:
+  - Name: Forum
+    Url: https://playnite.link/forum/thread-564.html
+  - Name: Github
+    Url: https://github.com/Lacro59/playnite-backgroundchanger-plugin
+  - Name: Translations
+    Url: https://crowdin.com/project/playnite-extensions

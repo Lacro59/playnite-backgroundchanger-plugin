@@ -1,0 +1,3 @@
+[submodule "APNG"]
+	path = APNG
+	url = https://github.com/oven425/APNG.git
