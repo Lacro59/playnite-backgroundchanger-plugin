@@ -1,0 +1,80 @@
+﻿<Window x:Class="wpf_animatedimage.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:wpf_animatedimage"
+        xmlns:controls="clr-namespace:wpf_animatedimage.Controls"
+        mc:Ignorable="d" 
+        Title="MainWindow" Height="450" Width="800">
+    
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <controls:AnimatedImage x:Name="PART_AnimatedImage" 
+                                UseAnimated="True"
+                                UseBitmapImage="{Binding ElementName=PART_Toggle, Path=IsChecked}" 
+                                DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}"
+                                Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" />
+
+        <Grid Grid.Column="2" Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            
+            <Button Height="30" Click="Button_Click" Content="Load image" Grid.Row="0" />
+            <ToggleButton IsChecked="True" Height="30" Name="PART_Toggle"
+                          Content="Use BitmapImage for WebP" Grid.Row="2" />
+
+            <TextBlock Grid.Row="4" TextWrapping="Wrap"
+                       Text="Using BitmapImage for WebP decrease memory usage but animation is slower." />
+
+            <Button Height="30" Click="ButtonExtract_Click" Content="Extract WebP images" Grid.Row="6" />
+        </Grid>
+        
+
+        <Grid Grid.Column="2" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <Label Content="Name" Grid.Column="0" Grid.Row="0" />
+            <Label Name="PART_Name" Grid.Column="2" Grid.Row="0" />
+
+            <Label Content="Size" Grid.Column="0" Grid.Row="2" />
+            <Label Name="PART_Size" Grid.Column="2" Grid.Row="2" />
+
+            <Label Content="Frames" Grid.Column="0" Grid.Row="4" />
+            <Label Name="PART_Frames" Grid.Column="2" Grid.Row="4" />
+
+            <Label Content="Delay" Grid.Column="0" Grid.Row="6" />
+            <Label Name="PART_Delay" Grid.Column="2" Grid.Row="6" />
+        </Grid>
+    </Grid>
+</Window>

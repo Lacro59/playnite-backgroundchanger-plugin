@@ -114,9 +114,7 @@
     <None Include="extension.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="LICENSE" />
     <None Include="packages.config" />
-    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="App.xaml">
@@ -176,6 +174,7 @@
       <Name>CommonPluginsResources</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="playnite-plugincommon\CommonPlayniteShared\CommonPlayniteShared.projitems" Label="Shared" />
   <Import Project="playnite-plugincommon\CommonPluginsShared\CommonPluginsShared.projitems" Label="Shared" />
   <Import Project="SharedDLL\SharedDLL.projitems" Label="Shared" />

@@ -1,0 +1,26 @@
+﻿<Window x:Class="WPF_APNG.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF_APNG"
+        mc:Ignorable="d"
+        Loaded="Window_Loaded"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <StackPanel >
+
+
+            <!--<Border Height="400" Width="480" ClipToBounds="True"  >
+                <Image ClipToBounds="True" x:Name="image_png" Source="test.png" Width="16320" Height="400" Loaded="Image_Loaded_1">
+                  
+                </Image>
+            </Border>-->
+            
+        </StackPanel>
+        <Image x:Name="image_png">
+        </Image>
+
+    </Grid>
+    
+</Window>
