@@ -2,7 +2,7 @@ AddonId: playnite-backgroundchanger-plugin
 Packages:
   - Version: 2.0
     RequiredApiVersion: 6.0.0
-    ReleaseDate: 2021-01-25
+    ReleaseDate: 2021-09-04
     PackageUrl: https://github.com/Lacro59/playnite-backgroundchanger-plugin/releases/download/v1.1/BackgroundChanger_1_1.pext
     Changelog:
       - Playnite 9 beta version (not compatible with Playnite 8)
