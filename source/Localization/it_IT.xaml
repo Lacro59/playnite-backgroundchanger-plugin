@@ -1,0 +1,33 @@
+﻿<?xml version="1.0"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- MainView -->
+
+    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
+    
+    <sys:String x:Key="LOCBcManageBackground">Gestisci immagini di sfondo</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Gestisci le immagini di copertina</sys:String>
+
+    <!-- BackgroundChangerSettingsView -->
+
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">Chiave api SteamGridDB</sys:String>
+    
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Visualizza l'immagine di sfondo del plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Visualizza l'immagine della copertina del plugin</sys:String>
+    
+    <sys:String x:Key="LOCBcEnableRandomSelect">Abilita selezione casuale</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Attiva cambio automatico</sys:String>
+    <sys:String x:Key="LOCBcTimeInterval">Intervallo di tempo</sys:String>
+    <sys:String x:Key="LOCBcSeconds">secondi</sys:String>
+
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Abilitare sfondo animato</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Abilita copertina animata</sys:String>
+
+    <!-- ImagesManagerView -->
+
+    <sys:String x:Key="LOCBcSteamGridDbSelecty">Scegli da SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
+    
+    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
+
+</ResourceDictionary>
