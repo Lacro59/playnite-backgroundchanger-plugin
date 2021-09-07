@@ -15,7 +15,7 @@
     <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">Увімкнути випадковий вибір</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">Увімкнути випадковий вибі</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Часовий інтервал</sys:String>
     <sys:String x:Key="LOCBcSeconds">сек.</sys:String>
