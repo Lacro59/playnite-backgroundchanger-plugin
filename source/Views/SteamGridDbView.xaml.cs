@@ -157,6 +157,11 @@ namespace BackgroundChanger.Views
                 try
                 {
                     DataSearch = steamGridDbApi.SearchElement(Id, steamGridDbType);
+
+                    //foreach (var el in DataSearch.data)
+                    //{
+                    //    var tmp = el.IsVideoConverted;
+                    //}
                 }
                 catch (Exception ex)
                 {

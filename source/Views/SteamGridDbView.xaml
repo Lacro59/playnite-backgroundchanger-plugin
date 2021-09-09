@@ -8,6 +8,7 @@
              xmlns:converters="clr-namespace:CommonPluginsPlaynite.Converters"
              xmlns:controls="clr-namespace:wpf_animatedimage.Controls"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
+             xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
              mc:Ignorable="d" 
              Height="720" Width="1200">
 
@@ -15,6 +16,8 @@
         <converters:StringNullOrEmptyToBoolConverter x:Key="StringNullOrEmptyToBoolConverter" />
         <commonpluginsshared:StringRemoveConverter x:Key="StringRemoveConverter" />
         <commonpluginsshared:GetImageConverter x:Key="GetImageConverter" />
+        <converters:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
 
     <Grid>
@@ -152,14 +155,14 @@
                                         <ColumnDefinition Width="230" />
                                     </Grid.ColumnDefinitions>
 
-                                    <!--controls:AnimatedImage Grid.Column="0" 
-                                                            Stretch="Uniform"                                
-                                                            Source="{Binding thumb, Converter={StaticResource GetImageConverter}}" Height="140"
-                                                            RenderOptions.BitmapScalingMode="Fant"
-                                                            UseAnimated="{Binding UseAnimated}"
-                                                            UseBitmapImage="True" 
-                                                            DecodePixelWidth="{Binding ElementName=ImageHolder, Path=ActualWidth}" /-->
-                                    <Image Stretch="Uniform" Source="{Binding thumb}" Height="140" />
+                                    <controls:AnimatedImage Stretch="Uniform"                                
+                                                            Source="{Binding thumbnail, Converter={StaticResource GetImageConverter}}" Height="140"
+                                                            RenderOptions.BitmapScalingMode="LowQuality"
+                                                            UseAnimated="False"
+                                                            DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}" />
+                                    <!--Image Stretch="Uniform" Source="{Binding thumbnail}" Height="140" RenderOptions.BitmapScalingMode="LowQuality" /-->
+                                    <!--MediaElement Stretch="Uniform" pbeh:MediaElementBehaviors.Repeat="True" Source="{Binding VideoFile}" Height="140"
+                                                  Visibility="{Binding IsVideoConverted, Converter={StaticResource BooleanToVisibilityConverter}}" /-->
 
                                     <Grid Grid.Column="2">
                                         <Grid.RowDefinitions>
