@@ -27,6 +27,7 @@
 
     <sys:String x:Key="LOCBcSteamGridDbSelecty">Select from SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
     
     <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
 
