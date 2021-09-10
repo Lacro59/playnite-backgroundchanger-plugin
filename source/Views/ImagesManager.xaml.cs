@@ -337,7 +337,6 @@ namespace BackgroundChanger.Views
                     if (System.IO.Path.GetExtension(FilePath).ToLower().IndexOf("webp") > -1)
                     {
                         WebpAnim webPAnim = new WebpAnim();
-                        webPAnim = new WebpAnim();
                         webPAnim.Load(FilePath);
 
                         string FileName = Path.GetFileNameWithoutExtension(FilePath);

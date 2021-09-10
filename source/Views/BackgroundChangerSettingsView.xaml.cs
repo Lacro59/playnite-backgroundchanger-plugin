@@ -1,7 +1,10 @@
-﻿using Playnite.SDK;
+﻿using BackgroundChanger.Services;
+using CommonPluginsPlaynite.Common;
+using Playnite.SDK;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +25,7 @@ namespace BackgroundChanger.Views
         private static IResourceProvider resources = new ResourceProvider();
         private IPlayniteAPI PlayniteApi;
 
+        private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
 
         public BackgroundChangerSettingsView(IPlayniteAPI PlayniteApi)
         {
@@ -75,6 +79,22 @@ namespace BackgroundChanger.Views
             {
                 PART_FfmpegFile.Text = SelectedFile;
                 ((BackgroundChangerSettingsViewModel)this.DataContext).Settings.ffmpegFile = SelectedFile;
+            }
+        }
+
+
+        private void ButtonWebpinfo_Click(object sender, RoutedEventArgs e)
+        {
+            string SelectedFile = PlayniteApi.Dialogs.SelectFile("File|webpinfo.exe");
+
+            if (!SelectedFile.IsNullOrEmpty())
+            {
+                string destFileName = System.IO.Path.Combine(PluginDatabase.Paths.PluginPath, "webpinfo.exe");
+
+                FileSystem.CopyFile(SelectedFile, destFileName, true);
+
+                PART_WebpinfoFile.Text = destFileName;
+                ((BackgroundChangerSettingsViewModel)this.DataContext).Settings.webpinfoFile = destFileName;
             }
         }
     }

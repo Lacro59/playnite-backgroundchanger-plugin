@@ -41,6 +41,23 @@
             <Button Grid.Column="3" Content="&#xeb12;" FontFamily="{DynamicResource FontIcoFont}" HorizontalAlignment="Right"
                     Click="ButtonFfmpeg_Click" />
         </Grid>
+        
+        <Grid Margin="0,0,0,30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Column="0" Grid.Row="0" Content="{DynamicResource LOCBcWebpinfoFile}" />
+            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Settings.webpinfoFile, Mode=TwoWay}" Name="PART_WebpinfoFile" />
+            <Button Grid.Column="3" Content="&#xeb12;" FontFamily="{DynamicResource FontIcoFont}" HorizontalAlignment="Right"
+                    Click="ButtonWebpinfo_Click" />
+        </Grid>
 
 
         <Label Content="{DynamicResource LOCCommonControlsAvailable}" />
