@@ -65,12 +65,6 @@ namespace BackgroundChanger.Views
         }
 
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Process.Start((string)((FrameworkElement)sender).Tag);
-        }
-
-
         private void ButtonFfmpeg_Click(object sender, RoutedEventArgs e)
         {
             string SelectedFile = PlayniteApi.Dialogs.SelectFile("File|ffmpeg.exe");
