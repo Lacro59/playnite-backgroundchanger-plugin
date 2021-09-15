@@ -55,11 +55,7 @@ namespace BackgroundChanger.Services
                 int Index = gameBackgroundImages.Items.FindIndex(x => x.IsDefault && !x.IsCover);
                 if (Index != -1)
                 {
-                    string FullPath = gameBackgroundImages.Items[Index].FullPath;
-                    if (!File.Exists(FullPath))
-                    {
-                        gameBackgroundImages.Items.RemoveAt(Index);
-                    }
+                    gameBackgroundImages.Items.RemoveAt(Index);
                 }
             }
             if (!gameBackgroundImages.BackgroundImage.IsNullOrEmpty() && gameBackgroundImages.Items.Find(x => x.IsDefault && !x.IsCover) == null)
@@ -84,11 +80,7 @@ namespace BackgroundChanger.Services
                 int Index = gameBackgroundImages.Items.FindIndex(x => x.IsDefault && x.IsCover);
                 if (Index != -1)
                 {
-                    string FullPath = gameBackgroundImages.Items[Index].FullPath;
-                    if (!File.Exists(FullPath))
-                    {
-                        gameBackgroundImages.Items.RemoveAt(0);
-                    }
+                    gameBackgroundImages.Items.RemoveAt(Index);
                 }
             }
             if (!gameBackgroundImages.CoverImage.IsNullOrEmpty() && gameBackgroundImages.Items.Find(x => x.IsDefault && x.IsCover) == null)
@@ -129,6 +121,7 @@ namespace BackgroundChanger.Services
             foreach (var GameUpdated in e.UpdatedItems)
             {
                 Database.SetGameInfo<ItemImage>(PlayniteApi, GameUpdated.NewData.Id);
+                var data = Get(GameUpdated.NewData.Id);
             }
         }
     }
