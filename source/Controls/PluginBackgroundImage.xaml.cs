@@ -170,6 +170,9 @@ namespace BackgroundChanger.Controls
                 {
                     try
                     {
+                        Video1.LoadedBehavior = MediaState.Stop;
+                        Video2.LoadedBehavior = MediaState.Stop;
+
                         if (!gameBackgroundImages.HasDataBackground)
                         {
                             MustDisplay = false;
@@ -420,6 +423,8 @@ namespace BackgroundChanger.Controls
         {
             AnimatedImage1.Source = null;
             AnimatedImage1.UpdateLayout();
+            Video1.Source = null;
+            Video1.UpdateLayout();
             GC.Collect();
         }
 
@@ -427,6 +432,9 @@ namespace BackgroundChanger.Controls
         {
             AnimatedImage2.Source = null;
             AnimatedImage2.UpdateLayout();
+            Video2.Source = null;
+            Video2.UpdateLayout();
+            GC.Collect();
         }
 
         private void BorderDarkenOut_Completed(object sender, EventArgs e)
@@ -471,33 +479,25 @@ namespace BackgroundChanger.Controls
             var blurAmount = BlurAmount;
             var blurEnabled = IsBlurEnabled;
             var highQuality = HighQualityBlur;
-            //BitmapImage image = null;
+
             string image = null;
 
             if (newSource?.Equals(currentSource) == true)
             {
+                if (Video1.Source != null)
+                {
+                    Video1.LoadedBehavior = MediaState.Play;
+                }
+                if (Video2.Source != null)
+                {
+                    Video2.LoadedBehavior = MediaState.Play;
+                }
+
                 return;
             }
 
             currentSource = newSource;
-            //if (newSource != null)
-            //{
-            //    image = await Task.Factory.StartNew(() =>
-            //    {
-            //        if (newSource is string str)
-            //        {
-            //            return ImageSourceManager.GetImage(str, false);
-            //        }
-            //        else if (newSource is BitmapLoadProperties props)
-            //        {
-            //            return ImageSourceManager.GetImage(props.Source, false, props);
-            //        }
-            //        else
-            //        {
-            //            return null;
-            //        }
-            //    });
-            //}
+
             if (newSource is string)
             {
                 if (!File.Exists(newSource.ToString()))
@@ -564,6 +564,8 @@ namespace BackgroundChanger.Controls
                             AnimatedImage2.Source = null;
                             Video1.Source = new Uri(image);
                             Video2.Source = null;
+
+                            Video1.LoadedBehavior = MediaState.Play;
                         }
                         else
                         {
@@ -588,6 +590,8 @@ namespace BackgroundChanger.Controls
                             AnimatedImage2.Source = null;
                             Video1.Source = null;
                             Video2.Source = new Uri(image);
+
+                            Video2.LoadedBehavior = MediaState.Play;
                         }
                         else
                         {
@@ -613,6 +617,8 @@ namespace BackgroundChanger.Controls
                             AnimatedImage2.Source = null;
                             Video1.Source = new Uri(image);
                             Video2.Source = null;
+
+                            Video1.LoadedBehavior = MediaState.Play;
                         }
                         else
                         {
@@ -640,6 +646,8 @@ namespace BackgroundChanger.Controls
                         AnimatedImage2.Source = null;
                         Video1.Source = new Uri(image);
                         Video2.Source = null;
+
+                        Video1.LoadedBehavior = MediaState.Play;
                     }
                     else
                     {
@@ -657,6 +665,8 @@ namespace BackgroundChanger.Controls
                         AnimatedImage2.Source = null;
                         Video1.Source = null;
                         Video2.Source = new Uri(image);
+
+                        Video2.LoadedBehavior = MediaState.Play;
                     }
                     else
                     {
@@ -674,6 +684,8 @@ namespace BackgroundChanger.Controls
                         AnimatedImage2.Source = null;
                         Video1.Source = new Uri(image);
                         Video2.Source = null;
+
+                        Video1.LoadedBehavior = MediaState.Play;
                     }
                     else
                     {
@@ -698,41 +710,44 @@ namespace BackgroundChanger.Controls
 
             try
             {
-                string PathImage = string.Empty;
-
-                if (ControlDataContext.EnableRandomSelect)
+                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
-                    if (gameBackgroundImages.ItemsBackground.Count != 0)
+                    string PathImage = string.Empty;
+
+                    if (ControlDataContext.EnableRandomSelect)
                     {
-                        Random rnd = new Random();
-                        int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
-                        while (ImgSelected == Counter && gameBackgroundImages.ItemsBackground.Count != 1)
+                        if (gameBackgroundImages.ItemsBackground.Count != 0)
                         {
-                            ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
-                        }
-                        Counter = ImgSelected;
+                            Random rnd = new Random();
+                            int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
+                            while (ImgSelected == Counter && gameBackgroundImages.ItemsBackground.Count != 1)
+                            {
+                                ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
+                            }
+                            Counter = ImgSelected;
 
-                        PathImage = gameBackgroundImages.ItemsBackground[ImgSelected].FullPath;
-                    }
-
-                    SetBackgroundImage(PathImage);
-                }
-                else
-                {
-                    Counter++;
-
-                    if (gameBackgroundImages.ItemsBackground.Count != 0)
-                    {
-                        if (Counter == gameBackgroundImages.ItemsBackground.Count)
-                        {
-                            Counter = 0;
+                            PathImage = gameBackgroundImages.ItemsBackground[ImgSelected].FullPath;
                         }
 
-                        PathImage = gameBackgroundImages.ItemsBackground[Counter].FullPath;
+                        SetBackgroundImage(PathImage);
                     }
+                    else
+                    {
+                        Counter++;
 
-                    SetBackgroundImage(PathImage);
-                }
+                        if (gameBackgroundImages.ItemsBackground.Count != 0)
+                        {
+                            if (Counter == gameBackgroundImages.ItemsBackground.Count)
+                            {
+                                Counter = 0;
+                            }
+
+                            PathImage = gameBackgroundImages.ItemsBackground[Counter].FullPath;
+                        }
+
+                        SetBackgroundImage(PathImage);
+                    }
+                }));
             }
             catch (Exception ex)
             {

@@ -443,17 +443,24 @@ namespace BackgroundChanger.Views
 
                     if (System.IO.Path.GetExtension((string)value).ToLower().Contains("png"))
                     {
-                        CPng_Reader pngr = new CPng_Reader();
-                        Dictionary<fcTL, MemoryStream> m_Apng;
-                        using (var fStream = FileSystem.OpenReadFileStreamSafe((string)value))
+                        try
                         {
-                            m_Apng = pngr.Open(fStream).SpltAPng();
-                        }
+                            CPng_Reader pngr = new CPng_Reader();
+                            Dictionary<fcTL, MemoryStream> m_Apng;
+                            using (var fStream = FileSystem.OpenReadFileStreamSafe((string)value))
+                            {
+                                m_Apng = pngr.Open(fStream).SpltAPng();
+                            }
 
-                        // Animated
-                        if (m_Apng.Count > 0)
+                            // Animated
+                            if (m_Apng.Count > 0)
+                            {
+                                return "\ueb16 \ueb13";
+                            }
+                        }
+                        catch (Exception ex)
                         {
-                            return "\ueb16 \ueb13";
+                            Common.LogError(ex, true);
                         }
                     } 
 

@@ -165,6 +165,8 @@ namespace BackgroundChanger.Controls
                 {
                     try
                     {
+                        Video1.LoadedBehavior = MediaState.Stop;
+
                         if (!gameBackgroundImages.HasDataCover)
                         {
                             MustDisplay = false;
@@ -271,16 +273,6 @@ namespace BackgroundChanger.Controls
 
         public void SetCoverImage(string PathImage = null)
         {
-            //this.Dispatcher?.BeginInvoke(DispatcherPriority.Render, (Action)delegate
-            //{
-            //    if (!File.Exists(PathImage))
-            //    {
-            //        PathImage = null;
-            //    }
-            //
-            //    this.Source = PathImage;
-            //});
-
             if (!File.Exists(PathImage))
             {
                 ControlDataContext.ImageSource = null;
@@ -293,6 +285,8 @@ namespace BackgroundChanger.Controls
             {
                 ControlDataContext.ImageSource = null;
                 ControlDataContext.VideoSource = PathImage;
+
+                Video1.LoadedBehavior = MediaState.Play;
             }
             else
             {
@@ -365,6 +359,11 @@ namespace BackgroundChanger.Controls
 
             if (newSource?.Equals(currentSource) == true)
             {
+                if (Video1.Source != null)
+                {
+                    Video1.LoadedBehavior = MediaState.Play;
+                }
+
                 return;
             }
 
@@ -379,6 +378,8 @@ namespace BackgroundChanger.Controls
             {
                 Image1.Source = null;
                 Video1.Source = new Uri(image);
+
+                Video1.LoadedBehavior = MediaState.Play;
             }
             else
             {
@@ -397,41 +398,44 @@ namespace BackgroundChanger.Controls
 
             try
             {
-                string PathImage = string.Empty;
-
-                if (ControlDataContext.EnableRandomSelect)
+                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => 
                 {
-                    if (gameBackgroundImages.ItemsCover.Count != 0)
+                    string PathImage = string.Empty;
+
+                    if (ControlDataContext.EnableRandomSelect)
                     {
-                        Random rnd = new Random();
-                        int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
-                        while (ImgSelected == Counter && gameBackgroundImages.ItemsCover.Count != 1)
+                        if (gameBackgroundImages.ItemsCover.Count != 0)
                         {
-                            ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
-                        }
-                        Counter = ImgSelected;
+                            Random rnd = new Random();
+                            int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
+                            while (ImgSelected == Counter && gameBackgroundImages.ItemsCover.Count != 1)
+                            {
+                                ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
+                            }
+                            Counter = ImgSelected;
 
-                        PathImage = gameBackgroundImages.ItemsCover[ImgSelected].FullPath;
-                    }
-
-                    SetCoverImage(PathImage);
-                }
-                else
-                {
-                    Counter++;
-
-                    if (gameBackgroundImages.ItemsCover.Count != 0)
-                    {
-                        if (Counter == gameBackgroundImages.ItemsCover.Count)
-                        {
-                            Counter = 0;
+                            PathImage = gameBackgroundImages.ItemsCover[ImgSelected].FullPath;
                         }
 
-                        PathImage = gameBackgroundImages.ItemsCover[Counter].FullPath;
+                        SetCoverImage(PathImage);
                     }
+                    else
+                    {
+                        Counter++;
 
-                    SetCoverImage(PathImage);
-                }
+                        if (gameBackgroundImages.ItemsCover.Count != 0)
+                        {
+                            if (Counter == gameBackgroundImages.ItemsCover.Count)
+                            {
+                                Counter = 0;
+                            }
+
+                            PathImage = gameBackgroundImages.ItemsCover[Counter].FullPath;
+                        }
+
+                        SetCoverImage(PathImage);
+                    }
+                }));
             }
             catch (Exception ex)
             {
