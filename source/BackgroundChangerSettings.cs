@@ -14,7 +14,7 @@ namespace BackgroundChanger
         public bool MenuInExtensions { get; set; } = true;
 
 
-        private bool _EnableBackgroundImage { get; set; } = false;
+        private bool _EnableBackgroundImage { get; set; } = true;
         public bool EnableBackgroundImage
         {
             get => _EnableBackgroundImage;
@@ -41,7 +41,7 @@ namespace BackgroundChanger
         }
 
 
-        private bool _EnableCoverImage { get; set; } = false;
+        private bool _EnableCoverImage { get; set; } = true;
         public bool EnableCoverImage
         {
             get => _EnableCoverImage;
