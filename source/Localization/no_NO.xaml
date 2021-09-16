@@ -3,7 +3,7 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
+    <sys:String x:Key="LOCBc">Bakgrunnsendrer</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">Manage background images</sys:String>
     <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
@@ -27,6 +27,7 @@
 
     <sys:String x:Key="LOCBcSteamGridDbSelecty">Select from SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
     
     <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
 

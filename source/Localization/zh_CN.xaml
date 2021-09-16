@@ -5,28 +5,29 @@
 
     <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">管理背景图片</sys:String>
-    <sys:String x:Key="LOCBcManageCover">管理封面图片</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">管理背景图</sys:String>
+    <sys:String x:Key="LOCBcManageCover">管理封面图</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
     <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB API 密钥</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">显示插件背景图片</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">显示插件封面图片</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">显示插件背景图</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">显示插件封面图</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">启用随机选择</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">启用随机选</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">启用自动切换</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">时间间隔</sys:String>
     <sys:String x:Key="LOCBcSeconds">秒</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">启用动画背景</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">启用动画背</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">启用动画封面</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">从 SteamGridDB 选择</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelecty">从 SteamGridDB 选</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
     
     <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
 

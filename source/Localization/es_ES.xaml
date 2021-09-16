@@ -5,29 +5,30 @@
 
     <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">Manage background images</sys:String>
-    <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">Administrar imágenes de fondo</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Administrar imágenes de portada</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api key</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">Clave API de SteamGridDB</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Mostrar la imagen de fondo del plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Mostrar la imagen de portada del plugin</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">Enable random selection</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
-    <sys:String x:Key="LOCBcTimeInterval">Time interval</sys:String>
-    <sys:String x:Key="LOCBcSeconds">seconds</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">Habilitar selección aleatoria</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Habilitar cambio automático</sys:String>
+    <sys:String x:Key="LOCBcTimeInterval">Intervalo de tiempo</sys:String>
+    <sys:String x:Key="LOCBcSeconds">segundos</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Habilitar fondo animado</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Habilitar portada animada</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">Select from SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelecty">Selecciona de SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">archivo ffmpeg</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">Archivo webpinfo</sys:String>
     
-    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
+    <sys:String x:Key="LOCBcFTooltTipConvert">Convertir a mp4 (rendimiento mejorado)</sys:String>
 
 </ResourceDictionary>

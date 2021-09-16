@@ -26,8 +26,9 @@
     <!-- ImagesManagerView -->
 
     <sys:String x:Key="LOCBcSteamGridDbSelecty">Scegli da SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">file ffmpeg</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">file webpinfo</sys:String>
     
-    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
+    <sys:String x:Key="LOCBcFTooltTipConvert">Converti in mp4 (prestazioni migliorate)</sys:String>
 
 </ResourceDictionary>
