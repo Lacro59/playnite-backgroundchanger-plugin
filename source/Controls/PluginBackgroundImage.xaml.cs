@@ -304,7 +304,6 @@ namespace BackgroundChanger.Controls
         internal Storyboard Image2FadeIn;
         internal Storyboard Image1FadeOut;
         internal Storyboard Image2FadeOut;
-        internal Storyboard stateAnim;
         internal Storyboard BorderDarkenFadeOut;
 
         #region AnimationEnabled
@@ -434,7 +433,6 @@ namespace BackgroundChanger.Controls
             AnimatedImage2.UpdateLayout();
             Video2.Source = null;
             Video2.UpdateLayout();
-            GC.Collect();
         }
 
         private void BorderDarkenOut_Completed(object sender, EventArgs e)
@@ -560,19 +558,19 @@ namespace BackgroundChanger.Controls
 
                         if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
                         {
-                            AnimatedImage1.Source = null;
-                            AnimatedImage2.Source = null;
+                            //AnimatedImage1.Source = null;
+                            //AnimatedImage2.Source = null;
                             Video1.Source = new Uri(image);
-                            Video2.Source = null;
+                            //Video2.Source = null;
 
                             Video1.LoadedBehavior = MediaState.Play;
                         }
                         else
                         {
-                            Video1.Source = null;
-                            Video2.Source = null;
+                            //Video1.Source = null;
+                            //Video2.Source = null;
                             AnimatedImage1.Source = image;
-                            AnimatedImage2.Source = null;
+                            //AnimatedImage2.Source = null;
                         }
 
                         Image1FadeIn.Begin();
@@ -586,18 +584,18 @@ namespace BackgroundChanger.Controls
 
                         if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
                         {
-                            AnimatedImage1.Source = null;
-                            AnimatedImage2.Source = null;
-                            Video1.Source = null;
+                            //AnimatedImage1.Source = null;
+                            //AnimatedImage2.Source = null;
+                            //Video1.Source = null;
                             Video2.Source = new Uri(image);
 
                             Video2.LoadedBehavior = MediaState.Play;
                         }
                         else
                         {
-                            Video1.Source = null;
-                            Video2.Source = null;
-                            AnimatedImage1.Source = null;
+                            //Video1.Source = null;
+                            //Video2.Source = null;
+                            //AnimatedImage1.Source = null;
                             AnimatedImage2.Source = image;
                         }
 
@@ -613,19 +611,19 @@ namespace BackgroundChanger.Controls
 
                         if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
                         {
-                            AnimatedImage1.Source = null;
-                            AnimatedImage2.Source = null;
+                            //AnimatedImage1.Source = null;
+                            //AnimatedImage2.Source = null;
                             Video1.Source = new Uri(image);
-                            Video2.Source = null;
+                            //Video2.Source = null;
 
                             Video1.LoadedBehavior = MediaState.Play;
                         }
                         else
                         {
-                            Video1.Source = null;
-                            Video2.Source = null;
+                            //Video1.Source = null;
+                            //Video2.Source = null;
                             AnimatedImage1.Source = image;
-                            AnimatedImage2.Source = null;
+                            //AnimatedImage2.Source = null;
                         }
 
                         Image1FadeIn.Begin();
@@ -642,37 +640,37 @@ namespace BackgroundChanger.Controls
                 {
                     if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
                     {
-                        AnimatedImage1.Source = null;
-                        AnimatedImage2.Source = null;
+                        //AnimatedImage1.Source = null;
+                        //AnimatedImage2.Source = null;
                         Video1.Source = new Uri(image);
-                        Video2.Source = null;
+                        //Video2.Source = null;
 
                         Video1.LoadedBehavior = MediaState.Play;
                     }
                     else
                     {
-                        Video1.Source = null;
-                        Video2.Source = null;
+                        //Video1.Source = null;
+                        //Video2.Source = null;
                         AnimatedImage1.Source = image;
-                        AnimatedImage2.Source = null;
+                        //AnimatedImage2.Source = null;
                     }
                 }
                 else if (currentImage == CurrentImage.Image2)
                 {
                     if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
                     {
-                        AnimatedImage1.Source = null;
-                        AnimatedImage2.Source = null;
-                        Video1.Source = null;
+                        //AnimatedImage1.Source = null;
+                        //AnimatedImage2.Source = null;
+                        //Video1.Source = null;
                         Video2.Source = new Uri(image);
 
                         Video2.LoadedBehavior = MediaState.Play;
                     }
                     else
                     {
-                        Video1.Source = null;
-                        Video2.Source = null;
-                        AnimatedImage1.Source = null;
+                        //Video1.Source = null;
+                        //Video2.Source = null;
+                        //AnimatedImage1.Source = null;
                         AnimatedImage2.Source = image;
                     }
                 }
@@ -680,19 +678,19 @@ namespace BackgroundChanger.Controls
                 {
                     if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
                     {
-                        AnimatedImage1.Source = null;
-                        AnimatedImage2.Source = null;
+                        //AnimatedImage1.Source = null;
+                        //AnimatedImage2.Source = null;
                         Video1.Source = new Uri(image);
-                        Video2.Source = null;
+                        //Video2.Source = null;
 
                         Video1.LoadedBehavior = MediaState.Play;
                     }
                     else
                     {
-                        Video1.Source = null;
-                        Video2.Source = null;
+                        //Video1.Source = null;
+                        //Video2.Source = null;
                         AnimatedImage1.Source = image;
-                        AnimatedImage2.Source = null;
+                        //AnimatedImage2.Source = null;
                     }
 
                     currentImage = CurrentImage.Image1;

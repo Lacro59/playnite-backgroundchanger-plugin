@@ -27,22 +27,34 @@
     <UserControl.Resources>
         <Storyboard x:Key="Image1FadeIn">
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             Storyboard.TargetName="Image1"
+                             Storyboard.TargetName="AnimatedImage1"
+                             From="0.0" To="1.0" Duration="0:0:0.5"/>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                             Storyboard.TargetName="Video1"
                              From="0.0" To="1.0" Duration="0:0:0.5"/>
         </Storyboard>
         <Storyboard x:Key="Image2FadeIn">
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             Storyboard.TargetName="Image2"
+                             Storyboard.TargetName="AnimatedImage2"
+                             From="0.0" To="1.0" Duration="0:0:0.5"/>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                             Storyboard.TargetName="Video2"
                              From="0.0" To="1.0" Duration="0:0:0.5"/>
         </Storyboard>
         <Storyboard x:Key="Image1FadeOut">
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             Storyboard.TargetName="Image1"
+                             Storyboard.TargetName="AnimatedImage1"
+                             From="1.0" To="0.0" Duration="0:0:0.5"/>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                             Storyboard.TargetName="Video1"
                              From="1.0" To="0.0" Duration="0:0:0.5"/>
         </Storyboard>
         <Storyboard x:Key="Image2FadeOut">
             <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             Storyboard.TargetName="Image2"
+                             Storyboard.TargetName="AnimatedImage2"
+                             From="1.0" To="0.0" Duration="0:0:0.5"/>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                             Storyboard.TargetName="Video2"
                              From="1.0" To="0.0" Duration="0:0:0.5"/>
         </Storyboard>
         <Storyboard x:Key="BorderDarkenFadeOut">
@@ -54,7 +66,7 @@
     </UserControl.Resources>
 
     <Grid Name="ImageHolder" Loaded="ImageHolder_Loaded">
-        <StackPanel x:Name="Image1">
+        <Grid>
             <controlsAnimated:AnimatedImage x:Name="AnimatedImage1"
                                             HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
                                             VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}"
@@ -71,9 +83,9 @@
                           OpacityMask="{Binding ImageOpacityMask, RelativeSource={RelativeSource AncestorType=UserControl}}"
                           HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
                           VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}" />
-        </StackPanel>
+        </Grid>
 
-        <StackPanel x:Name="Image2">
+        <Grid>
             <controlsAnimated:AnimatedImage x:Name="AnimatedImage2"
                                             HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
                                             VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}"
@@ -90,7 +102,7 @@
                           OpacityMask="{Binding ImageOpacityMask, RelativeSource={RelativeSource AncestorType=UserControl}}"
                           HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
                           VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}" />
-        </StackPanel>
+        </Grid>
 
         <Border x:Name="BorderDarken" Background="{Binding ImageDarkeningBrush, RelativeSource={RelativeSource AncestorType=UserControl}}" />
     </Grid>
