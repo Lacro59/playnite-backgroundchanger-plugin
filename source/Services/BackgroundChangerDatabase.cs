@@ -109,6 +109,9 @@ namespace BackgroundChanger.Services
 
             if (gameBackgroundImages == null)
             {
+                PluginSettings.Settings.HasDataBackground = false;
+                PluginSettings.Settings.HasDataCover = false;
+
                 return;
             }
 
