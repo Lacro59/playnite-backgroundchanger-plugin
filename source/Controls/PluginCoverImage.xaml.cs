@@ -5,6 +5,7 @@ using CommonPluginsShared;
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
 using CommonPluginsShared.Interfaces;
+using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -105,9 +107,36 @@ namespace BackgroundChanger.Controls
 
             // Apply settings
             PluginSettings_PropertyChanged(null, null);
+
+            if (PluginDatabase.PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
+            {
+                EventManager.RegisterClassHandler(typeof(Window), Window.UnloadedEvent, new RoutedEventHandler(WindowBase_UnloadedEvent));
+            }
         }
 
-        // TODO Get after settings modification
+
+        private void WindowBase_UnloadedEvent(object sender, System.EventArgs e)
+        {
+            string WinIdProperty = string.Empty;
+            string WinName = string.Empty;
+
+            try
+            {
+                WinIdProperty = ((Window)sender).GetValue(AutomationProperties.AutomationIdProperty).ToString();
+                WinName = ((Window)sender).Name;
+
+                if (WinIdProperty == "WindowSettings")
+                {
+                    GetCoverProperties();
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {WinName} - {WinIdProperty}");
+            }
+        }
+
+
         private void GetCoverProperties()
         {
             var thisParent = ((FrameworkElement)((FrameworkElement)((FrameworkElement)this.Parent).Parent).Parent).Parent;

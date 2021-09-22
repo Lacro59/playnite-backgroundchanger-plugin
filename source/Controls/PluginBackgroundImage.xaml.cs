@@ -5,6 +5,7 @@ using CommonPluginsShared;
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
 using CommonPluginsShared.Interfaces;
+using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -111,9 +113,36 @@ namespace BackgroundChanger.Controls
 
             // Apply settings
             PluginSettings_PropertyChanged(null, null);
+
+            if (PluginDatabase.PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
+            {
+                EventManager.RegisterClassHandler(typeof(Window), Window.UnloadedEvent, new RoutedEventHandler(WindowBase_UnloadedEvent));
+            }
         }
 
-        // TODO Get after settings modification
+
+        private void WindowBase_UnloadedEvent(object sender, System.EventArgs e)
+        {
+            string WinIdProperty = string.Empty;
+            string WinName = string.Empty;
+
+            try
+            {
+                WinIdProperty = ((Window)sender).GetValue(AutomationProperties.AutomationIdProperty).ToString();
+                WinName = ((Window)sender).Name;
+
+                if (WinIdProperty == "WindowSettings")
+                {
+                    GetFadeImageProperties();
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {WinName} - {WinIdProperty}");
+            }
+        }
+
+
         private void GetFadeImageProperties()
         {
             FrameworkElement PART_ImageBackground = UI.SearchElementByName("ControlRoot", false, false, 2);
@@ -640,37 +669,37 @@ namespace BackgroundChanger.Controls
                 {
                     if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
                     {
-                        //AnimatedImage1.Source = null;
-                        //AnimatedImage2.Source = null;
+                        AnimatedImage1.Source = null;
+                        AnimatedImage2.Source = null;
                         Video1.Source = new Uri(image);
-                        //Video2.Source = null;
+                        Video2.Source = null;
 
                         Video1.LoadedBehavior = MediaState.Play;
                     }
                     else
                     {
-                        //Video1.Source = null;
-                        //Video2.Source = null;
+                        Video1.Source = null;
+                        Video2.Source = null;
                         AnimatedImage1.Source = image;
-                        //AnimatedImage2.Source = null;
+                        AnimatedImage2.Source = null;
                     }
                 }
                 else if (currentImage == CurrentImage.Image2)
                 {
                     if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
                     {
-                        //AnimatedImage1.Source = null;
-                        //AnimatedImage2.Source = null;
-                        //Video1.Source = null;
+                        AnimatedImage1.Source = null;
+                        AnimatedImage2.Source = null;
+                        Video1.Source = null;
                         Video2.Source = new Uri(image);
 
                         Video2.LoadedBehavior = MediaState.Play;
                     }
                     else
                     {
-                        //Video1.Source = null;
-                        //Video2.Source = null;
-                        //AnimatedImage1.Source = null;
+                        Video1.Source = null;
+                        Video2.Source = null;
+                        AnimatedImage1.Source = null;
                         AnimatedImage2.Source = image;
                     }
                 }
@@ -678,19 +707,19 @@ namespace BackgroundChanger.Controls
                 {
                     if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
                     {
-                        //AnimatedImage1.Source = null;
-                        //AnimatedImage2.Source = null;
+                        AnimatedImage1.Source = null;
+                        AnimatedImage2.Source = null;
                         Video1.Source = new Uri(image);
-                        //Video2.Source = null;
+                        Video2.Source = null;
 
                         Video1.LoadedBehavior = MediaState.Play;
                     }
                     else
                     {
-                        //Video1.Source = null;
-                        //Video2.Source = null;
+                        Video1.Source = null;
+                        Video2.Source = null;
                         AnimatedImage1.Source = image;
-                        //AnimatedImage2.Source = null;
+                        AnimatedImage2.Source = null;
                     }
 
                     currentImage = CurrentImage.Image1;
