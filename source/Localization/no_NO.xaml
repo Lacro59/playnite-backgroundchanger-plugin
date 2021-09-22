@@ -5,30 +5,30 @@
 
     <sys:String x:Key="LOCBc">Bakgrunnsendrer</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">Manage background images</sys:String>
-    <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">Administrer bakgrunnsbilder</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Administrer forsidebilder</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api key</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB API-nøkkel</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Vis utvidelsens bakgrunnsbilde</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Vis utvidelsens omslagsbilde</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">Enable random selection</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
-    <sys:String x:Key="LOCBcTimeInterval">Time interval</sys:String>
-    <sys:String x:Key="LOCBcSeconds">seconds</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">Bruk tilfeldig utvalg</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Aktiver automatisk endring</sys:String>
+    <sys:String x:Key="LOCBcTimeInterval">Tidsintervall</sys:String>
+    <sys:String x:Key="LOCBcSeconds">sekunder</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Aktiver animert bakgrunn</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Aktiver animert omslag</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">Select from SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
-    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelecty">Velg fra SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg-fil</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo-fil</sys:String>
     
-    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
+    <sys:String x:Key="LOCBcFTooltTipConvert">Konverter til mp4 (bedre ytelse)</sys:String>
 
 </ResourceDictionary>

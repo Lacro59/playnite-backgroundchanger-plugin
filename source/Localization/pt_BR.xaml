@@ -6,29 +6,29 @@
     <sys:String x:Key="LOCBc">AlteradorDeFundo</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">Gerenciar imagens de fundo</sys:String>
-    <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Gerenciar imagens de capa</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api key</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">Chave de api SteamGridDB</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Exibir a imagem de fundo do plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Exibir a imagem de fundo do plugin</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Ativar seleção aleatória</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Ativar mudança automática</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Intervalo de tempo</sys:String>
     <sys:String x:Key="LOCBcSeconds">segundos</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Ativar fundo animado</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Ativar capa animada</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">Select from SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelecty">Selecionar do SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">arquivo ffmpeg</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">arquivo webpinfo</sys:String>
     
-    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
+    <sys:String x:Key="LOCBcFTooltTipConvert">Converter para mp4 (melhor desempenho)</sys:String>
 
 </ResourceDictionary>
