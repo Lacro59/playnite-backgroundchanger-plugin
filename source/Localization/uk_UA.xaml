@@ -6,29 +6,29 @@
     <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">Керування фоновими зображеннями</sys:String>
-    <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Керувати зображеннями обкладинок</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api key</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">Ключ api SteamGridDB</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Показувати фонове зображення плагіну</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Показувати зображення обкладинки плагіну</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">Увімкнути випадковий вибі</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">Увімкнути випадковий вибір</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Увімкнути автоматичну зміну</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Часовий інтервал</sys:String>
     <sys:String x:Key="LOCBcSeconds">сек.</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Увімкнути анімоване фонове зображення</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Увімкнути анімовану обкладинку</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">Select from SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelecty">Вибрати зі SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">файл ffmpeg</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">файл webpinfo</sys:String>
     
-    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
+    <sys:String x:Key="LOCBcFTooltTipConvert">Конвертувати в mp4 (продуктивність поліпшена)</sys:String>
 
 </ResourceDictionary>
