@@ -20,7 +20,7 @@
     <sys:String x:Key="LOCBcTimeInterval">Intervalle de temps</sys:String>
     <sys:String x:Key="LOCBcSeconds">secondes</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Activer le fond anim</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Activer le fond animé</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">Activer la pochette animée</sys:String>
 
     <!-- ImagesManagerView -->
