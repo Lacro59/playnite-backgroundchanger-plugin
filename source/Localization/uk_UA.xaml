@@ -12,16 +12,16 @@
 
     <sys:String x:Key="LOCBcSteamGridDbApiKey">Ключ api SteamGridDB</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">Показувати фонове зображення плагіну</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Показувати зображення обкладинки плагіну</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Показувати фонове зображення плагін</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Показувати зображення обкладинки плагін</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">Увімкнути випадковий вибір</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">Увімкнути автоматичну зміну</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">Увімкнути випадковий вибі</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Увімкнути автоматичну змін</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Часовий інтервал</sys:String>
     <sys:String x:Key="LOCBcSeconds">сек.</sys:String>
 
     <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Увімкнути анімоване фонове зображення</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Увімкнути анімовану обкладинку</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Увімкнути анімовану обкладинк</sys:String>
 
     <!-- ImagesManagerView -->
 
