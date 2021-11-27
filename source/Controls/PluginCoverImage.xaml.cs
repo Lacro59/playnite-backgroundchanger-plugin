@@ -9,8 +9,6 @@ using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -21,15 +19,7 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Effects;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace BackgroundChanger.Controls
@@ -52,7 +42,7 @@ namespace BackgroundChanger.Controls
             }
         }
 
-        private PluginCoverImageDataContext ControlDataContext;
+        private PluginCoverImageDataContext ControlDataContext = new PluginCoverImageDataContext();
         internal override IDataContext _ControlDataContext
         {
             get
@@ -99,6 +89,7 @@ namespace BackgroundChanger.Controls
         public PluginCoverImage()
         {
             InitializeComponent();
+            this.DataContext = ControlDataContext;
 
             PluginDatabase.PluginSettings.PropertyChanged += PluginSettings_PropertyChanged;
             PluginDatabase.Database.ItemUpdated += Database_ItemUpdated;
@@ -184,38 +175,28 @@ namespace BackgroundChanger.Controls
         }
 
 
-        public override Task<bool> SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
+        public override void SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
         {
-            return Task.Run(() =>
+            gameBackgroundImages = (GameBackgroundImages)PluginGameData;
+
+            try
             {
-                gameBackgroundImages = (GameBackgroundImages)PluginGameData;
+                Video1.LoadedBehavior = MediaState.Stop;
 
-                this.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
+                if (!gameBackgroundImages.HasDataCover)
                 {
-                    try
-                    {
-                        Video1.LoadedBehavior = MediaState.Stop;
+                    MustDisplay = false;
+                    return;
+                }
 
-                        if (!gameBackgroundImages.HasDataCover)
-                        {
-                            MustDisplay = false;
-                            this.DataContext = ControlDataContext;
-                            return;
-                        }
-
-                        IsFirst = true;
-                        SetCover();
-                        this.DataContext = ControlDataContext;
-                        IsFirst = false;
-                    }
-                    catch (Exception ex)
-                    {
-                        Common.LogError(ex, false);
-                    }
-                }));
-
-                return true;
-            });
+                IsFirst = true;
+                SetCover();
+                IsFirst = false;
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false);
+            }
         }
 
 
@@ -284,16 +265,16 @@ namespace BackgroundChanger.Controls
 
         public void SetDefaultCoverImage()
         {
-            if (PluginDatabase.GameContext.CoverImage.IsNullOrEmpty())
+            if (GameContext.CoverImage.IsNullOrEmpty())
             {
                 SetCoverImage();
             }
             else
             {
-                string PathImage = ImageSourceManager.GetImagePath(PluginDatabase.GameContext.CoverImage);
+                string PathImage = ImageSourceManager.GetImagePath(GameContext.CoverImage);
                 if (PathImage.IsNullOrEmpty())
                 {
-                    PathImage = PluginDatabase.PlayniteApi.Database.GetFullFilePath(PluginDatabase.GameContext.CoverImage);
+                    PathImage = PluginDatabase.PlayniteApi.Database.GetFullFilePath(GameContext.CoverImage);
                 }
 
                 SetCoverImage(PathImage);
