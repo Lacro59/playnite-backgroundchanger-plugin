@@ -12,3 +12,11 @@ Packages:
       - Added MP4 support
       - Added WEBP to MP4 converter
       - Fixed many bugs
+  - Version: 2.0.1
+    RequiredApiVersion: 6.1.0
+    ReleaseDate: 2021-11-27
+    PackageUrl: https://github.com/Lacro59/playnite-backgroundchanger-plugin/releases/download/v2.0.1/playnite-backgroundchanger-plugin_2_0_1.pext
+    Changelog:
+      - Updated localizations
+      - Fixed minor bugs
+      - Improved performances
