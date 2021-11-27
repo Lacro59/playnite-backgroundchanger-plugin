@@ -1,5 +1,5 @@
 ﻿using BackgroundChanger.Services;
-using CommonPluginsPlaynite.Common;
+using CommonPlayniteShared.Common;
 using Playnite.SDK;
 using System;
 using System.Collections.Generic;

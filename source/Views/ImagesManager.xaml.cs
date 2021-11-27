@@ -2,8 +2,8 @@
 using BackgroundChanger.Models;
 using BackgroundChanger.Services;
 using CommonPlayniteShared;
-using CommonPluginsPlaynite;
-using CommonPluginsPlaynite.Common;
+using CommonPlayniteShared;
+using CommonPlayniteShared.Common;
 using CommonPluginsShared;
 using Playnite.SDK;
 using Playnite.SDK.Data;

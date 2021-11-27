@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:BackgroundChanger.Views"
              xmlns:playnitecontrols="clr-namespace:CommonPluginsControls.PlayniteControls"
-             xmlns:converters="clr-namespace:CommonPluginsPlaynite.Converters"
+             xmlns:converters="clr-namespace:CommonPlayniteShared.Converters"
              xmlns:controls="clr-namespace:wpf_animatedimage.Controls"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
              xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
