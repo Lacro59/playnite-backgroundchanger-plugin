@@ -123,7 +123,7 @@ namespace BackgroundChanger.Controls
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {WinName} - {WinIdProperty}");
+                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {WinName} - {WinIdProperty}", true, "BackgroundChanger");
             }
         }
 
@@ -166,7 +166,7 @@ namespace BackgroundChanger.Controls
                             }
                             catch (Exception ex)
                             {
-                                Common.LogError(ex, false);
+                                Common.LogError(ex, false, true, "BackgroundChanger");
                             }
                         }
                     }
@@ -195,7 +195,7 @@ namespace BackgroundChanger.Controls
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "BackgroundChanger");
             }
         }
 
@@ -449,7 +449,7 @@ namespace BackgroundChanger.Controls
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "BackgroundChanger");
             }
         }
 

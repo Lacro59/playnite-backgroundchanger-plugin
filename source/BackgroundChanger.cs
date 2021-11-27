@@ -154,7 +154,7 @@ namespace BackgroundChanger
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "BackgroundChanger");
             }
         }
 

@@ -125,7 +125,7 @@ namespace BackgroundChanger.Views
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, false);
+                    Common.LogError(ex, false, true, "BackgroundChanger");
                 }
 
                 this.Dispatcher.BeginInvoke((Action)delegate
@@ -165,7 +165,7 @@ namespace BackgroundChanger.Views
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, false);
+                    Common.LogError(ex, false, true, "BackgroundChanger");
                 }
 
                 this.Dispatcher.BeginInvoke((Action)delegate

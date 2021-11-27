@@ -45,7 +45,7 @@ namespace BackgroundChanger.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "BackgroundChanger");
             }
 
             return null;
@@ -67,7 +67,7 @@ namespace BackgroundChanger.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "BackgroundChanger");
             }
 
             return null;
@@ -94,7 +94,7 @@ namespace BackgroundChanger.Services
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, false, $"Error on download {url}");
+                    Common.LogError(ex, false, $"Error on download {url}", true, "BackgroundChanger");
                     return string.Empty;
                 }
 

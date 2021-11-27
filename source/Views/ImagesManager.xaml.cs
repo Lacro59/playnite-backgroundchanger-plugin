@@ -117,7 +117,7 @@ namespace BackgroundChanger.Views
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "BackgroundChanger");
             }
         }
 
@@ -138,7 +138,7 @@ namespace BackgroundChanger.Views
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "BackgroundChanger");
             }
         }
 
@@ -164,7 +164,7 @@ namespace BackgroundChanger.Views
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "BackgroundChanger");
             }
         }
 
@@ -202,7 +202,7 @@ namespace BackgroundChanger.Views
                         }
                         catch (Exception ex)
                         {
-                            Common.LogError(ex, false);
+                            Common.LogError(ex, false, true, "BackgroundChanger");
                         }
                     }, globalProgressOptions);
 
@@ -225,7 +225,7 @@ namespace BackgroundChanger.Views
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "BackgroundChanger");
             }
         }
 
@@ -305,7 +305,7 @@ namespace BackgroundChanger.Views
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "BackgroundChanger");
             }
         }
 
@@ -372,7 +372,7 @@ namespace BackgroundChanger.Views
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "BackgroundChanger");
             }
 
             return VideoPath;
@@ -400,7 +400,7 @@ namespace BackgroundChanger.Views
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, false);
+                    Common.LogError(ex, false, true, "BackgroundChanger");
                 }
             }, globalProgressOptions);
 
@@ -469,7 +469,7 @@ namespace BackgroundChanger.Views
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "BackgroundChanger");
             }
 
             return string.Empty;
