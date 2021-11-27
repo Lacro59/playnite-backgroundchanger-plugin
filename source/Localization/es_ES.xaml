@@ -3,7 +3,7 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
+    <sys:String x:Key="LOCBc">Cambiador de fondo</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">Administrar imágenes de fondo</sys:String>
     <sys:String x:Key="LOCBcManageCover">Administrar imágenes de portada</sys:String>
