@@ -3,11 +3,9 @@ using CommonPlayniteShared.Common;
 using CommonPluginsShared;
 using Playnite.SDK.Data;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BackgroundChanger.Models
 {
