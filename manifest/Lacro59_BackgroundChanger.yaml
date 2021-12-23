@@ -20,3 +20,10 @@ Packages:
       - Updated localizations
       - Fixed minor bugs
       - Improved performances
+  - Version: 2.0.2
+    RequiredApiVersion: 6.2.0
+    ReleaseDate: 2021-12-23
+    PackageUrl: https://github.com/Lacro59/playnite-backgroundchanger-plugin/releases/download/v2.0.2/playnite-backgroundchanger-plugin_2_0_2.pext
+    Changelog:
+      - Updated localizations
+      - Now the favorite selection is first displayed in all cases
