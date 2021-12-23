@@ -246,15 +246,30 @@ namespace BackgroundChanger.Controls
                 }
                 else if (ControlDataContext.EnableRandomSelect)
                 {
-                    Random rnd = new Random();
-                    int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
-                    PathImage = gameBackgroundImages.ItemsCover[ImgSelected].FullPath;
+                    if (IsFirst && ItemFavorite != null)
+                    {
+                        PathImage = ItemFavorite.FullPath;
+                    }
+                    else
+                    {
+                        Random rnd = new Random();
+                        int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
+                        PathImage = gameBackgroundImages.ItemsCover[ImgSelected].FullPath;
+                    }
 
                     SetCoverImage(PathImage);
                 }
                 else
                 {
-                    SetDefaultCoverImage();
+                    if (ItemFavorite != null)
+                    {
+                        PathImage = ItemFavorite.FullPath;
+                        SetCoverImage(PathImage);
+                    }
+                    else
+                    {
+                        SetDefaultCoverImage();
+                    }
                 }
             }
             else

@@ -240,6 +240,7 @@ namespace BackgroundChanger.Controls
                             Counter = gameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
                         }
                         else
+
                         {
                             PathImage = gameBackgroundImages.ItemsBackground[Counter].FullPath;
                         }
@@ -254,15 +255,30 @@ namespace BackgroundChanger.Controls
                 }
                 else if (ControlDataContext.EnableRandomSelect)
                 {
-                    Random rnd = new Random();
-                    int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
-                    PathImage = gameBackgroundImages.ItemsBackground[ImgSelected].FullPath;
+                    if (IsFirst && ItemFavorite != null)
+                    {
+                        PathImage = ItemFavorite.FullPath;
+                    }
+                    else
+                    {
+                        Random rnd = new Random();
+                        int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
+                        PathImage = gameBackgroundImages.ItemsBackground[ImgSelected].FullPath;
+                    }
 
                     SetBackgroundImage(PathImage);
                 }
                 else
                 {
-                    SetDefaultBackgroundImage();
+                    if (ItemFavorite != null)
+                    {
+                        PathImage = ItemFavorite.FullPath;
+                        SetBackgroundImage(PathImage);
+                    }
+                    else
+                    {
+                        SetDefaultBackgroundImage();
+                    }
                 }
             }
             else
