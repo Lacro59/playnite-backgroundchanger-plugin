@@ -40,6 +40,16 @@ namespace BackgroundChanger.Models
         public Author author { get; set; }
 
         [DontSerialize]
+        public bool untagged
+        {
+            get
+            {
+                return !nsfw && !humor && !epilepsy;
+            }
+        }
+
+
+        [DontSerialize]
         public bool isVideo {
             get
             {

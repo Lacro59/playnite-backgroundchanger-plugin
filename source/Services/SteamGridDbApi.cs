@@ -23,8 +23,8 @@ namespace BackgroundChanger.Services
         private string ApiKey { get; set; }
         private const string UrlBase = @"https://www.steamgriddb.com";
         private string UrlSearch = UrlBase + "/api/v2/search/autocomplete/{0}";
-        private string UrlSearchGrids = UrlBase + "/api/v2/grids/game/{0}?dimensions=600x900,920x430,460x215,1024x1024,342x482&mimes=image/png,image/webp,image/jpeg&types=static,animated&styles=alternate,blurred,material,white_logo,no_logo";
-        private string UrlSearchHeroes = UrlBase + "/api/v2/heroes/game/{0}?dimensions=1920x620,3840x1240,1600x650&mimes=image/png,image/webp,image/jpeg&types=static,animated&styles=alternate,blurred,material";
+        private string UrlSearchGrids = UrlBase + "/api/v2/grids/game/{0}?dimensions=600x900,920x430,460x215,1024x1024,342x482&mimes=image/png,image/webp,image/jpeg&types=static,animated&styles=alternate,blurred,material,white_logo,no_logo&nsfw=any&humour=any";
+        private string UrlSearchHeroes = UrlBase + "/api/v2/heroes/game/{0}?dimensions=1920x620,3840x1240,1600x650&mimes=image/png,image/webp,image/jpeg&types=static,animated&styles=alternate,blurred,material&nsfw=any&humour=any";
         private string UrlGame = UrlBase + "/game/{0}";
 
 

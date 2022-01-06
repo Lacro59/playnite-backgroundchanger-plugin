@@ -30,7 +30,7 @@
 
         <Grid Margin="10" Name="PART_Data">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="280" />
+                <ColumnDefinition Width="250" />
                 <ColumnDefinition Width="10" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
@@ -69,25 +69,23 @@
                 <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*" />
-                        <ColumnDefinition Width="10" />
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="20" />
                         <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="20" />
                         <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="0.5*" />
                         <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="10" />
                         <RowDefinition Height="auto" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
 
                     <Label Grid.Row="0" Grid.Column="0" Content="{DynamicResource LOCCommonDimensions}" />
-                    <ComboBox Grid.Row="2" Grid.Column="0" Margin="10,0,0,0" Name="PART_ComboDimensions">
+                    <ComboBox Grid.Row="2" Grid.Column="0" Margin="10,0,0,0" Name="PART_ComboDimensions" IsEditable="true" IsReadOnly="true">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <CheckBox Checked="ApplyFilter" Unchecked="ApplyFilter"
@@ -97,49 +95,75 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <Label Grid.Row="0" Grid.Column="2" Content="{DynamicResource LOCCommonStyles}" />
-                    <ComboBox Grid.Row="2" Grid.Column="2" Margin="10,0,0,0" Name="PART_ComboStyles">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <CheckBox Checked="ApplyFilter" Unchecked="ApplyFilter"
-                                          Content="{Binding Name}" Tag="{Binding Data}" IsChecked="{Binding IsChecked}">
-                                </CheckBox>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-
-                    <Label Grid.Row="0" Grid.Column="4" Content="{DynamicResource LOCCommonSortByDate}" />
-                    <StackPanel Grid.Row="2" Grid.Column="4" Margin="10,0,0,0" Orientation="Horizontal">
+                    <Label Grid.Row="0" Grid.Column="2" Content="{DynamicResource LOCCommonSortByDate}" />
+                    <StackPanel Grid.Row="2" Grid.Column="2" Margin="10,0,0,0" Orientation="Horizontal">
                         <ToggleButton Name="PART_ButtonSortByDate_Asc" Content="&#xea5a;" IsChecked="False"
                                       Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
                         <ToggleButton Name="PART_ButtonSortByDate_Desc" Content="&#xea59;" IsChecked="True" Margin="10,0,0,0"
                                       Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
                     </StackPanel>
                     
-                    <Label Grid.Row="0" Grid.Column="6" Content="{DynamicResource LOCCommonSortByScore}" />
-                    <StackPanel Grid.Row="2" Grid.Column="6" Margin="10,0,0,0" Orientation="Horizontal">
+                    <Label Grid.Row="0" Grid.Column="4" Content="{DynamicResource LOCCommonSortByScore}" />
+                    <StackPanel Grid.Row="2" Grid.Column="4" Margin="10,0,0,0" Orientation="Horizontal">
                         <ToggleButton Name="PART_ButtonSortByScore_Asc" Content="&#xea5a;" IsChecked="False"
                                       Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
                         <ToggleButton Name="PART_ButtonSortByScore_Desc" Content="&#xea59;" IsChecked="False" Margin="10,0,0,0"
                                       Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
                     </StackPanel>
 
-                    <Label Grid.Row="0" Grid.Column="8" Content="{DynamicResource LOCCommonTypes}" />
-                    <ComboBox Grid.Row="2" Grid.Column="8" Margin="10,0,0,0" Name="PART_ComboTypes">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <CheckBox Checked="ApplyFilter" Unchecked="ApplyFilter"
-                                          Content="{Binding Name}" Tag="{Binding Data}" IsChecked="{Binding IsChecked}">
-                                </CheckBox>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-
-
                     <StackPanel Grid.Row="0" Grid.Column="20" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Label Content="{DynamicResource LOCCommonTotalFound}" />
                         <Label Margin="10,0,0,0" Name="PART_TotalFound" />
                     </StackPanel>
+
+                    <Grid Grid.Row="4" Grid.ColumnSpan="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="30" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="30" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="300" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0" Content="{DynamicResource LOCCommonStyles}" />
+                        <ComboBox Grid.Row="2" Grid.Column="2" Name="PART_ComboStyles" IsEditable="true" IsReadOnly="true">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Checked="ApplyFilter" Unchecked="ApplyFilter"
+                                              Content="{Binding Name}" Tag="{Binding Data}" IsChecked="{Binding IsChecked}">
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <Label Grid.Row="0" Grid.Column="4" Content="{DynamicResource LOCCommonTypes}" />
+                        <ComboBox Grid.Row="2" Grid.Column="6" Name="PART_ComboTypes" IsEditable="true" IsReadOnly="true">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Checked="ApplyFilter" Unchecked="ApplyFilter"
+                                              Content="{Binding Name}" Tag="{Binding Data}" IsChecked="{Binding IsChecked}">
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <Label Grid.Row="0" Grid.Column="8" Content="{DynamicResource LOCTagsLabel}" />
+                        <ComboBox Grid.Row="2" Grid.Column="10" Name="PART_ComboTags" IsEditable="true" IsReadOnly="true">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Checked="ApplyFilter" Unchecked="ApplyFilter"
+                                          Content="{Binding Name}" Tag="{Binding Data}" IsChecked="{Binding IsChecked}">
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
                 </Grid>
 
                 <Grid Name="PART_GridElementContener" Grid.Row="2">

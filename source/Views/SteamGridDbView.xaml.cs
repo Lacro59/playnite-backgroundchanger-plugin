@@ -105,6 +105,22 @@ namespace BackgroundChanger.Views
                 new CheckData { Name="Animated", Data="animated" }
             };
             PART_ComboTypes.ItemsSource = CheckTypes;
+
+            // Set Tags
+            List<CheckData> CheckTags = new List<CheckData>
+            {
+                new CheckData { Name="Humor", Data="Humor" },
+                new CheckData { Name="Adult Content", Data="Adult Content", IsChecked=false },
+                new CheckData { Name="Epilepsy", Data="Epilepsy" },
+                new CheckData { Name="Untagged", Data="Untagged" }
+            };
+            PART_ComboTags.ItemsSource = CheckTags;
+
+
+            ComboBox_SelectionChanged(PART_ComboDimensions, null);
+            ComboBox_SelectionChanged(PART_ComboStyles, null);
+            ComboBox_SelectionChanged(PART_ComboTags, null);
+            ComboBox_SelectionChanged(PART_ComboTypes, null);
         }
 
 
@@ -157,11 +173,6 @@ namespace BackgroundChanger.Views
                 try
                 {
                     DataSearch = steamGridDbApi.SearchElement(Id, steamGridDbType);
-
-                    //foreach (var el in DataSearch.data)
-                    //{
-                    //    var tmp = el.IsVideoConverted;
-                    //}
                 }
                 catch (Exception ex)
                 {
@@ -266,6 +277,13 @@ namespace BackgroundChanger.Views
                 List<CheckData> ListStyles = PART_ComboStyles.ItemsSource as List<CheckData>;
                 DataSearchFiltered = DataSearchFiltered.Where(x => ListStyles.Any(y => x.style == y.Data && y.IsChecked)).ToList();
 
+                List<CheckData> ListTags = PART_ComboTags.ItemsSource as List<CheckData>;
+                bool humor = ListTags.Find(x => x.Name == "Humor").IsChecked;
+                bool nsfw = ListTags.Find(x => x.Name == "Adult Content").IsChecked;
+                bool epilepsy = ListTags.Find(x => x.Name == "Epilepsy").IsChecked;
+                bool untagged = ListTags.Find(x => x.Name == "Untagged").IsChecked;
+                DataSearchFiltered = DataSearchFiltered.Where(x => (!humor ? false : x.humor == true) || (!nsfw ? false : x.nsfw == true) || (!epilepsy ? false : x.epilepsy == true) || (!untagged ? false : x.untagged == true)).ToList();
+
                 List<CheckData> ListTypes = PART_ComboTypes.ItemsSource as List<CheckData>;
                 if (ListTypes[0].IsChecked && !ListTypes[1].IsChecked)
                 {
@@ -286,7 +304,13 @@ namespace BackgroundChanger.Views
             if (DataSearchFiltered != null)
             {
                 PART_TotalFound.Content = DataSearchFiltered.Count;
-            }            
+            }
+
+
+            ComboBox_SelectionChanged(PART_ComboDimensions, null);
+            ComboBox_SelectionChanged(PART_ComboStyles, null);
+            ComboBox_SelectionChanged(PART_ComboTags, null);
+            ComboBox_SelectionChanged(PART_ComboTypes, null);
         }
 
         private void PART_ButtonSort_Click(object sender, RoutedEventArgs e)
@@ -370,6 +394,22 @@ namespace BackgroundChanger.Views
                 PART_ElementList.ItemsSource = null;
                 PART_ElementList.ItemsSource = DataSearchFiltered;
             }
+        }
+
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string data = string.Empty;
+            if (((ComboBox)sender).Name == "PART_ComboDimensions")
+            {
+                data = string.Join(", ", ((List<CheckData>)((ComboBox)sender).ItemsSource).Where(x => x.IsChecked).Select(x => x.Name.Split('-')[2].Trim()));
+            }
+            else
+            {
+                data = string.Join(", ", ((List<CheckData>)((ComboBox)sender).ItemsSource).Where(x => x.IsChecked).Select(x => x.Name));
+            }
+
+            ((ComboBox)sender).Text = data;
         }
     }
 
