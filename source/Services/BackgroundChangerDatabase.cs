@@ -12,7 +12,7 @@ using CommonPluginsShared;
 
 namespace BackgroundChanger.Services
 {
-    public class BackgroundChangerDatabase : PluginDatabaseObject<BackgroundChangerSettingsViewModel, BackgroundImagesCollection, GameBackgroundImages>
+    public class BackgroundChangerDatabase : PluginDatabaseObject<BackgroundChangerSettingsViewModel, BackgroundImagesCollection, GameBackgroundImages, ItemImage>
     {
         public BackgroundChangerDatabase(IPlayniteAPI PlayniteApi, BackgroundChangerSettingsViewModel PluginSettings, string PluginUserDataPath) : base(PlayniteApi, PluginSettings, "BackgroundChanger", PluginUserDataPath)
         {
@@ -130,15 +130,6 @@ namespace BackgroundChanger.Services
 
             PluginSettings.Settings.HasDataBackground = gameBackgroundImages.HasDataBackground;
             PluginSettings.Settings.HasDataCover = gameBackgroundImages.HasDataCover;
-        }
-
-        public override void Games_ItemUpdated(object sender, ItemUpdatedEventArgs<Game> e)
-        {
-            foreach (var GameUpdated in e.UpdatedItems)
-            {
-                Database.SetGameInfo<ItemImage>(PlayniteApi, GameUpdated.NewData.Id);
-                var data = Get(GameUpdated.NewData.Id);
-            }
         }
     }
 }
