@@ -39,6 +39,8 @@ namespace BackgroundChanger
             }
         }
 
+        public double Volume { get; set; } = 0;
+
 
         private bool _EnableCoverImage { get; set; } = true;
         public bool EnableCoverImage

@@ -185,6 +185,9 @@ namespace BackgroundChanger.Controls
         {
             gameBackgroundImages = (GameBackgroundImages)PluginGameData;
 
+            Video1.Volume = PluginDatabase.PluginSettings.Settings.Volume / 10;
+            Video2.Volume = PluginDatabase.PluginSettings.Settings.Volume / 10;
+
             try
             {
                 Video1.LoadedBehavior = MediaState.Stop;

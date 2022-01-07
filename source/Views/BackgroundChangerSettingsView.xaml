@@ -93,6 +93,8 @@
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="10" />
                                 <RowDefinition Height="auto" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
 
                             <CheckBox IsChecked="{Binding Settings.EnableBackgroundImageRandomSelect}" Grid.Column="0" Grid.Row="0">
@@ -105,7 +107,7 @@
                             <StackPanel Grid.Row="4" Margin="30,0,0,0" Orientation="Horizontal" 
                                         Grid.ColumnSpan="3"
                                         IsEnabled="{Binding ElementName=CbBcAutoChanger, Path=IsChecked, TargetNullValue=false}">
-                                <Label Content="{DynamicResource LOCBcTimeInterval}" Width="auto" Margin="0,0,20,0" VerticalAlignment="Center" />
+                                <Label Content="{DynamicResource LOCBcTimeInterval}" Width="130" VerticalAlignment="Center" />
                                 <Slider Name="hwBcSlider" Width="300" Minimum="10" Maximum="600" Value="{Binding Settings.BackgroundImageAutoChangerTimer}" 
                                         ValueChanged="HwBcSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
                                         IsSnapToTickEnabled="True" />
@@ -113,8 +115,16 @@
                                        Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
                             </StackPanel>
 
-                            <Label Grid.Row="6" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
-                            <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedBackground}" Grid.Column="0" Grid.Row="8">
+                            <StackPanel Grid.Row="6" Orientation="Horizontal" Grid.ColumnSpan="3">
+                                <Label Content="{DynamicResource LOCSettingsMusiVolume}" Width="140" VerticalAlignment="Center" Margin="0,0,20,0" />
+                                <Slider Width="300" Minimum="0" Maximum="100" Value="{Binding Settings.Volume}" Name="PART_sVolume"
+                                        VerticalAlignment="Center" TickFrequency="1" IsSnapToTickEnabled="True" />
+                                <Label VerticalAlignment="Center" ContentStringFormat=" {0}%"
+                                       Content="{Binding ElementName=PART_sVolume, Path=Value}" Width="150" Margin="20,0,0,0" />
+                            </StackPanel>
+
+                            <Label Grid.Row="8" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
+                            <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedBackground}" Grid.Column="0" Grid.Row="10">
                                 <Label Content="{DynamicResource LOCBcEnableImageAnimatedBackground}" />
                             </CheckBox>
                         </Grid>

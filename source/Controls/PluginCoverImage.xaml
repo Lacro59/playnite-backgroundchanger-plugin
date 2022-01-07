@@ -37,7 +37,7 @@
                                         DecodePixelWidth="{Binding ElementName=ImageHolder, Path=ActualWidth}">
         </controlsAnimated:AnimatedImage>
 
-        <MediaElement x:Name="Video1" pbeh:MediaElementBehaviors.Repeat="True"
+        <MediaElement x:Name="Video1" pbeh:MediaElementBehaviors.Repeat="True" Volume="0"
                       Source="{Binding VideoSource, IsAsync=True}"
                       Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
                       StretchDirection="{Binding StretchDirection}"
