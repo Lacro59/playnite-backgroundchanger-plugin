@@ -27,3 +27,11 @@ Packages:
     Changelog:
       - Updated localizations
       - Now the favorite selection is first displayed in all cases
+  - Version: 2.1
+    RequiredApiVersion: 6.2.0
+    ReleaseDate: 2022-01-07
+    PackageUrl: https://github.com/Lacro59/playnite-backgroundchanger-plugin/releases/download/v2.1/playnite-backgroundchanger-plugin_2_1.pext
+    Changelog:
+      - Added new filter options for SteamGridDB
+      - Added option to set background volume video
+      - Fixed minor bugs
