@@ -3,7 +3,7 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">BackgroundChanger-背景切换器</sys:String>
+    <sys:String x:Key="LOCBc">背景切换器-BackgroundChanger</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">管理背景图像</sys:String>
     <sys:String x:Key="LOCBcManageCover">管理封面图像</sys:String>
