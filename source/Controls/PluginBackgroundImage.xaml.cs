@@ -147,7 +147,7 @@ namespace BackgroundChanger.Controls
                 List<string> UsedProperties = new List<string>
                 {
                     "AnimationEnabled", "ImageOpacityMask", "ImageDarkeningBrush", "Stretch", "StretchDirection",
-                    "IsBlurEnabled", "BlurAmount", "HighQualityBlur"
+                    "IsBlurEnabled", "BlurAmount", "HighQualityBlur", "OpacityMask"
                 };
 
                 foreach (PropertyInfo propImageBackground in ImageBackgroundProperties)
