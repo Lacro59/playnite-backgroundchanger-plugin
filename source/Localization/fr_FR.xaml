@@ -3,24 +3,24 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
+    <sys:String x:Key="LOCBc">Modificateur d'arrière-plan</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">Gérer les images de fond</sys:String>
-    <sys:String x:Key="LOCBcManageCover">Gestion des images de couverture</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Gérer les pochettes</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">Clé Api SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">Clé API SteamGridDB</sys:String>
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Affiche l'image de fond du plugin</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Affiche l'image de couverture du plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Affiche la pochette du plugin</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Activer la sélection aléatoire</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Activer le changement automatique</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Intervalle de temps</sys:String>
     <sys:String x:Key="LOCBcSeconds">secondes</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Activer le fond anim</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Activer le fond animé</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">Activer la pochette animée</sys:String>
 
     <!-- ImagesManagerView -->
