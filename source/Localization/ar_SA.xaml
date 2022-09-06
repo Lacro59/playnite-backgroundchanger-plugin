@@ -3,25 +3,25 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
+    <sys:String x:Key="LOCBc">محول الخلفية</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">إدارة صور الخلفية</sys:String>
-    <sys:String x:Key="LOCBcManageCover">إدارة صور الغلاف</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">إدارة صور الخلفي</sys:String>
+    <sys:String x:Key="LOCBcManageCover">إدارة صور الغلا</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
     <sys:String x:Key="LOCBcSteamGridDbApiKey">مفتاح SteamGridDB API</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">عرض صورة خلفية الإضافة</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">عرض صورة غلاف الاضافة</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">عرض صورة خلفية الإضاف</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">عرض صورة غلاف الاضاف</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">تفعيل الاختيار العشوائي</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">تفعيل التغيير التلقائي</sys:String>
-    <sys:String x:Key="LOCBcTimeInterval">الفاصل الزمني</sys:String>
-    <sys:String x:Key="LOCBcSeconds">ثواني</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">تفعيل الاختيار العشوائ</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">تفعيل التغيير التلقائ</sys:String>
+    <sys:String x:Key="LOCBcTimeInterval">الفاصل الزمن</sys:String>
+    <sys:String x:Key="LOCBcSeconds">ثوان</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">تفعيل الخلفية المتحركة</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">تفعيل الغلاف المتحرك</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">تفعيل الخلفية المتحرك</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">تفعيل الغلاف المتحر</sys:String>
 
     <!-- ImagesManagerView -->
 
