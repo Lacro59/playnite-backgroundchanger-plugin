@@ -3,9 +3,9 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">背景切换器-BackgroundChanger</sys:String>
+    <sys:String x:Key="LOCBc">背景变更器</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">管理背景图像</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">管理背景图片</sys:String>
     <sys:String x:Key="LOCBcManageCover">管理封面图像</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
@@ -15,20 +15,20 @@
     <sys:String x:Key="LOCBcEnableBackgroundImage">显示插件背景图像</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">显示插件封面图像</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">启用随机选</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">启用随机</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">启用自动切换</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">时间间隔</sys:String>
     <sys:String x:Key="LOCBcSeconds">秒</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">启用动画背</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">启用动画背景</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">启用动画封面</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">从 SteamGridDB 选</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelecty">从 SteamGridDB </sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg 文件</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo 文件</sys:String>
     
-    <sys:String x:Key="LOCBcFTooltTipConvert">转换为 mp4（改善性能</sys:String>
+    <sys:String x:Key="LOCBcFTooltTipConvert">转换为 mp4（改善性能）</sys:String>
 
 </ResourceDictionary>
