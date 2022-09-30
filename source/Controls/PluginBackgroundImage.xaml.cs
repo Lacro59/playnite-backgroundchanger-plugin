@@ -32,35 +32,23 @@ namespace BackgroundChanger.Controls
         private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
         internal override IPluginDatabase _PluginDatabase
         {
-            get
-            {
-                return PluginDatabase;
-            }
-            set
-            {
-                PluginDatabase = (BackgroundChangerDatabase)_PluginDatabase;
-            }
+            get => PluginDatabase;
+            set => PluginDatabase = (BackgroundChangerDatabase)_PluginDatabase;
         }
 
         private PluginBackgroundImageDataContext ControlDataContext = new PluginBackgroundImageDataContext();
         internal override IDataContext _ControlDataContext
         {
-            get
-            {
-                return ControlDataContext;
-            }
-            set
-            {
-                ControlDataContext = (PluginBackgroundImageDataContext)_ControlDataContext;
-            }
+            get => ControlDataContext;
+            set => ControlDataContext = (PluginBackgroundImageDataContext)_ControlDataContext;
         }
 
-        private System.Timers.Timer BcTimer;
-        private int Counter = 0;
-        private GameBackgroundImages gameBackgroundImages;
+        private Timer BcTimer { get; set; }
+        private int Counter { get; set; } = 0;
+        private GameBackgroundImages gameBackgroundImages { get; set; }
 
-        private bool WindowsIsActivated = true;
-        private bool IsFirst = true;
+        private bool WindowsIsActivated { get; set; } = true;
+        private bool IsFirst { get; set; } = true;
 
 
         public override void SetDefaultDataContext()
@@ -217,7 +205,7 @@ namespace BackgroundChanger.Controls
             
             if (gameBackgroundImages.HasDataBackground)
             {
-                var ItemFavorite = gameBackgroundImages.ItemsBackground.Where(x => x.IsFavorite).FirstOrDefault();
+                ItemImage ItemFavorite = gameBackgroundImages.ItemsBackground.Where(x => x.IsFavorite).FirstOrDefault();
 
                 if (ControlDataContext.EnableAutoChanger)
                 {
@@ -231,7 +219,7 @@ namespace BackgroundChanger.Controls
                         else
                         {
                             Random rnd = new Random();
-                            Counter = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
+                            Counter = rnd.Next(0, gameBackgroundImages.ItemsBackground.Count);
                             PathImage = gameBackgroundImages.ItemsBackground[Counter].FullPath;
                         }
                     }
@@ -243,7 +231,6 @@ namespace BackgroundChanger.Controls
                             Counter = gameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
                         }
                         else
-
                         {
                             PathImage = gameBackgroundImages.ItemsBackground[Counter].FullPath;
                         }
@@ -251,7 +238,7 @@ namespace BackgroundChanger.Controls
 
                     SetBackgroundImage(PathImage);
 
-                    BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.BackgroundImageAutoChangerTimer * 1000);
+                    BcTimer = new Timer(PluginDatabase.PluginSettings.Settings.BackgroundImageAutoChangerTimer * 1000);
                     BcTimer.AutoReset = true;
                     BcTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
                     BcTimer.Start();
@@ -748,10 +735,10 @@ namespace BackgroundChanger.Controls
                         if (gameBackgroundImages.ItemsBackground.Count != 0)
                         {
                             Random rnd = new Random();
-                            int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
+                            int ImgSelected = rnd.Next(0, gameBackgroundImages.ItemsBackground.Count);
                             while (ImgSelected == Counter && gameBackgroundImages.ItemsBackground.Count != 1)
                             {
-                                ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
+                                ImgSelected = rnd.Next(0, gameBackgroundImages.ItemsBackground.Count);
                             }
                             Counter = ImgSelected;
 

@@ -124,15 +124,7 @@ namespace BackgroundChanger
         private BackgroundChangerSettings EditingClone { get; set; }
 
         private BackgroundChangerSettings _Settings;
-        public BackgroundChangerSettings Settings
-        {
-            get => _Settings;
-            set
-            {
-                _Settings = value;
-                OnPropertyChanged();
-            }
-        }
+        public BackgroundChangerSettings Settings { get => _Settings; set => SetValue(ref _Settings, value); }
 
 
         public BackgroundChangerSettingsViewModel(BackgroundChanger plugin)
@@ -141,7 +133,7 @@ namespace BackgroundChanger
             Plugin = plugin;
 
             // Load saved settings.
-            var savedSettings = plugin.LoadPluginSettings<BackgroundChangerSettings>();
+            BackgroundChangerSettings savedSettings = plugin.LoadPluginSettings<BackgroundChangerSettings>();
 
             // LoadPluginSettings returns null if not saved data is available.
             if (savedSettings != null)

@@ -32,35 +32,23 @@ namespace BackgroundChanger.Controls
         private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
         internal override IPluginDatabase _PluginDatabase
         {
-            get
-            {
-                return PluginDatabase;
-            }
-            set
-            {
-                PluginDatabase = (BackgroundChangerDatabase)_PluginDatabase;
-            }
+            get => PluginDatabase;
+            set => PluginDatabase = (BackgroundChangerDatabase)_PluginDatabase;
         }
 
         private PluginCoverImageDataContext ControlDataContext = new PluginCoverImageDataContext();
         internal override IDataContext _ControlDataContext
         {
-            get
-            {
-                return ControlDataContext;
-            }
-            set
-            {
-                ControlDataContext = (PluginCoverImageDataContext)_ControlDataContext;
-            }
+            get => ControlDataContext;
+            set => ControlDataContext = (PluginCoverImageDataContext)_ControlDataContext;
         }
 
-        private System.Timers.Timer BcTimer;
-        private int Counter = 0;
-        private GameBackgroundImages gameBackgroundImages;
+        private System.Timers.Timer BcTimer { get; set; }
+        private int Counter { get; set; } = 0;
+        private GameBackgroundImages gameBackgroundImages { get; set; }
 
-        private bool WindowsIsActivated = true;
-        private bool IsFirst = true;
+        private bool WindowsIsActivated { get; set; } = true;
+        private bool IsFirst { get; set; } = true;
 
 
         public override void SetDefaultDataContext()

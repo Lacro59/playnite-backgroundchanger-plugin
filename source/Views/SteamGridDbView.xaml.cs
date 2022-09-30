@@ -26,13 +26,13 @@ namespace BackgroundChanger.Views
     /// </summary>
     public partial class SteamGridDbView : UserControl
     {
-        private SteamGridDbApi steamGridDbApi = new SteamGridDbApi();
-        private SteamGridDbType steamGridDbType;
+        private SteamGridDbApi steamGridDbApi { get; set; } = new SteamGridDbApi();
+        private SteamGridDbType steamGridDbType { get; set; }
 
-        public SteamGridDbResult steamGridDbResult = null;
+        public SteamGridDbResult steamGridDbResult { get; set; } = null;
 
-        private SteamGridDbResultData DataSearch = null;
-        private List<SteamGridDbResult> DataSearchFiltered = null;
+        private SteamGridDbResultData DataSearch { get; set; } = null;
+        private List<SteamGridDbResult> DataSearchFiltered { get; set; } = null;
 
 
         public SteamGridDbView(string Name, SteamGridDbType steamGridDbType)

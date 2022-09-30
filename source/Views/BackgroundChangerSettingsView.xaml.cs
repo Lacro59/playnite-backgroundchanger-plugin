@@ -10,13 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace BackgroundChanger.Views
 {
@@ -40,28 +33,24 @@ namespace BackgroundChanger.Views
 
         private void HwBcSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            var slider = sender as Slider;
+            if (sender == null)
+            {
+                return;
+            }
 
-            try
-            {
-                labelBcIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
-            }
-            catch
-            {
-            }
+            Slider slider = sender as Slider;
+            labelBcIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
         }
 
         private void HwSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            var slider = sender as Slider;
+            if (sender == null)
+            {
+                return;
+            }
 
-            try
-            {
-                labelIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
-            }
-            catch
-            {
-            }
+            Slider slider = sender as Slider;
+            labelIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
         }
 
 

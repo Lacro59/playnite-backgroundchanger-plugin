@@ -2,7 +2,6 @@
 using BackgroundChanger.Models;
 using BackgroundChanger.Services;
 using CommonPlayniteShared;
-using CommonPlayniteShared;
 using CommonPlayniteShared.Common;
 using CommonPluginsShared;
 using Playnite.SDK;
@@ -19,12 +18,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using wpf_animatedimage;
 using Path = System.IO.Path;
 
@@ -40,10 +34,10 @@ namespace BackgroundChanger.Views
 
         private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
 
-        private GameBackgroundImages _gameBackgroundImages;
-        private List<ItemImage> _backgroundImages;
-        private List<ItemImage> _backgroundImagesEdited;
-        private bool _IsCover;
+        private GameBackgroundImages _gameBackgroundImages { get; set; }
+        private List<ItemImage> _backgroundImages { get; set; }
+        private List<ItemImage> _backgroundImagesEdited { get; set; }
+        private bool _IsCover { get; set; }
 
 
         public ImagesManager(IPlayniteAPI PlayniteApi, GameBackgroundImages gameBackgroundImages, bool IsCover)
@@ -73,7 +67,7 @@ namespace BackgroundChanger.Views
             try
             {
                 // Delete removed
-                var tmpActualList = _backgroundImages.Where(x => !x.IsDefault && x.IsCover == _IsCover).ToList();
+                List<ItemImage> tmpActualList = _backgroundImages.Where(x => !x.IsDefault && x.IsCover == _IsCover).ToList();
                 foreach (ItemImage itemImage in tmpActualList)
                 {
                     if (_backgroundImagesEdited.Where(x => x.FullPath == itemImage.FullPath).FirstOrDefault() == null)
@@ -108,7 +102,7 @@ namespace BackgroundChanger.Views
                 }
 
                 // Saved
-                var tmpList = Serialization.GetClone(_gameBackgroundImages.Items.Where(x => x.IsCover != _IsCover).ToList());
+                List<ItemImage> tmpList = Serialization.GetClone(_gameBackgroundImages.Items.Where(x => x.IsCover != _IsCover).ToList());
                 tmpList.AddRange(_backgroundImagesEdited);
                 _gameBackgroundImages.Items = tmpList;
                 BackgroundChanger.PluginDatabase.Update(_gameBackgroundImages);
@@ -178,7 +172,7 @@ namespace BackgroundChanger.Views
                     steamGridDbType = SteamGridDbType.grids;
                 }
 
-                var ViewExtension = new SteamGridDbView(_gameBackgroundImages.Name, steamGridDbType);
+                SteamGridDbView ViewExtension = new SteamGridDbView(_gameBackgroundImages.Name, steamGridDbType);
                 Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PlayniteApi, "SteamGridDB", ViewExtension);
                 windowExtension.ShowDialog();
 
@@ -289,7 +283,7 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                var Video = sender as MediaElement;
+                MediaElement Video = sender as MediaElement;
                 if (Video.NaturalDuration.HasTimeSpan && Video.NaturalDuration.TimeSpan.TotalSeconds > 2)
                 {
                     Video.LoadedBehavior = MediaState.Play;
