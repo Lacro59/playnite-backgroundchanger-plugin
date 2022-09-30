@@ -3,9 +3,9 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">背景变更器</sys:String>
+    <sys:String x:Key="LOCBc">背景变更</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">管理背景图片</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">管理背景图</sys:String>
     <sys:String x:Key="LOCBcManageCover">管理封面图像</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
@@ -20,7 +20,7 @@
     <sys:String x:Key="LOCBcTimeInterval">时间间隔</sys:String>
     <sys:String x:Key="LOCBcSeconds">秒</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">启用动画背景</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">启用动画背</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">启用动画封面</sys:String>
 
     <!-- ImagesManagerView -->
