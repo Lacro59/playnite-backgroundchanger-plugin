@@ -35,3 +35,10 @@ Packages:
       - Added new filter options for SteamGridDB
       - Added option to set background volume video
       - Fixed minor bugs
+  - Version: 3.0
+    RequiredApiVersion: 6.5.0
+    ReleaseDate: 2022-10-10
+    PackageUrl: https://github.com/Lacro59/playnite-backgroundchanger-plugin/releases/download/v3.0/playnite-backgroundchanger-plugin_3_0.pext
+    Changelog:
+      - Only Palynite 10
+      - Updated localizations
