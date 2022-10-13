@@ -3,9 +3,9 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
+    <sys:String x:Key="LOCBc">背景の変更</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">Manage background images</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">背景画像の管理</sys:String>
     <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
