@@ -3,32 +3,32 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
+    <sys:String x:Key="LOCBc">HáttérMódosító</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">Manage background images</sys:String>
-    <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">Háttérképek kezelése</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Borítóképek kezelése</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api key</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api kulcs</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">A bővítmény háttérképének megjelenítése</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">A bővítmény borítóképének megjelenítése</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">Enable random selection</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
-    <sys:String x:Key="LOCBcTimeInterval">Time interval</sys:String>
-    <sys:String x:Key="LOCBcSeconds">seconds</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">Véletlenszerű kiválasztás engedélyezése</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Automatikus változtatás engedélyezése</sys:String>
+    <sys:String x:Key="LOCBcTimeInterval">Időintervallum</sys:String>
+    <sys:String x:Key="LOCBcSeconds">másodperc</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Animált háttér engedélyezése</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Animált borítókép engedélyezése</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">Select from SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
-    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelecty">Választás a SteamGridDB-ből</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg fájl</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo fájl</sys:String>
     
-    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
+    <sys:String x:Key="LOCBcFTooltTipConvert">Konvertálás mp4-be (javult a teljesítmény)</sys:String>
 
 </ResourceDictionary>
