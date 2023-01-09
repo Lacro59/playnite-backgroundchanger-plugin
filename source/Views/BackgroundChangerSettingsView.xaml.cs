@@ -39,7 +39,10 @@ namespace BackgroundChanger.Views
             }
 
             Slider slider = sender as Slider;
-            labelBcIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
+            if (labelBcIntervalLabel_text?.Content != null)
+            {
+                labelBcIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
+            }
         }
 
         private void HwSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -50,7 +53,10 @@ namespace BackgroundChanger.Views
             }
 
             Slider slider = sender as Slider;
-            labelIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
+            if (labelIntervalLabel_text?.Content != null)
+            {
+                labelIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
+            }
         }
 
 

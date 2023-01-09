@@ -49,6 +49,8 @@ namespace BackgroundChanger
         // List custom controls
         public override Control GetGameViewControl(GetGameViewControlArgs args)
         {
+            System.Threading.SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
+
             if (args.Name == "PluginBackgroundImage")
             {
                 return new PluginBackgroundImage();
