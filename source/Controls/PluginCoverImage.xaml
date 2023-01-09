@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:BackgroundChanger.Controls"
         xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
         xmlns:controlsAnimated="clr-namespace:wpf_animatedimage.Controls"
-        mc:Ignorable="d"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:PluginCoverImageDataContext, IsDesignTimeCreatable=True}"
         MinHeight="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MinHeight}"
         Height="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Height}"
         MaxHeight="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MaxHeight}"
@@ -19,9 +19,7 @@
         VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=VerticalAlignment}">
 
     <UserControl.CacheMode>
-        <BitmapCache EnableClearType="False" 
-                     RenderAtScale="1" 
-                     SnapsToDevicePixels="False" />
+        <BitmapCache EnableClearType="False" RenderAtScale="1" SnapsToDevicePixels="False" />
     </UserControl.CacheMode>
 
     <Grid Name="ImageHolder" Loaded="ImageHolder_Loaded">

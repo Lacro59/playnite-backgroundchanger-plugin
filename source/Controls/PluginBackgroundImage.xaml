@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:BackgroundChanger.Controls"
         xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
         xmlns:controlsAnimated="clr-namespace:wpf_animatedimage.Controls"
-        mc:Ignorable="d"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:PluginBackgroundImageDataContext, IsDesignTimeCreatable=True}"
         MinHeight="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MinHeight}"
         Height="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Height}"
         MaxHeight="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MaxHeight}"

@@ -118,7 +118,7 @@ namespace BackgroundChanger.Controls
 
         private void GetCoverProperties()
         {
-            var thisParent = ((FrameworkElement)((FrameworkElement)((FrameworkElement)this.Parent).Parent).Parent).Parent;
+            DependencyObject thisParent = ((FrameworkElement)((FrameworkElement)((FrameworkElement)this.Parent).Parent).Parent).Parent;
             FrameworkElement PART_ImageCover = UI.SearchElementByName("PART_ImageCover", thisParent, false, false);
 
             if (PART_ImageCover != null)
@@ -137,13 +137,13 @@ namespace BackgroundChanger.Controls
                     {
                         if (UsedProperties.Contains(propImageBackground.Name))
                         {
-                            var propBackChangerImage = backChangerImageProperties.Where(x => x.Name == propImageBackground.Name).FirstOrDefault();
+                            PropertyInfo propBackChangerImage = backChangerImageProperties.Where(x => x.Name == propImageBackground.Name).FirstOrDefault();
 
                             try
                             {
                                 if (propBackChangerImage != null)
                                 {
-                                    var value = propImageBackground.GetValue(PART_ImageCover, null);
+                                    object value = propImageBackground.GetValue(PART_ImageCover, null);
                                     propBackChangerImage.SetValue(this, value, null);
                                 }
                                 else
@@ -324,8 +324,8 @@ namespace BackgroundChanger.Controls
 
         public object Source
         {
-            get { return GetValue(SourceProperty); }
-            set { SetValue(SourceProperty, value); }
+            get => GetValue(SourceProperty);
+            set => SetValue(SourceProperty, value);
         }
         #endregion Source
 
@@ -338,8 +338,8 @@ namespace BackgroundChanger.Controls
 
         public Stretch Stretch
         {
-            get { return (Stretch)GetValue(StretchProperty); }
-            set { SetValue(StretchProperty, value); }
+            get => (Stretch)GetValue(StretchProperty);
+            set => SetValue(StretchProperty, value);
         }
         #endregion Strech
 
@@ -352,8 +352,8 @@ namespace BackgroundChanger.Controls
 
         public StretchDirection StretchDirection
         {
-            get { return (StretchDirection)GetValue(StretchDirectionProperty); }
-            set { SetValue(StretchDirectionProperty, value); }
+            get => (StretchDirection)GetValue(StretchDirectionProperty);
+            set => SetValue(StretchDirectionProperty, value);
         }
         #endregion StretchDirection
 
