@@ -1,11 +1,11 @@
-﻿using APNG;
-using BackgroundChanger.Models;
+﻿using BackgroundChanger.Models;
 using BackgroundChanger.Services;
 using CommonPlayniteShared;
 using CommonPlayniteShared.Common;
 using CommonPluginsShared;
 using Playnite.SDK;
 using Playnite.SDK.Data;
+using QSoft.Apng;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -439,7 +439,7 @@ namespace BackgroundChanger.Views
                     {
                         try
                         {
-                            CPng_Reader pngr = new CPng_Reader();
+                            Png_Reader pngr = new Png_Reader();
                             Dictionary<fcTL, MemoryStream> m_Apng;
                             using (var fStream = FileSystem.OpenReadFileStreamSafe((string)value))
                             {

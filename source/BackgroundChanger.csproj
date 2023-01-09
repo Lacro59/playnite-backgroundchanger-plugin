@@ -267,9 +267,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="APNG\QAnimatedPNG\QAnimatedPNG.csproj">
-      <Project>{e45ead4e-aeaa-47a6-95be-544b59ba0bd1}</Project>
-      <Name>QAnimatedPNG</Name>
+    <ProjectReference Include="APNG\QSoft.Apng\QSoft.Apng.csproj">
+      <Project>{9B5C14B0-AAD8-47BB-9C8D-9F6C8D975897}</Project>
+      <Name>QSoft.Apng</Name>
     </ProjectReference>
     <ProjectReference Include="playnite-plugincommon\CommonPluginsResources\CommonPluginsResources.csproj">
       <Project>{4effe926-9c64-4750-a399-f344710edc09}</Project>

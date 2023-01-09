@@ -136,14 +136,7 @@ namespace BackgroundChanger
             BackgroundChangerSettings savedSettings = plugin.LoadPluginSettings<BackgroundChangerSettings>();
 
             // LoadPluginSettings returns null if not saved data is available.
-            if (savedSettings != null)
-            {
-                Settings = savedSettings;
-            }
-            else
-            {
-                Settings = new BackgroundChangerSettings();
-            }
+            Settings = savedSettings ?? new BackgroundChangerSettings();
         }
 
         // Code executed when settings view is opened and user starts editing values.
