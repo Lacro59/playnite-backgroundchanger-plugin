@@ -144,13 +144,12 @@ namespace BackgroundChanger.Controls
                     {
                         if (UsedProperties.Contains(propImageBackground.Name))
                         {
-                            var propBackChangerImage = backChangerImageProperties.Where(x => x.Name == propImageBackground.Name).FirstOrDefault();
-
+                            PropertyInfo propBackChangerImage = backChangerImageProperties.Where(x => x.Name == propImageBackground.Name).FirstOrDefault();
                             try
                             {
                                 if (propBackChangerImage != null)
                                 {
-                                    var value = propImageBackground.GetValue(PART_ImageBackground, null);
+                                    object value = propImageBackground.GetValue(PART_ImageBackground, null);
                                     propBackChangerImage.SetValue(this, value, null);
                                 }
                                 else

@@ -11,56 +11,20 @@ namespace BackgroundChanger.Models
     public class GameBackgroundImages : PluginDataBaseGame<ItemImage>
     {
         private List<ItemImage> _Items = new List<ItemImage>();
-        public override List<ItemImage> Items
-        {
-            get
-            {
-                return _Items;
-            }
-
-            set
-            {
-                _Items = value;
-                OnPropertyChanged();
-            }
-        }
+        public override List<ItemImage> Items { get => _Items; set => SetValue(ref _Items, value); }
 
 
         [DontSerialize]
-        public bool HasDataBackground
-        {
-            get
-            {
-                return Items.Where(x => !x.IsCover).Count() > 0;
-            }
-        }
+        public bool HasDataBackground => Items?.Where(x => !x.IsCover)?.Count() > 0;
 
         [DontSerialize]
-        public List<ItemImage> ItemsBackground
-        {
-            get
-            {
-                return Items.Where(x => !x.IsCover).ToList();
-            }
-        }
+        public List<ItemImage> ItemsBackground => Items?.Where(x => !x.IsCover)?.ToList();
 
 
         [DontSerialize]
-        public bool HasDataCover
-        {
-            get
-            {
-                return Items.Where(x => x.IsCover).Count() > 0;
-            }
-        }
+        public bool HasDataCover => Items?.Where(x => x.IsCover)?.Count() > 0;
 
         [DontSerialize]
-        public List<ItemImage> ItemsCover
-        {
-            get
-            {
-                return Items.Where(x => x.IsCover).ToList();
-            }
-        }
+        public List<ItemImage> ItemsCover => Items?.Where(x => x.IsCover)?.ToList();
     }
 }

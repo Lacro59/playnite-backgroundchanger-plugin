@@ -18,7 +18,7 @@ namespace BackgroundChanger.Models
 
     public class SteamGridDbResult : ObservableObject
     {
-        private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
+        private BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
 
         public int id { get; set; }
         public int score { get; set; }
@@ -40,17 +40,12 @@ namespace BackgroundChanger.Models
         public Author author { get; set; }
 
         [DontSerialize]
-        public bool untagged
-        {
-            get
-            {
-                return !nsfw && !humor && !epilepsy;
-            }
-        }
+        public bool untagged => !nsfw && !humor && !epilepsy;
 
 
         [DontSerialize]
-        public bool isVideo {
+        public bool isVideo 
+        {
             get
             {
                 if (thumb.IsNullOrEmpty())
@@ -62,18 +57,7 @@ namespace BackgroundChanger.Models
             }
         }
         [DontSerialize]
-        public string thumbnail
-        {
-            get
-            {
-                if (isVideo)
-                {
-                    return url;
-                }
-
-                return thumb;
-            }
-        }
+        public string thumbnail => isVideo ? url : thumb;
         [DontSerialize]
         public bool IsVideoConverted
         {
@@ -86,8 +70,7 @@ namespace BackgroundChanger.Models
 
                 if (File.Exists(PluginDatabase.PluginSettings.Settings.ffmpegFile))
                 {
-                    var VideoFile = Path.Combine(PluginDatabase.Paths.PluginCachePath, $"{id}.mp4");
-
+                    string VideoFile = Path.Combine(PluginDatabase.Paths.PluginCachePath, $"{id}.mp4");
                     if (File.Exists(VideoFile))
                     {
                         this.VideoFile = VideoFile;
@@ -113,17 +96,9 @@ namespace BackgroundChanger.Models
             }
         }
 
-        private string _VideoFile { get; set; } = string.Empty;
+        private string _VideoFile = string.Empty;
         [DontSerialize]
-        public string VideoFile
-        {
-            get => _VideoFile;
-            set
-            {
-                _VideoFile = value;
-                OnPropertyChanged();
-            }
-        }
+        public string VideoFile { get => _VideoFile; set => SetValue(ref _VideoFile, value); }
     }
 
     public class Author

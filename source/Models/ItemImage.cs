@@ -11,7 +11,7 @@ namespace BackgroundChanger.Models
 {
     public class ItemImage
     {
-        private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
+        private BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
 
 
         public string Name { get; set; }
@@ -21,7 +21,8 @@ namespace BackgroundChanger.Models
         public bool IsFavorite { get; set; }
 
         [DontSerialize]
-        public string ImageSize {
+        public string ImageSize 
+        {
             get
             {
                 if (File.Exists(FullPath))
@@ -61,7 +62,8 @@ namespace BackgroundChanger.Models
         }
         
         [DontSerialize]
-        public string FullPath {
+        public string FullPath 
+        {
             get
             {
                 if (FolderName.IsNullOrEmpty())
@@ -81,31 +83,9 @@ namespace BackgroundChanger.Models
         }
 
         [DontSerialize]
-        public bool IsVideo
-        {
-            get
-            {
-                if (FullPath.IsNullOrEmpty())
-                {
-                    return false;
-                }
-
-                return Path.GetExtension(FullPath).ToLower().Contains("mp4");
-            }
-        }
+        public bool IsVideo => FullPath.IsNullOrEmpty()? false : Path.GetExtension(FullPath).ToLower().Contains("mp4");
 
         [DontSerialize]
-        public bool IsConvertable
-        {
-            get
-            {
-                if (FullPath.IsNullOrEmpty())
-                {
-                    return false;
-                }
-
-                return Path.GetExtension(FullPath).ToLower().Contains("webp");
-            }
-        }
+        public bool IsConvertable => FullPath.IsNullOrEmpty() ? false : Path.GetExtension(FullPath).ToLower().Contains("webp");
     }
 }

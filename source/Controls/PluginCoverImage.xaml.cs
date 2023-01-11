@@ -138,7 +138,6 @@ namespace BackgroundChanger.Controls
                         if (UsedProperties.Contains(propImageBackground.Name))
                         {
                             PropertyInfo propBackChangerImage = backChangerImageProperties.Where(x => x.Name == propImageBackground.Name).FirstOrDefault();
-
                             try
                             {
                                 if (propBackChangerImage != null)

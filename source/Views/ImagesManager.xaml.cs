@@ -229,10 +229,9 @@ namespace BackgroundChanger.Views
 
         private void PART_LbBackgroundImages_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            try
+            if (PART_LbBackgroundImages?.SelectedItem != null)
             {
                 string FilePath = ((ItemImage)PART_LbBackgroundImages.SelectedItem).FullPath;
-
                 if (File.Exists(FilePath))
                 {
                     if (Path.GetExtension(FilePath).ToLower().Contains("mp4"))
@@ -246,10 +245,6 @@ namespace BackgroundChanger.Views
                         PART_Video.Source = null;
                     }
                 }
-            }
-            catch
-            {
-
             }
         }
 
