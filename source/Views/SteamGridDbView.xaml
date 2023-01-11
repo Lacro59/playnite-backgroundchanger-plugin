@@ -169,6 +169,7 @@
 
                 <Grid Name="PART_GridElementContener" Grid.Row="2">
                     <ListBox Name="PART_ElementList" SelectionChanged="PART_ElementList_SelectionChanged"
+                             SelectionMode="Multiple"
                              Width="{Binding ElementName=PART_GridElementContener, Path=ActualWidth}"
                              Height="{Binding ElementName=PART_GridElementContener, Path=ActualHeight}">
                         <ListBox.ItemTemplate>

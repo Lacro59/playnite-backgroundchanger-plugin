@@ -176,7 +176,7 @@ namespace BackgroundChanger.Views
                 Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PlayniteApi, "SteamGridDB", ViewExtension);
                 windowExtension.ShowDialog();
 
-                if (ViewExtension.steamGridDbResult != null)
+                if (ViewExtension.steamGridDbResults != null)
                 {
                     GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
                         resources.GetString("LOCCommonGettingData"),
@@ -184,20 +184,23 @@ namespace BackgroundChanger.Views
                     );
                     globalProgressOptions.IsIndeterminate = true;
 
-                    var ProgressDownload = PluginDatabase.PlayniteApi.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+                    GlobalProgressResult ProgressDownload = PluginDatabase.PlayniteApi.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
                     {
-                        try
+                        ViewExtension.steamGridDbResults.ForEach(x =>
                         {
-                            var cachedFile = HttpFileCache.GetWebFile(ViewExtension.steamGridDbResult.url);
-                            _backgroundImagesEdited.Add(new ItemImage
+                            try
                             {
-                                Name = cachedFile
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            Common.LogError(ex, false, true, "BackgroundChanger");
-                        }
+                                string cachedFile = HttpFileCache.GetWebFile(x.url);
+                                _backgroundImagesEdited.Add(new ItemImage
+                                {
+                                    Name = cachedFile
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                Common.LogError(ex, false, true, "BackgroundChanger");
+                            }
+                        });
                     }, globalProgressOptions);
 
 

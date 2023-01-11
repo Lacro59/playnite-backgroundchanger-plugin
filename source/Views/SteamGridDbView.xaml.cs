@@ -29,7 +29,7 @@ namespace BackgroundChanger.Views
         private SteamGridDbApi steamGridDbApi { get; set; } = new SteamGridDbApi();
         private SteamGridDbType steamGridDbType { get; set; }
 
-        public SteamGridDbResult steamGridDbResult { get; set; } = null;
+        public List<SteamGridDbResult> steamGridDbResults { get; set; }
 
         private SteamGridDbResultData DataSearch { get; set; } = null;
         private List<SteamGridDbResult> DataSearchFiltered { get; set; } = null;
@@ -243,8 +243,8 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                steamGridDbResult = ((SteamGridDbResult)PART_ElementList.SelectedItem);
-                if (steamGridDbResult != null)
+                steamGridDbResults = PART_ElementList.SelectedItems.Cast<SteamGridDbResult>().ToList();
+                if (steamGridDbResults != null)
                 {
                     ButtonSelect.IsEnabled = true;
                 }
