@@ -410,7 +410,7 @@ namespace BackgroundChanger.Controls
 
             try
             {
-                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => 
+                this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() => 
                 {
                     string PathImage = string.Empty;
 
@@ -464,29 +464,58 @@ namespace BackgroundChanger.Controls
             // Activate/Deactivated animation
             Application.Current.Activated += Application_Activated;
             Application.Current.Deactivated += Application_Deactivated;
+            Application.Current.MainWindow.StateChanged += MainWindow_StateChanged;
         }
 
 
         #region Activate/Deactivated animation
         private void Application_Deactivated(object sender, EventArgs e)
         {
-            WindowsIsActivated = false;
-            Video1.LoadedBehavior = MediaState.Pause;
-
-            if (BcTimer != null)
+            Task.Run(() =>
             {
-                BcTimer.Stop();
-            }
+                Thread.Sleep(1000);
+                this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                {
+                    WindowsIsActivated = false;
+                    Video1.LoadedBehavior = MediaState.Pause;
+
+                    if (BcTimer != null)
+                    {
+                        BcTimer.Stop();
+                    }
+                }));
+            });
         }
 
         private void Application_Activated(object sender, EventArgs e)
         {
-            WindowsIsActivated = true;
-            Video1.LoadedBehavior = MediaState.Play;
-
-            if (BcTimer != null)
+            Task.Run(() =>
             {
-                BcTimer.Start();
+                Thread.Sleep(1000);
+                this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                {
+                    WindowsIsActivated = true;
+                    Video1.LoadedBehavior = MediaState.Play;
+
+                    if (BcTimer != null)
+                    {
+                        BcTimer.Start();
+                    }
+                }));
+            });
+        }
+
+        private void MainWindow_StateChanged(object sender, EventArgs e)
+        {
+            switch (((Window)sender).WindowState)
+            {
+                case WindowState.Normal:
+                case WindowState.Maximized:
+                    Application_Activated(sender, e);
+                    break;
+                case WindowState.Minimized:
+                    Application_Deactivated(sender, e);
+                    break;
             }
         }
         #endregion

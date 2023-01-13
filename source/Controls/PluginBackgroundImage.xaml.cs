@@ -13,6 +13,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Automation;
@@ -43,7 +45,7 @@ namespace BackgroundChanger.Controls
             set => ControlDataContext = (PluginBackgroundImageDataContext)_ControlDataContext;
         }
 
-        private Timer BcTimer { get; set; }
+        private System.Timers.Timer BcTimer { get; set; }
         private int Counter { get; set; } = 0;
         private GameBackgroundImages gameBackgroundImages { get; set; }
 
@@ -237,7 +239,7 @@ namespace BackgroundChanger.Controls
 
                     SetBackgroundImage(PathImage);
 
-                    BcTimer = new Timer(PluginDatabase.PluginSettings.Settings.BackgroundImageAutoChangerTimer * 1000);
+                    BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.BackgroundImageAutoChangerTimer * 1000);
                     BcTimer.AutoReset = true;
                     BcTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
                     BcTimer.Start();
@@ -725,7 +727,7 @@ namespace BackgroundChanger.Controls
 
             try
             {
-                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
                     string PathImage = string.Empty;
 
@@ -779,31 +781,60 @@ namespace BackgroundChanger.Controls
             // Activate/Deactivated animation
             Application.Current.Activated += Application_Activated;
             Application.Current.Deactivated += Application_Deactivated;
+            Application.Current.MainWindow.StateChanged += MainWindow_StateChanged;
         }
 
 
         #region Activate/Deactivated animation
         private void Application_Deactivated(object sender, EventArgs e)
         {
-            WindowsIsActivated = false;
-            Video1.LoadedBehavior = MediaState.Pause;
-            Video2.LoadedBehavior = MediaState.Pause;
-
-            if (BcTimer != null)
+            Task.Run(() => 
             {
-                BcTimer.Stop();
-            }
+                Thread.Sleep(1000);
+                this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() => 
+                { 
+                    WindowsIsActivated = false;
+                    Video1.LoadedBehavior = MediaState.Pause;
+                    Video2.LoadedBehavior = MediaState.Pause;
+
+                    if (BcTimer != null)
+                    {
+                        BcTimer.Stop();
+                    }
+                }));
+            });
         }
 
         private void Application_Activated(object sender, EventArgs e)
         {
-            WindowsIsActivated = true;
-            Video1.LoadedBehavior = MediaState.Play;
-            Video2.LoadedBehavior = MediaState.Play;
-
-            if (BcTimer != null)
+            Task.Run(() =>
             {
-                BcTimer.Start();
+                Thread.Sleep(1000);
+                this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                {
+                    WindowsIsActivated = true;
+                    Video1.LoadedBehavior = MediaState.Play;
+                    Video2.LoadedBehavior = MediaState.Play;
+
+                    if (BcTimer != null)
+                    {
+                        BcTimer.Start();
+                    }
+                }));
+            });
+        }
+
+        private void MainWindow_StateChanged(object sender, EventArgs e)
+        {
+            switch (((Window)sender).WindowState)
+            {
+                case WindowState.Normal:
+                case WindowState.Maximized:
+                    Application_Activated(sender, e);
+                    break;
+                case WindowState.Minimized:
+                    Application_Deactivated(sender, e);
+                    break;
             }
         }
         #endregion
