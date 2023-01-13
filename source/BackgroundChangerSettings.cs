@@ -74,6 +74,12 @@ namespace BackgroundChanger
 
         public string ffmpegFile { get; set; } = string.Empty;
         public string webpinfoFile { get; set; } = string.Empty;
+
+
+        public bool useVideoDelayBackgroundImage { get; set; } = false;
+        public int videoDelayBackgroundImage { get; set; } = 5;
+        public bool useVideoDelayCoverImage { get; set; } = false;
+        public int videoDelayCoverImage { get; set; } = 5;
         #endregion
 
         // Playnite serializes settings object to a JSON object and saves it as text file.

@@ -204,7 +204,7 @@ namespace BackgroundChanger.Controls
         {
             string PathImage = string.Empty;
             
-            if (gameBackgroundImages.HasDataBackground)
+            if (gameBackgroundImages.HasDataBackground && !PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
             {
                 ItemImage ItemFavorite = gameBackgroundImages.ItemsBackground.Where(x => x.IsFavorite).FirstOrDefault();
 
@@ -293,6 +293,19 @@ namespace BackgroundChanger.Controls
                 }
 
                 SetBackgroundImage(PathImage);
+            }
+
+            if (PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
+            {
+                Task.Run(() =>
+                {
+                    Thread.Sleep(1000 * PluginDatabase.PluginSettings.Settings.videoDelayBackgroundImage);
+                    this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                    {
+                        string PathImage = gameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
+                        SetBackgroundImage(PathImage);
+                    }));
+                });
             }
         }
 

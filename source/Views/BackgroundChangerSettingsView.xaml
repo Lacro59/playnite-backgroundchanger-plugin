@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:commonPlugin="clr-namespace:CommonPluginsShared"
-             xmlns:AttachedProperties="clr-namespace:CommonPluginsShared.Controls"
+             xmlns:AttachedProperties="clr-namespace:CommonPluginsShared.Controls" xmlns:backgroundchanger="clr-namespace:BackgroundChanger" d:DataContext="{d:DesignInstance Type=backgroundchanger:BackgroundChangerSettingsViewModel}"
              mc:Ignorable="d" d:DesignWidth="600">
     
     <StackPanel Margin="20">
@@ -95,6 +95,10 @@
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="10" />
                                 <RowDefinition Height="auto" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
 
                             <CheckBox IsChecked="{Binding Settings.EnableBackgroundImageRandomSelect}" Grid.Column="0" Grid.Row="0">
@@ -107,24 +111,39 @@
                             <StackPanel Grid.Row="4" Margin="30,0,0,0" Orientation="Horizontal" 
                                         Grid.ColumnSpan="3"
                                         IsEnabled="{Binding ElementName=CbBcAutoChanger, Path=IsChecked, TargetNullValue=false}">
-                                <Label Content="{DynamicResource LOCBcTimeInterval}" Width="130" VerticalAlignment="Center" />
-                                <Slider Name="hwBcSlider" Width="300" Minimum="10" Maximum="600" Value="{Binding Settings.BackgroundImageAutoChangerTimer}" 
+                                <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
+                                <Slider Name="hwBcSlider" Width="300" Minimum="10" Maximum="100" Value="{Binding Settings.BackgroundImageAutoChangerTimer}" 
                                         ValueChanged="HwBcSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
                                         IsSnapToTickEnabled="True" />
                                 <Label Name="labelBcIntervalLabel_text" VerticalAlignment="Center"
                                        Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
                             </StackPanel>
 
-                            <StackPanel Grid.Row="6" Orientation="Horizontal" Grid.ColumnSpan="3">
-                                <Label Content="{DynamicResource LOCSettingsMusiVolume}" Width="140" VerticalAlignment="Center" Margin="0,0,20,0" />
+                            <CheckBox Name="CbBcVideoDelay" IsChecked="{Binding Settings.useVideoDelayBackgroundImage}" Grid.Column="0" Grid.Row="6"
+                                      ToolTip="{DynamicResource LOCBcVideoDelayToolTip}">
+                                <Label Content="{DynamicResource LOCBcEnableVideoDelay}" />
+                            </CheckBox>
+                            <StackPanel Grid.Row="8" Margin="30,0,0,0" Orientation="Horizontal" 
+                                        Grid.ColumnSpan="3"
+                                        IsEnabled="{Binding ElementName=CbBcVideoDelay, Path=IsChecked, TargetNullValue=false}">
+                                <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
+                                <Slider Name="hwBcVideoSlider" Width="300" Minimum="1" Maximum="100" Value="{Binding Settings.videoDelayBackgroundImage}" 
+                                        ValueChanged="hwBcVideoSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
+                                        IsSnapToTickEnabled="True" />
+                                <Label Name="labelBcVideoIntervalLabel_text" VerticalAlignment="Center"
+                                       Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="10" Orientation="Horizontal" Grid.ColumnSpan="3">
+                                <Label Content="{DynamicResource LOCSettingsMusiVolume}" VerticalAlignment="Center" Margin="0,0,20,0" />
                                 <Slider Width="300" Minimum="0" Maximum="100" Value="{Binding Settings.Volume}" Name="PART_sVolume"
                                         VerticalAlignment="Center" TickFrequency="1" IsSnapToTickEnabled="True" />
                                 <Label VerticalAlignment="Center" ContentStringFormat=" {0}%"
                                        Content="{Binding ElementName=PART_sVolume, Path=Value}" Width="150" Margin="20,0,0,0" />
                             </StackPanel>
 
-                            <Label Grid.Row="8" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
-                            <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedBackground}" Grid.Column="0" Grid.Row="10">
+                            <Label Grid.Row="12" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
+                            <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedBackground}" Grid.Column="0" Grid.Row="14">
                                 <Label Content="{DynamicResource LOCBcEnableImageAnimatedBackground}" />
                             </CheckBox>
                         </Grid>
@@ -166,6 +185,10 @@
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="10" />
                                 <RowDefinition Height="auto" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
 
                             <CheckBox IsChecked="{Binding Settings.EnableCoverImageRandomSelect}" Grid.Column="0" Grid.Row="0">
@@ -178,7 +201,7 @@
                             <StackPanel Grid.Row="4" Margin="30,0,0,0" Orientation="Horizontal" 
                                         Grid.ColumnSpan="3"
                                         IsEnabled="{Binding ElementName=CbAutoChanger, Path=IsChecked, TargetNullValue=false}">
-                                <Label Content="{DynamicResource LOCBcTimeInterval}" Width="auto" Margin="0,0,20,0" VerticalAlignment="Center" />
+                                <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
                                 <Slider Name="hwSlider" Width="300" Minimum="10" Maximum="600" Value="{Binding Settings.CoverImageAutoChangerTimer}" 
                                         ValueChanged="HwSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
                                         IsSnapToTickEnabled="True" />
@@ -186,8 +209,23 @@
                                        Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
                             </StackPanel>
 
-                            <Label Grid.Row="6" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
-                            <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedCover}" Grid.Column="0" Grid.Row="8">
+                            <CheckBox Name="CbVideoDelay" IsChecked="{Binding Settings.useVideoDelayCoverImage}" Grid.Column="0" Grid.Row="6"
+                                      ToolTip="{DynamicResource LOCBcVideoDelayToolTip}">
+                                <Label Content="{DynamicResource LOCBcEnableVideoDelay}" />
+                            </CheckBox>
+                            <StackPanel Grid.Row="8" Margin="30,0,0,0" Orientation="Horizontal" 
+                                        Grid.ColumnSpan="3"
+                                        IsEnabled="{Binding ElementName=CbVideoDelay, Path=IsChecked, TargetNullValue=false}">
+                                <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
+                                <Slider Name="hwVideoSlider" Width="300" Minimum="1" Maximum="100" Value="{Binding Settings.videoDelayCoverImage}" 
+                                        ValueChanged="hwVideoSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
+                                        IsSnapToTickEnabled="True" />
+                                <Label Name="labelVideoIntervalLabel_text" VerticalAlignment="Center"
+                                       Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
+                            </StackPanel>
+
+                            <Label Grid.Row="10" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
+                            <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedCover}" Grid.Column="0" Grid.Row="12">
                                 <Label Content="{DynamicResource LOCBcEnableImageAnimatedCover}" />
                             </CheckBox>
                         </Grid>

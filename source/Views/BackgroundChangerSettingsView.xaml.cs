@@ -86,5 +86,33 @@ namespace BackgroundChanger.Views
                 ((BackgroundChangerSettingsViewModel)this.DataContext).Settings.webpinfoFile = destFileName;
             }
         }
+
+        private void hwBcVideoSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (sender == null)
+            {
+                return;
+            }
+
+            Slider slider = sender as Slider;
+            if (labelBcVideoIntervalLabel_text?.Content != null)
+            {
+                labelBcVideoIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
+            }
+        }
+
+        private void hwVideoSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (sender == null)
+            {
+                return;
+            }
+
+            Slider slider = sender as Slider;
+            if (labelVideoIntervalLabel_text?.Content != null)
+            {
+                labelVideoIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
+            }
+        }
     }
 }

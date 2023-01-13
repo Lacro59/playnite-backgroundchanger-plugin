@@ -191,7 +191,7 @@ namespace BackgroundChanger.Controls
         {
             string PathImage = string.Empty;
             
-            if (gameBackgroundImages.HasDataCover)
+            if (gameBackgroundImages.HasDataCover && !PluginDatabase.PluginSettings.Settings.useVideoDelayCoverImage)
             {
                 var ItemFavorite = gameBackgroundImages.ItemsCover.Where(x => x.IsFavorite).FirstOrDefault();
 
@@ -279,7 +279,20 @@ namespace BackgroundChanger.Controls
                     PathImage = PluginDatabase.PlayniteApi.Database.GetFullFilePath(GameContext.CoverImage);
                 }
 
-                SetCoverImage(PathImage);
+                SetCoverImage(PathImage);                
+            }
+
+            if (PluginDatabase.PluginSettings.Settings.useVideoDelayCoverImage)
+            {
+                Task.Run(() => 
+                {
+                    Thread.Sleep(1000 * PluginDatabase.PluginSettings.Settings.videoDelayCoverImage);
+                    this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                    {
+                        string PathImage = gameBackgroundImages?.ItemsCover?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
+                        SetCoverImage(PathImage);
+                    }));
+                });
             }
         }
 
