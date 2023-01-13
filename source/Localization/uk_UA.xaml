@@ -22,6 +22,9 @@
 
     <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Увімкнути анімоване фонове зображення</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">Увімкнути анімовану обкладинку</sys:String>
+    
+    <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
 
     <!-- ImagesManagerView -->
 
