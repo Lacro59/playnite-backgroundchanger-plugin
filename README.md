@@ -12,17 +12,17 @@ Extension for [Playnite](https://playnite.link).
 ## Informations
 This plugin can manage your cover and background images with more formats and more options.
 
-<a target="_blank" href="https://github.com/Lacro59/playnite-backgroundchanger-plugin/blob/master/forum/main_01.jpg?raw=true">
+<a href="https://github.com/Lacro59/playnite-backgroundchanger-plugin/blob/master/forum/main_01.jpg?raw=true">
   <picture>
     <img alt="main_01" src="https://github.com/Lacro59/playnite-backgroundchanger-plugin/blob/master/forum/main_01.jpg?raw=true" height="200px">
   </picture>
 </a>
-<a target="_blank" href="https://github.com/Lacro59/playnite-backgroundchanger-plugin/blob/master/forum/steamgriddb_01.jpg?raw=true">
+<a href="https://github.com/Lacro59/playnite-backgroundchanger-plugin/blob/master/forum/steamgriddb_01.jpg?raw=true">
   <picture>
     <img alt="steamgriddb_01" src="https://github.com/Lacro59/playnite-backgroundchanger-plugin/blob/master/forum/steamgriddb_01.jpg?raw=true" height="200px">
   </picture>
 </a>
-<a target="_blank" href="https://github.com/Lacro59/playnite-backgroundchanger-plugin/blob/master/forum/settings_01.jpg?raw=true">
+<a href="https://github.com/Lacro59/playnite-backgroundchanger-plugin/blob/master/forum/settings_01.jpg?raw=true">
   <picture>
     <img alt="settings_01" src="https://github.com/Lacro59/playnite-backgroundchanger-plugin/blob/master/forum/settings_01.jpg?raw=true" height="200px">
   </picture>
