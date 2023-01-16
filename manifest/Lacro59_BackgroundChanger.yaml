@@ -42,3 +42,13 @@ Packages:
     Changelog:
       - Only Palynite 10
       - Updated localizations
+  - Version: 3.1
+    RequiredApiVersion: 6.8.0
+    ReleaseDate: 2023-01-16
+    PackageUrl: https://github.com/Lacro59/playnite-backgroundchanger-plugin/releases/download/v3.1/playnite-backgroundchanger-plugin_3_1.pext
+    Changelog:
+      - Fixed issue with settings
+      - Several Backgounds to select in steamgrid import
+      - Fixed an issue with videos always playing
+      - Possibilities to set a delay before showing background videos
+      - Updated localizations
