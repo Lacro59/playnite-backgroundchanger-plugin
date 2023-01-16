@@ -22,6 +22,9 @@
 
     <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Ativar fundo animado</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">Ativar capa animada</sys:String>
+    
+    <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
 
     <!-- ImagesManagerView -->
 
