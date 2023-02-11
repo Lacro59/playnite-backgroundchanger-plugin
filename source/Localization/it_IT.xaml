@@ -24,7 +24,7 @@
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">Abilita copertina animata</sys:String>
     
     <sys:String x:Key="LOCBcEnableVideoDelay">Abilita l'overlay video</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">Utilizza questa opzione se vuoi visualizzare l'immagine predefinita prima di un video.</sys:String>
 
     <!-- ImagesManagerView -->
 
