@@ -3,7 +3,7 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">محول الخلف</sys:String>
+    <sys:String x:Key="LOCBc">متغير الخلفية</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">إدارة صور الخل</sys:String>
     <sys:String x:Key="LOCBcManageCover">إدارة صور الغلا</sys:String>
