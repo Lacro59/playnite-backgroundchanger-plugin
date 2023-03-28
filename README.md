@@ -38,7 +38,7 @@ If the theme support function, you can:
 * have multiple cover and background images
 * change the image on the game selection or/and with a timer    
 
-# Experimental
+## Experimental
 In the options, you can enable the use animated images for the background and cover.
 This is an experimental feature with some bugs and possible memory leaks and some slowness.
 You can improve performance by converting webp files to mp4 files.
