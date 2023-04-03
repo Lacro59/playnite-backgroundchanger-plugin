@@ -23,8 +23,8 @@
     <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Aktiver animert bakgrunn</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">Aktiver animert omslag</sys:String>
     
-    <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">Aktiver videoforsinkelse</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">Bruk dette alternativet hvis du vil vise standardbildet før en video.</sys:String>
 
     <!-- ImagesManagerView -->
 
