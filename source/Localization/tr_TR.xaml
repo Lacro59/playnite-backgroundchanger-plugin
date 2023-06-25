@@ -3,35 +3,35 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
+    <sys:String x:Key="LOCBc">ArkaplanDeğiştirici</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">Manage background images</sys:String>
-    <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">Arkaplan resimlerini yönetin</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Kapak resimlerini yönetin</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api key</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api anahtarı</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Eklenti arkaplan resmini görüntüle</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Eklenti kapak resmini görüntüle</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">Enable random selection</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
-    <sys:String x:Key="LOCBcTimeInterval">Time interval</sys:String>
-    <sys:String x:Key="LOCBcSeconds">seconds</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">Rastgele seçimi etkinleştir</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Otomatik değiştirmeyi etkinleştir</sys:String>
+    <sys:String x:Key="LOCBcTimeInterval">Zaman aralığı</sys:String>
+    <sys:String x:Key="LOCBcSeconds">saniye</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Animasyonlu arkaplanı etkinleştir</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Animasyonlu kapak etkinleştir</sys:String>
     
-    <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">Video gecikmesini etkinleştir</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">Bir videodan önce öntanımlı resmi görüntülemek istiyorsanız bu seçeneği kullanın.</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">Select from SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
-    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelecty">SteamGridDB üzerinden seç</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg dosyası</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo dosyası</sys:String>
     
-    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
+    <sys:String x:Key="LOCBcFTooltTipConvert">Mp4 biçimine dönüştür (performans artar)</sys:String>
 
 </ResourceDictionary>
