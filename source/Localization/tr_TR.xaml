@@ -1,0 +1,37 @@
+﻿<?xml version="1.0"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- MainView -->
+
+    <sys:String x:Key="LOCBc">ArkaplanDeğiştirici</sys:String>
+    
+    <sys:String x:Key="LOCBcManageBackground">Arkaplan resimlerini yönetin</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Kapak resimlerini yönetin</sys:String>
+
+    <!-- BackgroundChangerSettingsView -->
+
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api anahtarı</sys:String>
+    
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Eklenti arkaplan resmini görüntüle</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Eklenti kapak resmini görüntüle</sys:String>
+    
+    <sys:String x:Key="LOCBcEnableRandomSelect">Rastgele seçimi etkinleştir</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Otomatik değiştirmeyi etkinleştir</sys:String>
+    <sys:String x:Key="LOCBcTimeInterval">Zaman aralığı</sys:String>
+    <sys:String x:Key="LOCBcSeconds">saniye</sys:String>
+
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Animasyonlu arkaplanı etkinleştir</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Animasyonlu kapak etkinleştir</sys:String>
+    
+    <sys:String x:Key="LOCBcEnableVideoDelay">Video gecikmesini etkinleştir</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">Bir videodan önce öntanımlı resmi görüntülemek istiyorsanız bu seçeneği kullanın.</sys:String>
+
+    <!-- ImagesManagerView -->
+
+    <sys:String x:Key="LOCBcSteamGridDbSelecty">SteamGridDB üzerinden seç</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg dosyası</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo dosyası</sys:String>
+    
+    <sys:String x:Key="LOCBcFTooltTipConvert">Mp4 biçimine dönüştür (performans artar)</sys:String>
+
+</ResourceDictionary>
