@@ -23,8 +23,8 @@
     <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Animierten Hintergrund aktivieren</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">Animiertes Titelbild aktivieren</sys:String>
     
-    <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">Video erzögerung aktivieren</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">Verwende diese Option, wenn du das Standardbild vor einem Video anzeigen möchtest.</sys:String>
 
     <!-- ImagesManagerView -->
 
