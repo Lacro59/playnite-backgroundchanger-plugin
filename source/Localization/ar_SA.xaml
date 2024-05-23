@@ -3,9 +3,9 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">محول الخلف</sys:String>
+    <sys:String x:Key="LOCBc">محول الخل</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">إدارة صور الخل</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">إدارة صور الخ</sys:String>
     <sys:String x:Key="LOCBcManageCover">إدارة صور الغلا</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
@@ -23,8 +23,8 @@
     <sys:String x:Key="LOCBcEnableImageAnimatedBackground">تفعيل الخلفية المتحر</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">تفعيل الغلاف المتحر</sys:String>
     
-    <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">تمكين تأخير الفيديو</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">استخدم هذا الخيار إذا كنت ترغب في عرض الصورة الافتراضية قبل الفيديو.</sys:String>
 
     <!-- ImagesManagerView -->
 
