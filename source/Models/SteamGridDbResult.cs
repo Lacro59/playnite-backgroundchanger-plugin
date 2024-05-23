@@ -44,20 +44,11 @@ namespace BackgroundChanger.Models
 
 
         [DontSerialize]
-        public bool isVideo 
-        {
-            get
-            {
-                if (thumb.IsNullOrEmpty())
-                {
-                    return false;
-                }
+        public bool isVideo => thumb.IsNullOrEmpty() ? false : thumb.Contains(".webm");
 
-                return thumb.Contains(".webm");
-            }
-        }
         [DontSerialize]
         public string thumbnail => isVideo ? url : thumb;
+
         [DontSerialize]
         public bool IsVideoConverted
         {
@@ -77,15 +68,15 @@ namespace BackgroundChanger.Models
                         return true;
                     }
 
-                    Task.Run(() =>
+                    _ = Task.Run(() =>
                     {
-                        var ffmpeg = $"-i {thumb} {VideoFile}";
+                        string ffmpeg = $"-i {thumb} {VideoFile}";
 
-                        var process = new Process();
+                        Process process = new Process();
                         process.StartInfo.FileName = PluginDatabase.PluginSettings.Settings.ffmpegFile;
                         process.StartInfo.Arguments = ffmpeg;
                         process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                        process.Start();
+                        _ = process.Start();
                         process.WaitForExit();
 
                         return true;

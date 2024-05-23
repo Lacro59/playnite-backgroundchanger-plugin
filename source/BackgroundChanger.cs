@@ -5,6 +5,7 @@ using CommonPluginsShared;
 using CommonPluginsShared.PlayniteExtended;
 using Playnite.SDK;
 using Playnite.SDK.Events;
+using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace BackgroundChanger
 {
     public class BackgroundChanger : PluginExtended<BackgroundChangerSettingsViewModel, BackgroundChangerDatabase>
     {
-        public override Guid Id { get; } = Guid.Parse("3afdd02b-db6c-4b60-8faa-2971d6dfad2a");
+        public override Guid Id => Guid.Parse("3afdd02b-db6c-4b60-8faa-2971d6dfad2a");
 
         public static FrameworkElement PART_ImageBackground = null;
 
@@ -49,8 +50,6 @@ namespace BackgroundChanger
         // List custom controls
         public override Control GetGameViewControl(GetGameViewControlArgs args)
         {
-            System.Threading.SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
-
             if (args.Name == "PluginBackgroundImage")
             {
                 return new PluginBackgroundImage();
@@ -70,8 +69,7 @@ namespace BackgroundChanger
         // To add new game menu items override GetGameMenuItems
         public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
-            var GameMenu = args.Games.First();
-
+            Game GameMenu = args.Games.First();
             List<GameMenuItem> gameMenuItems = new List<GameMenuItem>();
 
             if (PluginSettings.Settings.EnableBackgroundImage)
@@ -83,7 +81,7 @@ namespace BackgroundChanger
                     Description = ResourceProvider.GetString("LOCBcManageBackground"),
                     Action = (gameMenuItem) =>
                     {
-                        var ViewExtension = new ImagesManager( PluginDatabase.Get(GameMenu), false);
+                        ImagesManager ViewExtension = new ImagesManager(PluginDatabase.Get(GameMenu), false);
                         Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(ResourceProvider.GetString("LOCBc") + " - " + ResourceProvider.GetString("LOCGameBackgroundTitle"), ViewExtension);
                         windowExtension.ShowDialog();
                     }
@@ -99,7 +97,7 @@ namespace BackgroundChanger
                     Description = ResourceProvider.GetString("LOCBcManageCover"),
                     Action = (gameMenuItem) =>
                     {
-                        var ViewExtension = new ImagesManager(PluginDatabase.Get(GameMenu), true);
+                        ImagesManager ViewExtension = new ImagesManager(PluginDatabase.Get(GameMenu), true);
                         Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(ResourceProvider.GetString("LOCBc") + " - " + ResourceProvider.GetString("LOCGameCoverImageTitle"), ViewExtension);
                         windowExtension.ShowDialog();
                     }

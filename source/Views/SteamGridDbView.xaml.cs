@@ -126,6 +126,8 @@ namespace BackgroundChanger.Views
 
         private void SearchData(string Name)
         {
+            PART_SearchList.ItemsSource = null;
+            PART_ElementList.ItemsSource = null;
             PART_DataLoad.Visibility = Visibility.Visible;
             PART_Data.IsEnabled = false;
 
@@ -146,8 +148,6 @@ namespace BackgroundChanger.Views
 
                 _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
                 {
-                    PART_SearchList.ItemsSource = null;
-                    PART_ElementList.ItemsSource = null;
                     if (DataSearch != null)
                     {
                         PART_SearchList.ItemsSource = DataSearch.data;
@@ -161,6 +161,7 @@ namespace BackgroundChanger.Views
 
         private void SearchDataElements(int Id)
         {
+            PART_ElementList.ItemsSource = null;
             PART_DataLoad.Visibility = Visibility.Visible;
             PART_Data.IsEnabled = false;
 
@@ -232,8 +233,11 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                int Id = ((SteamGridDbSearchResult)PART_SearchList.SelectedItem).id;
-                SearchDataElements(Id);
+                if (PART_SearchList?.Items?.Count > 0)
+                {
+                    int Id = ((SteamGridDbSearchResult)PART_SearchList.SelectedItem).id;
+                    SearchDataElements(Id);
+                }
             }
             catch { }
         }
@@ -282,7 +286,7 @@ namespace BackgroundChanger.Views
                 bool nsfw = ListTags.Find(x => x.Name == "Adult Content").IsChecked;
                 bool epilepsy = ListTags.Find(x => x.Name == "Epilepsy").IsChecked;
                 bool untagged = ListTags.Find(x => x.Name == "Untagged").IsChecked;
-                DataSearchFiltered = DataSearchFiltered.Where(x => (!humor ? false : x.humor == true) || (!nsfw ? false : x.nsfw == true) || (!epilepsy ? false : x.epilepsy == true) || (!untagged ? false : x.untagged == true)).ToList();
+                DataSearchFiltered = DataSearchFiltered.Where(x => (humor && x.humor) || (nsfw && x.nsfw) || (epilepsy && x.epilepsy) || (untagged && x.untagged)).ToList();
 
                 List<CheckData> ListTypes = PART_ComboTypes.ItemsSource as List<CheckData>;
                 if (ListTypes[0].IsChecked && !ListTypes[1].IsChecked)

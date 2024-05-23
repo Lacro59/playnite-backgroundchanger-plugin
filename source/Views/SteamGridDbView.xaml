@@ -181,11 +181,12 @@
                                         <ColumnDefinition Width="230" />
                                     </Grid.ColumnDefinitions>
 
-                                    <controls:AnimatedImage Stretch="Uniform"                                
+                                    <!--controls:AnimatedImage Stretch="Uniform"                                
                                                             Source="{Binding thumbnail, Converter={StaticResource GetImageConverter}}" Height="140"
                                                             RenderOptions.BitmapScalingMode="LowQuality"
                                                             UseAnimated="False"
-                                                            DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}" />
+                                                            DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}" /-->
+                                    <controls1:ImageAsync Stretch="Uniform" Source="{Binding thumbnail}" Height="140" />
                                     
                                     <Grid Grid.Column="2">
                                         <Grid.RowDefinitions>
