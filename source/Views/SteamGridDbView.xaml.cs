@@ -182,6 +182,7 @@ namespace BackgroundChanger.Views
 
                 _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
                 {
+                    ButtonSelectAll.IsEnabled = DataSearch?.data?.Count > 0;
                     if (DataSearch != null)
                     {
                         ApplyFilter(null, null);
@@ -196,6 +197,12 @@ namespace BackgroundChanger.Views
 
         private void ButtonSelect_Click(object sender, RoutedEventArgs e)
         {
+            ((Window)this.Parent).Close();
+        }
+
+        private void ButtonSelectAll_Click(object sender, RoutedEventArgs e)
+        {
+            PART_ElementList.SelectAll();
             ((Window)this.Parent).Close();
         }
 
