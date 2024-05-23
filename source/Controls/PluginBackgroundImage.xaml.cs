@@ -31,18 +31,14 @@ namespace BackgroundChanger.Controls
     /// </summary>
     public partial class PluginBackgroundImage : PluginUserControlExtend
     {
-        private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
-        internal override IPluginDatabase _PluginDatabase
-        {
-            get => PluginDatabase;
-            set => PluginDatabase = (BackgroundChangerDatabase)_PluginDatabase;
-        }
+        private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
+        internal override IPluginDatabase pluginDatabase => PluginDatabase;
 
         private PluginBackgroundImageDataContext ControlDataContext = new PluginBackgroundImageDataContext();
-        internal override IDataContext _ControlDataContext
+        internal override IDataContext controlDataContext
         {
             get => ControlDataContext;
-            set => ControlDataContext = (PluginBackgroundImageDataContext)_ControlDataContext;
+            set => ControlDataContext = (PluginBackgroundImageDataContext)controlDataContext;
         }
 
         private System.Timers.Timer BcTimer { get; set; }
@@ -91,12 +87,12 @@ namespace BackgroundChanger.Controls
             PluginDatabase.PluginSettings.PropertyChanged += PluginSettings_PropertyChanged;
             PluginDatabase.Database.ItemUpdated += Database_ItemUpdated;
             PluginDatabase.Database.ItemCollectionChanged += Database_ItemCollectionChanged;
-            PluginDatabase.PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
+            API.Instance.Database.Games.ItemUpdated += Games_ItemUpdated;
 
             // Apply settings
             PluginSettings_PropertyChanged(null, null);
 
-            if (PluginDatabase.PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
+            if (API.Instance.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {
                 EventManager.RegisterClassHandler(typeof(Window), Window.UnloadedEvent, new RoutedEventHandler(WindowBase_UnloadedEvent));
             }
@@ -156,7 +152,7 @@ namespace BackgroundChanger.Controls
                                 }
                                 else
                                 {
-                                    logger.Warn($"No property for {propImageBackground.Name}");
+                                    Logger.Warn($"No property for {propImageBackground.Name}");
                                 }
                             }
                             catch (Exception ex)
@@ -253,7 +249,7 @@ namespace BackgroundChanger.Controls
                     else
                     {
                         Random rnd = new Random();
-                        int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsBackground.Count));
+                        int ImgSelected = rnd.Next(0, gameBackgroundImages.ItemsBackground.Count);
                         PathImage = gameBackgroundImages.ItemsBackground[ImgSelected].FullPath;
                     }
 
@@ -289,7 +285,7 @@ namespace BackgroundChanger.Controls
                 string PathImage = ImageSourceManager.GetImagePath(GameContext.BackgroundImage);
                 if (PathImage.IsNullOrEmpty())
                 {
-                    PathImage = PluginDatabase.PlayniteApi.Database.GetFullFilePath(GameContext.BackgroundImage);
+                    PathImage = API.Instance.Database.GetFullFilePath(GameContext.BackgroundImage);
                 }
 
                 SetBackgroundImage(PathImage);
@@ -297,10 +293,10 @@ namespace BackgroundChanger.Controls
 
             if (PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
             {
-                Task.Run(() =>
+                _ = Task.Run(() =>
                 {
                     Thread.Sleep(1000 * PluginDatabase.PluginSettings.Settings.videoDelayBackgroundImage);
-                    this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                    _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                     {
                         string PathImage = gameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
                         SetBackgroundImage(PathImage);
@@ -311,7 +307,7 @@ namespace BackgroundChanger.Controls
 
         public void SetBackgroundImage(string PathImage = null)
         {
-            this.Dispatcher?.BeginInvoke(DispatcherPriority.Render, (Action)delegate
+            _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Render, (Action)delegate
             {
                 if (!File.Exists(PathImage))
                 {
@@ -474,15 +470,15 @@ namespace BackgroundChanger.Controls
 
         private static void BlurSettingChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
-            var control = (PluginBackgroundImage)obj;
+            PluginBackgroundImage control = (PluginBackgroundImage)obj;
             if (control.Source == null)
             {
                 return;
             }
 
-            var blurAmount = control.BlurAmount;
-            var blurEnabled = control.IsBlurEnabled;
-            var highQuality = control.HighQualityBlur;
+            int blurAmount = control.BlurAmount;
+            bool blurEnabled = control.IsBlurEnabled;
+            bool highQuality = control.HighQualityBlur;
             if (blurEnabled)
             {
                 control.ImageHolder.Effect = new BlurEffect()
@@ -500,15 +496,15 @@ namespace BackgroundChanger.Controls
 
         private static void SourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
-            var control = (PluginBackgroundImage)obj;
+            PluginBackgroundImage control = (PluginBackgroundImage)obj;
             control.LoadNewSource(args.NewValue, args.OldValue);
         }
 
         private async void LoadNewSource(object newSource, object oldSource)
         {
-            var blurAmount = BlurAmount;
-            var blurEnabled = IsBlurEnabled;
-            var highQuality = HighQualityBlur;
+            int blurAmount = BlurAmount;
+            bool blurEnabled = IsBlurEnabled;
+            bool highQuality = HighQualityBlur;
 
             string image = null;
 
@@ -532,7 +528,7 @@ namespace BackgroundChanger.Controls
             {
                 if (!File.Exists(newSource.ToString()))
                 {
-                    logger.Warn($"File not founs {newSource}");
+                    Logger.Warn($"File not founs {newSource}");
                 }
                 else
                 {
@@ -588,7 +584,7 @@ namespace BackgroundChanger.Controls
                     {
                         Image1FadeOut.Stop();
 
-                        if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
+                        if (Path.GetExtension(image).ToLower().Contains("mp4"))
                         {
                             //AnimatedImage1.Source = null;
                             //AnimatedImage2.Source = null;
@@ -614,7 +610,7 @@ namespace BackgroundChanger.Controls
                     {
                         Image2FadeOut.Stop();
 
-                        if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
+                        if (Path.GetExtension(image).ToLower().Contains("mp4"))
                         {
                             //AnimatedImage1.Source = null;
                             //AnimatedImage2.Source = null;
@@ -641,7 +637,7 @@ namespace BackgroundChanger.Controls
                     {
                         Image1FadeOut.Stop();
 
-                        if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
+                        if (Path.GetExtension(image).ToLower().Contains("mp4"))
                         {
                             //AnimatedImage1.Source = null;
                             //AnimatedImage2.Source = null;
@@ -670,7 +666,7 @@ namespace BackgroundChanger.Controls
             {
                 if (currentImage == CurrentImage.Image1)
                 {
-                    if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
+                    if (Path.GetExtension(image).ToLower().Contains("mp4"))
                     {
                         AnimatedImage1.Source = null;
                         AnimatedImage2.Source = null;
@@ -689,7 +685,7 @@ namespace BackgroundChanger.Controls
                 }
                 else if (currentImage == CurrentImage.Image2)
                 {
-                    if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
+                    if (Path.GetExtension(image).ToLower().Contains("mp4"))
                     {
                         AnimatedImage1.Source = null;
                         AnimatedImage2.Source = null;
@@ -708,7 +704,7 @@ namespace BackgroundChanger.Controls
                 }
                 else
                 {
-                    if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
+                    if (Path.GetExtension(image).ToLower().Contains("mp4"))
                     {
                         AnimatedImage1.Source = null;
                         AnimatedImage2.Source = null;
@@ -731,7 +727,7 @@ namespace BackgroundChanger.Controls
         }
 
 
-        private void OnTimedEvent(Object source, ElapsedEventArgs e)
+        private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             if (!WindowsIsActivated)
             {
@@ -740,7 +736,7 @@ namespace BackgroundChanger.Controls
 
             try
             {
-                this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
                     string PathImage = string.Empty;
 

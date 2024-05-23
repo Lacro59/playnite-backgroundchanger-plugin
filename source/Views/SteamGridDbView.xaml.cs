@@ -26,10 +26,10 @@ namespace BackgroundChanger.Views
     /// </summary>
     public partial class SteamGridDbView : UserControl
     {
-        private SteamGridDbApi steamGridDbApi { get; set; } = new SteamGridDbApi();
-        private SteamGridDbType steamGridDbType { get; set; }
+        private SteamGridDbApi SteamGridDbApi { get; set; } = new SteamGridDbApi();
+        private SteamGridDbType SteamGridDbType { get; set; }
 
-        public List<SteamGridDbResult> steamGridDbResults { get; set; }
+        public List<SteamGridDbResult> SteamGridDbResults { get; set; }
 
         private SteamGridDbResultData DataSearch { get; set; } = null;
         private List<SteamGridDbResult> DataSearchFiltered { get; set; } = null;
@@ -39,7 +39,7 @@ namespace BackgroundChanger.Views
         {
             InitializeComponent();
 
-            this.steamGridDbType = steamGridDbType;
+            this.SteamGridDbType = steamGridDbType;
 
             SearchElement.Text = Name;
             SearchData(Name);
@@ -79,7 +79,7 @@ namespace BackgroundChanger.Views
 
                     new CheckData { Name="Square - 1:1 - 1024x1024", Data="1024x1024" },
                     new CheckData { Name="Square - 1:1 - 512x512", Data="512x512" },
- 
+
                     new CheckData { Name="Galaxy 2.0 - 22:31 - 660x930", Data="660x930" },
                     new CheckData { Name="Galaxy 2.0 - 22:31 - 342x482", Data="342x482" },
                 };
@@ -132,19 +132,19 @@ namespace BackgroundChanger.Views
             ButtonSelect.IsEnabled = false;
 
             string GameSearch = Name;
-            Task task = Task.Run(() =>
+            _ = Task.Run(() =>
             {
                 SteamGridDbSearchResultData DataSearch = null;
                 try
                 {
-                    DataSearch = steamGridDbApi.SearchGame(GameSearch);
+                    DataSearch = SteamGridDbApi.SearchGame(GameSearch);
                 }
                 catch (Exception ex)
                 {
                     Common.LogError(ex, false, true, "BackgroundChanger");
                 }
 
-                this.Dispatcher.BeginInvoke((Action)delegate
+                _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
                 {
                     PART_SearchList.ItemsSource = null;
                     PART_ElementList.ItemsSource = null;
@@ -158,7 +158,7 @@ namespace BackgroundChanger.Views
                 });
             });
         }
-        
+
         private void SearchDataElements(int Id)
         {
             PART_DataLoad.Visibility = Visibility.Visible;
@@ -167,19 +167,19 @@ namespace BackgroundChanger.Views
             ButtonSelect.IsEnabled = false;
 
             string GameSearch = SearchElement.Text;
-            Task task = Task.Run(() =>
+            _ = Task.Run(() =>
             {
                 DataSearch = null;
                 try
                 {
-                    DataSearch = steamGridDbApi.SearchElement(Id, steamGridDbType);
+                    DataSearch = SteamGridDbApi.SearchElement(Id, SteamGridDbType);
                 }
                 catch (Exception ex)
                 {
                     Common.LogError(ex, false, true, "BackgroundChanger");
                 }
 
-                this.Dispatcher.BeginInvoke((Action)delegate
+                _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
                 {
                     if (DataSearch != null)
                     {
@@ -216,10 +216,10 @@ namespace BackgroundChanger.Views
             {
                 PART_BtSearch.IsEnabled = true;
 
-                if (e.Key == System.Windows.Input.Key.Enter)
+                if (e.Key == Key.Enter)
                 {
                     PART_BtSearch_Click(null, null);
-                }                
+                }
             }
             else
             {
@@ -243,8 +243,8 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                steamGridDbResults = PART_ElementList.SelectedItems.Cast<SteamGridDbResult>().ToList();
-                if (steamGridDbResults != null)
+                SteamGridDbResults = PART_ElementList.SelectedItems.Cast<SteamGridDbResult>().ToList();
+                if (SteamGridDbResults != null)
                 {
                     ButtonSelect.IsEnabled = true;
                 }
@@ -399,15 +399,9 @@ namespace BackgroundChanger.Views
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            string data = string.Empty;
-            if (((ComboBox)sender).Name == "PART_ComboDimensions")
-            {
-                data = string.Join(", ", ((List<CheckData>)((ComboBox)sender).ItemsSource).Where(x => x.IsChecked).Select(x => x.Name.Split('-')[2].Trim()));
-            }
-            else
-            {
-                data = string.Join(", ", ((List<CheckData>)((ComboBox)sender).ItemsSource).Where(x => x.IsChecked).Select(x => x.Name));
-            }
+            string data = ((ComboBox)sender).Name == "PART_ComboDimensions"
+                ? string.Join(", ", ((List<CheckData>)((ComboBox)sender).ItemsSource).Where(x => x.IsChecked).Select(x => x.Name.Split('-')[2].Trim()))
+                : string.Join(", ", ((List<CheckData>)((ComboBox)sender).ItemsSource).Where(x => x.IsChecked).Select(x => x.Name));
 
             ((ComboBox)sender).Text = data;
         }

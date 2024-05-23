@@ -14,7 +14,7 @@ namespace BackgroundChanger.Services
 {
     public class BackgroundChangerDatabase : PluginDatabaseObject<BackgroundChangerSettingsViewModel, BackgroundImagesCollection, GameBackgroundImages, ItemImage>
     {
-        public BackgroundChangerDatabase(IPlayniteAPI PlayniteApi, BackgroundChangerSettingsViewModel PluginSettings, string PluginUserDataPath) : base(PlayniteApi, PluginSettings, "BackgroundChanger", PluginUserDataPath)
+        public BackgroundChangerDatabase(BackgroundChangerSettingsViewModel PluginSettings, string PluginUserDataPath) : base(PluginSettings, "BackgroundChanger", PluginUserDataPath)
         {
 
         }
@@ -28,11 +28,11 @@ namespace BackgroundChanger.Services
                 stopWatch.Start();
 
                 Database = new BackgroundImagesCollection(Paths.PluginDatabasePath);
-                Database.SetGameInfo<ItemImage>(PlayniteApi);
+                Database.SetGameInfo<ItemImage>();
 
                 stopWatch.Stop();
                 TimeSpan ts = stopWatch.Elapsed;
-                logger.Info($"LoadDatabase with {Database.Count} items - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)}");
+                Logger.Info($"LoadDatabase with {Database.Count} items - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)}");
             }
             catch (Exception ex)
             {
@@ -50,7 +50,7 @@ namespace BackgroundChanger.Services
 
             if (gameBackgroundImages == null)
             {
-                Game game = PlayniteApi.Database.Games.Get(Id);
+                Game game = API.Instance.Database.Games.Get(Id);
                 if (game != null)
                 {
                     gameBackgroundImages = GetDefault(game);
@@ -76,7 +76,7 @@ namespace BackgroundChanger.Services
                 string PathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.BackgroundImage);
                 if (PathImage.IsNullOrEmpty() && !File.Exists(PathImage))
                 {
-                    PathImage = PlayniteApi.Database.GetFullFilePath(gameBackgroundImages.BackgroundImage);
+                    PathImage = API.Instance.Database.GetFullFilePath(gameBackgroundImages.BackgroundImage);
                 }
 
                 gameBackgroundImages.Items.Insert(0, new ItemImage
@@ -101,7 +101,7 @@ namespace BackgroundChanger.Services
                 string PathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.CoverImage);
                 if (PathImage.IsNullOrEmpty() && !File.Exists(PathImage))
                 {
-                    PathImage = PlayniteApi.Database.GetFullFilePath(gameBackgroundImages.CoverImage);
+                    PathImage = API.Instance.Database.GetFullFilePath(gameBackgroundImages.CoverImage);
                 }
 
                 gameBackgroundImages.Items.Insert(0, new ItemImage

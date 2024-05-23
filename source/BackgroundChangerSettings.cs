@@ -13,60 +13,28 @@ namespace BackgroundChanger
         public bool MenuInExtensions { get; set; } = true;
 
 
-        private bool _EnableBackgroundImage { get; set; } = true;
-        public bool EnableBackgroundImage
-        {
-            get => _EnableBackgroundImage;
-            set
-            {
-                _EnableBackgroundImage = value;
-                OnPropertyChanged();
-            }
-        }
+        private bool enableBackgroundImage = true;
+        public bool EnableBackgroundImage { get => enableBackgroundImage; set => SetValue(ref enableBackgroundImage, value); }
 
         public bool EnableBackgroundImageRandomSelect { get; set; } = false;
         public bool EnableBackgroundImageAutoChanger { get; set; } = false;
         public int BackgroundImageAutoChangerTimer { get; set; } = 10;
 
-        private bool _EnableImageAnimatedBackground { get; set; } = false;
-        public bool EnableImageAnimatedBackground
-        {
-            get => _EnableImageAnimatedBackground;
-            set
-            {
-                _EnableImageAnimatedBackground = value;
-                OnPropertyChanged();
-            }
-        }
+        private bool enableImageAnimatedBackground = false;
+        public bool EnableImageAnimatedBackground { get => enableImageAnimatedBackground; set => SetValue(ref enableImageAnimatedBackground, value); }
 
         public double Volume { get; set; } = 0;
 
 
-        private bool _EnableCoverImage { get; set; } = true;
-        public bool EnableCoverImage
-        {
-            get => _EnableCoverImage;
-            set
-            {
-                _EnableCoverImage = value;
-                OnPropertyChanged();
-            }
-        }
+        private bool enableCoverImage = true;
+        public bool EnableCoverImage { get => enableCoverImage; set => SetValue(ref enableCoverImage, value); }
 
         public bool EnableCoverImageRandomSelect { get; set; } = false;
         public bool EnableCoverImageAutoChanger { get; set; } = false;
         public int CoverImageAutoChangerTimer { get; set; } = 10;
 
-        private bool _EnableImageAnimatedCover { get; set; } = false;
-        public bool EnableImageAnimatedCover
-        {
-            get => _EnableImageAnimatedCover;
-            set
-            {
-                _EnableImageAnimatedCover = value;
-                OnPropertyChanged();
-            }
-        }
+        private bool enableImageAnimatedCover = false;
+        public bool EnableImageAnimatedCover { get => enableImageAnimatedCover; set => SetValue(ref enableImageAnimatedCover, value); }
 
 
         public string SteamGridDbApiKey { get; set; } = string.Empty;
@@ -85,41 +53,17 @@ namespace BackgroundChanger
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
         #region Variables exposed
-        private bool _HasData { get; set; } = false;
+        private bool hasData = false;
         [DontSerialize]
-        public bool HasData
-        {
-            get => _HasData;
-            set
-            {
-                _HasData = value;
-                OnPropertyChanged();
-            }
-        }
+        public bool HasData { get => hasData; set => SetValue(ref hasData, value); }
 
-        private bool _HasDataBackground { get; set; } = false;
+        private bool hasDataBackground = false;
         [DontSerialize]
-        public bool HasDataBackground
-        {
-            get => _HasDataBackground;
-            set
-            {
-                _HasDataBackground = value;
-                OnPropertyChanged();
-            }
-        }
+        public bool HasDataBackground { get => hasDataBackground; set => SetValue(ref hasDataBackground, value); }
 
-        private bool _HasDataCover { get; set; } = false;
+        private bool hasDataCover = false;
         [DontSerialize]
-        public bool HasDataCover
-        {
-            get => _HasDataCover;
-            set
-            {
-                _HasDataCover = value;
-                OnPropertyChanged();
-            }
-        }
+        public bool HasDataCover { get => hasDataCover; set => SetValue(ref hasDataCover, value); }
         #endregion
     }
 
@@ -129,8 +73,8 @@ namespace BackgroundChanger
         private readonly BackgroundChanger Plugin;
         private BackgroundChangerSettings EditingClone { get; set; }
 
-        private BackgroundChangerSettings _Settings;
-        public BackgroundChangerSettings Settings { get => _Settings; set => SetValue(ref _Settings, value); }
+        private BackgroundChangerSettings settings;
+        public BackgroundChangerSettings Settings { get => settings; set => SetValue(ref settings, value); }
 
 
         public BackgroundChangerSettingsViewModel(BackgroundChanger plugin)

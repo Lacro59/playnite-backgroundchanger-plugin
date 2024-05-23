@@ -29,32 +29,28 @@ namespace BackgroundChanger.Views
     /// </summary>
     public partial class ImagesManager : UserControl
     {
-        private IPlayniteAPI _PlayniteApi;
-        protected static IResourceProvider resources = new ResourceProvider();
+        private BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
 
-        private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
-
-        private GameBackgroundImages _gameBackgroundImages { get; set; }
-        private List<ItemImage> _backgroundImages { get; set; }
-        private List<ItemImage> _backgroundImagesEdited { get; set; }
-        private bool _IsCover { get; set; }
+        private GameBackgroundImages GameBackgroundImages { get; set; }
+        private List<ItemImage> BackgroundImages { get; set; }
+        private List<ItemImage> BackgroundImagesEdited { get; set; }
+        private bool IsCover { get; set; }
 
 
-        public ImagesManager(IPlayniteAPI PlayniteApi, GameBackgroundImages gameBackgroundImages, bool IsCover)
+        public ImagesManager(GameBackgroundImages gameBackgroundImages, bool IsCover)
         {
-            _PlayniteApi = PlayniteApi;
-            _gameBackgroundImages = gameBackgroundImages;
-            _backgroundImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == IsCover).ToList());
-            _backgroundImagesEdited = Serialization.GetClone(_backgroundImages);
-            _IsCover = IsCover;
+            this.GameBackgroundImages = gameBackgroundImages;
+            BackgroundImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == IsCover).ToList());
+            BackgroundImagesEdited = Serialization.GetClone(BackgroundImages);
+            this.IsCover = IsCover;
 
             InitializeComponent();
 
             PART_LbBackgroundImages.ItemsSource = null;
-            PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
+            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
 
             PART_BackgroundImage.UseAnimated = true;
-        }        
+        }
 
 
         private void PART_BtCancel_Click(object sender, RoutedEventArgs e)
@@ -67,19 +63,19 @@ namespace BackgroundChanger.Views
             try
             {
                 // Delete removed
-                List<ItemImage> tmpActualList = _backgroundImages.Where(x => !x.IsDefault && x.IsCover == _IsCover).ToList();
+                List<ItemImage> tmpActualList = BackgroundImages.Where(x => !x.IsDefault && x.IsCover == IsCover).ToList();
                 foreach (ItemImage itemImage in tmpActualList)
                 {
-                    if (_backgroundImagesEdited.Where(x => x.FullPath == itemImage.FullPath).FirstOrDefault() == null)
+                    if (BackgroundImagesEdited.FirstOrDefault(x => x.FullPath == itemImage.FullPath) == null)
                     {
                         FileSystem.DeleteFileSafe(itemImage.FullPath);
                     }
                 }
 
                 // Add newed
-                for (int index = 0; index < _backgroundImagesEdited.Count; index++)
+                for (int index = 0; index < BackgroundImagesEdited.Count; index++)
                 {
-                    ItemImage itemImage = _backgroundImagesEdited[index];
+                    ItemImage itemImage = BackgroundImagesEdited[index];
 
                     if (itemImage.FolderName.IsNullOrEmpty() && !itemImage.IsDefault)
                     {
@@ -88,30 +84,26 @@ namespace BackgroundChanger.Views
                         string ext = Path.GetExtension(OriginalPath);
 
                         itemImage.Name = ImageGuid.ToString() + ext;
-                        itemImage.FolderName = _gameBackgroundImages.Id.ToString();
-                        itemImage.IsCover = _IsCover;
+                        itemImage.FolderName = GameBackgroundImages.Id.ToString();
+                        itemImage.IsCover = IsCover;
 
                         string Dir = Path.GetDirectoryName(itemImage.FullPath);
-                        if (!Directory.Exists(Dir))
-                        {
-                            Directory.CreateDirectory(Dir);
-                        }
-
+                        FileSystem.CreateDirectory(Dir);
                         File.Copy(OriginalPath, itemImage.FullPath);
                     }
                 }
 
                 // Saved
-                List<ItemImage> tmpList = Serialization.GetClone(_gameBackgroundImages.Items.Where(x => x.IsCover != _IsCover).ToList());
-                tmpList.AddRange(_backgroundImagesEdited);
-                _gameBackgroundImages.Items = tmpList;
-                BackgroundChanger.PluginDatabase.Update(_gameBackgroundImages);
+                List<ItemImage> tmpList = Serialization.GetClone(GameBackgroundImages.Items.Where(x => x.IsCover != IsCover).ToList());
+                tmpList.AddRange(BackgroundImagesEdited);
+                GameBackgroundImages.Items = tmpList;
+                BackgroundChanger.PluginDatabase.Update(GameBackgroundImages);
 
                 ((Window)this.Parent).Close();
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
         }
 
@@ -126,13 +118,13 @@ namespace BackgroundChanger.Views
                 PART_LbBackgroundImages.ItemsSource = null;
 
                 int index = int.Parse(((Button)sender).Tag.ToString());
-                _backgroundImagesEdited.RemoveAt(index);
+                BackgroundImagesEdited.RemoveAt(index);
 
-                PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
+                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
         }
 
@@ -140,13 +132,13 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                List<string> SelectedFiles = _PlayniteApi.Dialogs.SelectFiles("(*.jpg, *.jpeg, *.png)|*.jpg; *.jpeg; *.png|(*.webp)|*.webp|(*.mp4)|*.mp4");
+                List<string> SelectedFiles = API.Instance.Dialogs.SelectFiles("(*.jpg, *.jpeg, *.png)|*.jpg; *.jpeg; *.png|(*.webp)|*.webp|(*.mp4)|*.mp4");
 
                 if (SelectedFiles != null && SelectedFiles.Count > 0)
                 {
                     foreach(string FilePath in SelectedFiles)
                     {
-                        _backgroundImagesEdited.Add(new ItemImage
+                        BackgroundImagesEdited.Add(new ItemImage
                         {
                             Name = FilePath
                         });
@@ -154,11 +146,11 @@ namespace BackgroundChanger.Views
                 }
 
                 PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
+                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
         }
 
@@ -167,44 +159,44 @@ namespace BackgroundChanger.Views
             try
             {
                 SteamGridDbType steamGridDbType = SteamGridDbType.heroes;
-                if (_IsCover)
+                if (IsCover)
                 {
                     steamGridDbType = SteamGridDbType.grids;
                 }
 
-                SteamGridDbView ViewExtension = new SteamGridDbView(_gameBackgroundImages.Name, steamGridDbType);
-                Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PlayniteApi, "SteamGridDB", ViewExtension);
-                windowExtension.ShowDialog();
+                SteamGridDbView ViewExtension = new SteamGridDbView(GameBackgroundImages.Name, steamGridDbType);
+                Window windowExtension = PlayniteUiHelper.CreateExtensionWindow("SteamGridDB", ViewExtension);
+                _ = windowExtension.ShowDialog();
 
-                if (ViewExtension.steamGridDbResults != null)
+                if (ViewExtension.SteamGridDbResults != null)
                 {
                     GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
-                        resources.GetString("LOCCommonGettingData"),
+                        ResourceProvider.GetString("LOCCommonGettingData"),
                         false
                     );
                     globalProgressOptions.IsIndeterminate = true;
 
-                    GlobalProgressResult ProgressDownload = PluginDatabase.PlayniteApi.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+                    GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
                     {
-                        ViewExtension.steamGridDbResults.ForEach(x =>
+                        ViewExtension.SteamGridDbResults.ForEach(x =>
                         {
                             try
                             {
                                 string cachedFile = HttpFileCache.GetWebFile(x.url);
-                                _backgroundImagesEdited.Add(new ItemImage
+                                BackgroundImagesEdited.Add(new ItemImage
                                 {
                                     Name = cachedFile
                                 });
                             }
                             catch (Exception ex)
                             {
-                                Common.LogError(ex, false, true, "BackgroundChanger");
+                                Common.LogError(ex, false, true, PluginDatabase.PluginName);
                             }
                         });
                     }, globalProgressOptions);
 
 
-                    Task.Run(() =>
+                    _ = Task.Run(() =>
                     {
                         while (!(bool)ProgressDownload.Result)
                         {
@@ -212,17 +204,17 @@ namespace BackgroundChanger.Views
                         }
                     }).ContinueWith(antecedant => 
                     {
-                        this.Dispatcher.BeginInvoke((Action)delegate
+                        _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
                         {
                             PART_LbBackgroundImages.ItemsSource = null;
-                            PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
+                            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
                         });
                     });
                 }
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
         }
 
@@ -252,28 +244,26 @@ namespace BackgroundChanger.Views
         private void PART_BtUp_Click(object sender, RoutedEventArgs e)
         {
             int index = int.Parse(((Button)sender).Tag.ToString());
-
             if (index > 1)
             {
-                _backgroundImagesEdited.Insert(index - 1, _backgroundImagesEdited[index]);
-                _backgroundImagesEdited.RemoveAt(index + 1);
+                BackgroundImagesEdited.Insert(index - 1, BackgroundImagesEdited[index]);
+                BackgroundImagesEdited.RemoveAt(index + 1);
 
                 PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
+                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
             }
         }
 
         private void PART_BtDown_Click(object sender, RoutedEventArgs e)
         {
             int index = int.Parse(((Button)sender).Tag.ToString());
-
-            if (index < _backgroundImagesEdited.Count - 1)
+            if (index < BackgroundImagesEdited.Count - 1)
             {
-                _backgroundImagesEdited.Insert(index + 2, _backgroundImagesEdited[index]);
-                _backgroundImagesEdited.RemoveAt(index);
+                BackgroundImagesEdited.Insert(index + 2, BackgroundImagesEdited[index]);
+                BackgroundImagesEdited.RemoveAt(index);
 
                 PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
+                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
             }
         }
 
@@ -286,7 +276,7 @@ namespace BackgroundChanger.Views
                 {
                     Video.LoadedBehavior = MediaState.Play;
                     Video.LoadedBehavior = MediaState.Pause;
-                    Video.Position = new TimeSpan(0, 0, ((int)Video.NaturalDuration.TimeSpan.TotalSeconds / 2));
+                    Video.Position = new TimeSpan(0, 0, (int)Video.NaturalDuration.TimeSpan.TotalSeconds / 2);
                 }
 
                 FrameworkElement ElementParent = (FrameworkElement)((FrameworkElement)sender).Parent;
@@ -297,7 +287,7 @@ namespace BackgroundChanger.Views
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
         }
 
@@ -306,12 +296,12 @@ namespace BackgroundChanger.Views
         {
             int index = int.Parse(((TextBlock)sender).Tag.ToString());
 
-            bool newValue = !_backgroundImagesEdited[index].IsFavorite;
-            _backgroundImagesEdited.ForEach(c => c.IsFavorite = false);
-            _backgroundImagesEdited[index].IsFavorite = newValue;
+            bool newValue = !BackgroundImagesEdited[index].IsFavorite;
+            BackgroundImagesEdited.ForEach(c => c.IsFavorite = false);
+            BackgroundImagesEdited[index].IsFavorite = newValue;
 
             PART_LbBackgroundImages.ItemsSource = null;
-            PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
+            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
         }
 
 
@@ -319,14 +309,13 @@ namespace BackgroundChanger.Views
         {
             string VideoPath = string.Empty;
 
-            FileSystem.DeleteDirectory(PluginDatabase.Paths.PluginCachePath);
-            FileSystem.CreateDirectory(PluginDatabase.Paths.PluginCachePath);
+            FileSystem.CreateDirectory(PluginDatabase.Paths.PluginCachePath, true);
 
             try
             {
                 if (FilePath != null && FilePath != string.Empty)
                 {
-                    if (System.IO.Path.GetExtension(FilePath).ToLower().IndexOf("webp") > -1)
+                    if (Path.GetExtension(FilePath).ToLower().IndexOf("webp") > -1)
                     {
                         WebpAnim webPAnim = new WebpAnim();
                         webPAnim.Load(FilePath);
@@ -334,7 +323,7 @@ namespace BackgroundChanger.Views
                         string FileName = Path.GetFileNameWithoutExtension(FilePath);
                         int ActualFrame = 0;
                         while (ActualFrame < webPAnim.FramesCount())
-                        {                            
+                        {
                             string PathTemp = Path.Combine(PluginDatabase.Paths.PluginCachePath, $"FileName_{ActualFrame:D4}.png");
 
                             System.Drawing.Image img = System.Drawing.Image.FromStream(webPAnim.GetFrameStream(ActualFrame));
@@ -347,11 +336,11 @@ namespace BackgroundChanger.Views
                         double Width = webPAnim.GetFrameBitmapSource(0).Width;
                         double Height = webPAnim.GetFrameBitmapSource(0).Height;
 
-                        var ffmpeg = $"-r 25 -f "
+                        string ffmpeg = $"-r 25 -f "
                             + $"image2 -s {Width}x{Height} -i \"{PluginDatabase.Paths.PluginCachePath}\\FileName_%4d.png\" " 
                             + $"-vcodec libx264 -crf 25 -pix_fmt yuv420p \"{PluginDatabase.Paths.PluginCachePath}\\{FileName}.mp4\"";
 
-                        var process = new Process();
+                        Process process = new Process();
                         process.StartInfo.FileName = PluginDatabase.PluginSettings.Settings.ffmpegFile;
                         process.StartInfo.Arguments = ffmpeg;
                         process.Start();
@@ -364,7 +353,7 @@ namespace BackgroundChanger.Views
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
 
             return VideoPath;
@@ -373,18 +362,18 @@ namespace BackgroundChanger.Views
         private void PART_BtConvert_Click(object sender, RoutedEventArgs e)
         {
             int index = int.Parse(((Button)sender).Tag.ToString());
-            string FilePath = _backgroundImagesEdited[index].FullPath;
+            string FilePath = BackgroundImagesEdited[index].FullPath;
 
 
             string VideoPath = string.Empty;
 
             GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
-                resources.GetString("LOCCommonConverting"),
+                ResourceProvider.GetString("LOCCommonConverting"),
                 false
             );
             globalProgressOptions.IsIndeterminate = true;
 
-            var ProgressDownload = PluginDatabase.PlayniteApi.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+            GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
             {
                 try
                 {
@@ -392,7 +381,7 @@ namespace BackgroundChanger.Views
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, false, true, "BackgroundChanger");
+                    Common.LogError(ex, false, true, PluginDatabase.PluginName);
                 }
             }, globalProgressOptions);
 
@@ -402,44 +391,42 @@ namespace BackgroundChanger.Views
                 PART_BtDelete_Click(sender, e);
 
 
-                _backgroundImagesEdited.Add(new ItemImage
+                BackgroundImagesEdited.Add(new ItemImage
                 {
                     Name = VideoPath
                 });
 
                 PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = _backgroundImagesEdited;
+                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
             }
         }
     }
 
     public class GetMediaTypeConverter : IValueConverter
     {
-        private static ILogger logger = LogManager.GetLogger();
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             try
             {
-                if (value is string)
+                if (value is string @string)
                 {
-                    if (System.IO.Path.GetExtension((string)value).ToLower().Contains("mp4"))
+                    if (Path.GetExtension(@string).ToLower().Contains("mp4"))
                     {
                         return "\ueb13";
                     }
 
-                    if (System.IO.Path.GetExtension((string)value).ToLower().Contains("webp"))
+                    if (Path.GetExtension(@string).ToLower().Contains("webp"))
                     {
                         return "\ueb16 \ueb13";
-                    } 
+                    }
 
-                    if (System.IO.Path.GetExtension((string)value).ToLower().Contains("png"))
+                    if (Path.GetExtension(@string).ToLower().Contains("png"))
                     {
                         try
                         {
                             Png_Reader pngr = new Png_Reader();
                             Dictionary<fcTL, MemoryStream> m_Apng;
-                            using (var fStream = FileSystem.OpenReadFileStreamSafe((string)value))
+                            using (Stream fStream = FileSystem.OpenReadFileStreamSafe(@string))
                             {
                                 m_Apng = pngr.Open(fStream).SpltAPng();
                             }
@@ -454,7 +441,7 @@ namespace BackgroundChanger.Views
                         {
                             Common.LogError(ex, true);
                         }
-                    } 
+                    }
 
                     return "\ueb16";
                 }

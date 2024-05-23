@@ -10,8 +10,8 @@ namespace BackgroundChanger.Models
 {
     public class GameBackgroundImages : PluginDataBaseGame<ItemImage>
     {
-        private List<ItemImage> _Items = new List<ItemImage>();
-        public override List<ItemImage> Items { get => _Items; set => SetValue(ref _Items, value); }
+        private List<ItemImage> items = new List<ItemImage>();
+        public override List<ItemImage> Items { get => items; set => SetValue(ref items, value); }
 
 
         [DontSerialize]

@@ -21,7 +21,7 @@ namespace BackgroundChanger.Models
         public bool IsFavorite { get; set; }
 
         [DontSerialize]
-        public string ImageSize 
+        public string ImageSize
         {
             get
             {
@@ -60,32 +60,21 @@ namespace BackgroundChanger.Models
                 }
             }
         }
-        
+
         [DontSerialize]
-        public string FullPath 
-        {
-            get
-            {
-                if (FolderName.IsNullOrEmpty())
-                {
-                    return Name;
-                }
-                else
-                {
-                    return Path.Combine(
+        public string FullPath => FolderName.IsNullOrEmpty()
+                    ? Name
+                    : Path.Combine(
                         PluginDatabase.Paths.PluginUserDataPath,
                         "Images",
                         FolderName,
                         Name
                     );
-                }
-            }
-        }
 
         [DontSerialize]
-        public bool IsVideo => FullPath.IsNullOrEmpty()? false : Path.GetExtension(FullPath).ToLower().Contains("mp4");
+        public bool IsVideo => !FullPath.IsNullOrEmpty() && Path.GetExtension(FullPath).ToLower().Contains("mp4");
 
         [DontSerialize]
-        public bool IsConvertable => FullPath.IsNullOrEmpty() ? false : Path.GetExtension(FullPath).ToLower().Contains("webp");
+        public bool IsConvertable => !FullPath.IsNullOrEmpty() && Path.GetExtension(FullPath).ToLower().Contains("webp");
     }
 }

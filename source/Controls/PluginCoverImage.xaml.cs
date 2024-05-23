@@ -29,18 +29,14 @@ namespace BackgroundChanger.Controls
     /// </summary>
     public partial class PluginCoverImage : PluginUserControlExtend
     {
-        private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
-        internal override IPluginDatabase _PluginDatabase
-        {
-            get => PluginDatabase;
-            set => PluginDatabase = (BackgroundChangerDatabase)_PluginDatabase;
-        }
+        private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
+        internal override IPluginDatabase pluginDatabase => PluginDatabase;
 
         private PluginCoverImageDataContext ControlDataContext = new PluginCoverImageDataContext();
-        internal override IDataContext _ControlDataContext
+        internal override IDataContext controlDataContext
         {
             get => ControlDataContext;
-            set => ControlDataContext = (PluginCoverImageDataContext)_ControlDataContext;
+            set => ControlDataContext = (PluginCoverImageDataContext)controlDataContext;
         }
 
         private System.Timers.Timer BcTimer { get; set; }
@@ -82,12 +78,12 @@ namespace BackgroundChanger.Controls
             PluginDatabase.PluginSettings.PropertyChanged += PluginSettings_PropertyChanged;
             PluginDatabase.Database.ItemUpdated += Database_ItemUpdated;
             PluginDatabase.Database.ItemCollectionChanged += Database_ItemCollectionChanged;
-            PluginDatabase.PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
+            API.Instance.Database.Games.ItemUpdated += Games_ItemUpdated;
 
             // Apply settings
             PluginSettings_PropertyChanged(null, null);
 
-            if (PluginDatabase.PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
+            if (API.Instance.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {
                 EventManager.RegisterClassHandler(typeof(Window), Window.UnloadedEvent, new RoutedEventHandler(WindowBase_UnloadedEvent));
             }
@@ -147,7 +143,7 @@ namespace BackgroundChanger.Controls
                                 }
                                 else
                                 {
-                                    logger.Warn($"No property for {propImageBackground.Name}");
+                                    Logger.Warn($"No property for {propImageBackground.Name}");
                                 }
 
                             }
@@ -190,10 +186,10 @@ namespace BackgroundChanger.Controls
         public void SetCover()
         {
             string PathImage = string.Empty;
-            
+
             if (gameBackgroundImages.HasDataCover && !PluginDatabase.PluginSettings.Settings.useVideoDelayCoverImage)
             {
-                var ItemFavorite = gameBackgroundImages.ItemsCover.Where(x => x.IsFavorite).FirstOrDefault();
+                ItemImage ItemFavorite = gameBackgroundImages.ItemsCover.FirstOrDefault(x => x.IsFavorite);
 
                 if (ControlDataContext.EnableAutoChanger)
                 {
@@ -205,9 +201,9 @@ namespace BackgroundChanger.Controls
                             Counter = gameBackgroundImages.ItemsCover.FindIndex(x => x.IsFavorite);
                         }
                         else
-                        { 
+                        {
                             Random rnd = new Random();
-                            Counter = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
+                            Counter = rnd.Next(0, gameBackgroundImages.ItemsCover.Count);
                             PathImage = gameBackgroundImages.ItemsCover[Counter].FullPath;
                         }
                     }
@@ -276,18 +272,18 @@ namespace BackgroundChanger.Controls
                 string PathImage = ImageSourceManager.GetImagePath(GameContext.CoverImage);
                 if (PathImage.IsNullOrEmpty())
                 {
-                    PathImage = PluginDatabase.PlayniteApi.Database.GetFullFilePath(GameContext.CoverImage);
+                    PathImage = API.Instance.Database.GetFullFilePath(GameContext.CoverImage);
                 }
 
-                SetCoverImage(PathImage);                
+                SetCoverImage(PathImage);
             }
 
             if (PluginDatabase.PluginSettings.Settings.useVideoDelayCoverImage)
             {
-                Task.Run(() => 
+                _ = Task.Run(() =>
                 {
                     Thread.Sleep(1000 * PluginDatabase.PluginSettings.Settings.videoDelayCoverImage);
-                    this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                    _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                     {
                         string PathImage = gameBackgroundImages?.ItemsCover?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
                         SetCoverImage(PathImage);
@@ -304,9 +300,9 @@ namespace BackgroundChanger.Controls
                 ControlDataContext.VideoSource = null;
                 return;
             }
-            
-            
-            if (System.IO.Path.GetExtension(PathImage).ToLower().Contains("mp4"))
+
+
+            if (Path.GetExtension(PathImage).ToLower().Contains("mp4"))
             {
                 ControlDataContext.ImageSource = null;
                 ControlDataContext.VideoSource = PathImage;
@@ -319,10 +315,10 @@ namespace BackgroundChanger.Controls
                 ControlDataContext.VideoSource = null;
             }
 
-            this.Dispatcher?.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
+            _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
             {
                 Image1.Source = ControlDataContext.ImageSource;
-                Video1.Source = (ControlDataContext.VideoSource.IsNullOrEmpty()) ? null : new Uri(ControlDataContext.VideoSource);
+                Video1.Source = ControlDataContext.VideoSource.IsNullOrEmpty() ? null : new Uri(ControlDataContext.VideoSource);
             }));
         }
 
@@ -374,7 +370,7 @@ namespace BackgroundChanger.Controls
 
         private static void SourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
-            var control = (PluginCoverImage)obj;
+            PluginCoverImage control = (PluginCoverImage)obj;
             control.LoadNewSource(args.NewValue, args.OldValue);
         }
 
@@ -399,7 +395,7 @@ namespace BackgroundChanger.Controls
                 image = (string)currentSource;
             }
 
-            if (System.IO.Path.GetExtension(image).ToLower().Contains("mp4"))
+            if (Path.GetExtension(image).ToLower().Contains("mp4"))
             {
                 Image1.Source = null;
                 Video1.Source = new Uri(image);
@@ -423,7 +419,7 @@ namespace BackgroundChanger.Controls
 
             try
             {
-                this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() => 
+                _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() => 
                 {
                     string PathImage = string.Empty;
 

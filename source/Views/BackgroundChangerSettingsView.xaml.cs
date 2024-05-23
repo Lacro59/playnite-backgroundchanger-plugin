@@ -15,15 +15,10 @@ namespace BackgroundChanger.Views
 {
     public partial class BackgroundChangerSettingsView : UserControl
     {
-        private static IResourceProvider resources = new ResourceProvider();
-        private IPlayniteAPI PlayniteApi;
+        private BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
 
-        private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
-
-        public BackgroundChangerSettingsView(IPlayniteAPI PlayniteApi)
+        public BackgroundChangerSettingsView()
         {
-            this.PlayniteApi = PlayniteApi;
-
             InitializeComponent();
 
             HwBcSlider_ValueChanged(hwSlider, null);
@@ -41,7 +36,7 @@ namespace BackgroundChanger.Views
             Slider slider = sender as Slider;
             if (labelBcIntervalLabel_text?.Content != null)
             {
-                labelBcIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
+                labelBcIntervalLabel_text.Content = "(" + slider.Value + " " + ResourceProvider.GetString("LOCBcSeconds") + ")";
             }
         }
 
@@ -55,14 +50,14 @@ namespace BackgroundChanger.Views
             Slider slider = sender as Slider;
             if (labelIntervalLabel_text?.Content != null)
             {
-                labelIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
+                labelIntervalLabel_text.Content = "(" + slider.Value + " " + ResourceProvider.GetString("LOCBcSeconds") + ")";
             }
         }
 
 
         private void ButtonFfmpeg_Click(object sender, RoutedEventArgs e)
         {
-            string SelectedFile = PlayniteApi.Dialogs.SelectFile("File|ffmpeg.exe");
+            string SelectedFile = API.Instance.Dialogs.SelectFile("File|ffmpeg.exe");
 
             if (!SelectedFile.IsNullOrEmpty())
             {
@@ -74,7 +69,7 @@ namespace BackgroundChanger.Views
 
         private void ButtonWebpinfo_Click(object sender, RoutedEventArgs e)
         {
-            string SelectedFile = PlayniteApi.Dialogs.SelectFile("File|webpinfo.exe");
+            string SelectedFile = API.Instance.Dialogs.SelectFile("File|webpinfo.exe");
 
             if (!SelectedFile.IsNullOrEmpty())
             {
@@ -97,7 +92,7 @@ namespace BackgroundChanger.Views
             Slider slider = sender as Slider;
             if (labelBcVideoIntervalLabel_text?.Content != null)
             {
-                labelBcVideoIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
+                labelBcVideoIntervalLabel_text.Content = "(" + slider.Value + " " + ResourceProvider.GetString("LOCBcSeconds") + ")";
             }
         }
 
@@ -111,7 +106,7 @@ namespace BackgroundChanger.Views
             Slider slider = sender as Slider;
             if (labelVideoIntervalLabel_text?.Content != null)
             {
-                labelVideoIntervalLabel_text.Content = "(" + slider.Value + " " + resources.GetString("LOCBcSeconds") + ")";
+                labelVideoIntervalLabel_text.Content = "(" + slider.Value + " " + ResourceProvider.GetString("LOCBcSeconds") + ")";
             }
         }
     }
