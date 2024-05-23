@@ -74,8 +74,7 @@
                                             Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             UseAnimated="{Binding UseAnimated}"
                                             OpacityMask="{Binding ImageOpacityMask, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            UseBitmapImage="True" 
-                                            DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}">
+                                            UseBitmapImage="True">
             </controlsAnimated:AnimatedImage>
 
             <MediaElement x:Name="Video1" pbeh:MediaElementBehaviors.Repeat="True"
@@ -93,8 +92,7 @@
                                             Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             UseAnimated="{Binding UseAnimated}"
                                             OpacityMask="{Binding ImageOpacityMask, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            UseBitmapImage="True" 
-                                            DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}">
+                                            UseBitmapImage="True">
             </controlsAnimated:AnimatedImage>
 
             <MediaElement x:Name="Video2" pbeh:MediaElementBehaviors.Repeat="True"

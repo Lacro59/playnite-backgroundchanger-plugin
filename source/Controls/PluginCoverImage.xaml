@@ -31,8 +31,7 @@
                                         StretchDirection="{Binding StretchDirection}"
                                         UseAnimated="{Binding UseAnimated}"
                                         UseBitmapImage="True" 
-                                        Source="{Binding ImageSource, IsAsync=True}"
-                                        DecodePixelWidth="{Binding ElementName=ImageHolder, Path=ActualWidth}">
+                                        Source="{Binding ImageSource, IsAsync=True}">
         </controlsAnimated:AnimatedImage>
 
         <MediaElement x:Name="Video1" pbeh:MediaElementBehaviors.Repeat="True" Volume="0"
