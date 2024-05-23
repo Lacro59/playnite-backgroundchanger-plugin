@@ -8,7 +8,7 @@
              xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
              xmlns:controlsAnimated="clr-namespace:wpf_animatedimage.Controls"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
-             xmlns:converters1="clr-namespace:CommonPlayniteShared.Converters"
+             xmlns:converters1="clr-namespace:CommonPlayniteShared.Converters" xmlns:controls="clr-namespace:CommonPluginsShared.Controls"
              mc:Ignorable="d" 
              Height="720" Width="1200">
 
@@ -55,6 +55,7 @@
                                 </Grid.RowDefinitions>
 
                                 <TextBlock MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
+                                           VerticalAlignment="Top" HorizontalAlignment="Left"
                                            FontFamily="{DynamicResource CommonFont}" 
                                            Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}">
                                     <TextBlock.Style>
@@ -75,15 +76,16 @@
                                     </TextBlock.Effect>
                                 </TextBlock>
                                 
-                                <Image Grid.Row="0" Height="128" Width="150" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                       Stretch="Uniform"
-                                       Visibility="{Binding IsVideo, Converter={StaticResource InvertedBooleanToVisibilityConverter}}">
+                                <controls:ImageAsync Grid.Row="0" Height="128" Width="150" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                     Stretch="Uniform" RenderOptions.BitmapScalingMode="Linear"
+                                                     Visibility="{Binding IsVideo, Converter={StaticResource InvertedBooleanToVisibilityConverter}}">
                                     <Image.Source>
                                         <MultiBinding Converter="{StaticResource ImageConverter}" ConverterParameter="2">
                                             <Binding Path="FullPath" IsAsync="True" />
                                         </MultiBinding>
                                     </Image.Source>
-                                </Image>
+                                </controls:ImageAsync>
+                                
                                 <TextBlock Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                            FontFamily="{DynamicResource FontIcoFont}" FontSize="20"
                                            Text="{Binding FullPath, Converter={StaticResource GetMediaTypeConverter}}">
