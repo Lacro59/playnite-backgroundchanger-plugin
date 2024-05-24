@@ -40,99 +40,28 @@
                      Height="{Binding ElementName=PART_GridContener, Path=ActualHeight}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid Margin="0,2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="10" />
-                                <ColumnDefinition Width="auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <Grid Grid.Column="0">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="10" />
-                                    <RowDefinition Height="auto" />
-                                </Grid.RowDefinitions>
-
-                                <TextBlock MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
-                                           VerticalAlignment="Top" HorizontalAlignment="Left"
-                                           FontFamily="{DynamicResource CommonFont}" 
-                                           Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}">
-                                    <TextBlock.Style>
-                                        <Style TargetType="{x:Type TextBlock}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsFavorite}" Value="False">
-                                                    <Setter Property="Text" Value="&#xea58;" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsFavorite}" Value="True">
-                                                    <Setter Property="Text" Value="&#xea57;" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-
-                                    <TextBlock.Effect>
-                                        <DropShadowEffect Color="Black" Opacity="0.75" BlurRadius="3" ShadowDepth="0" />
-                                    </TextBlock.Effect>
-                                </TextBlock>
-                                
-                                <controls:ImageAsync Grid.Row="0" Height="128" Width="150" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                     Stretch="Uniform" RenderOptions.BitmapScalingMode="Linear"
-                                                     Visibility="{Binding IsVideo, Converter={StaticResource InvertedBooleanToVisibilityConverter}}">
-                                    <Image.Source>
-                                        <MultiBinding Converter="{StaticResource ImageConverter}" ConverterParameter="2">
-                                            <Binding Path="FullPath" IsAsync="True" />
-                                        </MultiBinding>
-                                    </Image.Source>
-                                </controls:ImageAsync>
-                                
-                                <TextBlock Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                           FontFamily="{DynamicResource FontIcoFont}" FontSize="20"
-                                           Text="{Binding FullPath, Converter={StaticResource GetMediaTypeConverter}}">
-                                    <TextBlock.Effect>
-                                        <DropShadowEffect Color="Black" Opacity="0.75" BlurRadius="3" ShadowDepth="0" />
-                                    </TextBlock.Effect>
-                                </TextBlock>
-
-                                <MediaElement Grid.Row="0" Height="128" Width="150" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                              ScrubbingEnabled="True"
-                                              Stretch="Uniform" MediaOpened="Video_MediaOpened"
-                                              Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                              Source="{Binding FullPath}" LoadedBehavior="Stop" Name="Video" />
-
-                                <Label Grid.Row="2" Content="{Binding ImageSize, FallbackValue='1366x768'}" HorizontalAlignment="Left"
-                                       Visibility="{Binding IsVideo, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" />
-                                <StackPanel Grid.Row="2" Orientation="Horizontal"
-                                            Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                    <Label x:Name="PART_Width" />
-                                    <Label Content="x" />
-                                    <Label x:Name="PART_Height" />
-                                </StackPanel>
-                                
-                                <Label Grid.Row="2" Content="{Binding ImageWeight, FallbackValue='78 Mo'}" HorizontalAlignment="Right" />
-                            </Grid>
-
-                            <Grid Grid.Column="2">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="5" />
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="10" />
-                                    <RowDefinition Height="auto" />
-                                </Grid.RowDefinitions>
-
-                                <Button Name="PART_BtUp" Content="" Click="PART_BtUp_Click" 
+                        <DockPanel Margin="0,2" LastChildFill="True">
+                            <DockPanel DockPanel.Dock="Right" LastChildFill="True" Margin="5,0,0,0">
+                                <Button Name="PART_BtUp" DockPanel.Dock="Top"
+                                        Content="" Click="PART_BtUp_Click" 
                                         IsEnabled="{Binding IsDefault, Converter={StaticResource InvertedBoolenConverter}}"
-                                        VerticalAlignment="Top" Grid.Row="0" FontFamily="{DynamicResource CommonFont}" 
+                                        FontFamily="{DynamicResource CommonFont}" 
                                         Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}" />
-                                <Button Name="PART_BtDown" Content="" Click="PART_BtDown_Click" 
+                                <Button Name="PART_BtDown" DockPanel.Dock="Top"
+                                        Content="" Click="PART_BtDown_Click" Margin="0,5,0,0"
                                         IsEnabled="{Binding IsDefault, Converter={StaticResource InvertedBoolenConverter}}"
-                                        VerticalAlignment="Top" Grid.Row="2" FontFamily="{DynamicResource CommonFont}" 
+                                        FontFamily="{DynamicResource CommonFont}" 
                                         Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}" />
 
-                                <Button Name="PART_BtConvert" Content="&#xe97b;" Click="PART_BtConvert_Click"
-                                        Grid.Row="3" 
+                                <Button Name="PART_BtDelete" Content="" Click="PART_BtDelete_Click"
+                                        DockPanel.Dock="Bottom" Margin="0,5,0,0"
+                                        IsEnabled="{Binding IsDefault, Converter={StaticResource InvertedBoolenConverter}}"
+                                        ToolTip="{DynamicResource LOCRemoveTitle}" FontFamily="{DynamicResource CommonFont}"
+                                        Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}" />
+
+
+                                <Button Name="PART_BtConvert" Content="&#xe97b;" Click="PART_BtConvert_Click" 
+                                        DockPanel.Dock="Bottom"
                                         ToolTip="{DynamicResource LOCBcFTooltTipConvert}" FontFamily="{DynamicResource CommonFont}"
                                         Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}">
                                     <Button.IsEnabled>
@@ -144,12 +73,74 @@
                                     </Button.IsEnabled>
                                 </Button>
 
-                                <Button Name="PART_BtDelete" Content="" Click="PART_BtDelete_Click"
-                                        Grid.Row="5" IsEnabled="{Binding IsDefault, Converter={StaticResource InvertedBoolenConverter}}"
-                                        ToolTip="{DynamicResource LOCRemoveTitle}" FontFamily="{DynamicResource CommonFont}"
-                                        Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}" />
-                            </Grid>
-                        </Grid>
+                                <StackPanel />
+                            </DockPanel>
+
+                            <DockPanel LastChildFill="True">
+                                <DockPanel DockPanel.Dock="Bottom">
+                                    <Label DockPanel.Dock="Left" Content="{Binding ImageSize, FallbackValue='1366x768'}" HorizontalAlignment="Left"
+                                           Visibility="{Binding IsVideo, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" />
+                                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"
+                                                Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <Label x:Name="PART_Width" />
+                                        <Label Content="x" />
+                                        <Label x:Name="PART_Height" />
+                                    </StackPanel>
+
+                                    <Label DockPanel.Dock="Right" Content="{Binding ImageWeight, FallbackValue='78 Mo'}" HorizontalAlignment="Right" />
+                                </DockPanel>
+
+                                <Grid Name="PART_ListContener">
+                                    <TextBlock MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
+                                           Margin="5,5,0,0"
+                                           VerticalAlignment="Top" HorizontalAlignment="Left"
+                                           FontFamily="{DynamicResource CommonFont}" 
+                                           Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="Text" Value="&#xea58;" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsFavorite}" Value="False">
+                                                        <Setter Property="Text" Value="&#xea58;" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                                        <Setter Property="Text" Value="&#xea57;" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+
+                                        <TextBlock.Effect>
+                                            <DropShadowEffect Color="Black" Opacity="0.75" BlurRadius="3" ShadowDepth="0" />
+                                        </TextBlock.Effect>
+                                    </TextBlock>
+
+                                    <TextBlock Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                           Margin="0,0,5,5"
+                                           FontFamily="{DynamicResource FontIcoFont}" FontSize="20"
+                                           Text="{Binding FullPath, Converter={StaticResource GetMediaTypeConverter}, FallbackValue='A'}">
+                                        <TextBlock.Effect>
+                                            <DropShadowEffect Color="Black" Opacity="0.75" BlurRadius="3" ShadowDepth="0" />
+                                        </TextBlock.Effect>
+                                    </TextBlock>
+
+                                    <controls:ImageAsync Height="128" Width="150"
+                                                     Stretch="Uniform" RenderOptions.BitmapScalingMode="Linear"
+                                                     Visibility="{Binding IsVideo, Converter={StaticResource InvertedBooleanToVisibilityConverter}}">
+                                        <Image.Source>
+                                            <MultiBinding Converter="{StaticResource ImageConverter}" ConverterParameter="2">
+                                                <Binding Path="FullPath" IsAsync="True" />
+                                            </MultiBinding>
+                                        </Image.Source>
+                                    </controls:ImageAsync>
+                                    <MediaElement Height="128" Width="150"
+                                              ScrubbingEnabled="True" MediaOpened="Video_MediaOpened" 
+                                              Source="{Binding FullPath}" LoadedBehavior="Stop" Name="Video"
+                                              Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                                </Grid>
+                            </DockPanel>
+                        </DockPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

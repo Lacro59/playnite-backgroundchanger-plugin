@@ -9,7 +9,7 @@
              xmlns:controls="clr-namespace:wpf_animatedimage.Controls"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
              xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
-             xmlns:controls1="clr-namespace:CommonPluginsShared.Controls"
+             xmlns:controls1="clr-namespace:CommonPluginsShared.Controls" xmlns:controls2="clr-namespace:CommonPluginsControls.Controls"
              mc:Ignorable="d" 
              Height="720" Width="1200">
 
@@ -51,9 +51,9 @@
                          Height="{Binding ElementName=PART_GridContener, Path=ActualHeight}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="0,2">
-                                <Label Content="{Binding name}" />
-                            </Grid>
+                            <StackPanel x:Name="PART_ListContener">
+                                <controls2:TextBlockTrimmed Margin="0,2" Text="{Binding name}" MaxWidth="{Binding ElementName=PART_ListContener, Path=ActualWidth}"/>
+                            </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
