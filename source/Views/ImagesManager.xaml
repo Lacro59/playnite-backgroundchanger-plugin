@@ -73,7 +73,26 @@
                                     </Button.IsEnabled>
                                 </Button>
 
-                                <StackPanel />
+                                <Grid>
+                                    <Button Name="PART_BtDefault" Content="&#xE807;" Click="PART_BtDefault_Click" 
+                                            VerticalAlignment="Center"
+                                            ToolTip="{DynamicResource LOCSaveAsDefault}" FontFamily="{DynamicResource FontIcoFont}"
+                                            Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                <Setter Property="IsEnabled" Value="True" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsVideo}" Value="True">
+                                                        <Setter Property="IsEnabled" Value="False" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                                        <Setter Property="IsEnabled" Value="False" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Grid>
                             </DockPanel>
 
                             <DockPanel LastChildFill="True">
@@ -91,6 +110,37 @@
                                 </DockPanel>
 
                                 <Grid Name="PART_ListContener">
+                                    <controls:ImageAsync Height="150" Width="170"
+                                                     Stretch="Uniform" RenderOptions.BitmapScalingMode="Linear"
+                                                     Visibility="{Binding IsVideo, Converter={StaticResource InvertedBooleanToVisibilityConverter}}">
+                                        <Image.Source>
+                                            <MultiBinding Converter="{StaticResource ImageConverter}" ConverterParameter="2">
+                                                <Binding Path="FullPath" IsAsync="True" />
+                                            </MultiBinding>
+                                        </Image.Source>
+                                    </controls:ImageAsync>
+                                    <MediaElement Height="150" Width="170"
+                                              ScrubbingEnabled="True" MediaOpened="Video_MediaOpened" 
+                                              Source="{Binding FullPath}" LoadedBehavior="Stop" Name="Video"
+                                              Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    
+                                    <TextBlock Margin="0,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Right" FontFamily="{DynamicResource FontIcoFont}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="Text" Value="" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                                        <Setter Property="Text" Value="&#xE807;" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+
+                                        <TextBlock.Effect>
+                                            <DropShadowEffect Color="Black" Opacity="0.75" BlurRadius="3" ShadowDepth="0" />
+                                        </TextBlock.Effect>
+                                    </TextBlock>
+                                    
                                     <TextBlock MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
                                            Margin="5,5,0,0"
                                            VerticalAlignment="Top" HorizontalAlignment="Left"
@@ -123,21 +173,6 @@
                                             <DropShadowEffect Color="Black" Opacity="0.75" BlurRadius="3" ShadowDepth="0" />
                                         </TextBlock.Effect>
                                     </TextBlock>
-
-                                    <controls:ImageAsync Height="128" Width="150"
-                                                     Stretch="Uniform" RenderOptions.BitmapScalingMode="Linear"
-                                                     Visibility="{Binding IsVideo, Converter={StaticResource InvertedBooleanToVisibilityConverter}}">
-                                        <Image.Source>
-                                            <MultiBinding Converter="{StaticResource ImageConverter}" ConverterParameter="2">
-                                                <Binding Path="FullPath" IsAsync="True" />
-                                            </MultiBinding>
-                                        </Image.Source>
-                                    </controls:ImageAsync>
-                                    <MediaElement Height="128" Width="150"
-                                              ScrubbingEnabled="True" MediaOpened="Video_MediaOpened" 
-                                              Source="{Binding FullPath}" LoadedBehavior="Stop" Name="Video"
-                                              Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}" />
-
                                 </Grid>
                             </DockPanel>
                         </DockPanel>

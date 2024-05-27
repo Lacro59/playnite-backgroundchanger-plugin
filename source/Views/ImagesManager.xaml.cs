@@ -3,8 +3,10 @@ using BackgroundChanger.Services;
 using CommonPlayniteShared;
 using CommonPlayniteShared.Common;
 using CommonPluginsShared;
+using CommonPluginsShared.Extensions;
 using Playnite.SDK;
 using Playnite.SDK.Data;
+using Playnite.SDK.Models;
 using QSoft.Apng;
 using System;
 using System.Collections.Generic;
@@ -37,12 +39,12 @@ namespace BackgroundChanger.Views
         private bool IsCover { get; set; }
 
 
-        public ImagesManager(GameBackgroundImages gameBackgroundImages, bool IsCover)
+        public ImagesManager(GameBackgroundImages gameBackgroundImages, bool isCover)
         {
-            this.GameBackgroundImages = gameBackgroundImages;
-            BackgroundImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == IsCover).ToList());
+            GameBackgroundImages = gameBackgroundImages;
+            BackgroundImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == isCover).ToList());
             BackgroundImagesEdited = Serialization.GetClone(BackgroundImages);
-            this.IsCover = IsCover;
+            IsCover = isCover;
 
             InitializeComponent();
 
@@ -62,8 +64,10 @@ namespace BackgroundChanger.Views
         {
             try
             {
+                ItemImage originalDefault = BackgroundImages.FirstOrDefault(x => x.IsDefault);
+
                 // Delete removed
-                List<ItemImage> tmpActualList = BackgroundImages.Where(x => !x.IsDefault && x.IsCover == IsCover).ToList();
+                List<ItemImage> tmpActualList = BackgroundImages.Where(x => !x.Name.IsEqual(originalDefault.Name) && x.IsCover == IsCover).ToList();
                 foreach (ItemImage itemImage in tmpActualList)
                 {
                     if (BackgroundImagesEdited.FirstOrDefault(x => x.FullPath == itemImage.FullPath) == null)
@@ -77,7 +81,7 @@ namespace BackgroundChanger.Views
                 {
                     ItemImage itemImage = BackgroundImagesEdited[index];
 
-                    if (itemImage.FolderName.IsNullOrEmpty() && !itemImage.IsDefault)
+                    if (itemImage.FolderName.IsNullOrEmpty() && !itemImage.Name.IsEqual(originalDefault.Name))
                     {
                         Guid ImageGuid = Guid.NewGuid();
                         string OriginalPath = itemImage.Name;
@@ -91,6 +95,45 @@ namespace BackgroundChanger.Views
                         FileSystem.CreateDirectory(Dir);
                         File.Copy(OriginalPath, itemImage.FullPath);
                     }
+                }
+
+                // Default
+                ItemImage newDefault = BackgroundImagesEdited.FirstOrDefault(x => x.IsDefault);
+                if (!originalDefault?.Name.IsEqual(newDefault?.Name) ?? false)
+                {
+                    // Copy old in exention data
+                    string FolderName = GameBackgroundImages.Id.ToString();
+                    string newPath = Path.Combine(
+                        PluginDatabase.Paths.PluginUserDataPath,
+                        "Images",
+                        FolderName,
+                        Path.GetFileName(originalDefault.Name)
+                    );
+                    File.Copy(originalDefault.Name, newPath);
+                    FileSystem.DeleteFileSafe(originalDefault.Name);
+
+                    // Copy new in game data
+                    Game game = GameBackgroundImages.Game;
+                    string filePath = API.Instance.Database.AddFile(newDefault.FullPath, game.Id);
+                    FileSystem.DeleteFileSafe(newDefault.FullPath);
+
+                    ItemImage originalNew = BackgroundImages.FirstOrDefault(x => x.Name.IsEqual(newDefault.Name));
+                    ItemImage newOld = BackgroundImagesEdited.FirstOrDefault(x => x.Name.IsEqual(originalDefault.Name));
+
+                    newOld.Name = Path.GetFileName(originalDefault.Name);
+                    newOld.FolderName = FolderName;
+
+                    if (IsCover)
+                    {
+                        game.CoverImage = filePath;
+                    }
+                    else
+                    {
+                        game.BackgroundImage = filePath;
+                    }
+                    API.Instance.Database.Games.Update(game);
+                    newDefault.Name = API.Instance.Database.GetFullFilePath(filePath);
+                    newDefault.FolderName = null;
                 }
 
                 // Saved
@@ -280,10 +323,13 @@ namespace BackgroundChanger.Views
                 }
 
                 FrameworkElement ElementParent = (FrameworkElement)((FrameworkElement)sender).Parent;
-                var ElementWidth = ElementParent.FindName("PART_Width");
-                var ElementHeight = ElementParent.FindName("PART_Height");
-                ((Label)ElementWidth).Content = ((MediaElement)sender).NaturalVideoWidth;
-                ((Label)ElementHeight).Content = ((MediaElement)sender).NaturalVideoHeight;
+                if (ElementParent != null)
+                {
+                    var ElementWidth = ElementParent.FindName("PART_Width");
+                    var ElementHeight = ElementParent.FindName("PART_Height");
+                    ((Label)ElementWidth).Content = ((MediaElement)sender).NaturalVideoWidth;
+                    ((Label)ElementHeight).Content = ((MediaElement)sender).NaturalVideoHeight;
+                }
             }
             catch (Exception ex)
             {
@@ -399,6 +445,20 @@ namespace BackgroundChanger.Views
                 PART_LbBackgroundImages.ItemsSource = null;
                 PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
             }
+        }
+
+        private void PART_BtDefault_Click(object sender, RoutedEventArgs e)
+        {
+            int index = int.Parse(((Button)sender).Tag.ToString());
+
+            BackgroundImagesEdited.ForEach(c => c.IsDefault = false);
+            BackgroundImagesEdited[index].IsDefault = true;
+
+            BackgroundImagesEdited.Insert(0, BackgroundImagesEdited[index]);
+            BackgroundImagesEdited.RemoveAt(index + 1);
+
+            PART_LbBackgroundImages.ItemsSource = null;
+            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
         }
     }
 
