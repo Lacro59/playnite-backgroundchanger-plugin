@@ -186,7 +186,7 @@
                                                             RenderOptions.BitmapScalingMode="LowQuality"
                                                             UseAnimated="False"
                                                             DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}" /-->
-                                    <controls1:ImageAsync Stretch="Uniform" Source="{Binding thumbnail}" Height="140" />
+                                    <controls1:ImageAsync Stretch="Uniform" Source="{Binding Thumbnail}" Height="140" />
                                     
                                     <Grid Grid.Column="2">
                                         <Grid.RowDefinitions>
@@ -196,23 +196,23 @@
                                         </Grid.RowDefinitions>
 
                                         <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                            <controls1:ImageAsync Source="{Binding author.avatar}" Height="32" Width="32" Stretch="Uniform" />
-                                            <Label Margin="10,0,0,0" Content="{Binding author.name}" />
+                                            <controls1:ImageAsync Source="{Binding Author.Avatar}" Height="32" Width="32" Stretch="Uniform" />
+                                            <Label Margin="10,0,0,0" Content="{Binding Author.Name}" />
                                         </StackPanel>
 
                                         <StackPanel Grid.Row="2" Orientation="Horizontal">
-                                            <Label Content="{Binding style}" Typography.Capitals="SmallCaps" />
+                                            <Label Content="{Binding Style}" Typography.Capitals="SmallCaps" />
 
                                             <Label Margin="10,0,0,0" Content="-" />
 
-                                            <Label Margin="10,0,0,0" Content="{Binding width}" />
+                                            <Label Margin="10,0,0,0" Content="{Binding Width}" />
                                             <Label Content="x" />
-                                            <Label Content="{Binding height}" />
+                                            <Label Content="{Binding Height}" />
 
                                             <Label Margin="10,0,0,0" Content="-" />
 
                                             <Label Margin="10,0,0,0" Typography.Capitals="AllSmallCaps"
-                                                   Content="{Binding mime, Converter={StaticResource StringRemoveConverter}, ConverterParameter='image/'}" />
+                                                   Content="{Binding Mime, Converter={StaticResource StringRemoveConverter}, ConverterParameter='image/'}" />
                                         </StackPanel>
                                     </Grid>
                                 </Grid>

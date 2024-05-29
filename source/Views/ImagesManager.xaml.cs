@@ -225,7 +225,7 @@ namespace BackgroundChanger.Views
                         {
                             try
                             {
-                                string cachedFile = HttpFileCache.GetWebFile(x.url);
+                                string cachedFile = HttpFileCache.GetWebFile(x.Url);
                                 BackgroundImagesEdited.Add(new ItemImage
                                 {
                                     Name = cachedFile

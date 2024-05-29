@@ -173,7 +173,20 @@ namespace BackgroundChanger.Views
                 DataSearch = null;
                 try
                 {
-                    DataSearch = SteamGridDbApi.SearchElement(Id, SteamGridDbType);
+                    SteamGridDbResultData steamGridDbResultData = null;
+                    steamGridDbResultData = SteamGridDbApi.SearchElement(Id, SteamGridDbType);
+                    DataSearch = new SteamGridDbResultData
+                    {
+                        Data = new List<SteamGridDbResult>()
+                    };
+
+                    int page = 0;
+                    while (steamGridDbResultData?.Data?.Count > 0)
+                    {
+                        DataSearch.Data.AddRange(steamGridDbResultData.Data);
+                        page++;
+                        steamGridDbResultData = SteamGridDbApi.SearchElement(Id, SteamGridDbType, page);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -182,7 +195,7 @@ namespace BackgroundChanger.Views
 
                 _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
                 {
-                    ButtonSelectAll.IsEnabled = DataSearch?.data?.Count > 0;
+                    ButtonSelectAll.IsEnabled = DataSearch?.Data?.Count > 0;
                     if (DataSearch != null)
                     {
                         ApplyFilter(null, null);
@@ -279,30 +292,30 @@ namespace BackgroundChanger.Views
 
             if (DataSearch != null)
             {
-                DataSearchFiltered = Serialization.GetClone(DataSearch.data);
+                DataSearchFiltered = Serialization.GetClone(DataSearch.Data);
 
 
                 List<CheckData> ListDimensions = PART_ComboDimensions.ItemsSource as List<CheckData>;
-                DataSearchFiltered = DataSearchFiltered.Where(x => ListDimensions.Any(y => (x.width + "x" + x.height) == y.Data && y.IsChecked)).ToList();
+                DataSearchFiltered = DataSearchFiltered.Where(x => ListDimensions.Any(y => (x.Width + "x" + x.Height) == y.Data && y.IsChecked)).ToList();
 
                 List<CheckData> ListStyles = PART_ComboStyles.ItemsSource as List<CheckData>;
-                DataSearchFiltered = DataSearchFiltered.Where(x => ListStyles.Any(y => x.style == y.Data && y.IsChecked)).ToList();
+                DataSearchFiltered = DataSearchFiltered.Where(x => ListStyles.Any(y => x.Style == y.Data && y.IsChecked)).ToList();
 
                 List<CheckData> ListTags = PART_ComboTags.ItemsSource as List<CheckData>;
                 bool humor = ListTags.Find(x => x.Name == "Humor").IsChecked;
                 bool nsfw = ListTags.Find(x => x.Name == "Adult Content").IsChecked;
                 bool epilepsy = ListTags.Find(x => x.Name == "Epilepsy").IsChecked;
                 bool untagged = ListTags.Find(x => x.Name == "Untagged").IsChecked;
-                DataSearchFiltered = DataSearchFiltered.Where(x => (humor && x.humor) || (nsfw && x.nsfw) || (epilepsy && x.epilepsy) || (untagged && x.untagged)).ToList();
+                DataSearchFiltered = DataSearchFiltered.Where(x => (humor && x.Humor) || (nsfw && x.Nsfw) || (epilepsy && x.Epilepsy) || (untagged && x.Untagged)).ToList();
 
                 List<CheckData> ListTypes = PART_ComboTypes.ItemsSource as List<CheckData>;
                 if (ListTypes[0].IsChecked && !ListTypes[1].IsChecked)
                 {
-                    DataSearchFiltered = DataSearchFiltered.Where(x => ListTypes.Any(y => x.mime != "image/webp" && y.IsChecked)).ToList();
+                    DataSearchFiltered = DataSearchFiltered.Where(x => ListTypes.Any(y => x.Mime != "image/webp" && y.IsChecked)).ToList();
                 }
                 else if (!ListTypes[0].IsChecked && ListTypes[1].IsChecked)
                 {
-                    DataSearchFiltered = DataSearchFiltered.Where(x => ListTypes.Any(y => x.mime == "image/webp" && y.IsChecked)).ToList();
+                    DataSearchFiltered = DataSearchFiltered.Where(x => ListTypes.Any(y => x.Mime == "image/webp" && y.IsChecked)).ToList();
                 }
 
 
@@ -382,23 +395,23 @@ namespace BackgroundChanger.Views
 
                 if ((bool)PART_ButtonSortByDate_Asc.IsChecked)
                 {
-                    DataSearchFiltered.Sort((x, y) => x.id.CompareTo(y.id));
+                    DataSearchFiltered.Sort((x, y) => x.Id.CompareTo(y.Id));
                 }
 
                 if ((bool)PART_ButtonSortByDate_Desc.IsChecked)
                 {
-                    DataSearchFiltered.Sort((x, y) => y.id.CompareTo(x.id));
+                    DataSearchFiltered.Sort((x, y) => y.Id.CompareTo(x.Id));
                 }
 
 
                 if ((bool)PART_ButtonSortByScore_Asc.IsChecked)
                 {
-                    DataSearchFiltered.Sort((x, y) => x.score.CompareTo(y.score));
+                    DataSearchFiltered.Sort((x, y) => x.Score.CompareTo(y.Score));
                 }
 
                 if ((bool)PART_ButtonSortByScore_Desc.IsChecked)
                 {
-                    DataSearchFiltered.Sort((x, y) => y.score.CompareTo(x.score));
+                    DataSearchFiltered.Sort((x, y) => y.Score.CompareTo(x.Score));
                 }
 
 

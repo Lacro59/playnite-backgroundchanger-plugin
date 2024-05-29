@@ -18,14 +18,14 @@ namespace BackgroundChanger.Services
 
     public class SteamGridDbApi
     {
-        private BackgroundChangerDatabase PluginDatabase = BackgroundChanger.PluginDatabase;
+        private BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
 
         private string ApiKey { get; set; }
-        private const string UrlBase = @"https://www.steamgriddb.com";
-        private string UrlSearch => UrlBase + "/api/v2/search/autocomplete/{0}";
-        private string UrlSearchGrids => UrlBase + "/api/v2/grids/game/{0}?dimensions=600x900,920x430,460x215,1024x1024,342x482&mimes=image/png,image/webp,image/jpeg&types=static,animated&styles=alternate,blurred,material,white_logo,no_logo&nsfw=any&humour=any";
-        private string UrlSearchHeroes => UrlBase + "/api/v2/heroes/game/{0}?dimensions=1920x620,3840x1240,1600x650&mimes=image/png,image/webp,image/jpeg&types=static,animated&styles=alternate,blurred,material&nsfw=any&humour=any";
-        private string UrlGame => UrlBase + "/game/{0}";
+        private static string UrlBase => @"https://www.steamgriddb.com";
+        private static string UrlSearch => UrlBase + "/api/v2/search/autocomplete/{0}";
+        private static string UrlSearchGrids => UrlBase + "/api/v2/grids/game/{0}?dimensions=600x900,920x430,460x215,1024x1024,342x482&mimes=image/png,image/webp,image/jpeg&types=static,animated&styles=alternate,blurred,material,white_logo,no_logo&nsfw=any&humour=any&page={1}";
+        private static string UrlSearchHeroes => UrlBase + "/api/v2/heroes/game/{0}?dimensions=1920x620,3840x1240,1600x650&mimes=image/png,image/webp,image/jpeg&types=static,animated&styles=alternate,blurred,material&nsfw=any&humour=any&page={1}";
+        private static string UrlGame => UrlBase + "/game/{0}";
 
 
         public SteamGridDbApi()
@@ -44,29 +44,29 @@ namespace BackgroundChanger.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
 
             return null;
         }
 
-        public SteamGridDbResultData SearchElement(int Id, SteamGridDbType steamGridDbType)
+        public SteamGridDbResultData SearchElement(int Id, SteamGridDbType steamGridDbType, int page = 0)
         {
             try
             {
-                string Url = UrlSearchHeroes;
+                string url = UrlSearchHeroes;
                 if (steamGridDbType == SteamGridDbType.grids)
                 {
-                    Url = UrlSearchGrids;
+                    url = UrlSearchGrids;
                 }
 
-                string Response = DownloadStringData(string.Format(Url, Id)).GetAwaiter().GetResult();
-                SteamGridDbResultData ResultData = Serialization.FromJson<SteamGridDbResultData>(Response);
+                string response = DownloadStringData(string.Format(url, Id, page)).GetAwaiter().GetResult();
+                Serialization.TryFromJson(response, out SteamGridDbResultData ResultData);
                 return ResultData;
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
 
             return null;
@@ -87,7 +87,7 @@ namespace BackgroundChanger.Services
                 HttpResponseMessage response;
                 try
                 {
-                    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0");
+                    client.DefaultRequestHeaders.Add("User-Agent", Web.UserAgent);
                     client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}");
                     response = await client.SendAsync(request).ConfigureAwait(false);
                 }
@@ -114,7 +114,6 @@ namespace BackgroundChanger.Services
                     }
 
                     Common.LogDebug(true, string.Format("DownloadStringData() redirecting to {0}", redirectUri));
-
                     return await DownloadStringData(redirectUri.ToString());
                 }
                 else
