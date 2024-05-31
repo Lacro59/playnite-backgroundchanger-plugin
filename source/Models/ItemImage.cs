@@ -21,6 +21,9 @@ namespace BackgroundChanger.Models
         public bool IsFavorite { get; set; }
 
         [DontSerialize]
+        public bool Exist => File.Exists(FullPath);
+
+        [DontSerialize]
         public string ImageSize
         {
             get

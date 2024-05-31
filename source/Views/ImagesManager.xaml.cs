@@ -42,7 +42,7 @@ namespace BackgroundChanger.Views
         public ImagesManager(GameBackgroundImages gameBackgroundImages, bool isCover)
         {
             GameBackgroundImages = gameBackgroundImages;
-            BackgroundImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == isCover).ToList());
+            BackgroundImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == isCover && x.Exist).ToList());
             BackgroundImagesEdited = Serialization.GetClone(BackgroundImages);
             IsCover = isCover;
 
@@ -67,14 +67,13 @@ namespace BackgroundChanger.Views
                 ItemImage originalDefault = BackgroundImages.FirstOrDefault(x => x.IsDefault);
 
                 // Delete removed
-                List<ItemImage> tmpActualList = BackgroundImages.Where(x => !x.Name.IsEqual(originalDefault.Name) && x.IsCover == IsCover).ToList();
-                foreach (ItemImage itemImage in tmpActualList)
+                BackgroundImages.Where(x => !x.Name.IsEqual(originalDefault.Name) && x.IsCover == IsCover)?.ForEach(y =>
                 {
-                    if (BackgroundImagesEdited.FirstOrDefault(x => x.FullPath == itemImage.FullPath) == null)
+                    if (BackgroundImagesEdited.FirstOrDefault(x => x.FullPath == y.FullPath) == null)
                     {
-                        FileSystem.DeleteFileSafe(itemImage.FullPath);
+                        FileSystem.DeleteFileSafe(y.FullPath);
                     }
-                }
+                });
 
                 // Add newed
                 for (int index = 0; index < BackgroundImagesEdited.Count; index++)
