@@ -502,227 +502,234 @@ namespace BackgroundChanger.Controls
 
         private async void LoadNewSource(object newSource, object oldSource)
         {
-            int blurAmount = BlurAmount;
-            bool blurEnabled = IsBlurEnabled;
-            bool highQuality = HighQualityBlur;
-
-            string image = null;
-
-            if (newSource?.Equals(currentSource) == true)
+            try
             {
-                if (Video1.Source != null)
+                int blurAmount = BlurAmount;
+                bool blurEnabled = IsBlurEnabled;
+                bool highQuality = HighQualityBlur;
+
+                string image = null;
+
+                if (newSource?.Equals(currentSource) == true)
                 {
-                    Video1.LoadedBehavior = MediaState.Play;
+                    if (Video1.Source != null)
+                    {
+                        Video1.LoadedBehavior = MediaState.Play;
+                    }
+                    if (Video2.Source != null)
+                    {
+                        Video2.LoadedBehavior = MediaState.Play;
+                    }
+
+                    return;
                 }
-                if (Video2.Source != null)
+
+                currentSource = newSource;
+
+                if (newSource is string)
                 {
-                    Video2.LoadedBehavior = MediaState.Play;
+                    if (!File.Exists(newSource.ToString()))
+                    {
+                        Logger.Warn($"File not founs {newSource}");
+                    }
+                    else
+                    {
+                        image = (string)currentSource;
+                    }
                 }
 
-                return;
-            }
-
-            currentSource = newSource;
-
-            if (newSource is string)
-            {
-                if (!File.Exists(newSource.ToString()))
+                if (blurEnabled)
                 {
-                    Logger.Warn($"File not founs {newSource}");
+                    if (ImageHolder.Effect == null)
+                    {
+                        ImageHolder.Effect = new BlurEffect()
+                        {
+                            KernelType = KernelType.Gaussian,
+                            Radius = blurAmount,
+                            RenderingBias = highQuality ? RenderingBias.Quality : RenderingBias.Performance
+                        };
+                    }
                 }
                 else
                 {
-                    image = (string)currentSource;
-                }
-            }
-
-            if (blurEnabled)
-            {
-                if (ImageHolder.Effect == null)
-                {
-                    ImageHolder.Effect = new BlurEffect()
+                    if (ImageHolder.Effect != null)
                     {
-                        KernelType = KernelType.Gaussian,
-                        Radius = blurAmount,
-                        RenderingBias = highQuality ? RenderingBias.Quality : RenderingBias.Performance
-                    };
-                }
-            }
-            else
-            {
-                if (ImageHolder.Effect != null)
-                {
-                    ImageHolder.Effect = null;
-                }
-            }
-
-            if (AnimationEnabled)
-            {
-                if (image == null)
-                {
-                    if (currentImage == CurrentImage.None)
-                    {
-                        return;
+                        ImageHolder.Effect = null;
                     }
+                }
 
+                if (AnimationEnabled)
+                {
+                    if (image == null)
+                    {
+                        if (currentImage == CurrentImage.None)
+                        {
+                            return;
+                        }
+
+                        if (currentImage == CurrentImage.Image1)
+                        {
+                            Image1FadeOut.Begin();
+                            BorderDarkenFadeOut.Begin();
+                        }
+                        else if (currentImage == CurrentImage.Image2)
+                        {
+                            Image2FadeOut.Begin();
+                            BorderDarkenFadeOut.Begin();
+                        }
+
+                        currentImage = CurrentImage.None;
+                    }
+                    else
+                    {
+                        if (currentImage == CurrentImage.None)
+                        {
+                            Image1FadeOut.Stop();
+
+                            if (Path.GetExtension(image).ToLower().Contains("mp4"))
+                            {
+                                //AnimatedImage1.Source = null;
+                                //AnimatedImage2.Source = null;
+                                Video1.Source = new Uri(image);
+                                //Video2.Source = null;
+
+                                Video1.LoadedBehavior = MediaState.Play;
+                            }
+                            else
+                            {
+                                //Video1.Source = null;
+                                //Video2.Source = null;
+                                AnimatedImage1.Source = image;
+                                //AnimatedImage2.Source = null;
+                            }
+
+                            Image1FadeIn.Begin();
+                            BorderDarken.Opacity = 1;
+                            BorderDarkenFadeOut.Stop();
+                            currentImage = CurrentImage.Image1;
+                        }
+                        else if (currentImage == CurrentImage.Image1)
+                        {
+                            Image2FadeOut.Stop();
+
+                            if (Path.GetExtension(image).ToLower().Contains("mp4"))
+                            {
+                                //AnimatedImage1.Source = null;
+                                //AnimatedImage2.Source = null;
+                                //Video1.Source = null;
+                                Video2.Source = new Uri(image);
+
+                                Video2.LoadedBehavior = MediaState.Play;
+                            }
+                            else
+                            {
+                                //Video1.Source = null;
+                                //Video2.Source = null;
+                                //AnimatedImage1.Source = null;
+                                AnimatedImage2.Source = image;
+                            }
+
+                            Image2FadeIn.Begin();
+                            Image1FadeOut.Begin();
+                            BorderDarken.Opacity = 1;
+                            BorderDarkenFadeOut.Stop();
+                            currentImage = CurrentImage.Image2;
+                        }
+                        else if (currentImage == CurrentImage.Image2)
+                        {
+                            Image1FadeOut.Stop();
+
+                            if (Path.GetExtension(image).ToLower().Contains("mp4"))
+                            {
+                                //AnimatedImage1.Source = null;
+                                //AnimatedImage2.Source = null;
+                                Video1.Source = new Uri(image);
+                                //Video2.Source = null;
+
+                                Video1.LoadedBehavior = MediaState.Play;
+                            }
+                            else
+                            {
+                                //Video1.Source = null;
+                                //Video2.Source = null;
+                                AnimatedImage1.Source = image;
+                                //AnimatedImage2.Source = null;
+                            }
+
+                            Image1FadeIn.Begin();
+                            Image2FadeOut.Begin();
+                            BorderDarken.Opacity = 1;
+                            BorderDarkenFadeOut.Stop();
+                            currentImage = CurrentImage.Image1;
+                        }
+                    }
+                }
+                else
+                {
                     if (currentImage == CurrentImage.Image1)
                     {
-                        Image1FadeOut.Begin();
-                        BorderDarkenFadeOut.Begin();
-                    }
-                    else if (currentImage == CurrentImage.Image2)
-                    {
-                        Image2FadeOut.Begin();
-                        BorderDarkenFadeOut.Begin();
-                    }
-
-                    currentImage = CurrentImage.None;
-                }
-                else
-                {
-                    if (currentImage == CurrentImage.None)
-                    {
-                        Image1FadeOut.Stop();
-
-                        if (Path.GetExtension(image).ToLower().Contains("mp4"))
+                        if (image != null && Path.GetExtension(image).ToLower().Contains("mp4"))
                         {
-                            //AnimatedImage1.Source = null;
-                            //AnimatedImage2.Source = null;
+                            AnimatedImage1.Source = null;
+                            AnimatedImage2.Source = null;
                             Video1.Source = new Uri(image);
-                            //Video2.Source = null;
+                            Video2.Source = null;
 
                             Video1.LoadedBehavior = MediaState.Play;
                         }
                         else
                         {
-                            //Video1.Source = null;
-                            //Video2.Source = null;
+                            Video1.Source = null;
+                            Video2.Source = null;
                             AnimatedImage1.Source = image;
-                            //AnimatedImage2.Source = null;
+                            AnimatedImage2.Source = null;
                         }
-
-                        Image1FadeIn.Begin();
-                        BorderDarken.Opacity = 1;
-                        BorderDarkenFadeOut.Stop();
-                        currentImage = CurrentImage.Image1;
                     }
-                    else if (currentImage == CurrentImage.Image1)
+                    else if (currentImage == CurrentImage.Image2)
                     {
-                        Image2FadeOut.Stop();
-
-                        if (Path.GetExtension(image).ToLower().Contains("mp4"))
+                        if (image != null && Path.GetExtension(image).ToLower().Contains("mp4"))
                         {
-                            //AnimatedImage1.Source = null;
-                            //AnimatedImage2.Source = null;
-                            //Video1.Source = null;
+                            AnimatedImage1.Source = null;
+                            AnimatedImage2.Source = null;
+                            Video1.Source = null;
                             Video2.Source = new Uri(image);
 
                             Video2.LoadedBehavior = MediaState.Play;
                         }
                         else
                         {
-                            //Video1.Source = null;
-                            //Video2.Source = null;
-                            //AnimatedImage1.Source = null;
+                            Video1.Source = null;
+                            Video2.Source = null;
+                            AnimatedImage1.Source = null;
                             AnimatedImage2.Source = image;
                         }
-
-                        Image2FadeIn.Begin();
-                        Image1FadeOut.Begin();
-                        BorderDarken.Opacity = 1;
-                        BorderDarkenFadeOut.Stop();
-                        currentImage = CurrentImage.Image2;
                     }
-                    else if (currentImage == CurrentImage.Image2)
+                    else
                     {
-                        Image1FadeOut.Stop();
-
-                        if (Path.GetExtension(image).ToLower().Contains("mp4"))
+                        if (image != null && Path.GetExtension(image).ToLower().Contains("mp4"))
                         {
-                            //AnimatedImage1.Source = null;
-                            //AnimatedImage2.Source = null;
+                            AnimatedImage1.Source = null;
+                            AnimatedImage2.Source = null;
                             Video1.Source = new Uri(image);
-                            //Video2.Source = null;
+                            Video2.Source = null;
 
                             Video1.LoadedBehavior = MediaState.Play;
                         }
                         else
                         {
-                            //Video1.Source = null;
-                            //Video2.Source = null;
+                            Video1.Source = null;
+                            Video2.Source = null;
                             AnimatedImage1.Source = image;
-                            //AnimatedImage2.Source = null;
+                            AnimatedImage2.Source = null;
                         }
 
-                        Image1FadeIn.Begin();
-                        Image2FadeOut.Begin();
-                        BorderDarken.Opacity = 1;
-                        BorderDarkenFadeOut.Stop();
                         currentImage = CurrentImage.Image1;
                     }
                 }
             }
-            else
+            catch (Exception ex)
             {
-                if (currentImage == CurrentImage.Image1)
-                {
-                    if (Path.GetExtension(image).ToLower().Contains("mp4"))
-                    {
-                        AnimatedImage1.Source = null;
-                        AnimatedImage2.Source = null;
-                        Video1.Source = new Uri(image);
-                        Video2.Source = null;
-
-                        Video1.LoadedBehavior = MediaState.Play;
-                    }
-                    else
-                    {
-                        Video1.Source = null;
-                        Video2.Source = null;
-                        AnimatedImage1.Source = image;
-                        AnimatedImage2.Source = null;
-                    }
-                }
-                else if (currentImage == CurrentImage.Image2)
-                {
-                    if (Path.GetExtension(image).ToLower().Contains("mp4"))
-                    {
-                        AnimatedImage1.Source = null;
-                        AnimatedImage2.Source = null;
-                        Video1.Source = null;
-                        Video2.Source = new Uri(image);
-
-                        Video2.LoadedBehavior = MediaState.Play;
-                    }
-                    else
-                    {
-                        Video1.Source = null;
-                        Video2.Source = null;
-                        AnimatedImage1.Source = null;
-                        AnimatedImage2.Source = image;
-                    }
-                }
-                else
-                {
-                    if (Path.GetExtension(image).ToLower().Contains("mp4"))
-                    {
-                        AnimatedImage1.Source = null;
-                        AnimatedImage2.Source = null;
-                        Video1.Source = new Uri(image);
-                        Video2.Source = null;
-
-                        Video1.LoadedBehavior = MediaState.Play;
-                    }
-                    else
-                    {
-                        Video1.Source = null;
-                        Video2.Source = null;
-                        AnimatedImage1.Source = image;
-                        AnimatedImage2.Source = null;
-                    }
-
-                    currentImage = CurrentImage.Image1;
-                }
+                Common.LogError(ex, false, true, pluginDatabase.PluginName);
             }
         }
 

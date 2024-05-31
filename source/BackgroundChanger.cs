@@ -137,7 +137,7 @@ namespace BackgroundChanger
         {
             try
             {
-                if (args.NewValue != null && args.NewValue.Count == 1)
+                if (args?.NewValue != null && args.NewValue.Count == 1)
                 {
                     PluginDatabase.GameContext = args.NewValue[0];
                     PluginDatabase.SetThemesResources(PluginDatabase.GameContext);
@@ -145,7 +145,7 @@ namespace BackgroundChanger
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
         }
 
