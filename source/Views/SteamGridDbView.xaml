@@ -9,7 +9,8 @@
              xmlns:controls="clr-namespace:wpf_animatedimage.Controls"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
              xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
-             xmlns:controls1="clr-namespace:CommonPluginsShared.Controls" xmlns:controls2="clr-namespace:CommonPluginsControls.Controls"
+             xmlns:controls1="clr-namespace:CommonPluginsShared.Controls" 
+             xmlns:controls2="clr-namespace:CommonPluginsControls.Controls"
              mc:Ignorable="d" 
              Height="720" Width="1200">
 

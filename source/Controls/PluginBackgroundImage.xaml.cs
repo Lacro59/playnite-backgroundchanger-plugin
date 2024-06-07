@@ -9,6 +9,7 @@ using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -116,20 +117,28 @@ namespace BackgroundChanger.Controls
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {WinName} - {WinIdProperty}", true, "BackgroundChanger");
+                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {WinName} - {WinIdProperty}", true, PluginDatabase.PluginName);
             }
         }
 
-
         private void GetFadeImageProperties()
         {
-            FrameworkElement PART_ImageBackground = UI.SearchElementByName("ControlRoot", false, false, 2);
+            if (!PluginDatabase.PluginSettings.Settings.BackgroundImageSameSettings)
+            {
+                return;
+            }
+
+            FrameworkElement PART_ImageBackground_4 = UI.SearchElementByName("ControlRoot", false, false, 4);
+            FrameworkElement PART_ImageBackground_3 = UI.SearchElementByName("ControlRoot", false, false, 3);
+            FrameworkElement PART_ImageBackground_2 = UI.SearchElementByName("ControlRoot", false, false, 2);
+
+            FrameworkElement PART_ImageBackground = PART_ImageBackground_4 ?? PART_ImageBackground_3 ?? PART_ImageBackground_2 ?? null;
 
             if (PART_ImageBackground != null)
             {
                 PropertyInfo[] ImageBackgroundProperties = PART_ImageBackground.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
                 PropertyInfo[] backChangerImageProperties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                    
+
                 List<string> UsedProperties = new List<string>
                 {
                     "AnimationEnabled", "ImageOpacityMask", "ImageDarkeningBrush", "Stretch", "StretchDirection",
@@ -157,7 +166,7 @@ namespace BackgroundChanger.Controls
                             }
                             catch (Exception ex)
                             {
-                                Common.LogError(ex, false, true, "BackgroundChanger");
+                                Common.LogError(ex, false, true, PluginDatabase.PluginName);
                             }
                         }
                     }
@@ -191,7 +200,7 @@ namespace BackgroundChanger.Controls
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
         }
 
@@ -199,7 +208,7 @@ namespace BackgroundChanger.Controls
         public void SetBackground()
         {
             string PathImage = string.Empty;
-            
+
             if (gameBackgroundImages.HasDataBackground && !PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
             {
                 ItemImage ItemFavorite = gameBackgroundImages.ItemsBackground.Where(x => x.IsFavorite).FirstOrDefault();
@@ -343,10 +352,10 @@ namespace BackgroundChanger.Controls
 
         public bool AnimationEnabled
         {
-            get { return (bool)GetValue(AnimationEnabledProperty); }
-            set { SetValue(AnimationEnabledProperty, value); }
+            get => (bool)GetValue(AnimationEnabledProperty);
+            set => SetValue(AnimationEnabledProperty, value);
         }
-        #endregion AnimationEnabled
+        #endregion
 
         #region Source
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(
@@ -357,10 +366,10 @@ namespace BackgroundChanger.Controls
 
         public object Source
         {
-            get { return GetValue(SourceProperty); }
-            set { SetValue(SourceProperty, value); }
+            get => GetValue(SourceProperty);
+            set => SetValue(SourceProperty, value);
         }
-        #endregion Source
+        #endregion
 
         #region ImageOpacityMask
         public static readonly DependencyProperty ImageOpacityMaskProperty = DependencyProperty.Register(
@@ -371,10 +380,10 @@ namespace BackgroundChanger.Controls
 
         public Brush ImageOpacityMask
         {
-            get { return (Brush)GetValue(ImageOpacityMaskProperty); }
-            set { SetValue(ImageOpacityMaskProperty, value); }
+            get => (Brush)GetValue(ImageOpacityMaskProperty);
+            set => SetValue(ImageOpacityMaskProperty, value);
         }
-        #endregion ImageOpacityMask
+        #endregion
 
         #region ImageDarkeningBrush
         public static readonly DependencyProperty ImageDarkeningBrushProperty = DependencyProperty.Register(
@@ -385,10 +394,10 @@ namespace BackgroundChanger.Controls
 
         public Brush ImageDarkeningBrush
         {
-            get { return (Brush)GetValue(ImageDarkeningBrushProperty); }
-            set { SetValue(ImageDarkeningBrushProperty, value); }
+            get => (Brush)GetValue(ImageDarkeningBrushProperty);
+            set => SetValue(ImageDarkeningBrushProperty, value);
         }
-        #endregion ImageDarkeningBrush
+        #endregion
 
         #region Stretch
         public static readonly DependencyProperty StretchProperty = DependencyProperty.Register(
@@ -399,10 +408,24 @@ namespace BackgroundChanger.Controls
 
         public Stretch Stretch
         {
-            get { return (Stretch)GetValue(StretchProperty); }
-            set { SetValue(StretchProperty, value); }
+            get => (Stretch)GetValue(StretchProperty);
+            set => SetValue(StretchProperty, value);
         }
-        #endregion Strech
+        #endregion
+
+        #region StretchDirection
+        public static readonly DependencyProperty StretchDirectionProperty = DependencyProperty.Register(
+            nameof(StretchDirection),
+            typeof(StretchDirection),
+            typeof(PluginBackgroundImage),
+            new PropertyMetadata(default));
+
+        public StretchDirection StretchDirection
+        {
+            get => (StretchDirection)GetValue(StretchProperty);
+            set => SetValue(StretchProperty, value);
+        }
+        #endregion
 
         #region IsBlurEnabled
         public static readonly DependencyProperty IsBlurEnabledProperty = DependencyProperty.Register(
@@ -413,10 +436,10 @@ namespace BackgroundChanger.Controls
 
         public bool IsBlurEnabled
         {
-            get { return (bool)GetValue(IsBlurEnabledProperty); }
-            set { SetValue(IsBlurEnabledProperty, value); }
+            get => (bool)GetValue(IsBlurEnabledProperty);
+            set => SetValue(IsBlurEnabledProperty, value);
         }
-        #endregion IsBlurEnabled
+        #endregion
 
         #region BlurAmount
         public static readonly DependencyProperty BlurAmountProperty = DependencyProperty.Register(
@@ -427,10 +450,10 @@ namespace BackgroundChanger.Controls
 
         public int BlurAmount
         {
-            get { return (int)GetValue(BlurAmountProperty); }
-            set { SetValue(BlurAmountProperty, value); }
+            get => (int)GetValue(BlurAmountProperty);
+            set => SetValue(BlurAmountProperty, value);
         }
-        #endregion IsBlurEnabled
+        #endregion
 
         #region HighQualityBlur
         public static readonly DependencyProperty HighQualityBlurProperty = DependencyProperty.Register(
@@ -441,10 +464,10 @@ namespace BackgroundChanger.Controls
 
         public bool HighQualityBlur
         {
-            get { return (bool)GetValue(HighQualityBlurProperty); }
-            set { SetValue(HighQualityBlurProperty, value); }
+            get => (bool)GetValue(HighQualityBlurProperty);
+            set => SetValue(HighQualityBlurProperty, value);
         }
-        #endregion HighQualityBlur
+        #endregion
 
         private void Image1FadeOut_Completed(object sender, EventArgs e)
         {
@@ -479,19 +502,14 @@ namespace BackgroundChanger.Controls
             int blurAmount = control.BlurAmount;
             bool blurEnabled = control.IsBlurEnabled;
             bool highQuality = control.HighQualityBlur;
-            if (blurEnabled)
-            {
-                control.ImageHolder.Effect = new BlurEffect()
+            control.ImageHolder.Effect = blurEnabled
+                ? new BlurEffect()
                 {
                     KernelType = KernelType.Gaussian,
                     Radius = blurAmount,
                     RenderingBias = highQuality ? RenderingBias.Quality : RenderingBias.Performance
-                };
-            }
-            else
-            {
-                control.ImageHolder.Effect = null;
-            }
+                }
+                : null;
         }
 
         private static void SourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
@@ -784,7 +802,7 @@ namespace BackgroundChanger.Controls
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
         }
 
@@ -804,11 +822,11 @@ namespace BackgroundChanger.Controls
         #region Activate/Deactivated animation
         private void Application_Deactivated(object sender, EventArgs e)
         {
-            Task.Run(() => 
+            _ = Task.Run(() =>
             {
                 Thread.Sleep(1000);
-                this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() => 
-                { 
+                _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                {
                     WindowsIsActivated = false;
                     Video1.LoadedBehavior = MediaState.Pause;
                     Video2.LoadedBehavior = MediaState.Pause;
@@ -823,10 +841,10 @@ namespace BackgroundChanger.Controls
 
         private void Application_Activated(object sender, EventArgs e)
         {
-            Task.Run(() =>
+            _ = Task.Run(() =>
             {
                 Thread.Sleep(1000);
-                this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
                     WindowsIsActivated = true;
                     Video1.LoadedBehavior = MediaState.Play;
@@ -850,6 +868,8 @@ namespace BackgroundChanger.Controls
                     break;
                 case WindowState.Minimized:
                     Application_Deactivated(sender, e);
+                    break;
+                default:
                     break;
             }
         }

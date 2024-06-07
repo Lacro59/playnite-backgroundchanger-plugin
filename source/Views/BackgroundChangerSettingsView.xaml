@@ -4,234 +4,236 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:commonPlugin="clr-namespace:CommonPluginsShared"
-             xmlns:AttachedProperties="clr-namespace:CommonPluginsShared.Controls" xmlns:backgroundchanger="clr-namespace:BackgroundChanger" d:DataContext="{d:DesignInstance Type=backgroundchanger:BackgroundChangerSettingsViewModel}"
-             mc:Ignorable="d" d:DesignWidth="600">
-    
-    <StackPanel Margin="20">
-        <Grid Margin="0,0,0,30">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="10" />
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="10" />
-                <ColumnDefinition Width="auto" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="20" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="20" />
-                <RowDefinition Height="auto" />
-            </Grid.RowDefinitions>
+             xmlns:AttachedProperties="clr-namespace:CommonPluginsShared.Controls" 
+             xmlns:backgroundchanger="clr-namespace:BackgroundChanger" 
+             xmlns:pcmd="clr-namespace:CommonPluginsShared"
+             mc:Ignorable="d" d:DesignWidth="600"
+             d:DataContext="{d:DesignInstance Type=backgroundchanger:BackgroundChangerSettingsViewModel}">
 
-            <Label Grid.Column="0" Grid.Row="0" Content="{DynamicResource LOCBcSteamGridDbApiKey}" />
-            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Settings.SteamGridDbApiKey}" />
-            <Button Grid.Column="5" Grid.Row="0" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}"
-                    Command="{x:Static commonPlugin:Commands.NavigateUrl}"
-                    CommandParameter="https://www.steamgriddb.com/profile/preferences/api" />
+    <TabControl Margin="20" Name="tcSettings">
+        <TabItem Header="{DynamicResource LOCBc}">
+            <ScrollViewer Margin="0,10,0,0">
+                <Grid Margin="0,0,0,30">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="20" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="20" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
 
-            <Label Grid.Column="0" Grid.Row="2" Content="{DynamicResource LOCBcFfmpegFile}" />
-            <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Settings.ffmpegFile, Mode=TwoWay}" Name="PART_FfmpegFile" />
-            <Button Grid.Column="3" Grid.Row="2" Content="&#xeb12;" FontFamily="{DynamicResource FontIcoFont}" HorizontalAlignment="Right"
-                    Click="ButtonFfmpeg_Click" />
-            <Button Grid.Column="5" Grid.Row="2" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}"
-                    Command="{x:Static commonPlugin:Commands.NavigateUrl}"
-                    CommandParameter="https://www.ffmpeg.org/" />
+                    <Label Grid.Column="0" Grid.Row="0" Content="{DynamicResource LOCBcSteamGridDbApiKey}" />
+                    <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Settings.SteamGridDbApiKey}" />
+                    <Button Grid.Column="5" Grid.Row="0" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}"
+                            Command="{x:Static commonPlugin:Commands.NavigateUrl}"
+                            CommandParameter="https://www.steamgriddb.com/profile/preferences/api" />
 
-            <Label Grid.Column="0" Grid.Row="4" Content="{DynamicResource LOCBcWebpinfoFile}" />
-            <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Settings.webpinfoFile, Mode=TwoWay}" Name="PART_WebpinfoFile" />
-            <Button Grid.Column="3" Grid.Row="4" Content="&#xeb12;" FontFamily="{DynamicResource FontIcoFont}" HorizontalAlignment="Right"
-                    Click="ButtonWebpinfo_Click" />
-            <Button Grid.Column="5" Grid.Row="4" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}"
-                    Command="{x:Static commonPlugin:Commands.NavigateUrl}"
-                    CommandParameter="https://developers.google.com/speed/webp/download" />
-        </Grid>
+                    <Label Grid.Column="0" Grid.Row="2" Content="{DynamicResource LOCBcFfmpegFile}" />
+                    <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Settings.ffmpegFile, Mode=TwoWay}" Name="PART_FfmpegFile" />
+                    <Button Grid.Column="3" Grid.Row="2" Content="&#xeb12;" FontFamily="{DynamicResource FontIcoFont}" HorizontalAlignment="Right"
+                            Click="ButtonFfmpeg_Click" />
+                    <Button Grid.Column="5" Grid.Row="2" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}"
+                            Command="{x:Static commonPlugin:Commands.NavigateUrl}"
+                            CommandParameter="https://www.ffmpeg.org/" />
 
+                    <Label Grid.Column="0" Grid.Row="4" Content="{DynamicResource LOCBcWebpinfoFile}" />
+                    <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Settings.webpinfoFile, Mode=TwoWay}" Name="PART_WebpinfoFile" />
+                    <Button Grid.Column="3" Grid.Row="4" Content="&#xeb12;" FontFamily="{DynamicResource FontIcoFont}" HorizontalAlignment="Right"
+                            Click="ButtonWebpinfo_Click" />
+                    <Button Grid.Column="5" Grid.Row="4" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}"
+                            Command="{x:Static commonPlugin:Commands.NavigateUrl}"
+                            CommandParameter="https://developers.google.com/speed/webp/download" />
+                </Grid>
+            </ScrollViewer>
+        </TabItem>
 
-        <Label Content="{DynamicResource LOCCommonControlsAvailable}" />
-        <Separator Margin="0,0,0,10" />
+        <TabItem Header="{DynamicResource LOCCommonIntegration}">
+            <ScrollViewer Margin="0,10,0,0">
+                <StackPanel>
+                    <Label Content="{DynamicResource LOCCommonControlsAvailable}" />
+                    <Separator Margin="0,0,0,10" />
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="10" />
-                <RowDefinition Height="auto" />
-            </Grid.RowDefinitions>
+                    <Expander Margin="0,0,0,10">
+                        <Expander.Style>
+                            <Style TargetType="{x:Type Expander}" BasedOn="{StaticResource {x:Type Expander}}">
+                                <Setter Property="Background" Value="Transparent" />
+                            </Style>
+                        </Expander.Style>
 
-            <Expander Grid.Row="0">
-                <Expander.Style>
-                    <Style TargetType="{x:Type Expander}" BasedOn="{StaticResource {x:Type Expander}}">
-                        <Setter Property="Background" Value="Transparent" />
-                    </Style>
-                </Expander.Style>
+                        <Expander.Header>
+                            <CheckBox IsChecked="{Binding Settings.EnableBackgroundImage}" Name="PART_IntegrationBackgroundImage"
+                                      Content="{DynamicResource LOCBcEnableBackgroundImage}" />
+                        </Expander.Header>
 
-                <Expander.Header>
-                    <CheckBox  IsChecked="{Binding Settings.EnableBackgroundImage}" Name="PART_IntegrationBackgroundImage">
-                        <Label Content="{DynamicResource LOCBcEnableBackgroundImage}" />
-                    </CheckBox>
-                </Expander.Header>
+                        <Expander.Content>
+                            <Border IsEnabled="{Binding ElementName=PART_IntegrationBackgroundImage, Path=IsChecked}"
+				                    Margin="5" Padding="10"
+				                    BorderBrush="{DynamicResource PopupBorderBrush}"
+				                    BorderThickness="{DynamicResource PopupBorderThickness}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="10" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                    </Grid.RowDefinitions>
 
-                <Expander.Content>
-                    <Border IsEnabled="{Binding ElementName=PART_IntegrationBackgroundImage, Path=IsChecked}"
-				            Margin="5" Padding="10"
-				            BorderBrush="{DynamicResource PopupBorderBrush}"
-				            BorderThickness="{DynamicResource PopupBorderThickness}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="10" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
+                                    <CheckBox IsChecked="{Binding Settings.BackgroundImageSameSettings}" Grid.Column="0" Grid.Row="0"
+                                              Grid.ColumnSpan="4"
+                                              Command="{x:Static pcmd:Commands.RestartRequired}" 
+                                              CommandParameter="{Binding RelativeSource={RelativeSource Self}}"
+                                              Content="{DynamicResource LOCBcBackgroundSameSettings}" />
 
-                            <CheckBox IsChecked="{Binding Settings.EnableBackgroundImageRandomSelect}" Grid.Column="0" Grid.Row="0">
-                                <Label Content="{DynamicResource LOCBcEnableRandomSelect}" />
-                            </CheckBox>
+                                    <CheckBox IsChecked="{Binding Settings.EnableBackgroundImageRandomSelect}" Grid.Column="0" Grid.Row="2"
+                                              Content="{DynamicResource LOCBcEnableRandomSelect}" />
 
-                            <CheckBox Name="CbBcAutoChanger" IsChecked="{Binding Settings.EnableBackgroundImageAutoChanger}" Grid.Column="0" Grid.Row="2">
-                                <Label Content="{DynamicResource LOCBcEnableAutoChanger}" />
-                            </CheckBox>
-                            <StackPanel Grid.Row="4" Margin="30,0,0,0" Orientation="Horizontal" 
-                                        Grid.ColumnSpan="3"
-                                        IsEnabled="{Binding ElementName=CbBcAutoChanger, Path=IsChecked, TargetNullValue=false}">
-                                <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
-                                <Slider Name="hwBcSlider" Width="300" Minimum="10" Maximum="100" Value="{Binding Settings.BackgroundImageAutoChangerTimer}" 
-                                        ValueChanged="HwBcSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
-                                        IsSnapToTickEnabled="True" />
-                                <Label Name="labelBcIntervalLabel_text" VerticalAlignment="Center"
-                                       Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
-                            </StackPanel>
+                                    <CheckBox Name="CbBcAutoChanger" IsChecked="{Binding Settings.EnableBackgroundImageAutoChanger}" Grid.Column="0" Grid.Row="4"
+                                              Content="{DynamicResource LOCBcEnableAutoChanger}" />
+                                    <StackPanel Grid.Row="6" Margin="30,0,0,0" Orientation="Horizontal" 
+                                                Grid.ColumnSpan="3"
+                                                IsEnabled="{Binding ElementName=CbBcAutoChanger, Path=IsChecked, TargetNullValue=false}">
+                                        <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
+                                        <Slider Name="hwBcSlider" Width="300" Minimum="10" Maximum="100" Value="{Binding Settings.BackgroundImageAutoChangerTimer}" 
+                                                ValueChanged="HwBcSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
+                                                IsSnapToTickEnabled="True" />
+                                        <Label Name="labelBcIntervalLabel_text" VerticalAlignment="Center"
+                                               Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
+                                    </StackPanel>
 
-                            <CheckBox Name="CbBcVideoDelay" IsChecked="{Binding Settings.useVideoDelayBackgroundImage}" Grid.Column="0" Grid.Row="6"
-                                      ToolTip="{DynamicResource LOCBcVideoDelayToolTip}">
-                                <Label Content="{DynamicResource LOCBcEnableVideoDelay}" />
-                            </CheckBox>
-                            <StackPanel Grid.Row="8" Margin="30,0,0,0" Orientation="Horizontal" 
-                                        Grid.ColumnSpan="3"
-                                        IsEnabled="{Binding ElementName=CbBcVideoDelay, Path=IsChecked, TargetNullValue=false}">
-                                <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
-                                <Slider Name="hwBcVideoSlider" Width="300" Minimum="1" Maximum="100" Value="{Binding Settings.videoDelayBackgroundImage}" 
-                                        ValueChanged="hwBcVideoSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
-                                        IsSnapToTickEnabled="True" />
-                                <Label Name="labelBcVideoIntervalLabel_text" VerticalAlignment="Center"
-                                       Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
-                            </StackPanel>
+                                    <CheckBox Name="CbBcVideoDelay" IsChecked="{Binding Settings.useVideoDelayBackgroundImage}" Grid.Column="0" Grid.Row="8"
+                                              ToolTip="{DynamicResource LOCBcVideoDelayToolTip}"
+                                              Content="{DynamicResource LOCBcEnableVideoDelay}" />
+                                    <StackPanel Grid.Row="10" Margin="30,0,0,0" Orientation="Horizontal" 
+                                                Grid.ColumnSpan="3"
+                                                IsEnabled="{Binding ElementName=CbBcVideoDelay, Path=IsChecked, TargetNullValue=false}">
+                                        <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
+                                        <Slider Name="hwBcVideoSlider" Width="300" Minimum="1" Maximum="100" Value="{Binding Settings.videoDelayBackgroundImage}" 
+                                                ValueChanged="hwBcVideoSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
+                                                IsSnapToTickEnabled="True" />
+                                        <Label Name="labelBcVideoIntervalLabel_text" VerticalAlignment="Center"
+                                               Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
+                                    </StackPanel>
 
-                            <StackPanel Grid.Row="10" Orientation="Horizontal" Grid.ColumnSpan="3">
-                                <Label Content="{DynamicResource LOCSettingsMusiVolume}" VerticalAlignment="Center" Margin="0,0,20,0" />
-                                <Slider Width="300" Minimum="0" Maximum="100" Value="{Binding Settings.Volume}" Name="PART_sVolume"
-                                        VerticalAlignment="Center" TickFrequency="1" IsSnapToTickEnabled="True" />
-                                <Label VerticalAlignment="Center" ContentStringFormat=" {0}%"
-                                       Content="{Binding ElementName=PART_sVolume, Path=Value}" Width="150" Margin="20,0,0,0" />
-                            </StackPanel>
+                                    <StackPanel Grid.Row="12" Orientation="Horizontal" Grid.ColumnSpan="3">
+                                        <Label Content="{DynamicResource LOCSettingsMusiVolume}" VerticalAlignment="Center" Margin="0,0,20,0" />
+                                        <Slider Width="300" Minimum="0" Maximum="100" Value="{Binding Settings.Volume}" Name="PART_sVolume"
+                                                VerticalAlignment="Center" TickFrequency="1" IsSnapToTickEnabled="True" />
+                                        <Label VerticalAlignment="Center" ContentStringFormat=" {0}%"
+                                               Content="{Binding ElementName=PART_sVolume, Path=Value}" Width="150" Margin="20,0,0,0" />
+                                    </StackPanel>
 
-                            <Label Grid.Row="12" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
-                            <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedBackground}" Grid.Column="0" Grid.Row="14">
-                                <Label Content="{DynamicResource LOCBcEnableImageAnimatedBackground}" />
-                            </CheckBox>
-                        </Grid>
-                    </Border>
-                </Expander.Content>
-            </Expander>
+                                    <Label Grid.Row="14" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
+                                    <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedBackground}" Grid.Column="0" Grid.Row="16"
+                                              Content="{DynamicResource LOCBcEnableImageAnimatedBackground}" />
+                                </Grid>
+                            </Border>
+                        </Expander.Content>
+                    </Expander>
 
-            <Expander Grid.Row="2">
-                <Expander.Style>
-                    <Style TargetType="{x:Type Expander}" BasedOn="{StaticResource {x:Type Expander}}">
-                        <Setter Property="Background" Value="Transparent" />
-                    </Style>
-                </Expander.Style>
+                    <Expander>
+                        <Expander.Style>
+                            <Style TargetType="{x:Type Expander}" BasedOn="{StaticResource {x:Type Expander}}">
+                                <Setter Property="Background" Value="Transparent" />
+                            </Style>
+                        </Expander.Style>
 
-                <Expander.Header>
-                    <CheckBox IsChecked="{Binding Settings.EnableCoverImage}" Name="PART_IntegrationCoverImage">
-                        <Label Content="{DynamicResource LOCBcEnableCoverImage}" />
-                    </CheckBox>
-                </Expander.Header>
+                        <Expander.Header>
+                            <CheckBox IsChecked="{Binding Settings.EnableCoverImage}" Name="PART_IntegrationCoverImage"
+                                      Content="{DynamicResource LOCBcEnableCoverImage}" />
+                        </Expander.Header>
 
-                <Expander.Content>
-                    <Border IsEnabled="{Binding ElementName=PART_IntegrationCoverImage, Path=IsChecked}"
-				            Margin="5" Padding="10"
-				            BorderBrush="{DynamicResource PopupBorderBrush}"
-				            BorderThickness="{DynamicResource PopupBorderThickness}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="10" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
+                        <Expander.Content>
+                            <Border IsEnabled="{Binding ElementName=PART_IntegrationCoverImage, Path=IsChecked}"
+				                    Margin="5" Padding="10"
+				                    BorderBrush="{DynamicResource PopupBorderBrush}"
+				                    BorderThickness="{DynamicResource PopupBorderThickness}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="10" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="auto" />
+                                    </Grid.RowDefinitions>
 
-                            <CheckBox IsChecked="{Binding Settings.EnableCoverImageRandomSelect}" Grid.Column="0" Grid.Row="0">
-                                <Label Content="{DynamicResource LOCBcEnableRandomSelect}" />
-                            </CheckBox>
+                                    <CheckBox IsChecked="{Binding Settings.EnableCoverImageRandomSelect}" Grid.Column="0" Grid.Row="0"
+                                              Content="{DynamicResource LOCBcEnableRandomSelect}" />
 
-                            <CheckBox Name="CbAutoChanger" IsChecked="{Binding Settings.EnableCoverImageAutoChanger}" Grid.Column="0" Grid.Row="2">
-                                <Label Content="{DynamicResource LOCBcEnableAutoChanger}" />
-                            </CheckBox>
-                            <StackPanel Grid.Row="4" Margin="30,0,0,0" Orientation="Horizontal" 
-                                        Grid.ColumnSpan="3"
-                                        IsEnabled="{Binding ElementName=CbAutoChanger, Path=IsChecked, TargetNullValue=false}">
-                                <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
-                                <Slider Name="hwSlider" Width="300" Minimum="10" Maximum="600" Value="{Binding Settings.CoverImageAutoChangerTimer}" 
-                                        ValueChanged="HwSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
-                                        IsSnapToTickEnabled="True" />
-                                <Label Name="labelIntervalLabel_text" VerticalAlignment="Center"
-                                       Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
-                            </StackPanel>
+                                    <CheckBox Name="CbAutoChanger" IsChecked="{Binding Settings.EnableCoverImageAutoChanger}" Grid.Column="0" Grid.Row="2"
+                                              Content="{DynamicResource LOCBcEnableAutoChanger}" />
+                                    <StackPanel Grid.Row="4" Margin="30,0,0,0" Orientation="Horizontal" 
+                                                Grid.ColumnSpan="3"
+                                                IsEnabled="{Binding ElementName=CbAutoChanger, Path=IsChecked, TargetNullValue=false}">
+                                        <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
+                                        <Slider Name="hwSlider" Width="300" Minimum="10" Maximum="600" Value="{Binding Settings.CoverImageAutoChangerTimer}" 
+                                                ValueChanged="HwSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
+                                                IsSnapToTickEnabled="True" />
+                                        <Label Name="labelIntervalLabel_text" VerticalAlignment="Center"
+                                               Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
+                                    </StackPanel>
 
-                            <CheckBox Name="CbVideoDelay" IsChecked="{Binding Settings.useVideoDelayCoverImage}" Grid.Column="0" Grid.Row="6"
-                                      ToolTip="{DynamicResource LOCBcVideoDelayToolTip}">
-                                <Label Content="{DynamicResource LOCBcEnableVideoDelay}" />
-                            </CheckBox>
-                            <StackPanel Grid.Row="8" Margin="30,0,0,0" Orientation="Horizontal" 
-                                        Grid.ColumnSpan="3"
-                                        IsEnabled="{Binding ElementName=CbVideoDelay, Path=IsChecked, TargetNullValue=false}">
-                                <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
-                                <Slider Name="hwVideoSlider" Width="300" Minimum="1" Maximum="100" Value="{Binding Settings.videoDelayCoverImage}" 
-                                        ValueChanged="hwVideoSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
-                                        IsSnapToTickEnabled="True" />
-                                <Label Name="labelVideoIntervalLabel_text" VerticalAlignment="Center"
-                                       Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
-                            </StackPanel>
+                                    <CheckBox Name="CbVideoDelay" IsChecked="{Binding Settings.useVideoDelayCoverImage}" Grid.Column="0" Grid.Row="6"
+                                              ToolTip="{DynamicResource LOCBcVideoDelayToolTip}"
+                                              Content="{DynamicResource LOCBcEnableVideoDelay}" />
+                                    <StackPanel Grid.Row="8" Margin="30,0,0,0" Orientation="Horizontal" 
+                                                Grid.ColumnSpan="3"
+                                                IsEnabled="{Binding ElementName=CbVideoDelay, Path=IsChecked, TargetNullValue=false}">
+                                        <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
+                                        <Slider Name="hwVideoSlider" Width="300" Minimum="1" Maximum="100" Value="{Binding Settings.videoDelayCoverImage}" 
+                                                ValueChanged="hwVideoSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
+                                                IsSnapToTickEnabled="True" />
+                                        <Label Name="labelVideoIntervalLabel_text" VerticalAlignment="Center"
+                                               Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
+                                    </StackPanel>
 
-                            <Label Grid.Row="10" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
-                            <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedCover}" Grid.Column="0" Grid.Row="12">
-                                <Label Content="{DynamicResource LOCBcEnableImageAnimatedCover}" />
-                            </CheckBox>
-                        </Grid>
-                    </Border>
-                </Expander.Content>
-            </Expander>
-        </Grid>
-    </StackPanel>
+                                    <Label Grid.Row="10" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
+                                    <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedCover}" Grid.Column="0" Grid.Row="12"
+                                              Content="{DynamicResource LOCBcEnableImageAnimatedCover}" />
+                                </Grid>
+                            </Border>
+                        </Expander.Content>
+                    </Expander>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+    </TabControl>
 </UserControl>

@@ -16,6 +16,8 @@ namespace BackgroundChanger
         private bool enableBackgroundImage = true;
         public bool EnableBackgroundImage { get => enableBackgroundImage; set => SetValue(ref enableBackgroundImage, value); }
 
+        public bool BackgroundImageSameSettings { get; set; } = true;
+
         public bool EnableBackgroundImageRandomSelect { get; set; } = false;
         public bool EnableBackgroundImageAutoChanger { get; set; } = false;
         public int BackgroundImageAutoChangerTimer { get; set; } = 10;

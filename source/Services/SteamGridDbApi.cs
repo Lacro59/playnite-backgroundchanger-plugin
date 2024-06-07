@@ -73,7 +73,6 @@ namespace BackgroundChanger.Services
         }
 
 
-
         public async Task<string> DownloadStringData(string url)
         {
             using (HttpClient client = new HttpClient())
