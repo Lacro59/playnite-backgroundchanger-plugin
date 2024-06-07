@@ -1,0 +1,102 @@
+﻿<UserControl x:Class="BackgroundChanger.Views.GoogleImageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BackgroundChanger.Views" 
+             xmlns:playnitecontrols="clr-namespace:CommonPluginsControls.PlayniteControls" 
+             xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
+             xmlns:converters="clr-namespace:CommonPlayniteShared.Converters" 
+             xmlns:pctrls="clr-namespace:CommonPlayniteShared.Controls"
+             xmlns:controls="clr-namespace:CommonPluginsShared.Controls"
+             Height="700" Width="1100"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:GoogleImageViewModel}">
+
+    <UserControl.Resources>
+        <converters:StringNullOrEmptyToBoolConverter x:Key="StringNullOrEmptyToBoolConverter" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid Name="PART_DataLoad">
+            <ProgressBar IsIndeterminate="True" Width="350" Height="40" />
+            <TextBlock Text="{DynamicResource LOCDownloadingLabel}"
+                       Style="{DynamicResource BaseTextBlockStyle}"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
+
+        <DockPanel Margin="10" Name="PART_Data" LastChildFill="True">
+            <DockPanel DockPanel.Dock="Bottom">
+                <DockPanel LastChildFill="False" DockPanel.Dock="Bottom" Margin="0,10,0,0">
+                    <Label Content="SafeSearch" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                    <ComboBox pbeh:SelectorBehaviors.EnumSource="{x:Type local:SafeSearchSettings}"
+                              SelectedValue="{Binding SafeSearch}" DockPanel.Dock="Left" Margin="10,0,0,0" />
+                    <CheckBox Content="{DynamicResource LOCTransparent}" IsChecked="{Binding Transparent}" DockPanel.Dock="Left" Margin="10,0,0,0" />
+
+                    <Button Margin="10,0,0,0" Content="{DynamicResource LOCCancelLabel}" DockPanel.Dock="Right"  Click="Button_Click" />
+                    <Button Name="ButtonSelect" IsEnabled="False" Content="{DynamicResource LOCSelect}" DockPanel.Dock="Right" Click="ButtonSelect_Click" />
+                </DockPanel>
+                
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                    <Label Name="TextBlockResolution" Content="{DynamicResource LOCSearchResolutionLabel}" />
+                    <playnitecontrols:NullableIntBox MinValue="1" MaxValue="9999" Width="40" Margin="10,0,0,0" Value="{Binding SearchWidth}" />
+                    <Label Content="x" Margin="4,0,4,0"/>
+                    <playnitecontrols:NullableIntBox MinValue="1" MaxValue="9999" Width="40" Margin="10,0,0,0" Value="{Binding SearchHeight}" />
+
+                    <Button Content="{DynamicResource LOCPresets}" Margin="10,0,0,0" pbeh:LeftClickContextMenuBehavior.Enabled="True">
+                        <Button.ContextMenu>
+                            <ContextMenu Placement="Bottom">
+                                <MenuItem Header="{DynamicResource LOCSearchResolutionAnyLabel}" Command="{Binding ClearSearchResolutionCommand}" />
+                                <MenuItem Header="1920x620 (Steam Hero)" Command="{Binding SetSearchResolutionCommand}" CommandParameter="1920x620" />
+                                <MenuItem Header="1920x1080 (1080p)" Command="{Binding SetSearchResolutionCommand}" CommandParameter="1920x1080" />
+                                <MenuItem Header="2560x1440 (1440p)" Command="{Binding SetSearchResolutionCommand}" CommandParameter="2560x1440" />
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <Button Name="PART_BtSearch" Content="{DynamicResource LOCSearchLabel}" Command="{Binding SearchCommand}"
+                            IsEnabled="{Binding SearchTerm, Converter={StaticResource StringNullOrEmptyToBoolConverter}}"/>
+                    <playnitecontrols:SearchBox x:Name="SearchElement" Width="400" Margin="10,0,0,0" 
+                                                Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <playnitecontrols:SearchBox.InputBindings>
+                            <KeyBinding Command="{Binding SearchCommand}" Key="Return" />
+                        </playnitecontrols:SearchBox.InputBindings>
+                    </playnitecontrols:SearchBox>
+                </StackPanel>
+            </DockPanel>
+
+            <Separator Margin="0,10,0,10" DockPanel.Dock="Bottom" />
+
+            <Button HorizontalAlignment="Center" DockPanel.Dock="Bottom" MinWidth="200" Margin="0,5,0,0"
+                    Visibility="{Binding ShowLoadMore, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Command="{Binding LoadMoreCommand}" Content="{DynamicResource LOCLoadMore}" />
+
+            <ListBox Name="PART_ElementList" SelectionChanged="PART_ElementList_SelectionChanged" SelectionMode="Multiple"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    BorderThickness="0"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    ItemsSource="{Binding DisplayImages}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel ToolTip="{Binding ImageUrl}" ToolTipService.InitialShowDelay="2000" Margin="5">
+                            <TextBlock DockPanel.Dock="Bottom" Text="{Binding Size, StringFormat={}{0}px}" Margin="0,3,0,0"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Image Source="{Binding ThumbUrl, IsAsync=True}"
+                                   Width="{Binding DataContext.ItemWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Height="{Binding DataContext.ItemHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   DockPanel.Dock="Top" Stretch="Uniform" StretchDirection="Both" />
+                        </DockPanel>
+                    </DataTemplate> 
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+    </Grid>
+</UserControl>

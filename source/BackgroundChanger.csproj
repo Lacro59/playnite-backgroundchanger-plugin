@@ -96,10 +96,14 @@
     <Compile Include="Models\ItemImage.cs" />
     <Compile Include="Models\BackgroundImagesCollection.cs" />
     <Compile Include="Models\GameBackgroundImages.cs" />
+    <Compile Include="Models\GoogleImage.cs" />
     <Compile Include="Models\SteamGridDbResult.cs" />
     <Compile Include="Models\SteamGridDbSearchResult.cs" />
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Controls\TextBlockTrimmed.xaml.cs">
       <DependentUpon>TextBlockTrimmed.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="playnite-plugincommon\CommonPluginsControls\PlayniteControls\NullableIntBox.xaml.cs">
+      <DependentUpon>NullableIntBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="playnite-plugincommon\CommonPluginsControls\PlayniteControls\SearchBox.xaml.cs">
       <DependentUpon>SearchBox.xaml</DependentUpon>
@@ -109,6 +113,9 @@
     </Compile>
     <Compile Include="Services\BackgroundChangerDatabase.cs" />
     <Compile Include="Services\SteamGridDbApi.cs" />
+    <Compile Include="Views\GoogleImageView.xaml.cs">
+      <DependentUpon>GoogleImageView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ImagesManager.xaml.cs">
       <DependentUpon>ImagesManager.xaml</DependentUpon>
     </Compile>
@@ -338,6 +345,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="playnite-plugincommon\CommonPluginsControls\PlayniteControls\NullableIntBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="playnite-plugincommon\CommonPluginsControls\PlayniteControls\SearchBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -345,6 +356,10 @@
     <Page Include="playnite-plugincommon\CommonPluginsControls\Views\OptionsDownloadData.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\GoogleImageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ImagesManager.xaml">
       <SubType>Designer</SubType>

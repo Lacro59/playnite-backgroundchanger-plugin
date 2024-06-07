@@ -10,7 +10,7 @@
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
              xmlns:converters1="clr-namespace:CommonPlayniteShared.Converters" xmlns:controls="clr-namespace:CommonPluginsShared.Controls"
              mc:Ignorable="d" 
-             Height="720" Width="1200">
+             Height="700" Width="1100">
 
     <UserControl.Resources>
         <converters:InvertedBoolenConverter x:Key="InvertedBoolenConverter" />
@@ -191,12 +191,14 @@
             <DockPanel KeyboardNavigation.TabNavigation="Local" LastChildFill="False" Margin="0,5">
                 <Button TabIndex="1" Name="PART_BtAdd" Content="{DynamicResource LOCSelectFileTitle}" DockPanel.Dock="Left"
                         Style="{StaticResource BottomButton}" Click="PART_BtAdd_Click" />
-                <Button TabIndex="2" Name="PART_BtAddSteamGridDb" Content="{DynamicResource LOCBcSteamGridDbSelecty}" DockPanel.Dock="Left"
+                <Button TabIndex="2" Name="PART_BtAddSteamGridDb" Content="{DynamicResource LOCBcSteamGridDbSelect}" DockPanel.Dock="Left"
                         Style="{StaticResource BottomButton}" Click="PART_BtAddSteamGridDb_Click" />
+                <Button TabIndex="3" Name="PART_BtAddGoogleImage" Content="{DynamicResource LOCBcGoogleImageSelect}" DockPanel.Dock="Left"
+                        Style="{StaticResource BottomButton}" Click="PART_BtAddGoogleImage_Click" />
 
-                <Button TabIndex="3" Name="PART_BtCancel" Content="{DynamicResource LOCCancelLabel}" DockPanel.Dock="Right" IsCancel="True"
+                <Button TabIndex="4" Name="PART_BtCancel" Content="{DynamicResource LOCCancelLabel}" DockPanel.Dock="Right" IsCancel="True"
                         Style="{StaticResource BottomButton}" Click="PART_BtCancel_Click" />
-                <Button TabIndex="4" Name="PART_BtOK" Content="{DynamicResource LOCSaveLabel}" DockPanel.Dock="Right" IsDefault="True"
+                <Button TabIndex="5" Name="PART_BtOK" Content="{DynamicResource LOCSaveLabel}" DockPanel.Dock="Right" IsDefault="True"
                         Style="{StaticResource BottomButton}" Click="PART_BtOK_Click" />
             </DockPanel>
         </Border>

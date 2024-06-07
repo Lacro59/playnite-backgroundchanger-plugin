@@ -12,7 +12,7 @@
              xmlns:controls1="clr-namespace:CommonPluginsShared.Controls" 
              xmlns:controls2="clr-namespace:CommonPluginsControls.Controls"
              mc:Ignorable="d" 
-             Height="720" Width="1200">
+             Height="700" Width="1100">
 
     <UserControl.Resources>
         <converters:StringNullOrEmptyToBoolConverter x:Key="StringNullOrEmptyToBoolConverter" />

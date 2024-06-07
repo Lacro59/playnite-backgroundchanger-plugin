@@ -459,6 +459,64 @@ namespace BackgroundChanger.Views
             PART_LbBackgroundImages.ItemsSource = null;
             PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
         }
+
+        private void PART_BtAddGoogleImage_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                GoogleImageView ViewExtension = new GoogleImageView(GameBackgroundImages.Name);
+                Window windowExtension = PlayniteUiHelper.CreateExtensionWindow("Google Image", ViewExtension);
+                _ = windowExtension.ShowDialog();
+
+                if (ViewExtension.GoogleImageResults?.Count > 0)
+                {
+                    GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
+                        ResourceProvider.GetString("LOCCommonGettingData"),
+                        false
+                    );
+                    globalProgressOptions.IsIndeterminate = true;
+
+                    GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+                    {
+                        ViewExtension.GoogleImageResults.ForEach(x =>
+                        {
+                            try
+                            {
+                                string cachedFile = HttpFileCache.GetWebFile(x.ImageUrl);
+                                BackgroundImagesEdited.Add(new ItemImage
+                                {
+                                    Name = cachedFile
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                            }
+                        });
+                    }, globalProgressOptions);
+
+
+                    _ = Task.Run(() =>
+                    {
+                        while (!(bool)ProgressDownload.Result)
+                        {
+
+                        }
+                    }).ContinueWith(antecedant =>
+                    {
+                        _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
+                        {
+                            PART_LbBackgroundImages.ItemsSource = null;
+                            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+                        });
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
+        }
     }
 
     public class GetMediaTypeConverter : IValueConverter
