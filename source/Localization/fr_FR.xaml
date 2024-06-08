@@ -28,7 +28,7 @@
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">Sélectionner à partir de SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelecty">Sélectionner depuis SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">fichier ffmpeg</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">fichier webpinfo</sys:String>
     
