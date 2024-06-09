@@ -14,6 +14,8 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">プラグインの背景画像を表示</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">プラグインのカバー画像を表示</sys:String>
+
+    <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">ランダム選択を有効にする</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">自動変更を有効にする</sys:String>
@@ -28,7 +30,8 @@
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">SteamGridDB から選択</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg ファイル</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo ファイル</sys:String>
     
