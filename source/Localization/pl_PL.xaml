@@ -14,6 +14,8 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Wyświetlaj obraz tła wtyczki</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Wyświetlaj obraz okładki wtyczki</sys:String>
+
+    <sys:String x:Key="LOCBcBackgroundSameSettings">Użyto tego samego ustawienia dla tła gry wtyczki co dla tła motywu *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Włącz wybór losowy</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Włącz automatyczną zmianę</sys:String>
@@ -28,7 +30,8 @@
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">Wybierz z SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">Wybierz z SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">Wybierz z Google Obrazy</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">plik ffmpeg</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">plik webpinfo</sys:String>
     
