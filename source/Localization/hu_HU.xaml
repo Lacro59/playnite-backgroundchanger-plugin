@@ -14,6 +14,8 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">A bővítmény háttérképének megjelenítése</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">A bővítmény borítóképének megjelenítése</sys:String>
+
+    <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Véletlenszerű kiválasztás engedélyezése</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Automatikus változtatás engedélyezése</sys:String>
@@ -28,7 +30,8 @@
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">Választás a SteamGridDB-ből</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg fájl</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo fájl</sys:String>
     
