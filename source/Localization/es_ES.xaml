@@ -14,6 +14,8 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Mostrar la imagen de fondo del plugin</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Mostrar la imagen de portada del plugin</sys:String>
+
+    <sys:String x:Key="LOCBcBackgroundSameSettings">Utilizar el mismo ajuste para el fondo del juego del plugin que el fondo del tema *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Habilitar selección aleatoria</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Habilitar cambio automático</sys:String>
@@ -28,7 +30,8 @@
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">Selecciona de SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">Selecciona de SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">Seleccionar desde imagen de Google</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">archivo ffmpeg</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">Archivo webpinfo</sys:String>
     
