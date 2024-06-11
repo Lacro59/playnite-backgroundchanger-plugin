@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Playnite.SDK.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,16 +9,23 @@ namespace BackgroundChanger.Models
 {
     public class SteamGridDbSearchResultData
     {
-        public bool success { get; set; }
-        public List<SteamGridDbSearchResult> data { get; set; }
+        [SerializationPropertyName("success")]
+        public bool Success { get; set; }
+        [SerializationPropertyName("data")]
+        public List<SteamGridDbSearchResult> Data { get; set; }
     }
 
     public class SteamGridDbSearchResult
     {
-        public string name { get; set; }
-        public long release_date { get; set; }
-        public bool verified { get; set; }
-        public int id { get; set; }
-        public List<string> types { get; set; }
+        [SerializationPropertyName("name")]
+        public string Name { get; set; }
+        [SerializationPropertyName("release_date")]
+        public long ReleaseDate { get; set; }
+        [SerializationPropertyName("verified")]
+        public bool Verified { get; set; }
+        [SerializationPropertyName("id")]
+        public int Id { get; set; }
+        [SerializationPropertyName("types")]
+        public List<string> Types { get; set; }
     }
 }

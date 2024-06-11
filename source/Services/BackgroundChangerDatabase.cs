@@ -36,7 +36,7 @@ namespace BackgroundChanger.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginName);
                 return false;
             }
 

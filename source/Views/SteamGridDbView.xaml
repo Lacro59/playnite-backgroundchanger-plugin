@@ -53,7 +53,7 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel x:Name="PART_ListContener">
-                                <controls2:TextBlockTrimmed Margin="0,2" Text="{Binding name}" MaxWidth="{Binding ElementName=PART_ListContener, Path=ActualWidth}"/>
+                                <controls2:TextBlockTrimmed Margin="0,2" Text="{Binding Name}" MaxWidth="{Binding ElementName=PART_ListContener, Path=ActualWidth}"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

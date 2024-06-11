@@ -150,7 +150,7 @@ namespace BackgroundChanger.Views
                 {
                     if (DataSearch != null)
                     {
-                        PART_SearchList.ItemsSource = DataSearch.data;
+                        PART_SearchList.ItemsSource = DataSearch.Data;
                     }
 
                     PART_DataLoad.Visibility = Visibility.Collapsed;
@@ -255,7 +255,7 @@ namespace BackgroundChanger.Views
             {
                 if (PART_SearchList?.Items?.Count > 0)
                 {
-                    int Id = ((SteamGridDbSearchResult)PART_SearchList.SelectedItem).id;
+                    int Id = ((SteamGridDbSearchResult)PART_SearchList.SelectedItem).Id;
                     SearchDataElements(Id);
                 }
             }
