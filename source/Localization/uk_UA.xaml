@@ -14,6 +14,8 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Показувати фонове зображення плагіну</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Показувати зображення обкладинки плагіну</sys:String>
+
+    <sys:String x:Key="LOCBcBackgroundSameSettings">Використовувати ті самі налаштування для фонового зображення гри плагіну, що й для фону теми *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Увімкнути випадковий вибір</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Увімкнути автоматичну зміну</sys:String>
@@ -28,7 +30,8 @@
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">Вибрати зі SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">Вибрати зі SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">Вибрати з Google Зображення</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">файл ffmpeg</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">файл webpinfo</sys:String>
     

@@ -14,6 +14,8 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">显示插件背景图像</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">显示插件封面图像</sys:String>
+
+    <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">启用随机</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">启用自动切换</sys:String>
@@ -28,7 +30,8 @@
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">从 SteamGridDB </sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg 文件</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo 文件</sys:String>
     

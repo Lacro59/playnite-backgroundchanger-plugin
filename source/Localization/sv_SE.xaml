@@ -14,6 +14,8 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Visa plugin bakgrundsbild</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Visa plugin omslagsbild</sys:String>
+
+    <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Aktivera slumpmässigt urval</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Aktivera automatisk ändring</sys:String>
@@ -28,7 +30,8 @@
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelecty">Välj från SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg fil</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo fil</sys:String>
     
