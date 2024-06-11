@@ -52,3 +52,19 @@ Packages:
       - Fixed an issue with videos always playing
       - Possibilities to set a delay before showing background videos
       - Updated localizations
+  - Version: 3.2
+    RequiredApiVersion: 6.11.0
+    ReleaseDate: 2024-06-11
+    PackageUrl: https://github.com/Lacro59/playnite-backgroundchanger-plugin/releases/download/v3.2/playnite-backgroundchanger-plugin_3_2.pext
+    Changelog:
+      - 'Updated: Localizations'
+      - 'Added: Web image search functionality'
+      - 'Fixed: Window background settings also affect game background when plugin is turned on'
+      - 'Fixed: Not analyzing or downloading humor assets'
+      - 'Fixed: Various errors message'
+      - 'Updated: UI'
+      - 'Fixed: Select from SteamGridDB only goes up to 50 covers'
+      - 'Added: Set a cover/background as the default'
+      - 'Fixed: Images become blurred when switching to a different box art aspect ratio'
+      - 'Added: Select all found results'
+      - 'Added: Lazy loading'
