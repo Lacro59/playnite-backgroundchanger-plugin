@@ -3,17 +3,17 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
+    <sys:String x:Key="LOCBc">Modificador de fundo</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">Manage background images</sys:String>
-    <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">Gerenciar imagens de fundo</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Gerenciar imagens de capa</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api key</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">Chave de API SteamGridDB</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Exibir a imagem de fundo do plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Exibir a imagem de capa do plugin</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     
@@ -26,7 +26,7 @@
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
     
     <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">Utilize esta opção se pretender apresentar a imagem predefinida antes de um vídeo.</sys:String>
 
     <!-- ImagesManagerView -->
 
