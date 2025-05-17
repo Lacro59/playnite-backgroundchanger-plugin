@@ -6,32 +6,32 @@
     <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">背景画像の管理</sys:String>
-    <sys:String x:Key="LOCBcManageCover">カバー画像の管理</sys:String>
+    <sys:String x:Key="LOCBcManageCover">バー画像の管</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
     <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB API キー</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">プラグインの背景画像を表示</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">プラグインのカバー画像を表示</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">ラグインの背景画像を表示</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">ラグインのカバー画像を表示</sys:String>
 
-    <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
+    <sys:String x:Key="LOCBcBackgroundSameSettings">プラグインのゲーム背景をテーマ背景と同じ設定にした *。</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">ランダム選択を有効にする</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">ダム選択を有効にする</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">自動変更を有効にする</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">時間間隔</sys:String>
     <sys:String x:Key="LOCBcSeconds">秒</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">アニメーション背景を有効にする</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">アニメーションカバーを有効にする</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">ニメーション背景を有効にする</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">ニメーションカバーを有効にする</sys:String>
     
-    <sys:String x:Key="LOCBcEnableVideoDelay">ビデオの遅延を有効にする</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">ビデオの前に既定の画像を表示する場合は、このオプションを使用します。</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">デオの遅延を有効にする</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">デオの前に既定の画像を表示する場合は、このオプションを使用します</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">SteamGridDBから選択</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">グーグル画像から選択</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg ファイル</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo ファイル</sys:String>
     
