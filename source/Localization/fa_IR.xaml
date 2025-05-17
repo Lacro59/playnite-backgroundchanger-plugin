@@ -3,7 +3,7 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
+    <sys:String x:Key="LOCBc">تغییر دهنده ی بکگراند</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">Manage background images</sys:String>
     <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
@@ -31,7 +31,7 @@
     <!-- ImagesManagerView -->
 
     <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">انتخاب از تصاویر گوگل</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
     

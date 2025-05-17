@@ -3,7 +3,7 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">محول الخل</sys:String>
+    <sys:String x:Key="LOCBc">محول الخ</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">إدارة صور الخ</sys:String>
     <sys:String x:Key="LOCBcManageCover">إدارة صور الغلا</sys:String>
@@ -25,7 +25,7 @@
     <sys:String x:Key="LOCBcEnableImageAnimatedBackground">تفعيل الخلفية المتحر</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">تفعيل الغلاف المتحر</sys:String>
     
-    <sys:String x:Key="LOCBcEnableVideoDelay">تمكين تأخير الفيديو</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">تمكين تأخير الفيدي</sys:String>
     <sys:String x:Key="LOCBcVideoDelayToolTip">استخدم هذا الخيار إذا كنت ترغب في عرض الصورة الافتراضية قبل الفيديو.</sys:String>
 
     <!-- ImagesManagerView -->
