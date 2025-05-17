@@ -1,5 +1,5 @@
 # .coderabbit.yml
-ignored_branch: "l10n_devel"
+ignored_branch: "l10n_master, l10n_devel"
 ignored_titles: ""
 limit_reviews_by_label: ""
 path_filters: ""
