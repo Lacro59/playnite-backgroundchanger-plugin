@@ -67,7 +67,7 @@ namespace BackgroundChanger.Views
                 ItemImage originalDefault = BackgroundImages.FirstOrDefault(x => x.IsDefault);
 
                 // Delete removed
-                BackgroundImages.Where(x => !x.Name.IsEqual(originalDefault.Name) && x.IsCover == IsCover)?.ForEach(y =>
+                BackgroundImages.Where(x => !x.Name.IsEqual(originalDefault?.Name) && x.IsCover == IsCover)?.ForEach(y =>
                 {
                     if (BackgroundImagesEdited.FirstOrDefault(x => x.FullPath == y.FullPath) == null)
                     {
@@ -80,7 +80,7 @@ namespace BackgroundChanger.Views
                 {
                     ItemImage itemImage = BackgroundImagesEdited[index];
 
-                    if (itemImage.FolderName.IsNullOrEmpty() && !itemImage.Name.IsEqual(originalDefault.Name))
+                    if (itemImage.FolderName.IsNullOrEmpty() && !itemImage.Name.IsEqual(originalDefault?.Name))
                     {
                         Guid ImageGuid = Guid.NewGuid();
                         string OriginalPath = itemImage.Name;
