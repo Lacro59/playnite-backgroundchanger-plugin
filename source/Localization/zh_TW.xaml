@@ -5,8 +5,8 @@
 
     <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">Manage background images</sys:String>
-    <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">管理背景圖像</sys:String>
+    <sys:String x:Key="LOCBcManageCover">管理封面圖像</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
@@ -19,8 +19,8 @@
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Enable random selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
-    <sys:String x:Key="LOCBcTimeInterval">Time interval</sys:String>
-    <sys:String x:Key="LOCBcSeconds">seconds</sys:String>
+    <sys:String x:Key="LOCBcTimeInterval">時間間隔</sys:String>
+    <sys:String x:Key="LOCBcSeconds">秒</sys:String>
 
     <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
@@ -30,8 +30,8 @@
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">從 SteamGridDB 中選擇</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">從 Google 圖像中選擇</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
     

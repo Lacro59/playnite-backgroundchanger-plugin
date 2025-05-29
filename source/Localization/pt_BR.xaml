@@ -3,7 +3,7 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
+    <sys:String x:Key="LOCBc">Trocador de fundo</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">Gerenciar imagens de fundo</sys:String>
     <sys:String x:Key="LOCBcManageCover">Gerenciar imagens de capa</sys:String>
@@ -15,7 +15,7 @@
     <sys:String x:Key="LOCBcEnableBackgroundImage">Exibir a imagem de fundo do plugin</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Exibir a imagem de fundo do plugin</sys:String>
 
-    <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
+    <sys:String x:Key="LOCBcBackgroundSameSettings">Usou a mesma configuração para o fundo do plug-in que o fundo do tema *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Ativar seleção aleatória</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Ativar mudança automática</sys:String>
@@ -30,8 +30,8 @@
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">Selecionar do SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">Selecione do Google Imagens</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">arquivo ffmpeg</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">arquivo webpinfo</sys:String>
     

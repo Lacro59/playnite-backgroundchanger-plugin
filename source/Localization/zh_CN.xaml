@@ -5,7 +5,7 @@
 
     <sys:String x:Key="LOCBc">背景变更</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">管理背景图</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">管理背景图像</sys:String>
     <sys:String x:Key="LOCBcManageCover">管理封面图像</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
@@ -15,23 +15,23 @@
     <sys:String x:Key="LOCBcEnableBackgroundImage">显示插件背景图像</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">显示插件封面图像</sys:String>
 
-    <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
+    <sys:String x:Key="LOCBcBackgroundSameSettings">与主题背景相同的插件游戏背景设置*</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">启用随机</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">启用随机选择</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">启用自动切换</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">时间间隔</sys:String>
     <sys:String x:Key="LOCBcSeconds">秒</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">启用动画背</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">启用动画背景</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">启用动画封面</sys:String>
     
-    <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">6666666666666666</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">如果您想要在视频前显示默认图像，请使用此选项。</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">从 SteamGridDB 选择</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">从谷歌图像中选择</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg 文件</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo 文件</sys:String>
     
