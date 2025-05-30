@@ -9,11 +9,9 @@ using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -33,10 +31,10 @@ namespace BackgroundChanger.Controls
     public partial class PluginBackgroundImage : PluginUserControlExtend
     {
         private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
-        internal override IPluginDatabase pluginDatabase => PluginDatabase;
+        protected override IPluginDatabase pluginDatabase => PluginDatabase;
 
         private PluginBackgroundImageDataContext ControlDataContext = new PluginBackgroundImageDataContext();
-        internal override IDataContext controlDataContext
+        protected override IDataContext controlDataContext
         {
             get => ControlDataContext;
             set => ControlDataContext = (PluginBackgroundImageDataContext)controlDataContext;

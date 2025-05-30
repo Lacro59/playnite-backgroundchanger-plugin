@@ -11,6 +11,8 @@
                 <ResourceDictionary Source="playnite-plugincommon/CommonPluginsResources/ResourcesPlaynite/Common.xaml" />
                 <!--Playnite Default localization-->
                 <ResourceDictionary Source="playnite-plugincommon/CommonPluginsResources/ResourcesPlaynite/LocSource.xaml" />
+                <ResourceDictionary Source="playnite-plugincommon/CommonPluginsResources/ResourcesPlaynite/AmazonLocSource.xaml" />
+                <ResourceDictionary Source="playnite-plugincommon/CommonPluginsResources/ResourcesPlaynite/BattleNetLocSource.xaml" />
                 <ResourceDictionary Source="playnite-plugincommon/CommonPluginsResources/ResourcesPlaynite/EpicLocSource.xaml" />
                 <ResourceDictionary Source="playnite-plugincommon/CommonPluginsResources/ResourcesPlaynite/GogLocSource.xaml" />
                 <ResourceDictionary Source="playnite-plugincommon/CommonPluginsResources/ResourcesPlaynite/HumbleLocSource.xaml" />

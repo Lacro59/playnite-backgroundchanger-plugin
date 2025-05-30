@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -30,10 +29,10 @@ namespace BackgroundChanger.Controls
     public partial class PluginCoverImage : PluginUserControlExtend
     {
         private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
-        internal override IPluginDatabase pluginDatabase => PluginDatabase;
+        protected override IPluginDatabase pluginDatabase => PluginDatabase;
 
         private PluginCoverImageDataContext ControlDataContext = new PluginCoverImageDataContext();
-        internal override IDataContext controlDataContext
+        protected override IDataContext controlDataContext
         {
             get => ControlDataContext;
             set => ControlDataContext = (PluginCoverImageDataContext)controlDataContext;

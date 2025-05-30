@@ -19,31 +19,6 @@ namespace BackgroundChanger.Services
 
         }
 
-
-        protected override bool LoadDatabase()
-        {
-            try
-            {
-                Stopwatch stopWatch = new Stopwatch();
-                stopWatch.Start();
-
-                Database = new BackgroundImagesCollection(Paths.PluginDatabasePath);
-                Database.SetGameInfo<ItemImage>();
-
-                stopWatch.Stop();
-                TimeSpan ts = stopWatch.Elapsed;
-                Logger.Info($"LoadDatabase with {Database.Count} items - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)}");
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginName);
-                return false;
-            }
-
-            return true;
-        }
-
-
         public override GameBackgroundImages Get(Guid Id, bool OnlyCache = false, bool Force = false)
         {
             GameBackgroundImages gameBackgroundImages = GetOnlyCache(Id);
