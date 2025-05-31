@@ -1,20 +1,16 @@
-﻿using Playnite.SDK;
+﻿using CommonPluginsShared.Plugins;
+using Playnite.SDK;
 using Playnite.SDK.Data;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace BackgroundChanger
 {
-    public class BackgroundChangerSettings : ObservableObject
+    public class BackgroundChangerSettings : PluginSettings
     {
         #region Settings variables
-        public bool MenuInExtensions { get; set; } = true;
 
-
-        private bool enableBackgroundImage = true;
-        public bool EnableBackgroundImage { get => enableBackgroundImage; set => SetValue(ref enableBackgroundImage, value); }
+        private bool _enableBackgroundImage = true;
+        public bool EnableBackgroundImage { get => _enableBackgroundImage; set => SetValue(ref _enableBackgroundImage, value); }
 
         public bool BackgroundImageSameSettings { get; set; } = true;
 
@@ -22,21 +18,21 @@ namespace BackgroundChanger
         public bool EnableBackgroundImageAutoChanger { get; set; } = false;
         public int BackgroundImageAutoChangerTimer { get; set; } = 10;
 
-        private bool enableImageAnimatedBackground = false;
-        public bool EnableImageAnimatedBackground { get => enableImageAnimatedBackground; set => SetValue(ref enableImageAnimatedBackground, value); }
+        private bool _enableImageAnimatedBackground = false;
+        public bool EnableImageAnimatedBackground { get => _enableImageAnimatedBackground; set => SetValue(ref _enableImageAnimatedBackground, value); }
 
         public double Volume { get; set; } = 0;
 
 
-        private bool enableCoverImage = true;
-        public bool EnableCoverImage { get => enableCoverImage; set => SetValue(ref enableCoverImage, value); }
+        private bool _enableCoverImage = true;
+        public bool EnableCoverImage { get => _enableCoverImage; set => SetValue(ref _enableCoverImage, value); }
 
         public bool EnableCoverImageRandomSelect { get; set; } = false;
         public bool EnableCoverImageAutoChanger { get; set; } = false;
         public int CoverImageAutoChangerTimer { get; set; } = 10;
 
-        private bool enableImageAnimatedCover = false;
-        public bool EnableImageAnimatedCover { get => enableImageAnimatedCover; set => SetValue(ref enableImageAnimatedCover, value); }
+        private bool _enableImageAnimatedCover = false;
+        public bool EnableImageAnimatedCover { get => _enableImageAnimatedCover; set => SetValue(ref _enableImageAnimatedCover, value); }
 
 
         public string SteamGridDbApiKey { get; set; } = string.Empty;
@@ -50,14 +46,12 @@ namespace BackgroundChanger
         public int videoDelayBackgroundImage { get; set; } = 5;
         public bool useVideoDelayCoverImage { get; set; } = false;
         public int videoDelayCoverImage { get; set; } = 5;
+
         #endregion
 
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
         #region Variables exposed
-        private bool hasData = false;
-        [DontSerialize]
-        public bool HasData { get => hasData; set => SetValue(ref hasData, value); }
 
         private bool hasDataBackground = false;
         [DontSerialize]
@@ -66,6 +60,7 @@ namespace BackgroundChanger
         private bool hasDataCover = false;
         [DontSerialize]
         public bool HasDataCover { get => hasDataCover; set => SetValue(ref hasDataCover, value); }
+
         #endregion
     }
 
@@ -75,8 +70,8 @@ namespace BackgroundChanger
         private readonly BackgroundChanger Plugin;
         private BackgroundChangerSettings EditingClone { get; set; }
 
-        private BackgroundChangerSettings settings;
-        public BackgroundChangerSettings Settings { get => settings; set => SetValue(ref settings, value); }
+        private BackgroundChangerSettings _settings;
+        public BackgroundChangerSettings Settings { get => _settings; set => SetValue(ref _settings, value); }
 
 
         public BackgroundChangerSettingsViewModel(BackgroundChanger plugin)

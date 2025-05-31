@@ -100,22 +100,22 @@ namespace BackgroundChanger.Controls
 
         private void WindowBase_UnloadedEvent(object sender, System.EventArgs e)
         {
-            string WinIdProperty = string.Empty;
-            string WinName = string.Empty;
+            string winIdProperty = string.Empty;
+            string winName = string.Empty;
 
             try
             {
-                WinIdProperty = ((Window)sender).GetValue(AutomationProperties.AutomationIdProperty).ToString();
-                WinName = ((Window)sender).Name;
+                winIdProperty = ((Window)sender).GetValue(AutomationProperties.AutomationIdProperty).ToString();
+                winName = ((Window)sender).Name;
 
-                if (WinIdProperty == "WindowSettings")
+                if (winIdProperty == "WindowSettings")
                 {
                     GetFadeImageProperties();
                 }
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {WinName} - {WinIdProperty}", true, PluginDatabase.PluginName);
+                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {winName} - {winIdProperty}", true, PluginDatabase.PluginName);
             }
         }
 

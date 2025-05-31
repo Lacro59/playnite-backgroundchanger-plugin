@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using BackgroundChanger.Services;
 using Playnite.SDK.Data;
@@ -17,6 +16,7 @@ namespace BackgroundChanger.Models
         [SerializationPropertyName("data")]
         public List<SteamGridDbResult> Data { get; set; }
     }
+
 
     public class SteamGridDbResult : ObservableObject
     {
@@ -105,10 +105,11 @@ namespace BackgroundChanger.Models
             }
         }
 
-        private string videoFile = string.Empty;
+        private string _videoFile = string.Empty;
         [DontSerialize]
-        public string VideoFile { get => videoFile; set => SetValue(ref videoFile, value); }
+        public string VideoFile { get => _videoFile; set => SetValue(ref _videoFile, value); }
     }
+
 
     public class Author
     {

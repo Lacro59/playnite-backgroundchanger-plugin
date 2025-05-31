@@ -91,22 +91,22 @@ namespace BackgroundChanger.Controls
 
         private void WindowBase_UnloadedEvent(object sender, System.EventArgs e)
         {
-            string WinIdProperty = string.Empty;
-            string WinName = string.Empty;
+            string winIdProperty = string.Empty;
+            string winName = string.Empty;
 
             try
             {
-                WinIdProperty = ((Window)sender).GetValue(AutomationProperties.AutomationIdProperty).ToString();
-                WinName = ((Window)sender).Name;
+                winIdProperty = ((Window)sender).GetValue(AutomationProperties.AutomationIdProperty).ToString();
+                winName = ((Window)sender).Name;
 
-                if (WinIdProperty == "WindowSettings")
+                if (winIdProperty == "WindowSettings")
                 {
                     GetCoverProperties();
                 }
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {WinName} - {WinIdProperty}", true, "BackgroundChanger");
+                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {winName} - {winIdProperty}", true, "BackgroundChanger");
             }
         }
 
@@ -184,7 +184,7 @@ namespace BackgroundChanger.Controls
 
         public void SetCover()
         {
-            string PathImage = string.Empty;
+            string pathImage = string.Empty;
 
             if (gameBackgroundImages.HasDataCover && !PluginDatabase.PluginSettings.Settings.useVideoDelayCoverImage)
             {
@@ -196,30 +196,30 @@ namespace BackgroundChanger.Controls
                     {
                         if (IsFirst && ItemFavorite != null)
                         {
-                            PathImage = ItemFavorite.FullPath;
+                            pathImage = ItemFavorite.FullPath;
                             Counter = gameBackgroundImages.ItemsCover.FindIndex(x => x.IsFavorite);
                         }
                         else
                         {
                             Random rnd = new Random();
                             Counter = rnd.Next(0, gameBackgroundImages.ItemsCover.Count);
-                            PathImage = gameBackgroundImages.ItemsCover[Counter].FullPath;
+                            pathImage = gameBackgroundImages.ItemsCover[Counter].FullPath;
                         }
                     }
                     else
                     {
                         if (IsFirst && ItemFavorite != null)
                         {
-                            PathImage = ItemFavorite.FullPath;
+                            pathImage = ItemFavorite.FullPath;
                             Counter = gameBackgroundImages.ItemsCover.FindIndex(x => x.IsFavorite);
                         }
                         else
                         {
-                            PathImage = gameBackgroundImages.ItemsCover[Counter].FullPath;
+                            pathImage = gameBackgroundImages.ItemsCover[Counter].FullPath;
                         }
                     }
 
-                    SetCoverImage(PathImage);
+                    SetCoverImage(pathImage);
 
                     BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.CoverImageAutoChangerTimer * 1000);
                     BcTimer.AutoReset = true;
@@ -230,23 +230,23 @@ namespace BackgroundChanger.Controls
                 {
                     if (IsFirst && ItemFavorite != null)
                     {
-                        PathImage = ItemFavorite.FullPath;
+                        pathImage = ItemFavorite.FullPath;
                     }
                     else
                     {
                         Random rnd = new Random();
                         int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
-                        PathImage = gameBackgroundImages.ItemsCover[ImgSelected].FullPath;
+                        pathImage = gameBackgroundImages.ItemsCover[ImgSelected].FullPath;
                     }
 
-                    SetCoverImage(PathImage);
+                    SetCoverImage(pathImage);
                 }
                 else
                 {
                     if (ItemFavorite != null)
                     {
-                        PathImage = ItemFavorite.FullPath;
-                        SetCoverImage(PathImage);
+                        pathImage = ItemFavorite.FullPath;
+                        SetCoverImage(pathImage);
                     }
                     else
                     {
@@ -268,13 +268,13 @@ namespace BackgroundChanger.Controls
             }
             else
             {
-                string PathImage = ImageSourceManager.GetImagePath(GameContext.CoverImage);
-                if (PathImage.IsNullOrEmpty())
+                string pathImage = ImageSourceManager.GetImagePath(GameContext.CoverImage);
+                if (pathImage.IsNullOrEmpty())
                 {
-                    PathImage = API.Instance.Database.GetFullFilePath(GameContext.CoverImage);
+                    pathImage = API.Instance.Database.GetFullFilePath(GameContext.CoverImage);
                 }
 
-                SetCoverImage(PathImage);
+                SetCoverImage(pathImage);
             }
 
             if (PluginDatabase.PluginSettings.Settings.useVideoDelayCoverImage)
@@ -284,16 +284,16 @@ namespace BackgroundChanger.Controls
                     Thread.Sleep(1000 * PluginDatabase.PluginSettings.Settings.videoDelayCoverImage);
                     _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                     {
-                        string PathImage = gameBackgroundImages?.ItemsCover?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
-                        SetCoverImage(PathImage);
+                        string pathImage = gameBackgroundImages?.ItemsCover?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
+                        SetCoverImage(pathImage);
                     }));
                 });
             }
         }
 
-        public void SetCoverImage(string PathImage = null)
+        public void SetCoverImage(string pathImage = null)
         {
-            if (!File.Exists(PathImage))
+            if (!File.Exists(pathImage))
             {
                 ControlDataContext.ImageSource = null;
                 ControlDataContext.VideoSource = null;
@@ -301,16 +301,16 @@ namespace BackgroundChanger.Controls
             }
 
 
-            if (Path.GetExtension(PathImage).ToLower().Contains("mp4"))
+            if (Path.GetExtension(pathImage).ToLower().Contains("mp4"))
             {
                 ControlDataContext.ImageSource = null;
-                ControlDataContext.VideoSource = PathImage;
+                ControlDataContext.VideoSource = pathImage;
 
                 Video1.LoadedBehavior = MediaState.Play;
             }
             else
             {
-                ControlDataContext.ImageSource = PathImage;
+                ControlDataContext.ImageSource = pathImage;
                 ControlDataContext.VideoSource = null;
             }
 
@@ -409,7 +409,7 @@ namespace BackgroundChanger.Controls
         }
 
 
-        private void OnTimedEvent(Object source, ElapsedEventArgs e)
+        private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             if (!WindowsIsActivated)
             {
@@ -420,24 +420,24 @@ namespace BackgroundChanger.Controls
             {
                 _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() => 
                 {
-                    string PathImage = string.Empty;
+                    string pathImage = string.Empty;
 
                     if (ControlDataContext.EnableRandomSelect)
                     {
                         if (gameBackgroundImages.ItemsCover.Count != 0)
                         {
                             Random rnd = new Random();
-                            int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
-                            while (ImgSelected == Counter && gameBackgroundImages.ItemsCover.Count != 1)
+                            int imgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
+                            while (imgSelected == Counter && gameBackgroundImages.ItemsCover.Count != 1)
                             {
-                                ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
+                                imgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
                             }
-                            Counter = ImgSelected;
+                            Counter = imgSelected;
 
-                            PathImage = gameBackgroundImages.ItemsCover[ImgSelected].FullPath;
+                            pathImage = gameBackgroundImages.ItemsCover[imgSelected].FullPath;
                         }
 
-                        SetCoverImage(PathImage);
+                        SetCoverImage(pathImage);
                     }
                     else
                     {
@@ -450,10 +450,10 @@ namespace BackgroundChanger.Controls
                                 Counter = 0;
                             }
 
-                            PathImage = gameBackgroundImages.ItemsCover[Counter].FullPath;
+                            pathImage = gameBackgroundImages.ItemsCover[Counter].FullPath;
                         }
 
-                        SetCoverImage(PathImage);
+                        SetCoverImage(pathImage);
                     }
                 }));
             }
