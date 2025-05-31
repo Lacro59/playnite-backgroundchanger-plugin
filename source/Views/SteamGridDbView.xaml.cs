@@ -2,22 +2,15 @@
 using BackgroundChanger.Services;
 using CommonPluginsControls.PlayniteControls;
 using CommonPluginsShared;
+using Playnite.SDK;
 using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace BackgroundChanger.Views
 {
@@ -35,14 +28,14 @@ namespace BackgroundChanger.Views
         private List<SteamGridDbResult> DataSearchFiltered { get; set; } = null;
 
 
-        public SteamGridDbView(string Name, SteamGridDbType steamGridDbType)
+        public SteamGridDbView(string name, SteamGridDbType steamGridDbType)
         {
             InitializeComponent();
 
-            this.SteamGridDbType = steamGridDbType;
+            SteamGridDbType = steamGridDbType;
 
-            SearchElement.Text = Name;
-            SearchData(Name);
+            SearchElement.Text = name;
+            SearchData(name);
 
 
             if (steamGridDbType == SteamGridDbType.heroes)
@@ -124,57 +117,45 @@ namespace BackgroundChanger.Views
         }
 
 
-        private void SearchData(string Name)
+        private void SearchData(string name)
         {
             PART_SearchList.ItemsSource = null;
             PART_ElementList.ItemsSource = null;
-            PART_DataLoad.Visibility = Visibility.Visible;
-            PART_Data.IsEnabled = false;
 
             ButtonSelect.IsEnabled = false;
 
-            string GameSearch = Name;
-            _ = Task.Run(() =>
+            SteamGridDbSearchResultData dataSearch = null;
+            if (API.Instance.Dialogs.ActivateGlobalProgress((_) =>
             {
-                SteamGridDbSearchResultData DataSearch = null;
                 try
                 {
-                    DataSearch = SteamGridDbApi.SearchGame(GameSearch);
+                    dataSearch = SteamGridDbApi.SearchGame(name);
                 }
                 catch (Exception ex)
                 {
                     Common.LogError(ex, false, true, "BackgroundChanger");
                 }
-
-                _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
+            }, new GlobalProgressOptions("LOCDownloadingLabel")).Result == true)
+            {
+                if (dataSearch != null)
                 {
-                    if (DataSearch != null)
-                    {
-                        PART_SearchList.ItemsSource = DataSearch.Data;
-                    }
-
-                    PART_DataLoad.Visibility = Visibility.Collapsed;
-                    PART_Data.IsEnabled = true;
-                });
-            });
+                    PART_SearchList.ItemsSource = dataSearch.Data;
+                }
+            }
         }
 
-        private void SearchDataElements(int Id)
+        private void SearchDataElements(int id)
         {
             PART_ElementList.ItemsSource = null;
-            PART_DataLoad.Visibility = Visibility.Visible;
-            PART_Data.IsEnabled = false;
-
             ButtonSelect.IsEnabled = false;
 
-            string GameSearch = SearchElement.Text;
-            _ = Task.Run(() =>
+            DataSearch = null;
+            if (API.Instance.Dialogs.ActivateGlobalProgress((_) =>
             {
-                DataSearch = null;
                 try
                 {
                     SteamGridDbResultData steamGridDbResultData = null;
-                    steamGridDbResultData = SteamGridDbApi.SearchElement(Id, SteamGridDbType);
+                    steamGridDbResultData = SteamGridDbApi.SearchElement(id, SteamGridDbType);
                     DataSearch = new SteamGridDbResultData
                     {
                         Data = new List<SteamGridDbResult>()
@@ -185,43 +166,38 @@ namespace BackgroundChanger.Views
                     {
                         DataSearch.Data.AddRange(steamGridDbResultData.Data);
                         page++;
-                        steamGridDbResultData = SteamGridDbApi.SearchElement(Id, SteamGridDbType, page);
+                        steamGridDbResultData = SteamGridDbApi.SearchElement(id, SteamGridDbType, page);
                     }
                 }
                 catch (Exception ex)
                 {
                     Common.LogError(ex, false, true, "BackgroundChanger");
                 }
-
-                _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
+            }, new GlobalProgressOptions("LOCDownloadingLabel")).Result == true)
+            {
+                ButtonSelectAll.IsEnabled = DataSearch?.Data?.Count > 0;
+                if (DataSearch != null)
                 {
-                    ButtonSelectAll.IsEnabled = DataSearch?.Data?.Count > 0;
-                    if (DataSearch != null)
-                    {
-                        ApplyFilter(null, null);
-                    }
-
-                    PART_DataLoad.Visibility = Visibility.Collapsed;
-                    PART_Data.IsEnabled = true;
-                });
-            });
+                    ApplyFilter(null, null);
+                }
+            }
         }
 
 
         private void ButtonSelect_Click(object sender, RoutedEventArgs e)
         {
-            ((Window)this.Parent).Close();
+            ((Window)Parent).Close();
         }
 
         private void ButtonSelectAll_Click(object sender, RoutedEventArgs e)
         {
             PART_ElementList.SelectAll();
-            ((Window)this.Parent).Close();
+            ((Window)Parent).Close();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            ((Window)this.Parent).Close();
+            ((Window)Parent).Close();
         }
 
 
@@ -255,8 +231,8 @@ namespace BackgroundChanger.Views
             {
                 if (PART_SearchList?.Items?.Count > 0)
                 {
-                    int Id = ((SteamGridDbSearchResult)PART_SearchList.SelectedItem).Id;
-                    SearchDataElements(Id);
+                    int id = ((SteamGridDbSearchResult)PART_SearchList.SelectedItem).Id;
+                    SearchDataElements(id);
                 }
             }
             catch { }
@@ -343,12 +319,12 @@ namespace BackgroundChanger.Views
             {
                 if (sender != null)
                 {
-                    string BtName = ((ToggleButton)sender).Name;
-                    bool IsChecked = (bool)((ToggleButton)sender).IsChecked;
+                    string btName = ((ToggleButton)sender).Name;
+                    bool isChecked = (bool)((ToggleButton)sender).IsChecked;
 
-                    if (BtName == "PART_ButtonSortByDate_Asc")
+                    if (btName == "PART_ButtonSortByDate_Asc")
                     {
-                        if (IsChecked)
+                        if (isChecked)
                         {
                             PART_ButtonSortByDate_Desc.IsChecked = false;
 
@@ -357,9 +333,9 @@ namespace BackgroundChanger.Views
                         }
                     }
 
-                    if (BtName == "PART_ButtonSortByDate_Desc")
+                    if (btName == "PART_ButtonSortByDate_Desc")
                     {
-                        if (IsChecked)
+                        if (isChecked)
                         {
                             PART_ButtonSortByDate_Asc.IsChecked = false;
 
@@ -369,9 +345,9 @@ namespace BackgroundChanger.Views
                     }
 
 
-                    if (BtName == "PART_ButtonSortByScore_Asc")
+                    if (btName == "PART_ButtonSortByScore_Asc")
                     {
-                        if (IsChecked)
+                        if (isChecked)
                         {
                             PART_ButtonSortByDate_Asc.IsChecked = false;
                             PART_ButtonSortByDate_Desc.IsChecked = false;
@@ -380,9 +356,9 @@ namespace BackgroundChanger.Views
                         }
                     }
 
-                    if (BtName == "PART_ButtonSortByScore_Desc")
+                    if (btName == "PART_ButtonSortByScore_Desc")
                     {
-                        if (IsChecked)
+                        if (isChecked)
                         {
                             PART_ButtonSortByDate_Asc.IsChecked = false;
                             PART_ButtonSortByDate_Desc.IsChecked = false;

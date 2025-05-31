@@ -1,23 +1,13 @@
-﻿using AngleSharp.Dom;
-using AngleSharp.Dom.Html;
-using AngleSharp.Parser.Html;
-using BackgroundChanger.Models;
+﻿using BackgroundChanger.Models;
 using CommonPlayniteShared;
-using CommonPluginsControls.PlayniteControls;
-using CommonPluginsShared;
 using Playnite.SDK;
-using Playnite.SDK.Data;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace BackgroundChanger.Views
 {
@@ -59,14 +49,15 @@ namespace BackgroundChanger.Views
 
         private void ButtonSelect_Click(object sender, RoutedEventArgs e)
         {
-            ((Window)this.Parent).Close();
+            ((Window)Parent).Close();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            ((Window)this.Parent).Close();
+            ((Window)Parent).Close();
         }
     }
+
 
     public enum SafeSearchSettings
     {
@@ -78,6 +69,7 @@ namespace BackgroundChanger.Views
         Off
     }
 
+
     public class GoogleImageViewModel : ObservableObject
     {
         private GoogleImageDownloader Downloader => new GoogleImageDownloader();
@@ -85,20 +77,20 @@ namespace BackgroundChanger.Views
         public double ItemWidth { get; set; } = 240;
         public double ItemHeight { get; set; } = 180;
 
-        private string searchTerm;
-        public string SearchTerm { get => searchTerm; set => SetValue(ref searchTerm, value); }
+        private string _searchTerm;
+        public string SearchTerm { get => _searchTerm; set => SetValue(ref _searchTerm, value); }
 
-        private int? searchWidth;
-        public int? SearchWidth { get => searchWidth; set => SetValue(ref searchWidth, value); }
+        private int? _searchWidth;
+        public int? SearchWidth { get => _searchWidth; set => SetValue(ref _searchWidth, value); }
 
-        private int? searchHeight;
-        public int? SearchHeight { get => searchHeight; set => SetValue(ref searchHeight, value); }
+        private int? _searchHeight;
+        public int? SearchHeight { get => _searchHeight; set => SetValue(ref _searchHeight, value); }
 
-        private SafeSearchSettings safeSearch = SafeSearchSettings.On;
-        public SafeSearchSettings SafeSearch { get => safeSearch; set => SetValue(ref safeSearch, value); }
+        private SafeSearchSettings _safeSearch = SafeSearchSettings.On;
+        public SafeSearchSettings SafeSearch { get => _safeSearch; set => SetValue(ref _safeSearch, value); }
 
-        private bool transparent = false;
-        public bool Transparent { get => transparent; set => SetValue(ref transparent, value); }
+        private bool _transparent = false;
+        public bool Transparent { get => _transparent; set => SetValue(ref _transparent, value); }
 
 
         public RelayCommand<object> SearchCommand => new RelayCommand<object>((a) =>
@@ -146,16 +138,16 @@ namespace BackgroundChanger.Views
         }
 
 
-        private List<GoogleImage> availableImages = new List<GoogleImage>();
-        public List<GoogleImage> AvailableImages { get => availableImages; set => SetValue(ref availableImages, value); }
+        private List<GoogleImage> _availableImages = new List<GoogleImage>();
+        public List<GoogleImage> AvailableImages { get => _availableImages; set => SetValue(ref _availableImages, value); }
 
         public ObservableCollection<GoogleImage> DisplayImages
         {
             get;
         } = new ObservableCollection<GoogleImage>();
 
-        private bool showLoadMore = false;
-        public bool ShowLoadMore { get => showLoadMore; set => SetValue(ref showLoadMore, value); }
+        private bool _showLoadMore = false;
+        public bool ShowLoadMore { get => _showLoadMore; set => SetValue(ref _showLoadMore, value); }
 
         public void Search()
         {

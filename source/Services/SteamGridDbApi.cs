@@ -27,18 +27,16 @@ namespace BackgroundChanger.Services
         private static string UrlSearchHeroes => UrlBase + "/api/v2/heroes/game/{0}?dimensions=1920x620,3840x1240,1600x650&mimes=image/png,image/webp,image/jpeg&types=static,animated&styles=alternate,blurred,material&nsfw=any&humor=any&page={1}";
         private static string UrlGame => UrlBase + "/game/{0}";
 
-
         public SteamGridDbApi()
         {
             ApiKey = PluginDatabase.PluginSettings.Settings.SteamGridDbApiKey;
         }
 
-
-        public SteamGridDbSearchResultData SearchGame(string Name)
+        public SteamGridDbSearchResultData SearchGame(string name)
         {
             try
             {
-                string Response = DownloadStringData(string.Format(UrlSearch, WebUtility.UrlEncode(Name))).GetAwaiter().GetResult();
+                string Response = DownloadStringData(string.Format(UrlSearch, WebUtility.UrlEncode(name))).GetAwaiter().GetResult();
                 SteamGridDbSearchResultData ResultData = Serialization.FromJson<SteamGridDbSearchResultData>(Response);
                 return ResultData;
             }
@@ -50,7 +48,7 @@ namespace BackgroundChanger.Services
             return null;
         }
 
-        public SteamGridDbResultData SearchElement(int Id, SteamGridDbType steamGridDbType, int page = 0)
+        public SteamGridDbResultData SearchElement(int id, SteamGridDbType steamGridDbType, int page = 0)
         {
             try
             {
@@ -60,7 +58,7 @@ namespace BackgroundChanger.Services
                     url = UrlSearchGrids;
                 }
 
-                string response = DownloadStringData(string.Format(url, Id, page)).GetAwaiter().GetResult();
+                string response = DownloadStringData(string.Format(url, id, page)).GetAwaiter().GetResult();
                 Serialization.TryFromJson(response, out SteamGridDbResultData ResultData);
                 return ResultData;
             }
@@ -71,7 +69,6 @@ namespace BackgroundChanger.Services
 
             return null;
         }
-
 
         public async Task<string> DownloadStringData(string url)
         {

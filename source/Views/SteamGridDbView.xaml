@@ -6,9 +6,7 @@
              xmlns:local="clr-namespace:BackgroundChanger.Views"
              xmlns:playnitecontrols="clr-namespace:CommonPluginsControls.PlayniteControls"
              xmlns:converters="clr-namespace:CommonPlayniteShared.Converters"
-             xmlns:controls="clr-namespace:wpf_animatedimage.Controls"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
-             xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
              xmlns:controls1="clr-namespace:CommonPluginsShared.Controls" 
              xmlns:controls2="clr-namespace:CommonPluginsControls.Controls"
              mc:Ignorable="d" 
@@ -22,45 +20,42 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
 
-    <Grid>
-        <Grid Name="PART_DataLoad">
-            <ProgressBar IsIndeterminate="True" Width="350" Height="40" />
-            <TextBlock Text="{DynamicResource LOCDownloadingLabel}"
-                       Style="{DynamicResource BaseTextBlockStyle}"
-                       HorizontalAlignment="Center" VerticalAlignment="Center" />
-        </Grid>
+    <DockPanel Margin="10" LastChildFill="True">
+        <StackPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
+            <Separator Margin="0,0,0,10" />
 
-        <Grid Margin="10" Name="PART_Data">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250" />
-                <ColumnDefinition Width="10" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="10" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="10" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="10" />
-                <RowDefinition Height="auto" />
-            </Grid.RowDefinitions>
+            <!-- Name -->
+            <Grid Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="6" />
+                    <ColumnDefinition Width="150" />
+                </Grid.ColumnDefinitions>
 
-            <Grid Grid.Row="0" Grid.Column="0" Name="PART_GridContener">
-                <ListBox Name="PART_SearchList" SelectionChanged="PART_SearchList_SelectionChanged"
-                         Width="{Binding ElementName=PART_GridContener, Path=ActualWidth}"
-                         Height="{Binding ElementName=PART_GridContener, Path=ActualHeight}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel x:Name="PART_ListContener">
-                                <controls2:TextBlockTrimmed Margin="0,2" Text="{Binding Name}" MaxWidth="{Binding ElementName=PART_ListContener, Path=ActualWidth}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <playnitecontrols:SearchBox Grid.Column="0" x:Name="SearchElement" KeyUp="SearchElement_KeyUp" />
+                <Button Name="PART_BtSearch" Grid.Column="3" Content="{DynamicResource LOCSearchLabel}" Click="PART_BtSearch_Click"
+                        IsEnabled="{Binding ElementName=SearchElement, Path=Text, Converter={StaticResource StringNullOrEmptyToBoolConverter}}"/>
             </Grid>
 
-            <Grid Grid.Row="0" Grid.Column="2">
+            <!-- Actions -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="6" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="6" />
+                    <ColumnDefinition Width="100" />
+                </Grid.ColumnDefinitions>
+
+                <Button Name="ButtonSelect" IsEnabled="False" Grid.Column="1" Content="{DynamicResource LOCSelect}" VerticalAlignment="Center" Click="ButtonSelect_Click" />
+                <Button Name="ButtonSelectAll" IsEnabled="False" Grid.Column="3" Content="{DynamicResource LOCSelectAll}" VerticalAlignment="Center" Click="ButtonSelectAll_Click" />
+                <Button Grid.Column="5" Content="{DynamicResource LOCCancelLabel}" VerticalAlignment="Center" Click="Button_Click" />
+            </Grid>
+        </StackPanel>
+        
+        <DockPanel>
+            <Grid DockPanel.Dock="Right" Width="850">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="10" />
@@ -104,7 +99,7 @@
                         <ToggleButton Name="PART_ButtonSortByDate_Desc" Content="&#xea59;" IsChecked="True" Margin="10,0,0,0"
                                       Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
                     </StackPanel>
-                    
+
                     <Label Grid.Row="0" Grid.Column="4" Content="{DynamicResource LOCCommonSortByScore}" />
                     <StackPanel Grid.Row="2" Grid.Column="4" Margin="10,0,0,0" Orientation="Horizontal">
                         <ToggleButton Name="PART_ButtonSortByScore_Asc" Content="&#xea5a;" IsChecked="False"
@@ -188,7 +183,7 @@
                                                             UseAnimated="False"
                                                             DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}" /-->
                                     <controls1:ImageAsync Stretch="Uniform" Source="{Binding Thumbnail}" Height="140" />
-                                    
+
                                     <Grid Grid.Column="2">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="auto" />
@@ -222,37 +217,16 @@
                     </ListBox>
                 </Grid>
             </Grid>
-            
-            <Separator Grid.Row="2" Grid.ColumnSpan="3" />
-            
-            <!-- Name -->
-            <Grid Grid.Row="4" Grid.ColumnSpan="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="6" />
-                    <ColumnDefinition Width="150" />
-                </Grid.ColumnDefinitions>
 
-                <playnitecontrols:SearchBox Grid.Column="0" x:Name="SearchElement" KeyUp="SearchElement_KeyUp" />
-                <Button Name="PART_BtSearch" Grid.Column="3" Content="{DynamicResource LOCSearchLabel}" Click="PART_BtSearch_Click"
-                        IsEnabled="{Binding ElementName=SearchElement, Path=Text, Converter={StaticResource StringNullOrEmptyToBoolConverter}}"/>
-            </Grid>
-
-            <!-- Actions -->
-            <Grid Grid.Row="6" Grid.ColumnSpan="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="6" />
-                    <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="6" />
-                    <ColumnDefinition Width="100" />
-                </Grid.ColumnDefinitions>
-
-                <Button Name="ButtonSelect" IsEnabled="False" Grid.Column="1" Content="{DynamicResource LOCSelect}" VerticalAlignment="Center" Click="ButtonSelect_Click" />
-                <Button Name="ButtonSelectAll" IsEnabled="False" Grid.Column="3" Content="{DynamicResource LOCSelectAll}" VerticalAlignment="Center" Click="ButtonSelectAll_Click" />
-                <Button Grid.Column="5" Content="{DynamicResource LOCCancelLabel}" VerticalAlignment="Center" Click="Button_Click" />
-            </Grid>
-        </Grid>
-    </Grid>
+            <ListBox Name="PART_SearchList" SelectionChanged="PART_SearchList_SelectionChanged" Margin="0,0,10,0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel x:Name="PART_ListContener">
+                            <controls2:TextBlockTrimmed Margin="0,2" Text="{Binding Name}" MaxWidth="{Binding ElementName=PART_ListContener, Path=ActualWidth}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+    </DockPanel>
 </UserControl>
