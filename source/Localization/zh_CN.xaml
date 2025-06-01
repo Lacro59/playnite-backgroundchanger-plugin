@@ -25,15 +25,15 @@
     <sys:String x:Key="LOCBcEnableImageAnimatedBackground">启用动画背景</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">启用动画封面</sys:String>
     
-    <sys:String x:Key="LOCBcEnableVideoDelay">6666666666666666</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">启用视频延迟</sys:String>
     <sys:String x:Key="LOCBcVideoDelayToolTip">如果您想要在视频前显示默认图像，请使用此选项。</sys:String>
 
     <!-- ImagesManagerView -->
 
     <sys:String x:Key="LOCBcSteamGridDbSelect">从 SteamGridDB 选择</sys:String>
     <sys:String x:Key="LOCBcGoogleImageSelect">从谷歌图像中选择</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg 文件</sys:String>
-    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo 文件</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg 路径</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo 路径</sys:String>
     
     <sys:String x:Key="LOCBcFTooltTipConvert">转换为 mp4（改善性能）</sys:String>
 
