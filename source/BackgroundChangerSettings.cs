@@ -53,13 +53,13 @@ namespace BackgroundChanger
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
         #region Variables exposed
 
-        private bool hasDataBackground = false;
+        private bool _hasDataBackground = false;
         [DontSerialize]
-        public bool HasDataBackground { get => hasDataBackground; set => SetValue(ref hasDataBackground, value); }
+        public bool HasDataBackground { get => _hasDataBackground; set => SetValue(ref _hasDataBackground, value); }
 
-        private bool hasDataCover = false;
+        private bool _hasDataCover = false;
         [DontSerialize]
-        public bool HasDataCover { get => hasDataCover; set => SetValue(ref hasDataCover, value); }
+        public bool HasDataCover { get => _hasDataCover; set => SetValue(ref _hasDataCover, value); }
 
         #endregion
     }
