@@ -10,7 +10,6 @@ using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -39,7 +38,6 @@ namespace BackgroundChanger
             });
         }
 
-
         #region Custom event
 
         #endregion
@@ -63,7 +61,6 @@ namespace BackgroundChanger
         }
 
         #endregion
-
 
         #region Menus
 
@@ -176,7 +173,6 @@ namespace BackgroundChanger
         }
 
         #endregion
-
 
         #region Application event
 

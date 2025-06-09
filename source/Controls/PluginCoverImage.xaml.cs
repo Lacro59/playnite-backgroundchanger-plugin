@@ -4,6 +4,7 @@ using CommonPlayniteShared;
 using CommonPluginsShared;
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
+using CommonPluginsShared.Extensions;
 using CommonPluginsShared.Interfaces;
 using Playnite.SDK;
 using Playnite.SDK.Models;
@@ -268,12 +269,8 @@ namespace BackgroundChanger.Controls
             }
             else
             {
-                string pathImage = ImageSourceManager.GetImagePath(GameContext.CoverImage);
-                if (pathImage.IsNullOrEmpty())
-                {
-                    pathImage = API.Instance.Database.GetFullFilePath(GameContext.CoverImage);
-                }
-
+                string pathImage = ImageSourceManager.GetImagePath(GameContext.CoverImage)
+                    ?? API.Instance.Database.GetFullFilePath(GameContext.CoverImage);
                 SetCoverImage(pathImage);
             }
 
@@ -301,7 +298,7 @@ namespace BackgroundChanger.Controls
             }
 
 
-            if (Path.GetExtension(pathImage).ToLower().Contains("mp4"))
+            if (Path.GetExtension(pathImage).IsEqual("mp4"))
             {
                 ControlDataContext.ImageSource = null;
                 ControlDataContext.VideoSource = pathImage;
@@ -394,7 +391,7 @@ namespace BackgroundChanger.Controls
                 image = (string)currentSource;
             }
 
-            if (Path.GetExtension(image).ToLower().Contains("mp4"))
+            if (Path.GetExtension(image).IsEqual("mp4"))
             {
                 Image1.Source = null;
                 Video1.Source = new Uri(image);

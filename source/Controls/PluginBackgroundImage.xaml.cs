@@ -42,7 +42,7 @@ namespace BackgroundChanger.Controls
 
         private System.Timers.Timer BcTimer { get; set; }
         private int Counter { get; set; } = 0;
-        private GameBackgroundImages gameBackgroundImages { get; set; }
+        private GameBackgroundImages GameBackgroundImages { get; set; }
 
         private bool WindowsIsActivated { get; set; } = true;
         private bool IsFirst { get; set; } = true;
@@ -71,7 +71,7 @@ namespace BackgroundChanger.Controls
         public PluginBackgroundImage()
         {
             InitializeComponent();
-            this.DataContext = ControlDataContext;
+            DataContext = ControlDataContext;
 
             Image1FadeIn = (Storyboard)TryFindResource("Image1FadeIn");
             Image2FadeIn = (Storyboard)TryFindResource("Image2FadeIn");
@@ -158,7 +158,7 @@ namespace BackgroundChanger.Controls
             if (PART_ImageBackground != null)
             {
                 PropertyInfo[] ImageBackgroundProperties = PART_ImageBackground.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                PropertyInfo[] backChangerImageProperties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                PropertyInfo[] backChangerImageProperties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
                 List<string> UsedProperties = new List<string>
                 {
@@ -198,7 +198,7 @@ namespace BackgroundChanger.Controls
 
         public override void SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
         {
-            gameBackgroundImages = (GameBackgroundImages)PluginGameData;
+            GameBackgroundImages = (GameBackgroundImages)PluginGameData;
 
             Video1.Volume = PluginDatabase.PluginSettings.Settings.Volume / 10;
             Video2.Volume = PluginDatabase.PluginSettings.Settings.Volume / 10;
@@ -208,10 +208,10 @@ namespace BackgroundChanger.Controls
                 Video1.LoadedBehavior = MediaState.Stop;
                 Video2.LoadedBehavior = MediaState.Stop;
 
-                if (!gameBackgroundImages.HasDataBackground)
+                if (!GameBackgroundImages.HasDataBackground)
                 {
                     MustDisplay = false;
-                    this.DataContext = ControlDataContext;
+                    DataContext = ControlDataContext;
                     return;
                 }
 
@@ -228,11 +228,11 @@ namespace BackgroundChanger.Controls
 
         public void SetBackground()
         {
-            string PathImage = string.Empty;
+            string pathImage = string.Empty;
 
-            if (gameBackgroundImages.HasDataBackground && !PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
+            if (GameBackgroundImages.HasDataBackground && !PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
             {
-                ItemImage ItemFavorite = gameBackgroundImages.ItemsBackground.Where(x => x.IsFavorite).FirstOrDefault();
+                ItemImage ItemFavorite = GameBackgroundImages.ItemsBackground.FirstOrDefault(x => x.IsFavorite);
 
                 if (ControlDataContext.EnableAutoChanger)
                 {
@@ -240,33 +240,35 @@ namespace BackgroundChanger.Controls
                     {
                         if (IsFirst && ItemFavorite != null)
                         {
-                            PathImage = ItemFavorite.FullPath;
-                            Counter = gameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
+                            pathImage = ItemFavorite.FullPath;
+                            Counter = GameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
                         }
                         else
                         {
                             Random rnd = new Random();
-                            Counter = rnd.Next(0, gameBackgroundImages.ItemsBackground.Count);
-                            PathImage = gameBackgroundImages.ItemsBackground[Counter].FullPath;
+                            Counter = rnd.Next(0, GameBackgroundImages.ItemsBackground.Count);
+                            pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
                         }
                     }
                     else
                     {
                         if (IsFirst && ItemFavorite != null)
                         {
-                            PathImage = ItemFavorite.FullPath;
-                            Counter = gameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
+                            pathImage = ItemFavorite.FullPath;
+                            Counter = GameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
                         }
                         else
                         {
-                            PathImage = gameBackgroundImages.ItemsBackground[Counter].FullPath;
+                            pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
                         }
                     }
 
-                    SetBackgroundImage(PathImage);
+                    SetBackgroundImage(pathImage);
 
-                    BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.BackgroundImageAutoChangerTimer * 1000);
-                    BcTimer.AutoReset = true;
+                    BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.BackgroundImageAutoChangerTimer * 1000)
+                    {
+                        AutoReset = true
+                    };
                     BcTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
                     BcTimer.Start();
                 }
@@ -274,23 +276,23 @@ namespace BackgroundChanger.Controls
                 {
                     if (IsFirst && ItemFavorite != null)
                     {
-                        PathImage = ItemFavorite.FullPath;
+                        pathImage = ItemFavorite.FullPath;
                     }
                     else
                     {
                         Random rnd = new Random();
-                        int ImgSelected = rnd.Next(0, gameBackgroundImages.ItemsBackground.Count);
-                        PathImage = gameBackgroundImages.ItemsBackground[ImgSelected].FullPath;
+                        int imgSelected = rnd.Next(0, GameBackgroundImages.ItemsBackground.Count);
+                        pathImage = GameBackgroundImages.ItemsBackground[imgSelected].FullPath;
                     }
 
-                    SetBackgroundImage(PathImage);
+                    SetBackgroundImage(pathImage);
                 }
                 else
                 {
                     if (ItemFavorite != null)
                     {
-                        PathImage = ItemFavorite.FullPath;
-                        SetBackgroundImage(PathImage);
+                        pathImage = ItemFavorite.FullPath;
+                        SetBackgroundImage(pathImage);
                     }
                     else
                     {
@@ -312,13 +314,9 @@ namespace BackgroundChanger.Controls
             }
             else
             {
-                string PathImage = ImageSourceManager.GetImagePath(GameContext.BackgroundImage);
-                if (PathImage.IsNullOrEmpty())
-                {
-                    PathImage = API.Instance.Database.GetFullFilePath(GameContext.BackgroundImage);
-                }
-
-                SetBackgroundImage(PathImage);
+                string pathImage = ImageSourceManager.GetImagePath(GameContext.BackgroundImage)
+                    ?? API.Instance.Database.GetFullFilePath(GameContext.BackgroundImage);
+                SetBackgroundImage(pathImage);
             }
 
             if (PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
@@ -328,8 +326,8 @@ namespace BackgroundChanger.Controls
                     Thread.Sleep(1000 * PluginDatabase.PluginSettings.Settings.videoDelayBackgroundImage);
                     _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                     {
-                        string PathImage = gameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
-                        SetBackgroundImage(PathImage);
+                        string pathImage = GameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
+                        SetBackgroundImage(pathImage);
                     }));
                 });
             }
@@ -343,7 +341,7 @@ namespace BackgroundChanger.Controls
                 {
                     PathImage = null;
                 }
-                this.Source = PathImage;
+                Source = PathImage;
             });
         }
 
@@ -496,7 +494,6 @@ namespace BackgroundChanger.Controls
             AnimatedImage1.UpdateLayout();
             Video1.Source = null;
             Video1.UpdateLayout();
-            GC.Collect();
         }
 
         private void Image2FadeOut_Completed(object sender, EventArgs e)
@@ -784,40 +781,40 @@ namespace BackgroundChanger.Controls
             {
                 _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
-                    string PathImage = string.Empty;
+                    string pathImage = string.Empty;
 
                     if (ControlDataContext.EnableRandomSelect)
                     {
-                        if (gameBackgroundImages.ItemsBackground.Count != 0)
+                        if (GameBackgroundImages.ItemsBackground.Count != 0)
                         {
                             Random rnd = new Random();
-                            int ImgSelected = rnd.Next(0, gameBackgroundImages.ItemsBackground.Count);
-                            while (ImgSelected == Counter && gameBackgroundImages.ItemsBackground.Count != 1)
+                            int imgSelected = rnd.Next(0, GameBackgroundImages.ItemsBackground.Count);
+                            while (imgSelected == Counter && GameBackgroundImages.ItemsBackground.Count != 1)
                             {
-                                ImgSelected = rnd.Next(0, gameBackgroundImages.ItemsBackground.Count);
+                                imgSelected = rnd.Next(0, GameBackgroundImages.ItemsBackground.Count);
                             }
-                            Counter = ImgSelected;
+                            Counter = imgSelected;
 
-                            PathImage = gameBackgroundImages.ItemsBackground[ImgSelected].FullPath;
+                            pathImage = GameBackgroundImages.ItemsBackground[imgSelected].FullPath;
                         }
 
-                        SetBackgroundImage(PathImage);
+                        SetBackgroundImage(pathImage);
                     }
                     else
                     {
                         Counter++;
 
-                        if (gameBackgroundImages.ItemsBackground.Count != 0)
+                        if (GameBackgroundImages.ItemsBackground.Count != 0)
                         {
-                            if (Counter == gameBackgroundImages.ItemsBackground.Count)
+                            if (Counter == GameBackgroundImages.ItemsBackground.Count)
                             {
                                 Counter = 0;
                             }
 
-                            PathImage = gameBackgroundImages.ItemsBackground[Counter].FullPath;
+                            pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
                         }
 
-                        SetBackgroundImage(PathImage);
+                        SetBackgroundImage(pathImage);
                     }
                 }));
             }
@@ -841,6 +838,7 @@ namespace BackgroundChanger.Controls
 
 
         #region Activate/Deactivated animation
+
         private void Application_Deactivated(object sender, EventArgs e)
         {
             _ = Task.Run(() =>
@@ -894,6 +892,7 @@ namespace BackgroundChanger.Controls
                     break;
             }
         }
+
         #endregion
     }
 
