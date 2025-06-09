@@ -1,13 +1,6 @@
 ﻿using BackgroundChanger.Services;
-using CommonPlayniteShared.Common;
 using Playnite.SDK;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -57,32 +50,26 @@ namespace BackgroundChanger.Views
 
         private void ButtonFfmpeg_Click(object sender, RoutedEventArgs e)
         {
-            string SelectedFile = API.Instance.Dialogs.SelectFile("File|ffmpeg.exe");
-
-            if (!SelectedFile.IsNullOrEmpty())
+            string selectedFile = API.Instance.Dialogs.SelectFile("File|ffmpeg.exe");
+            if (!selectedFile.IsNullOrEmpty())
             {
-                PART_FfmpegFile.Text = SelectedFile;
-                ((BackgroundChangerSettingsViewModel)this.DataContext).Settings.ffmpegFile = SelectedFile;
+                PART_FfmpegFile.Text = selectedFile;
+                ((BackgroundChangerSettingsViewModel)this.DataContext).Settings.ffmpegFile = selectedFile;
             }
         }
 
 
         private void ButtonWebpinfo_Click(object sender, RoutedEventArgs e)
         {
-            string SelectedFile = API.Instance.Dialogs.SelectFile("File|webpinfo.exe");
-
-            if (!SelectedFile.IsNullOrEmpty())
+            string selectedFile = API.Instance.Dialogs.SelectFile("File|webpinfo.exe");
+            if (!selectedFile.IsNullOrEmpty())
             {
-                string destFileName = System.IO.Path.Combine(PluginDatabase.Paths.PluginPath, "webpinfo.exe");
-
-                FileSystem.CopyFile(SelectedFile, destFileName, true);
-
-                PART_WebpinfoFile.Text = destFileName;
-                ((BackgroundChangerSettingsViewModel)this.DataContext).Settings.webpinfoFile = destFileName;
+                PART_WebpinfoFile.Text = selectedFile;
+                ((BackgroundChangerSettingsViewModel)this.DataContext).Settings.webpinfoFile = selectedFile;
             }
         }
 
-        private void hwBcVideoSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void HwBcVideoSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (sender == null)
             {
@@ -96,7 +83,7 @@ namespace BackgroundChanger.Views
             }
         }
 
-        private void hwVideoSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void HwVideoSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (sender == null)
             {

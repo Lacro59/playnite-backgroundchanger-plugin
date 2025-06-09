@@ -134,7 +134,7 @@
                                                 IsEnabled="{Binding ElementName=CbBcVideoDelay, Path=IsChecked, TargetNullValue=false}">
                                         <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
                                         <Slider Name="hwBcVideoSlider" Width="300" Minimum="1" Maximum="100" Value="{Binding Settings.videoDelayBackgroundImage}" 
-                                                ValueChanged="hwBcVideoSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
+                                                ValueChanged="HwBcVideoSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
                                                 IsSnapToTickEnabled="True" />
                                         <Label Name="labelBcVideoIntervalLabel_text" VerticalAlignment="Center"
                                                Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
@@ -219,7 +219,7 @@
                                                 IsEnabled="{Binding ElementName=CbVideoDelay, Path=IsChecked, TargetNullValue=false}">
                                         <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
                                         <Slider Name="hwVideoSlider" Width="300" Minimum="1" Maximum="100" Value="{Binding Settings.videoDelayCoverImage}" 
-                                                ValueChanged="hwVideoSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
+                                                ValueChanged="HwVideoSlider_ValueChanged" VerticalAlignment="Center" TickFrequency="10" 
                                                 IsSnapToTickEnabled="True" />
                                         <Label Name="labelVideoIntervalLabel_text" VerticalAlignment="Center"
                                                Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="20,0,0,0" />
