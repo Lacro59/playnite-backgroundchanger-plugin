@@ -126,9 +126,32 @@ namespace BackgroundChanger.Controls
                 return;
             }
 
-            FrameworkElement PART_ImageBackground_4 = UI.SearchElementByName("ControlRoot", false, false, 4);
-            FrameworkElement PART_ImageBackground_3 = UI.SearchElementByName("ControlRoot", false, false, 3);
-            FrameworkElement PART_ImageBackground_2 = UI.SearchElementByName("ControlRoot", false, false, 2);
+            FrameworkElement PART_ImageBackground_4 = null;
+            try
+            {
+                PART_ImageBackground_4 = UI.SearchElementByName("ControlRoot", false, false, 4);
+            }
+            catch
+            {
+            }
+
+            FrameworkElement PART_ImageBackground_3 = null;
+            try
+            {
+                PART_ImageBackground_3 = UI.SearchElementByName("ControlRoot", false, false, 3);
+            }
+            catch
+            {
+            }
+
+            FrameworkElement PART_ImageBackground_2 = null;
+            try
+            {
+                PART_ImageBackground_2 = UI.SearchElementByName("ControlRoot", false, false, 2);
+            }
+            catch
+            {
+            }
 
             FrameworkElement PART_ImageBackground = PART_ImageBackground_4 ?? PART_ImageBackground_3 ?? PART_ImageBackground_2 ?? null;
 
