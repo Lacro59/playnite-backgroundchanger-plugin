@@ -73,7 +73,7 @@ namespace BackgroundChanger.Controls
         public PluginCoverImage()
         {
             InitializeComponent();
-            this.DataContext = ControlDataContext;
+            DataContext = ControlDataContext;
 
             PluginDatabase.PluginSettings.PropertyChanged += PluginSettings_PropertyChanged;
             PluginDatabase.Database.ItemUpdated += Database_ItemUpdated;
@@ -120,7 +120,7 @@ namespace BackgroundChanger.Controls
             if (PART_ImageCover != null)
             {
                 PropertyInfo[] ImageCoverProperties = PART_ImageCover.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                PropertyInfo[] backChangerImageProperties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                PropertyInfo[] backChangerImageProperties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
                 List<string> UsedProperties = new List<string>
                 {
@@ -222,8 +222,10 @@ namespace BackgroundChanger.Controls
 
                     SetCoverImage(pathImage);
 
-                    BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.CoverImageAutoChangerTimer * 1000);
-                    BcTimer.AutoReset = true;
+                    BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.CoverImageAutoChangerTimer * 1000)
+                    {
+                        AutoReset = true
+                    };
                     BcTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
                     BcTimer.Start();
                 }
@@ -236,7 +238,7 @@ namespace BackgroundChanger.Controls
                     else
                     {
                         Random rnd = new Random();
-                        int ImgSelected = rnd.Next(0, (gameBackgroundImages.ItemsCover.Count));
+                        int ImgSelected = rnd.Next(0, gameBackgroundImages.ItemsCover.Count);
                         pathImage = gameBackgroundImages.ItemsCover[ImgSelected].FullPath;
                     }
 
@@ -281,8 +283,11 @@ namespace BackgroundChanger.Controls
                     Thread.Sleep(1000 * PluginDatabase.PluginSettings.Settings.videoDelayCoverImage);
                     _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                     {
-                        string pathImage = gameBackgroundImages?.ItemsCover?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
-                        SetCoverImage(pathImage);
+                        string pathVideo = gameBackgroundImages?.ItemsCover?.Where(x => x.IsVideo && x.Exist)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
+                        if (!pathVideo.IsNullOrEmpty())
+                        {
+                            SetCoverImage(pathVideo);
+                        }
                     }));
                 });
             }
