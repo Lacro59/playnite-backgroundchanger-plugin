@@ -18,11 +18,11 @@
         HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=HorizontalAlignment}"
         VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=VerticalAlignment}">
 
-    <UserControl.CacheMode>
+    <!--UserControl.CacheMode>
         <BitmapCache EnableClearType="False" 
                      RenderAtScale="1" 
                      SnapsToDevicePixels="False" />
-    </UserControl.CacheMode>
+    </UserControl.CacheMode-->
 
     <UserControl.Resources>
         <Storyboard x:Key="Image1FadeIn">
