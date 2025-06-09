@@ -100,13 +100,14 @@
                                       Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
                     </StackPanel>
 
-                    <Label Grid.Row="0" Grid.Column="4" Content="{DynamicResource LOCCommonSortByScore}" />
+                    <!-- Impossible with api data -->
+                    <!--Label Grid.Row="0" Grid.Column="4" Content="{DynamicResource LOCCommonSortByScore}" />
                     <StackPanel Grid.Row="2" Grid.Column="4" Margin="10,0,0,0" Orientation="Horizontal">
                         <ToggleButton Name="PART_ButtonSortByScore_Asc" Content="&#xea5a;" IsChecked="False"
                                       Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
                         <ToggleButton Name="PART_ButtonSortByScore_Desc" Content="&#xea59;" IsChecked="False" Margin="10,0,0,0"
                                       Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
-                    </StackPanel>
+                    </StackPanel-->
 
                     <StackPanel Grid.Row="0" Grid.Column="20" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Label Content="{DynamicResource LOCCommonTotalFound}" />

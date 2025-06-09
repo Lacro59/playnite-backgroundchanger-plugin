@@ -315,85 +315,58 @@ namespace BackgroundChanger.Views
 
         private void PART_ButtonSort_Click(object sender, RoutedEventArgs e)
         {
-            if (DataSearchFiltered != null)
+            // Exit if there is no data to sort
+            if (DataSearchFiltered == null)
             {
-                if (sender != null)
-                {
-                    string btName = ((ToggleButton)sender).Name;
-                    bool isChecked = (bool)((ToggleButton)sender).IsChecked;
-
-                    if (btName == "PART_ButtonSortByDate_Asc")
-                    {
-                        if (isChecked)
-                        {
-                            PART_ButtonSortByDate_Desc.IsChecked = false;
-
-                            PART_ButtonSortByScore_Asc.IsChecked = false;
-                            PART_ButtonSortByScore_Desc.IsChecked = false;
-                        }
-                    }
-
-                    if (btName == "PART_ButtonSortByDate_Desc")
-                    {
-                        if (isChecked)
-                        {
-                            PART_ButtonSortByDate_Asc.IsChecked = false;
-
-                            PART_ButtonSortByScore_Asc.IsChecked = false;
-                            PART_ButtonSortByScore_Desc.IsChecked = false;
-                        }
-                    }
-
-
-                    if (btName == "PART_ButtonSortByScore_Asc")
-                    {
-                        if (isChecked)
-                        {
-                            PART_ButtonSortByDate_Asc.IsChecked = false;
-                            PART_ButtonSortByDate_Desc.IsChecked = false;
-
-                            PART_ButtonSortByScore_Desc.IsChecked = false;
-                        }
-                    }
-
-                    if (btName == "PART_ButtonSortByScore_Desc")
-                    {
-                        if (isChecked)
-                        {
-                            PART_ButtonSortByDate_Asc.IsChecked = false;
-                            PART_ButtonSortByDate_Desc.IsChecked = false;
-
-                            PART_ButtonSortByScore_Asc.IsChecked = false;
-                        }
-                    }
-                }
-
-
-                if ((bool)PART_ButtonSortByDate_Asc.IsChecked)
-                {
-                    DataSearchFiltered.Sort((x, y) => x.Id.CompareTo(y.Id));
-                }
-
-                if ((bool)PART_ButtonSortByDate_Desc.IsChecked)
-                {
-                    DataSearchFiltered.Sort((x, y) => y.Id.CompareTo(x.Id));
-                }
-
-
-                if ((bool)PART_ButtonSortByScore_Asc.IsChecked)
-                {
-                    DataSearchFiltered.Sort((x, y) => x.Score.CompareTo(y.Score));
-                }
-
-                if ((bool)PART_ButtonSortByScore_Desc.IsChecked)
-                {
-                    DataSearchFiltered.Sort((x, y) => y.Score.CompareTo(x.Score));
-                }
-
-
-                PART_ElementList.ItemsSource = null;
-                PART_ElementList.ItemsSource = DataSearchFiltered;
+                return;
             }
+
+            // Handle toggle button exclusivity (only one can be checked at a time)
+            if (sender is ToggleButton btn)
+            {
+                // List all sort buttons
+                var sortButtons = new[]
+                {
+                    PART_ButtonSortByDate_Asc,
+                    PART_ButtonSortByDate_Desc,
+                    //PART_ButtonSortByScore_Asc,
+                    //PART_ButtonSortByScore_Desc
+                };
+
+                // Uncheck all other buttons if the current one is checked
+                if (btn.IsChecked == true)
+                {
+                    foreach (var b in sortButtons)
+                    {
+                        if (b != btn)
+                        {
+                            b.IsChecked = false;
+                        }
+                    }
+                }
+            }
+
+            // Sort the filtered data according to the selected sort button
+            if (PART_ButtonSortByDate_Asc.IsChecked == true)
+            {
+                DataSearchFiltered.Sort((x, y) => x.Id.CompareTo(y.Id));
+            }
+            else if (PART_ButtonSortByDate_Desc.IsChecked == true)
+            {
+                DataSearchFiltered.Sort((x, y) => y.Id.CompareTo(x.Id));
+            }
+            //else if (PART_ButtonSortByScore_Asc.IsChecked == true)
+            //{
+            //    DataSearchFiltered.Sort((x, y) => x.Score.CompareTo(y.Score));
+            //}
+            //else if (PART_ButtonSortByScore_Desc.IsChecked == true)
+            //{
+            //    DataSearchFiltered.Sort((x, y) => y.Score.CompareTo(x.Score));
+            //}
+
+            // Refresh the item source to update the UI
+            PART_ElementList.ItemsSource = null;
+            PART_ElementList.ItemsSource = DataSearchFiltered;
         }
 
 
