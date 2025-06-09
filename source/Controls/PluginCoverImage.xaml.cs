@@ -279,7 +279,7 @@ namespace BackgroundChanger.Controls
                 _ = Task.Run(() =>
                 {
                     Thread.Sleep(1000 * PluginDatabase.PluginSettings.Settings.videoDelayCoverImage);
-                    _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                    _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                     {
                         string pathImage = gameBackgroundImages?.ItemsCover?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
                         SetCoverImage(pathImage);
@@ -311,7 +311,7 @@ namespace BackgroundChanger.Controls
                 ControlDataContext.VideoSource = null;
             }
 
-            _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
+            _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
             {
                 Image1.Source = ControlDataContext.ImageSource;
                 Video1.Source = ControlDataContext.VideoSource.IsNullOrEmpty() ? null : new Uri(ControlDataContext.VideoSource);
@@ -415,7 +415,7 @@ namespace BackgroundChanger.Controls
 
             try
             {
-                _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() => 
+                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() => 
                 {
                     string pathImage = string.Empty;
 

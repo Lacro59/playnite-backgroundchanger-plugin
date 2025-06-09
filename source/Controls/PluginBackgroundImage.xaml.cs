@@ -324,24 +324,27 @@ namespace BackgroundChanger.Controls
                 _ = Task.Run(() =>
                 {
                     Thread.Sleep(1000 * PluginDatabase.PluginSettings.Settings.videoDelayBackgroundImage);
-                    _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                    _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                     {
-                        string pathImage = GameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
-                        SetBackgroundImage(pathImage);
+                        string pathVideo = GameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo && x.Exist)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
+                        if (!pathVideo.IsNullOrEmpty())
+                        {
+                            SetBackgroundImage(pathVideo);
+                        }
                     }));
                 });
             }
         }
 
-        public void SetBackgroundImage(string PathImage = null)
+        public void SetBackgroundImage(string pathImage = null)
         {
-            _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Render, (Action)delegate
+            _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Render, (Action)delegate
             {
-                if (!File.Exists(PathImage))
+                if (!File.Exists(pathImage))
                 {
-                    PathImage = null;
+                    pathImage = null;
                 }
-                Source = PathImage;
+                Source = pathImage;
             });
         }
 
@@ -779,7 +782,7 @@ namespace BackgroundChanger.Controls
 
             try
             {
-                _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
                     string pathImage = string.Empty;
 
@@ -844,7 +847,7 @@ namespace BackgroundChanger.Controls
             _ = Task.Run(() =>
             {
                 Thread.Sleep(1000);
-                _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
                     WindowsIsActivated = false;
                     Video1.LoadedBehavior = MediaState.Pause;
@@ -863,7 +866,7 @@ namespace BackgroundChanger.Controls
             _ = Task.Run(() =>
             {
                 Thread.Sleep(1000);
-                _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
                     WindowsIsActivated = true;
                     Video1.LoadedBehavior = MediaState.Play;

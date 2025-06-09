@@ -245,7 +245,7 @@ namespace BackgroundChanger.Views
                         }
                     }).ContinueWith(antecedant => 
                     {
-                        _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
+                        _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
                         {
                             PART_LbBackgroundImages.ItemsSource = null;
                             PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
@@ -502,7 +502,7 @@ namespace BackgroundChanger.Views
                         }
                     }).ContinueWith(antecedant =>
                     {
-                        _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
+                        _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
                         {
                             PART_LbBackgroundImages.ItemsSource = null;
                             PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
