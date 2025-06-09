@@ -33,22 +33,22 @@ namespace BackgroundChanger.Views
         private BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
 
         private GameBackgroundImages GameBackgroundImages { get; set; }
-        private List<ItemImage> BackgroundImages { get; set; }
-        private List<ItemImage> BackgroundImagesEdited { get; set; }
+        private List<ItemImage> CurrentImages { get; set; }
+        private List<ItemImage> EditedImages { get; set; }
         private bool IsCover { get; set; }
 
 
         public ImagesManager(GameBackgroundImages gameBackgroundImages, bool isCover)
         {
             GameBackgroundImages = gameBackgroundImages;
-            BackgroundImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == isCover && x.Exist).ToList());
-            BackgroundImagesEdited = Serialization.GetClone(BackgroundImages);
+            CurrentImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == isCover && x.Exist).ToList());
+            EditedImages = Serialization.GetClone(CurrentImages);
             IsCover = isCover;
 
             InitializeComponent();
 
             PART_LbBackgroundImages.ItemsSource = null;
-            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+            PART_LbBackgroundImages.ItemsSource = EditedImages;
 
             PART_BackgroundImage.UseAnimated = true;
         }
@@ -63,21 +63,21 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                ItemImage originalDefault = BackgroundImages.FirstOrDefault(x => x.IsDefault);
+                ItemImage originalDefault = CurrentImages.FirstOrDefault(x => x.IsDefault);
 
                 // Delete removed
-                BackgroundImages.Where(x => !x.Name.IsEqual(originalDefault?.Name) && x.IsCover == IsCover)?.ForEach(y =>
+                CurrentImages.Where(x => !x.Name.IsEqual(originalDefault?.Name) && x.IsCover == IsCover)?.ForEach(y =>
                 {
-                    if (BackgroundImagesEdited.FirstOrDefault(x => x.FullPath == y.FullPath) == null)
+                    if (EditedImages.FirstOrDefault(x => x.FullPath == y.FullPath) == null)
                     {
                         FileSystem.DeleteFileSafe(y.FullPath);
                     }
                 });
 
                 // Add newed
-                for (int index = 0; index < BackgroundImagesEdited.Count; index++)
+                for (int index = 0; index < EditedImages.Count; index++)
                 {
-                    ItemImage itemImage = BackgroundImagesEdited[index];
+                    ItemImage itemImage = EditedImages[index];
 
                     if (itemImage.FolderName.IsNullOrEmpty() && !itemImage.Name.IsEqual(originalDefault?.Name))
                     {
@@ -96,7 +96,7 @@ namespace BackgroundChanger.Views
                 }
 
                 // Default
-                ItemImage newDefault = BackgroundImagesEdited.FirstOrDefault(x => x.IsDefault);
+                ItemImage newDefault = EditedImages.FirstOrDefault(x => x.IsDefault);
                 if (!originalDefault?.Name.IsEqual(newDefault?.Name) ?? false)
                 {
                     // Copy old in exention data
@@ -115,8 +115,8 @@ namespace BackgroundChanger.Views
                     string filePath = API.Instance.Database.AddFile(newDefault.FullPath, game.Id);
                     FileSystem.DeleteFileSafe(newDefault.FullPath);
 
-                    ItemImage originalNew = BackgroundImages.FirstOrDefault(x => x.Name.IsEqual(newDefault.Name));
-                    ItemImage newOld = BackgroundImagesEdited.FirstOrDefault(x => x.Name.IsEqual(originalDefault.Name));
+                    ItemImage originalNew = CurrentImages.FirstOrDefault(x => x.Name.IsEqual(newDefault.Name));
+                    ItemImage newOld = EditedImages.FirstOrDefault(x => x.Name.IsEqual(originalDefault.Name));
 
                     newOld.Name = Path.GetFileName(originalDefault.Name);
                     newOld.FolderName = folderName;
@@ -136,7 +136,7 @@ namespace BackgroundChanger.Views
 
                 // Saved
                 List<ItemImage> tmpList = Serialization.GetClone(GameBackgroundImages.Items.Where(x => x.IsCover != IsCover).ToList());
-                tmpList.AddRange(BackgroundImagesEdited);
+                tmpList.AddRange(EditedImages);
                 GameBackgroundImages.Items = tmpList;
                 BackgroundChanger.PluginDatabase.Update(GameBackgroundImages);
 
@@ -159,9 +159,9 @@ namespace BackgroundChanger.Views
                 PART_LbBackgroundImages.ItemsSource = null;
 
                 int index = int.Parse(((Button)sender).Tag.ToString());
-                BackgroundImagesEdited.RemoveAt(index);
+                EditedImages.RemoveAt(index);
 
-                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+                PART_LbBackgroundImages.ItemsSource = EditedImages;
             }
             catch (Exception ex)
             {
@@ -179,7 +179,7 @@ namespace BackgroundChanger.Views
                 {
                     foreach(string filePath in selectedFiles)
                     {
-                        BackgroundImagesEdited.Add(new ItemImage
+                        EditedImages.Add(new ItemImage
                         {
                             Name = filePath
                         });
@@ -187,7 +187,7 @@ namespace BackgroundChanger.Views
                 }
 
                 PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+                PART_LbBackgroundImages.ItemsSource = EditedImages;
             }
             catch (Exception ex)
             {
@@ -224,7 +224,7 @@ namespace BackgroundChanger.Views
                             try
                             {
                                 string cachedFile = HttpFileCache.GetWebFile(x.Url);
-                                BackgroundImagesEdited.Add(new ItemImage
+                                EditedImages.Add(new ItemImage
                                 {
                                     Name = cachedFile
                                 });
@@ -248,7 +248,7 @@ namespace BackgroundChanger.Views
                         _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
                         {
                             PART_LbBackgroundImages.ItemsSource = null;
-                            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+                            PART_LbBackgroundImages.ItemsSource = EditedImages;
                         });
                     });
                 }
@@ -287,24 +287,24 @@ namespace BackgroundChanger.Views
             int index = int.Parse(((Button)sender).Tag.ToString());
             if (index > 1)
             {
-                BackgroundImagesEdited.Insert(index - 1, BackgroundImagesEdited[index]);
-                BackgroundImagesEdited.RemoveAt(index + 1);
+                EditedImages.Insert(index - 1, EditedImages[index]);
+                EditedImages.RemoveAt(index + 1);
 
                 PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+                PART_LbBackgroundImages.ItemsSource = EditedImages;
             }
         }
 
         private void PART_BtDown_Click(object sender, RoutedEventArgs e)
         {
             int index = int.Parse(((Button)sender).Tag.ToString());
-            if (index < BackgroundImagesEdited.Count - 1)
+            if (index < EditedImages.Count - 1)
             {
-                BackgroundImagesEdited.Insert(index + 2, BackgroundImagesEdited[index]);
-                BackgroundImagesEdited.RemoveAt(index);
+                EditedImages.Insert(index + 2, EditedImages[index]);
+                EditedImages.RemoveAt(index);
 
                 PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+                PART_LbBackgroundImages.ItemsSource = EditedImages;
             }
         }
 
@@ -340,12 +340,12 @@ namespace BackgroundChanger.Views
         {
             int index = int.Parse(((TextBlock)sender).Tag.ToString());
 
-            bool newValue = !BackgroundImagesEdited[index].IsFavorite;
-            BackgroundImagesEdited.ForEach(c => c.IsFavorite = false);
-            BackgroundImagesEdited[index].IsFavorite = newValue;
+            bool newValue = !EditedImages[index].IsFavorite;
+            EditedImages.ForEach(c => c.IsFavorite = false);
+            EditedImages[index].IsFavorite = newValue;
 
             PART_LbBackgroundImages.ItemsSource = null;
-            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+            PART_LbBackgroundImages.ItemsSource = EditedImages;
         }
 
 
@@ -406,7 +406,7 @@ namespace BackgroundChanger.Views
         private void PART_BtConvert_Click(object sender, RoutedEventArgs e)
         {
             int index = int.Parse(((Button)sender).Tag.ToString());
-            string filePath = BackgroundImagesEdited[index].FullPath;
+            string filePath = EditedImages[index].FullPath;
 
 
             string videoPath = string.Empty;
@@ -434,13 +434,13 @@ namespace BackgroundChanger.Views
             {
                 PART_BtDelete_Click(sender, e);
 
-                BackgroundImagesEdited.Add(new ItemImage
+                EditedImages.Add(new ItemImage
                 {
                     Name = videoPath
                 });
 
                 PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+                PART_LbBackgroundImages.ItemsSource = EditedImages;
             }
         }
 
@@ -448,14 +448,14 @@ namespace BackgroundChanger.Views
         {
             int index = int.Parse(((Button)sender).Tag.ToString());
 
-            BackgroundImagesEdited.ForEach(c => c.IsDefault = false);
-            BackgroundImagesEdited[index].IsDefault = true;
+            EditedImages.ForEach(c => c.IsDefault = false);
+            EditedImages[index].IsDefault = true;
 
-            BackgroundImagesEdited.Insert(0, BackgroundImagesEdited[index]);
-            BackgroundImagesEdited.RemoveAt(index + 1);
+            EditedImages.Insert(0, EditedImages[index]);
+            EditedImages.RemoveAt(index + 1);
 
             PART_LbBackgroundImages.ItemsSource = null;
-            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+            PART_LbBackgroundImages.ItemsSource = EditedImages;
         }
 
         private void PART_BtAddGoogleImage_Click(object sender, RoutedEventArgs e)
@@ -481,7 +481,7 @@ namespace BackgroundChanger.Views
                             try
                             {
                                 string cachedFile = HttpFileCache.GetWebFile(x.ImageUrl);
-                                BackgroundImagesEdited.Add(new ItemImage
+                                EditedImages.Add(new ItemImage
                                 {
                                     Name = cachedFile
                                 });
@@ -505,7 +505,7 @@ namespace BackgroundChanger.Views
                         _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
                         {
                             PART_LbBackgroundImages.ItemsSource = null;
-                            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+                            PART_LbBackgroundImages.ItemsSource = EditedImages;
                         });
                     });
                 }
