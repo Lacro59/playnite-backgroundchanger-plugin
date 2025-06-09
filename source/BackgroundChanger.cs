@@ -1,6 +1,8 @@
 ﻿using BackgroundChanger.Controls;
+using BackgroundChanger.Models;
 using BackgroundChanger.Services;
 using BackgroundChanger.Views;
+using CommonPlayniteShared.Commands;
 using CommonPluginsShared;
 using CommonPluginsShared.PlayniteExtended;
 using Playnite.SDK;
@@ -9,6 +11,7 @@ using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,6 +39,12 @@ namespace BackgroundChanger
                 SourceName = "BackgroundChanger",
                 SettingsRoot = $"{nameof(PluginSettings)}.{nameof(PluginSettings.Settings)}"
             });
+
+            var iconResourcesToAdd = new Dictionary<string, string>
+            {
+                { "openFolderIcon", "\xEC5B" }
+            };
+            Common.AddTextIcoFontResource(iconResourcesToAdd);
         }
 
         #region Custom event
@@ -70,6 +79,8 @@ namespace BackgroundChanger
             Game gameMenu = args.Games.First();
             List<GameMenuItem> gameMenuItems = new List<GameMenuItem>();
 
+            GameBackgroundImages data = PluginDatabase.Get(gameMenu, true);
+
             if (PluginSettings.Settings.EnableBackgroundImage)
             {
                 gameMenuItems.Add(new GameMenuItem
@@ -98,6 +109,30 @@ namespace BackgroundChanger
                         ImagesManager viewExtension = new ImagesManager(PluginDatabase.Get(gameMenu), true);
                         Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(ResourceProvider.GetString("LOCBc") + " - " + ResourceProvider.GetString("LOCGameCoverImageTitle"), viewExtension);
                         _ = windowExtension.ShowDialog();
+                    }
+                });
+            }
+
+            if (data.HasDataBackground || data.HasDataCover)
+            {
+                if (gameMenuItems.Count > 0)
+                {
+                    gameMenuItems.Add(new GameMenuItem
+                    {
+                        MenuSection = ResourceProvider.GetString("LOCBc"),
+                        Description = "-"
+                    });
+                }
+
+                gameMenuItems.Add(new GameMenuItem
+                {
+                    MenuSection = ResourceProvider.GetString("LOCBc"),
+                    Icon = "openFolderIcon",
+                    Description = ResourceProvider.GetString("LOCOpenMetadataFolder"),
+                    Action = (gameMenuItem) =>
+                    {
+                        string path = Path.Combine(PluginDatabase.Paths.PluginUserDataPath, "Images", gameMenu.Id.ToString());
+                        GlobalCommands.NavigateDirectoryCommand.Execute(path);
                     }
                 });
             }
