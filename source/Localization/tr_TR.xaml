@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Eklenti oyun arka planı için tema arka planıyla aynı ayar kullanıldı *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Rastgele seçimi etkinleştir</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Sadece playnite başlangıcında</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">Oyun seçimi açık</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Otomatik değiştirmeyi etkinleştir</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Zaman aralığı</sys:String>
     <sys:String x:Key="LOCBcSeconds">saniye</sys:String>
