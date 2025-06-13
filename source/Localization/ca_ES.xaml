@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Utilitza la configuració del tema per configurar la imatge de fons de joc del complement *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Activa la selecció aleatòria</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Activa el canvi automàtic</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Interval de temps</sys:String>
     <sys:String x:Key="LOCBcSeconds">segons</sys:String>
