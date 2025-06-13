@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Usou a mesma configuração para o fundo do plug-in que o fundo do tema *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Ativar seleção aleatória</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Ativar mudança automática</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Intervalo de tempo</sys:String>
     <sys:String x:Key="LOCBcSeconds">segundos</sys:String>
