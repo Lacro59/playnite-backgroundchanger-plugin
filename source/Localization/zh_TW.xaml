@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Enable random selection</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">時間間隔</sys:String>
     <sys:String x:Key="LOCBcSeconds">秒</sys:String>

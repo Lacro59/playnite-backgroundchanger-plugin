@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Użyto tego samego ustawienia dla tła gry wtyczki co dla tła motywu *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Włącz wybór losowy</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Włącz automatyczną zmianę</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Odstęp czasu</sys:String>
     <sys:String x:Key="LOCBcSeconds">sekundy</sys:String>

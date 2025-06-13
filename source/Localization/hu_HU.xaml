@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Véletlenszerű kiválasztás engedélyezése</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Automatikus változtatás engedélyezése</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Időintervallum</sys:String>
     <sys:String x:Key="LOCBcSeconds">másodperc</sys:String>
