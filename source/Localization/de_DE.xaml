@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Gleiche Einstellung für den Spielhintergrund des Plugins wie für den Hintergrund des Theme *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Zufällige Auswahl aktivieren</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Nur bei Playnite Start</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">Bei Auswahl des Spiels</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Automatische Änderung aktivieren</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Zeitintervall</sys:String>
     <sys:String x:Key="LOCBcSeconds">Sekunden</sys:String>
