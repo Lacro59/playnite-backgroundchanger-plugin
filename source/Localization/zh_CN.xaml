@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">与主题背景相同的插件游戏背景设置*</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">启用随机选择</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">启用自动切换</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">时间间隔</sys:String>
     <sys:String x:Key="LOCBcSeconds">秒</sys:String>
