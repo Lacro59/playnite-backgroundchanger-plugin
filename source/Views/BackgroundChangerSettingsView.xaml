@@ -6,9 +6,15 @@
              xmlns:commonPlugin="clr-namespace:CommonPluginsShared"
              xmlns:AttachedProperties="clr-namespace:CommonPluginsShared.Controls" 
              xmlns:backgroundchanger="clr-namespace:BackgroundChanger" 
-             xmlns:pcmd="clr-namespace:CommonPluginsShared" xmlns:playnitecontrols="clr-namespace:CommonPluginsControls.PlayniteControls"
-             mc:Ignorable="d" d:DesignWidth="600"
+             xmlns:pcmd="clr-namespace:CommonPluginsShared" 
+             xmlns:playnitecontrols="clr-namespace:CommonPluginsControls.PlayniteControls" 
+             xmlns:converters="clr-namespace:CommonPlayniteShared.Converters"
+             mc:Ignorable="d" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=backgroundchanger:BackgroundChangerSettingsViewModel}">
+
+    <UserControl.Resources>
+        <converters:InvertedBoolenConverter x:Key="InvertedBoolenConverter" />
+    </UserControl.Resources>
 
     <TabControl Margin="20" Name="tcSettings">
         <TabItem Header="{DynamicResource LOCBc}">
@@ -78,45 +84,31 @@
 				                    Margin="5" Padding="10"
 				                    BorderBrush="{DynamicResource PopupBorderBrush}"
 				                    BorderThickness="{DynamicResource PopupBorderThickness}">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="10" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                    </Grid.RowDefinitions>
-
-                                    <CheckBox IsChecked="{Binding Settings.BackgroundImageSameSettings}" Grid.Column="0" Grid.Row="0"
-                                              Grid.ColumnSpan="4"
+                                <StackPanel>
+                                    <CheckBox IsChecked="{Binding Settings.BackgroundImageSameSettings}" Margin="0,0,0,10"
                                               Command="{x:Static pcmd:Commands.RestartRequired}" 
                                               CommandParameter="{Binding RelativeSource={RelativeSource Self}}"
                                               Content="{DynamicResource LOCBcBackgroundSameSettings}" />
 
-                                    <CheckBox IsChecked="{Binding Settings.EnableBackgroundImageRandomSelect}" Grid.Column="0" Grid.Row="2"
-                                              Content="{DynamicResource LOCBcEnableRandomSelect}" />
+                                    <DockPanel Margin="0,0,0,10">
+                                        <CheckBox IsChecked="{Binding Settings.EnableBackgroundImageRandomSelect}" 
+                                                  DockPanel.Dock="Left"
+                                                  Content="{DynamicResource LOCBcEnableRandomSelect}" />
+                                        
+                                        <RadioButton IsChecked="{Binding Settings.EnableBackgroundImageRandomOnSelect}" 
+                                                  DockPanel.Dock="Right" GroupName="BcRandom"
+                                                  IsEnabled="{Binding ElementName=CbBcAutoChanger, Path=IsChecked, Converter={StaticResource InvertedBoolenConverter}}"
+                                                  Content="{DynamicResource LOCBcRandomOnSelect}" />
 
-                                    <CheckBox Name="CbBcAutoChanger" IsChecked="{Binding Settings.EnableBackgroundImageAutoChanger}" Grid.Column="0" Grid.Row="4"
+                                        <RadioButton IsChecked="{Binding Settings.EnableBackgroundImageRandomOnStart}" 
+                                                  HorizontalAlignment="Right" Margin="0,0,20,0" GroupName="BcRandom"
+                                                  IsEnabled="{Binding ElementName=CbBcAutoChanger, Path=IsChecked, Converter={StaticResource InvertedBoolenConverter}}"
+                                                  Content="{DynamicResource LOCBcRandomOnStart}" />
+                                    </DockPanel>
+
+                                    <CheckBox Name="CbBcAutoChanger" IsChecked="{Binding Settings.EnableBackgroundImageAutoChanger}" Margin="0,0,0,10"
                                               Content="{DynamicResource LOCBcEnableAutoChanger}" />
-                                    <StackPanel Grid.Row="6" Margin="30,0,0,0" Orientation="Horizontal" 
-                                                Grid.ColumnSpan="3"
+                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal" 
                                                 IsEnabled="{Binding ElementName=CbBcAutoChanger, Path=IsChecked, TargetNullValue=false}">
                                         <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
                                         <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
@@ -124,11 +116,10 @@
                                         <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
                                     </StackPanel>
 
-                                    <CheckBox Name="CbBcVideoDelay" IsChecked="{Binding Settings.useVideoDelayBackgroundImage}" Grid.Column="0" Grid.Row="8"
+                                    <CheckBox Name="CbBcVideoDelay" IsChecked="{Binding Settings.useVideoDelayBackgroundImage}" Margin="0,0,0,10"
                                               ToolTip="{DynamicResource LOCBcVideoDelayToolTip}"
                                               Content="{DynamicResource LOCBcEnableVideoDelay}" />
-                                    <StackPanel Grid.Row="10" Margin="30,0,0,0" Orientation="Horizontal" 
-                                                Grid.ColumnSpan="3"
+                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal" 
                                                 IsEnabled="{Binding ElementName=CbBcVideoDelay, Path=IsChecked, TargetNullValue=false}">
                                         <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
                                         <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
@@ -136,17 +127,17 @@
                                         <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
                                     </StackPanel>
 
-                                    <StackPanel Grid.Row="12" Orientation="Horizontal" Grid.ColumnSpan="3">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                                         <Label Content="{DynamicResource LOCSettingsMusiVolume}" VerticalAlignment="Center" Margin="0,0,20,0" />
                                         <playnitecontrols:NumericBox MinLongValue="0" MaxLongValue="100" Width="40"
                                                                      LongValue="{Binding Settings.Volume}" />
                                         <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
                                     </StackPanel>
 
-                                    <Label Grid.Row="14" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
+                                    <Label Margin="0,0,0,10" Content="EXPERIMENTAL" Foreground="DarkRed" />
                                     <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedBackground}" Grid.Column="0" Grid.Row="16"
                                               Content="{DynamicResource LOCBcEnableImageAnimatedBackground}" />
-                                </Grid>
+                                </StackPanel>
                             </Border>
                         </Expander.Content>
                     </Expander>
@@ -168,35 +159,26 @@
 				                    Margin="5" Padding="10"
 				                    BorderBrush="{DynamicResource PopupBorderBrush}"
 				                    BorderThickness="{DynamicResource PopupBorderThickness}">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="10" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                        <RowDefinition Height="10" />
-                                        <RowDefinition Height="auto" />
-                                    </Grid.RowDefinitions>
-
-                                    <CheckBox IsChecked="{Binding Settings.EnableCoverImageRandomSelect}" Grid.Column="0" Grid.Row="0"
+                                <StackPanel>
+                                    <DockPanel Margin="0,0,0,10">
+                                        <CheckBox IsChecked="{Binding Settings.EnableCoverImageRandomSelect}"
+                                                  DockPanel.Dock="Left"
                                               Content="{DynamicResource LOCBcEnableRandomSelect}" />
+                                        
+                                        <RadioButton IsChecked="{Binding Settings.EnableCoverImageRandomOnSelect}" 
+                                                  DockPanel.Dock="Right" GroupName="CoverRandom"
+                                                  IsEnabled="{Binding ElementName=CbAutoChanger, Path=IsChecked, Converter={StaticResource InvertedBoolenConverter}}"
+                                                  Content="{DynamicResource LOCBcRandomOnSelect}" />
 
-                                    <CheckBox Name="CbAutoChanger" IsChecked="{Binding Settings.EnableCoverImageAutoChanger}" Grid.Column="0" Grid.Row="2"
+                                        <RadioButton IsChecked="{Binding Settings.EnableCoverImageRandomOnStart}" 
+                                                  HorizontalAlignment="Right" Margin="0,0,20,0" GroupName="CoverRandom"
+                                                  IsEnabled="{Binding ElementName=CbAutoChanger, Path=IsChecked, Converter={StaticResource InvertedBoolenConverter}}"
+                                                  Content="{DynamicResource LOCBcRandomOnStart}" />
+                                    </DockPanel>
+
+                                    <CheckBox Name="CbAutoChanger" IsChecked="{Binding Settings.EnableCoverImageAutoChanger}" Margin="0,0,0,10"
                                               Content="{DynamicResource LOCBcEnableAutoChanger}" />
-                                    <StackPanel Grid.Row="4" Margin="30,0,0,0" Orientation="Horizontal" 
-                                                Grid.ColumnSpan="3"
+                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal" 
                                                 IsEnabled="{Binding ElementName=CbAutoChanger, Path=IsChecked, TargetNullValue=false}">
                                         <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
                                         <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
@@ -204,11 +186,10 @@
                                         <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
                                     </StackPanel>
 
-                                    <CheckBox Name="CbVideoDelay" IsChecked="{Binding Settings.useVideoDelayCoverImage}" Grid.Column="0" Grid.Row="6"
+                                    <CheckBox Name="CbVideoDelay" IsChecked="{Binding Settings.useVideoDelayCoverImage}"  Margin="0,0,0,10"
                                               ToolTip="{DynamicResource LOCBcVideoDelayToolTip}"
                                               Content="{DynamicResource LOCBcEnableVideoDelay}" />
-                                    <StackPanel Grid.Row="8" Margin="30,0,0,0" Orientation="Horizontal" 
-                                                Grid.ColumnSpan="3"
+                                    <StackPanel Grid.Row="8" Margin="50,0,0,10" Orientation="Horizontal" 
                                                 IsEnabled="{Binding ElementName=CbVideoDelay, Path=IsChecked, TargetNullValue=false}">
                                         <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
                                         <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
@@ -216,10 +197,10 @@
                                         <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
                                     </StackPanel>
 
-                                    <Label Grid.Row="10" VerticalAlignment="Bottom" Content="EXPERIMENTAL" Foreground="DarkRed" />
-                                    <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedCover}" Grid.Column="0" Grid.Row="12"
+                                    <Label  Margin="0,0,0,10" Content="EXPERIMENTAL" Foreground="DarkRed" />
+                                    <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedCover}"
                                               Content="{DynamicResource LOCBcEnableImageAnimatedCover}" />
-                                </Grid>
+                                </StackPanel>
                             </Border>
                         </Expander.Content>
                     </Expander>

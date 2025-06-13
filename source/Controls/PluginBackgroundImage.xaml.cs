@@ -63,6 +63,8 @@ namespace BackgroundChanger.Controls
                 IsActivated = PluginDatabase.PluginSettings.Settings.EnableBackgroundImage,
                 UseAnimated = PluginDatabase.PluginSettings.Settings.EnableImageAnimatedBackground,
                 EnableRandomSelect = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomSelect,
+                EnableRandomOnSelect = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomOnSelect,
+                EnableRandomOnStart = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomOnStart,
                 EnableAutoChanger = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageAutoChanger
             };
         }
@@ -274,15 +276,22 @@ namespace BackgroundChanger.Controls
                 }
                 else if (ControlDataContext.EnableRandomSelect)
                 {
-                    if (IsFirst && ItemFavorite != null)
+                    if (ControlDataContext.EnableRandomOnStart)
                     {
-                        pathImage = ItemFavorite.FullPath;
+                        pathImage = GameBackgroundImages.BackgroundImageOnStart.FullPath;
                     }
                     else
                     {
-                        Random rnd = new Random();
-                        int imgSelected = rnd.Next(0, GameBackgroundImages.ItemsBackground.Count);
-                        pathImage = GameBackgroundImages.ItemsBackground[imgSelected].FullPath;
+                        if (IsFirst && ItemFavorite != null)
+                        {
+                            pathImage = ItemFavorite.FullPath;
+                        }
+                        else
+                        {
+                            Random rnd = new Random();
+                            int imgSelected = rnd.Next(0, GameBackgroundImages.ItemsBackground.Count);
+                            pathImage = GameBackgroundImages.ItemsBackground[imgSelected].FullPath;
+                        }
                     }
 
                     SetBackgroundImage(pathImage);
@@ -905,6 +914,8 @@ namespace BackgroundChanger.Controls
         public bool IsActivated { get; set; }
         public bool UseAnimated { get; set; }
         public bool EnableRandomSelect { get; set; }
+        public bool EnableRandomOnSelect { get; set; }
+        public bool EnableRandomOnStart { get; set; }
         public bool EnableAutoChanger { get; set; }
     }
 }

@@ -15,6 +15,8 @@ namespace BackgroundChanger
         public bool BackgroundImageSameSettings { get; set; } = true;
 
         public bool EnableBackgroundImageRandomSelect { get; set; } = false;
+        public bool EnableBackgroundImageRandomOnStart { get; set; } = true;
+        public bool EnableBackgroundImageRandomOnSelect { get; set; } = false;
         public bool EnableBackgroundImageAutoChanger { get; set; } = false;
         public int BackgroundImageAutoChangerTimer { get; set; } = 10;
 
@@ -28,6 +30,8 @@ namespace BackgroundChanger
         public bool EnableCoverImage { get => _enableCoverImage; set => SetValue(ref _enableCoverImage, value); }
 
         public bool EnableCoverImageRandomSelect { get; set; } = false;
+        public bool EnableCoverImageRandomOnStart { get; set; } = true;
+        public bool EnableCoverImageRandomOnSelect { get; set; } = false;
         public bool EnableCoverImageAutoChanger { get; set; } = false;
         public int CoverImageAutoChangerTimer { get; set; } = 10;
 
