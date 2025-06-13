@@ -102,6 +102,7 @@
     <Compile Include="Controls\PluginBackgroundImage.xaml.cs">
       <DependentUpon>PluginBackgroundImage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\CheckData.cs" />
     <Compile Include="Models\ItemImage.cs" />
     <Compile Include="Models\BackgroundImagesCollection.cs" />
     <Compile Include="Models\GameBackgroundImages.cs" />

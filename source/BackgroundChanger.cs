@@ -90,7 +90,7 @@ namespace BackgroundChanger
                     Description = ResourceProvider.GetString("LOCBcManageBackground"),
                     Action = (gameMenuItem) =>
                     {
-                        ImagesManager viewExtension = new ImagesManager(PluginDatabase.Get(gameMenu), false);
+                        ImagesManager viewExtension = new ImagesManager(PluginDatabase.Get(gameMenu), false, this);
                         Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(ResourceProvider.GetString("LOCBc") + " - " + ResourceProvider.GetString("LOCGameBackgroundTitle"), viewExtension);
                         _ = windowExtension.ShowDialog();
                     }
@@ -106,7 +106,7 @@ namespace BackgroundChanger
                     Description = ResourceProvider.GetString("LOCBcManageCover"),
                     Action = (gameMenuItem) =>
                     {
-                        ImagesManager viewExtension = new ImagesManager(PluginDatabase.Get(gameMenu), true);
+                        ImagesManager viewExtension = new ImagesManager(PluginDatabase.Get(gameMenu), true, this);
                         Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(ResourceProvider.GetString("LOCBc") + " - " + ResourceProvider.GetString("LOCGameCoverImageTitle"), viewExtension);
                         _ = windowExtension.ShowDialog();
                     }

@@ -1,7 +1,9 @@
-﻿using CommonPluginsShared.Plugins;
+﻿using BackgroundChanger.Models;
+using CommonPluginsShared.Plugins;
 using Playnite.SDK;
 using Playnite.SDK.Data;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace BackgroundChanger
 {
@@ -52,6 +54,70 @@ namespace BackgroundChanger
         public int videoDelayCoverImage { get; set; } = 5;
 
         #endregion
+
+
+        public SteamGridFilters SgGridsFilters = new SteamGridFilters
+        {
+            CheckDimensions = new List<CheckData>
+            {
+                new CheckData { Name="Steam Vertical - 2:3 - 600x900", Data="600x900" },
+                new CheckData { Name="Steam Horizontal - 92:43 - 920x430", Data="920x430" },
+                new CheckData { Name="Steam Horizontal - 92:43 - 460x215", Data="460x215" },
+                new CheckData { Name="Square - 1:1 - 1024x1024", Data="1024x1024" },
+                new CheckData { Name="Square - 1:1 - 512x512", Data="512x512" },
+                new CheckData { Name="Galaxy 2.0 - 22:31 - 660x930", Data="660x930" },
+                new CheckData { Name="Galaxy 2.0 - 22:31 - 342x482", Data="342x482" },
+            },
+            CheckStyles = new List<CheckData>
+            {
+                new CheckData { Name="Alternate", Data="alternate" },
+                new CheckData { Name="White Logo", Data="white_logo" },
+                new CheckData { Name="Material", Data="material" },
+                new CheckData { Name="Blurred", Data="blurred" },
+                new CheckData { Name="No Logo", Data="no_logo" }
+            },
+            CheckTypes = new List<CheckData>
+            {
+                new CheckData { Name="Static", Data="static" },
+                new CheckData { Name="Animated", Data="animated" }
+            },
+            CheckTags = new List<CheckData>
+            {
+                new CheckData { Name="Humor", Data="Humor" },
+                new CheckData { Name="Adult Content", Data="Adult Content", IsChecked=false },
+                new CheckData { Name="Epilepsy", Data="Epilepsy" },
+                new CheckData { Name="Untagged", Data="Untagged" }
+            }
+        };
+
+        public SteamGridFilters SgHeroesFilters = new SteamGridFilters
+        {
+            CheckDimensions = new List<CheckData>
+            {
+                new CheckData { Name="Steam - 96:31 - 1920x620", Data="1920x620" },
+                new CheckData { Name="Steam - 96:31 - 3840x1240", Data="3840x1240" },
+                new CheckData { Name="Galaxy 2.0 - 32:13 - 1600x650", Data="1600x650" }
+            },
+            CheckStyles = new List<CheckData>
+            {
+                new CheckData { Name="Alternate", Data="alternate" },
+                new CheckData { Name="Material", Data="material" },
+                new CheckData { Name="Blurred", Data="blurred" }
+            },
+            CheckTypes = new List<CheckData>
+            {
+                new CheckData { Name="Static", Data="static" },
+                new CheckData { Name="Animated", Data="animated" }
+            },
+            CheckTags = new List<CheckData>
+            {
+                new CheckData { Name="Humor", Data="Humor" },
+                new CheckData { Name="Adult Content", Data="Adult Content", IsChecked=false },
+                new CheckData { Name="Epilepsy", Data="Epilepsy" },
+                new CheckData { Name="Untagged", Data="Untagged" }
+            }
+        };
+
 
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
@@ -120,5 +186,16 @@ namespace BackgroundChanger
             errors = new List<string>();
             return true;
         }
+    }
+
+
+    public class SteamGridFilters
+    {
+        public List<CheckData> CheckDimensions { get; set; }
+        public List<CheckData> CheckStyles { get; set; }
+        public List<CheckData> CheckTypes { get; set; }
+        public List<CheckData> CheckTags { get; set; }
+
+        public bool SortByDateAsc { get; set; }
     }
 }

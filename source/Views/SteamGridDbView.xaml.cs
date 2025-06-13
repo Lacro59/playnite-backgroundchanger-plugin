@@ -19,6 +19,9 @@ namespace BackgroundChanger.Views
     /// </summary>
     public partial class SteamGridDbView : UserControl
     {
+        private BackgroundChanger Plugin { get; }
+        private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
+
         private SteamGridDbApi SteamGridDbApi { get; set; } = new SteamGridDbApi();
         private SteamGridDbType SteamGridDbType { get; set; }
 
@@ -28,88 +31,43 @@ namespace BackgroundChanger.Views
         private List<SteamGridDbResult> DataSearchFiltered { get; set; } = null;
 
 
-        public SteamGridDbView(string name, SteamGridDbType steamGridDbType)
+        public SteamGridDbView(string name, SteamGridDbType steamGridDbType, BackgroundChanger plugin)
         {
             InitializeComponent();
 
+            Plugin = plugin;
             SteamGridDbType = steamGridDbType;
 
             SearchElement.Text = name;
             SearchData(name);
 
 
-            if (steamGridDbType == SteamGridDbType.heroes)
+            if (SteamGridDbType == SteamGridDbType.heroes)
             {
-                // Set Dimensions
-                List<CheckData> CheckDimensions = new List<CheckData>
-                {
-                    new CheckData { Name="Steam - 96:31 - 1920x620", Data="1920x620" },
-                    new CheckData { Name="Steam - 96:31 - 3840x1240", Data="3840x1240" },
+                PART_ComboDimensions.ItemsSource = PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckDimensions;
+                PART_ComboStyles.ItemsSource = PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckStyles;
+                PART_ComboTypes.ItemsSource = PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckTypes;
+                PART_ComboTags.ItemsSource = PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckTags;
 
-                    new CheckData { Name="Galaxy 2.0 - 32:13 - 1600x650", Data="1600x650" }
-                };
-                PART_ComboDimensions.ItemsSource = CheckDimensions;
-
-
-                // Set Styles
-                List<CheckData> CheckStyles = new List<CheckData>
-                {
-                    new CheckData { Name="Alternate", Data="alternate" },
-                    new CheckData { Name="Material", Data="material" },
-                    new CheckData { Name="Blurred", Data="blurred" }
-                };
-                PART_ComboStyles.ItemsSource = CheckStyles;
+                PART_ButtonSortByDate_Asc.IsChecked = PluginDatabase.PluginSettings.Settings.SgHeroesFilters.SortByDateAsc;
+                PART_ButtonSortByDate_Desc.IsChecked = !PluginDatabase.PluginSettings.Settings.SgHeroesFilters.SortByDateAsc;
             }
             else
             {
-                // Set Dimensions
-                List<CheckData> CheckDimensions = new List<CheckData>
-                {
-                    new CheckData { Name="Steam Vertical - 2:3 - 600x900", Data="600x900" },
+                PART_ComboDimensions.ItemsSource = PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckDimensions;
+                PART_ComboStyles.ItemsSource = PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckStyles;
+                PART_ComboTypes.ItemsSource = PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckTypes;
+                PART_ComboTags.ItemsSource = PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckTags;
 
-                    new CheckData { Name="Steam Horizontal - 92:43 - 920x430", Data="920x430" },
-                    new CheckData { Name="Steam Horizontal - 92:43 - 460x215", Data="460x215" },
-
-                    new CheckData { Name="Square - 1:1 - 1024x1024", Data="1024x1024" },
-                    new CheckData { Name="Square - 1:1 - 512x512", Data="512x512" },
-
-                    new CheckData { Name="Galaxy 2.0 - 22:31 - 660x930", Data="660x930" },
-                    new CheckData { Name="Galaxy 2.0 - 22:31 - 342x482", Data="342x482" },
-                };
-                PART_ComboDimensions.ItemsSource = CheckDimensions;
-
-
-                // Set Styles
-                List<CheckData> CheckStyles = new List<CheckData>
-                {
-                    new CheckData { Name="Alternate", Data="alternate" },
-                    new CheckData { Name="White Logo", Data="white_logo" },
-                    new CheckData { Name="Material", Data="material" },
-                    new CheckData { Name="Blurred", Data="blurred" },
-                    new CheckData { Name="No Logo", Data="no_logo" }
-                };
-                PART_ComboStyles.ItemsSource = CheckStyles;
+                PART_ButtonSortByDate_Asc.IsChecked = PluginDatabase.PluginSettings.Settings.SgGridsFilters.SortByDateAsc;
+                PART_ButtonSortByDate_Desc.IsChecked = !PluginDatabase.PluginSettings.Settings.SgGridsFilters.SortByDateAsc;
             }
 
-            // Set Types
-            List<CheckData> CheckTypes = new List<CheckData>
-            {
-                new CheckData { Name="Static", Data="static" },
-                new CheckData { Name="Animated", Data="animated" }
-            };
-            PART_ComboTypes.ItemsSource = CheckTypes;
+            Combox_Changed();
+        }
 
-            // Set Tags
-            List<CheckData> CheckTags = new List<CheckData>
-            {
-                new CheckData { Name="Humor", Data="Humor" },
-                new CheckData { Name="Adult Content", Data="Adult Content", IsChecked=false },
-                new CheckData { Name="Epilepsy", Data="Epilepsy" },
-                new CheckData { Name="Untagged", Data="Untagged" }
-            };
-            PART_ComboTags.ItemsSource = CheckTags;
-
-
+        private void Combox_Changed()
+        {
             ComboBox_SelectionChanged(PART_ComboDimensions, null);
             ComboBox_SelectionChanged(PART_ComboStyles, null);
             ComboBox_SelectionChanged(PART_ComboTags, null);
@@ -378,13 +336,103 @@ namespace BackgroundChanger.Views
 
             ((ComboBox)sender).Text = data;
         }
-    }
 
 
-    public class CheckData
-    {
-        public string Name { get; set; }
-        public string Data { get; set; }
-        public bool IsChecked { get; set; } = true;
+        private void ClearFilter_Click(object sender, RoutedEventArgs e)
+        {
+            if (SteamGridDbType == SteamGridDbType.heroes)
+            {
+                PART_ComboDimensions.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Steam - 96:31 - 1920x620", Data = "1920x620" },
+                    new CheckData { Name = "Steam - 96:31 - 3840x1240", Data = "3840x1240" },
+                    new CheckData { Name = "Galaxy 2.0 - 32:13 - 1600x650", Data = "1600x650" }
+                };
+
+                PART_ComboStyles.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Alternate", Data = "alternate" },
+                    new CheckData { Name = "Material", Data = "material" },
+                    new CheckData { Name = "Blurred", Data = "blurred" }
+                };
+
+                PART_ComboTypes.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Static", Data = "static" },
+                    new CheckData { Name = "Animated", Data = "animated" }
+                };
+
+                PART_ComboTags.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Humor", Data = "Humor" },
+                    new CheckData { Name = "Adult Content", Data = "Adult Content", IsChecked = false },
+                    new CheckData { Name = "Epilepsy", Data = "Epilepsy" },
+                    new CheckData { Name = "Untagged", Data = "Untagged" }
+                };
+            }
+            else
+            {
+                PART_ComboDimensions.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Steam Vertical - 2:3 - 600x900", Data = "600x900" },
+                    new CheckData { Name = "Steam Horizontal - 92:43 - 920x430", Data = "920x430" },
+                    new CheckData { Name = "Steam Horizontal - 92:43 - 460x215", Data = "460x215" },
+                    new CheckData { Name = "Square - 1:1 - 1024x1024", Data = "1024x1024" },
+                    new CheckData { Name = "Square - 1:1 - 512x512", Data = "512x512" },
+                    new CheckData { Name = "Galaxy 2.0 - 22:31 - 660x930", Data = "660x930" },
+                    new CheckData { Name = "Galaxy 2.0 - 22:31 - 342x482", Data = "342x482" }
+                };
+
+                PART_ComboStyles.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Alternate", Data = "alternate" },
+                    new CheckData { Name = "White Logo", Data = "white_logo" },
+                    new CheckData { Name = "Material", Data = "material" },
+                    new CheckData { Name = "Blurred", Data = "blurred" },
+                    new CheckData { Name = "No Logo", Data = "no_logo" }
+                };
+
+                PART_ComboTypes.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Static", Data = "static" },
+                    new CheckData { Name = "Animated", Data = "animated" }
+                };
+
+                PART_ComboTags.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Humor", Data = "Humor" },
+                    new CheckData { Name = "Adult Content", Data = "Adult Content", IsChecked = false },
+                    new CheckData { Name = "Epilepsy", Data = "Epilepsy" },
+                    new CheckData { Name = "Untagged", Data = "Untagged" }
+                };
+            }
+
+            Combox_Changed();
+        }
+
+        private void SavedFilter_Click(object sender, RoutedEventArgs e)
+        {
+            if (SteamGridDbType == SteamGridDbType.heroes)
+            {
+                PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckDimensions = (List<CheckData>)PART_ComboDimensions.ItemsSource;
+                PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckStyles = (List<CheckData>)PART_ComboStyles.ItemsSource;
+                PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckTypes = (List<CheckData>)PART_ComboTypes.ItemsSource;
+                PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckTags = (List<CheckData>)PART_ComboTags.ItemsSource;
+
+                PluginDatabase.PluginSettings.Settings.SgHeroesFilters.SortByDateAsc = (bool)PART_ButtonSortByDate_Asc.IsChecked;
+            }
+            else
+            {
+                PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckDimensions = (List<CheckData>)PART_ComboDimensions.ItemsSource;
+                PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckStyles = (List<CheckData>)PART_ComboStyles.ItemsSource;
+                PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckTypes = (List<CheckData>)PART_ComboTypes.ItemsSource;
+                PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckTags = (List<CheckData>)PART_ComboTags.ItemsSource;
+
+                PluginDatabase.PluginSettings.Settings.SgGridsFilters.SortByDateAsc = (bool)PART_ButtonSortByDate_Asc.IsChecked;
+            }
+
+            Plugin.SavePluginSettings(PluginDatabase.PluginSettings.Settings);
+            Combox_Changed();
+        }
     }
 }

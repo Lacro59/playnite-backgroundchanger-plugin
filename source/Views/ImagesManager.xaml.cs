@@ -30,7 +30,8 @@ namespace BackgroundChanger.Views
     /// </summary>
     public partial class ImagesManager : UserControl
     {
-        private BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
+        private BackgroundChanger Plugin { get; }
+        private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
 
         private GameBackgroundImages GameBackgroundImages { get; set; }
         private List<ItemImage> CurrentImages { get; set; }
@@ -38,12 +39,13 @@ namespace BackgroundChanger.Views
         private bool IsCover { get; set; }
 
 
-        public ImagesManager(GameBackgroundImages gameBackgroundImages, bool isCover)
+        public ImagesManager(GameBackgroundImages gameBackgroundImages, bool isCover, BackgroundChanger plugin)
         {
             GameBackgroundImages = gameBackgroundImages;
             CurrentImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == isCover && x.Exist).ToList());
             EditedImages = Serialization.GetClone(CurrentImages);
             IsCover = isCover;
+            Plugin = plugin;
 
             InitializeComponent();
 
@@ -205,7 +207,7 @@ namespace BackgroundChanger.Views
                     steamGridDbType = SteamGridDbType.grids;
                 }
 
-                SteamGridDbView viewExtension = new SteamGridDbView(GameBackgroundImages.Name, steamGridDbType);
+                SteamGridDbView viewExtension = new SteamGridDbView(GameBackgroundImages.Name, steamGridDbType, Plugin);
                 Window windowExtension = PlayniteUiHelper.CreateExtensionWindow("SteamGridDB", viewExtension);
                 _ = windowExtension.ShowDialog();
 
