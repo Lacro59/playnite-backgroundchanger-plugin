@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Используется тот же параметр для фона игры плагина, чем фон темы *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Включить случайный выбор</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Включить автоматическое изменение</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Временной интервал</sys:String>
     <sys:String x:Key="LOCBcSeconds">секунд(ы)</sys:String>
