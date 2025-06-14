@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">プラグインのゲーム背景をテーマ背景と同じ設定にした *。</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">ダム選択を有効にする</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">自動変更を有効にする</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">時間間隔</sys:String>
     <sys:String x:Key="LOCBcSeconds">秒</sys:String>
