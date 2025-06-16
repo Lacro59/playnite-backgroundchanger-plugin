@@ -18,8 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Χρήση της ίδιας ρύθμισης για το φόντο του παιχνιδιού από το πρόσθετο, παρά από το φόντο του θέματος</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Ενεργοποίηση τυχαίας επιλογής</sys:String>
-    <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
-    <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Μόνο κατά την εκκίνηση του Playnite</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">Κατά την επιλογή παιχνιδιού</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Ενεργοποίηση αυτόματης αλλαγής</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Χρονικό διάστημα</sys:String>
     <sys:String x:Key="LOCBcSeconds">δευτ.</sys:String>
