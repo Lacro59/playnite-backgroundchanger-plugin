@@ -311,6 +311,7 @@ namespace BackgroundChanger.Controls
                 return;
             }
 
+            PluginDatabase.PluginSettings.Settings.CoverIsVideo = Path.GetExtension(pathImage).IsEqual("mp4");
 
             if (Path.GetExtension(pathImage).IsEqual("mp4"))
             {

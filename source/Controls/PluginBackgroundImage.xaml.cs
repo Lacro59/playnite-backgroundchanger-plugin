@@ -4,6 +4,7 @@ using CommonPlayniteShared;
 using CommonPluginsShared;
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
+using CommonPluginsShared.Extensions;
 using CommonPluginsShared.Interfaces;
 using Playnite.SDK;
 using Playnite.SDK.Models;
@@ -630,11 +631,13 @@ namespace BackgroundChanger.Controls
                     }
                     else
                     {
+                        PluginDatabase.PluginSettings.Settings.BackgroundIsVideo = Path.GetExtension(image).IsEqual("mp4");
+
                         if (currentImage == CurrentImage.None)
                         {
                             Image1FadeOut.Stop();
 
-                            if (Path.GetExtension(image).ToLower().Contains("mp4"))
+                            if (Path.GetExtension(image).IsEqual("mp4"))
                             {
                                 //AnimatedImage1.Source = null;
                                 //AnimatedImage2.Source = null;
@@ -660,7 +663,7 @@ namespace BackgroundChanger.Controls
                         {
                             Image2FadeOut.Stop();
 
-                            if (Path.GetExtension(image).ToLower().Contains("mp4"))
+                            if (Path.GetExtension(image).IsEqual("mp4"))
                             {
                                 //AnimatedImage1.Source = null;
                                 //AnimatedImage2.Source = null;
@@ -687,7 +690,7 @@ namespace BackgroundChanger.Controls
                         {
                             Image1FadeOut.Stop();
 
-                            if (Path.GetExtension(image).ToLower().Contains("mp4"))
+                            if (Path.GetExtension(image).IsEqual("mp4"))
                             {
                                 //AnimatedImage1.Source = null;
                                 //AnimatedImage2.Source = null;

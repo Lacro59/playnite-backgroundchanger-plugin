@@ -131,6 +131,14 @@ namespace BackgroundChanger
         [DontSerialize]
         public bool HasDataCover { get => _hasDataCover; set => SetValue(ref _hasDataCover, value); }
 
+        private bool _backgroundIsVideo = false;
+        [DontSerialize]
+        public bool BackgroundIsVideo { get => _backgroundIsVideo; set => SetValue(ref _backgroundIsVideo, value); }
+
+        private bool _coverIsVideo = false;
+        [DontSerialize]
+        public bool CoverIsVideo { get => _coverIsVideo; set => SetValue(ref _coverIsVideo, value); }
+
         #endregion
     }
 
