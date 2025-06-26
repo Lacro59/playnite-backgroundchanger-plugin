@@ -179,7 +179,7 @@ namespace BackgroundChanger.Views
 
                 if (selectedFiles != null && selectedFiles.Count > 0)
                 {
-                    foreach(string filePath in selectedFiles)
+                    foreach (string filePath in selectedFiles)
                     {
                         EditedImages.Add(new ItemImage
                         {
@@ -245,7 +245,7 @@ namespace BackgroundChanger.Views
                         {
 
                         }
-                    }).ContinueWith(antecedant => 
+                    }).ContinueWith(antecedant =>
                     {
                         _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
                         {
@@ -269,7 +269,7 @@ namespace BackgroundChanger.Views
                 string filePath = ((ItemImage)PART_LbBackgroundImages.SelectedItem).FullPath;
                 if (File.Exists(filePath))
                 {
-                    if (Path.GetExtension(filePath).IsEqual("mp4"))
+                    if (Path.GetExtension(filePath).IsEqual(".mp4"))
                     {
                         PART_BackgroundImage.Source = null;
                         PART_Video.Source = new Uri(filePath);
@@ -361,7 +361,7 @@ namespace BackgroundChanger.Views
             {
                 if (filePath != null && filePath != string.Empty)
                 {
-                    if (Path.GetExtension(filePath).IsEqual("webp"))
+                    if (Path.GetExtension(filePath).IsEqual(".webp"))
                     {
                         WebpAnim webPAnim = new WebpAnim();
                         webPAnim.Load(filePath);
@@ -383,7 +383,7 @@ namespace BackgroundChanger.Views
                         double height = webPAnim.GetFrameBitmapSource(0).Height;
 
                         string ffmpeg = $"-r 25 -f "
-                            + $"image2 -s {width}x{height} -i \"{PluginDatabase.Paths.PluginCachePath}\\FileName_%4d.png\" " 
+                            + $"image2 -s {width}x{height} -i \"{PluginDatabase.Paths.PluginCachePath}\\FileName_%4d.png\" "
                             + $"-vcodec libx264 -crf 25 -pix_fmt yuv420p \"{PluginDatabase.Paths.PluginCachePath}\\{fileName}.mp4\"";
 
                         Process process = new Process();
@@ -409,8 +409,6 @@ namespace BackgroundChanger.Views
         {
             int index = int.Parse(((Button)sender).Tag.ToString());
             string filePath = EditedImages[index].FullPath;
-
-
             string videoPath = string.Empty;
 
             GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(ResourceProvider.GetString("LOCCommonConverting"))
@@ -423,7 +421,14 @@ namespace BackgroundChanger.Views
             {
                 try
                 {
-                    videoPath = ExtractAnimatedImageAndConvert(filePath);
+                    if (File.Exists(PluginDatabase.PluginSettings.Settings.ffmpegFile))
+                    {
+                        videoPath = ExtractAnimatedImageAndConvert(filePath);
+                    }
+                    else
+                    {
+                        API.Instance.Dialogs.ShowErrorMessage(ResourceProvider.GetString("LOCBcFfmpegNotFound"), PluginDatabase.PluginName);
+                    }
                 }
                 catch (Exception ex)
                 {

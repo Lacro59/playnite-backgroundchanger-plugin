@@ -8,7 +8,8 @@
              xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
              xmlns:controlsAnimated="clr-namespace:wpf_animatedimage.Controls"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
-             xmlns:converters1="clr-namespace:CommonPlayniteShared.Converters" xmlns:controls="clr-namespace:CommonPluginsShared.Controls"
+             xmlns:converters1="clr-namespace:CommonPlayniteShared.Converters" 
+             xmlns:controls="clr-namespace:CommonPluginsShared.Controls"
              mc:Ignorable="d" 
              Height="700" Width="1100">
 
@@ -123,7 +124,7 @@
                                               ScrubbingEnabled="True" MediaOpened="Video_MediaOpened" 
                                               Source="{Binding FullPath}" LoadedBehavior="Stop" Name="Video"
                                               Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                    
+
                                     <TextBlock Margin="0,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Right" FontFamily="{DynamicResource FontIcoFont}">
                                         <TextBlock.Style>
                                             <Style TargetType="{x:Type TextBlock}">
@@ -140,7 +141,7 @@
                                             <DropShadowEffect Color="Black" Opacity="0.75" BlurRadius="3" ShadowDepth="0" />
                                         </TextBlock.Effect>
                                     </TextBlock>
-                                    
+
                                     <TextBlock MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
                                            Margin="5,5,0,0"
                                            VerticalAlignment="Top" HorizontalAlignment="Left"

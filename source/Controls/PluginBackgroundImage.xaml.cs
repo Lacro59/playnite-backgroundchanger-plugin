@@ -631,13 +631,13 @@ namespace BackgroundChanger.Controls
                     }
                     else
                     {
-                        PluginDatabase.PluginSettings.Settings.BackgroundIsVideo = Path.GetExtension(image).IsEqual("mp4");
+                        PluginDatabase.PluginSettings.Settings.BackgroundIsVideo = Path.GetExtension(image).IsEqual(".mp4");
 
                         if (currentImage == CurrentImage.None)
                         {
                             Image1FadeOut.Stop();
 
-                            if (Path.GetExtension(image).IsEqual("mp4"))
+                            if (Path.GetExtension(image).IsEqual(".mp4"))
                             {
                                 //AnimatedImage1.Source = null;
                                 //AnimatedImage2.Source = null;
@@ -663,7 +663,7 @@ namespace BackgroundChanger.Controls
                         {
                             Image2FadeOut.Stop();
 
-                            if (Path.GetExtension(image).IsEqual("mp4"))
+                            if (Path.GetExtension(image).IsEqual(".mp4"))
                             {
                                 //AnimatedImage1.Source = null;
                                 //AnimatedImage2.Source = null;
@@ -690,7 +690,7 @@ namespace BackgroundChanger.Controls
                         {
                             Image1FadeOut.Stop();
 
-                            if (Path.GetExtension(image).IsEqual("mp4"))
+                            if (Path.GetExtension(image).IsEqual(".mp4"))
                             {
                                 //AnimatedImage1.Source = null;
                                 //AnimatedImage2.Source = null;
@@ -719,7 +719,7 @@ namespace BackgroundChanger.Controls
                 {
                     if (currentImage == CurrentImage.Image1)
                     {
-                        if (image != null && Path.GetExtension(image).ToLower().Contains("mp4"))
+                        if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
                         {
                             AnimatedImage1.Source = null;
                             AnimatedImage2.Source = null;
@@ -738,7 +738,7 @@ namespace BackgroundChanger.Controls
                     }
                     else if (currentImage == CurrentImage.Image2)
                     {
-                        if (image != null && Path.GetExtension(image).ToLower().Contains("mp4"))
+                        if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
                         {
                             AnimatedImage1.Source = null;
                             AnimatedImage2.Source = null;
@@ -757,7 +757,7 @@ namespace BackgroundChanger.Controls
                     }
                     else
                     {
-                        if (image != null && Path.GetExtension(image).ToLower().Contains("mp4"))
+                        if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
                         {
                             AnimatedImage1.Source = null;
                             AnimatedImage2.Source = null;

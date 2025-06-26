@@ -311,9 +311,9 @@ namespace BackgroundChanger.Controls
                 return;
             }
 
-            PluginDatabase.PluginSettings.Settings.CoverIsVideo = Path.GetExtension(pathImage).IsEqual("mp4");
+            PluginDatabase.PluginSettings.Settings.CoverIsVideo = Path.GetExtension(pathImage).IsEqual(".mp4");
 
-            if (Path.GetExtension(pathImage).IsEqual("mp4"))
+            if (Path.GetExtension(pathImage).IsEqual(".mp4"))
             {
                 ControlDataContext.ImageSource = null;
                 ControlDataContext.VideoSource = pathImage;
@@ -406,7 +406,7 @@ namespace BackgroundChanger.Controls
                 image = (string)currentSource;
             }
 
-            if (Path.GetExtension(image).IsEqual("mp4"))
+            if (Path.GetExtension(image).IsEqual(".mp4"))
             {
                 Image1.Source = null;
                 Video1.Source = new Uri(image);
