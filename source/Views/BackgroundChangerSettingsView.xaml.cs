@@ -25,14 +25,14 @@ namespace BackgroundChanger.Views
             }
         }
 
-        private void ButtonWebpinfo_Click(object sender, RoutedEventArgs e)
-        {
-            string selectedFile = API.Instance.Dialogs.SelectFile("File|webpinfo.exe");
-            if (!selectedFile.IsNullOrEmpty())
-            {
-                PART_WebpinfoFile.Text = selectedFile;
-                ((BackgroundChangerSettingsViewModel)DataContext).Settings.webpinfoFile = selectedFile;
-            }
-        }
+        //private void ButtonWebpinfo_Click(object sender, RoutedEventArgs e)
+        //{
+        //    string selectedFile = API.Instance.Dialogs.SelectFile("File|webpinfo.exe");
+        //    if (!selectedFile.IsNullOrEmpty())
+        //    {
+        //        PART_WebpinfoFile.Text = selectedFile;
+        //        ((BackgroundChangerSettingsViewModel)DataContext).Settings.webpinfoFile = selectedFile;
+        //    }
+        //}
     }
 }
