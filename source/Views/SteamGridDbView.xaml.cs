@@ -44,20 +44,20 @@ namespace BackgroundChanger.Views
 
             if (SteamGridDbType == SteamGridDbType.heroes)
             {
-                PART_ComboDimensions.ItemsSource = PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckDimensions;
-                PART_ComboStyles.ItemsSource = PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckStyles;
-                PART_ComboTypes.ItemsSource = PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckTypes;
-                PART_ComboTags.ItemsSource = PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckTags;
+                PART_ComboDimensions.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckDimensions);
+                PART_ComboStyles.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckStyles);
+                PART_ComboTypes.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckTypes);
+                PART_ComboTags.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckTags);
 
                 PART_ButtonSortByDate_Asc.IsChecked = PluginDatabase.PluginSettings.Settings.SgHeroesFilters.SortByDateAsc;
                 PART_ButtonSortByDate_Desc.IsChecked = !PluginDatabase.PluginSettings.Settings.SgHeroesFilters.SortByDateAsc;
             }
             else
             {
-                PART_ComboDimensions.ItemsSource = PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckDimensions;
-                PART_ComboStyles.ItemsSource = PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckStyles;
-                PART_ComboTypes.ItemsSource = PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckTypes;
-                PART_ComboTags.ItemsSource = PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckTags;
+                PART_ComboDimensions.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckDimensions);
+                PART_ComboStyles.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckStyles);
+                PART_ComboTypes.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckTypes);
+                PART_ComboTags.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckTags);
 
                 PART_ButtonSortByDate_Asc.IsChecked = PluginDatabase.PluginSettings.Settings.SgGridsFilters.SortByDateAsc;
                 PART_ButtonSortByDate_Desc.IsChecked = !PluginDatabase.PluginSettings.Settings.SgGridsFilters.SortByDateAsc;
