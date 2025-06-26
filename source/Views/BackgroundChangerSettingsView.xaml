@@ -32,8 +32,8 @@
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="20" />
                         <RowDefinition Height="auto" />
-                        <RowDefinition Height="20" />
-                        <RowDefinition Height="auto" />
+                        <!--RowDefinition Height="20" />
+                        <RowDefinition Height="auto" /-->
                     </Grid.RowDefinitions>
 
                     <Label Grid.Column="0" Grid.Row="0" Content="{DynamicResource LOCBcSteamGridDbApiKey}" />
@@ -50,13 +50,13 @@
                             Command="{x:Static commonPlugin:Commands.NavigateUrl}"
                             CommandParameter="https://www.ffmpeg.org/" />
 
-                    <Label Grid.Column="0" Grid.Row="4" Content="{DynamicResource LOCBcWebpinfoFile}" />
+                    <!--Label Grid.Column="0" Grid.Row="4" Content="{DynamicResource LOCBcWebpinfoFile}" />
                     <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Settings.webpinfoFile, Mode=TwoWay}" Name="PART_WebpinfoFile" />
                     <Button Grid.Column="3" Grid.Row="4" Content="&#xeb12;" FontFamily="{DynamicResource FontIcoFont}" HorizontalAlignment="Right"
                             Click="ButtonWebpinfo_Click" />
                     <Button Grid.Column="5" Grid.Row="4" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}"
                             Command="{x:Static commonPlugin:Commands.NavigateUrl}"
-                            CommandParameter="https://developers.google.com/speed/webp/download" />
+                            CommandParameter="https://developers.google.com/speed/webp/download" /-->
                 </Grid>
             </ScrollViewer>
         </TabItem>
