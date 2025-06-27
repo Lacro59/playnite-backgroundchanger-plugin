@@ -36,7 +36,8 @@
     <sys:String x:Key="LOCBcGoogleImageSelect">Google Resimler üstünden seç</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg dosyası</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo dosyası</sys:String>
-    
+
+    <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg bulunamadı</sys:String>
     <sys:String x:Key="LOCBcFTooltTipConvert">Mp4 biçimine dönüştür (performans artar)</sys:String>
 
 </ResourceDictionary>
