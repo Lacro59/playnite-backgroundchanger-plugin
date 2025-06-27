@@ -36,7 +36,8 @@
     <sys:String x:Key="LOCBcGoogleImageSelect">從 Google 圖像中選擇</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
-    
+
+    <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
     <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
 
 </ResourceDictionary>
