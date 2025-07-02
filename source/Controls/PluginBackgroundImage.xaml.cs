@@ -74,6 +74,8 @@ namespace BackgroundChanger.Controls
         public PluginBackgroundImage()
         {
             InitializeComponent();
+
+            Delay = 0;
             DataContext = ControlDataContext;
 
             Image1FadeIn = (Storyboard)TryFindResource("Image1FadeIn");

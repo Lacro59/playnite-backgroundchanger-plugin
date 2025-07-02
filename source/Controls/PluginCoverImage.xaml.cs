@@ -75,6 +75,8 @@ namespace BackgroundChanger.Controls
         public PluginCoverImage()
         {
             InitializeComponent();
+
+            Delay = 0;
             DataContext = ControlDataContext;
 
             PluginDatabase.PluginSettings.PropertyChanged += PluginSettings_PropertyChanged;
