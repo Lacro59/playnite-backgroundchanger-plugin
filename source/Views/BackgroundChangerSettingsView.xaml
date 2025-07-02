@@ -92,18 +92,54 @@
 
                                     <DockPanel Margin="0,0,0,10">
                                         <CheckBox IsChecked="{Binding Settings.EnableBackgroundImageRandomSelect}" 
-                                                  DockPanel.Dock="Left"
+                                                  DockPanel.Dock="Left" Name="cbBackgroundRandom"
                                                   Content="{DynamicResource LOCBcEnableRandomSelect}" />
                                         
-                                        <RadioButton IsChecked="{Binding Settings.EnableBackgroundImageRandomOnSelect}" 
-                                                  DockPanel.Dock="Right" GroupName="BcRandom"
-                                                  IsEnabled="{Binding ElementName=CbBcAutoChanger, Path=IsChecked, Converter={StaticResource InvertedBoolenConverter}}"
-                                                  Content="{DynamicResource LOCBcRandomOnSelect}" />
+                                        <RadioButton DockPanel.Dock="Right" GroupName="BcRandom"
+                                                     Name="rbBackgroundOnSelect" Click="rb_Click"
+                                                     Content="{DynamicResource LOCBcRandomOnSelect}">
+                                            <RadioButton.Style>
+                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
+                                                    <Style.Triggers>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding IsChecked, ElementName=CbBcAutoChanger}" Value="True" />
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </MultiDataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding IsChecked, ElementName=cbBackgroundRandom}" Value="False" />
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </MultiDataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </RadioButton.Style>
+                                        </RadioButton>
 
-                                        <RadioButton IsChecked="{Binding Settings.EnableBackgroundImageRandomOnStart}" 
-                                                  HorizontalAlignment="Right" Margin="0,0,20,0" GroupName="BcRandom"
-                                                  IsEnabled="{Binding ElementName=CbBcAutoChanger, Path=IsChecked, Converter={StaticResource InvertedBoolenConverter}}"
-                                                  Content="{DynamicResource LOCBcRandomOnStart}" />
+                                        <RadioButton HorizontalAlignment="Right" Margin="0,0,20,0" GroupName="BcRandom"
+                                                     Name="rbBackgroundOnStart" Click="rb_Click"
+                                                     Content="{DynamicResource LOCBcRandomOnStart}">
+                                            <RadioButton.Style>
+                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
+                                                    <Style.Triggers>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding IsChecked, ElementName=CbBcAutoChanger}" Value="True" />
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </MultiDataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding IsChecked, ElementName=cbBackgroundRandom}" Value="False" />
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </MultiDataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </RadioButton.Style>
+                                        </RadioButton>
                                     </DockPanel>
 
                                     <CheckBox Name="CbBcAutoChanger" IsChecked="{Binding Settings.EnableBackgroundImageAutoChanger}" Margin="0,0,0,10"
@@ -162,18 +198,54 @@
                                 <StackPanel>
                                     <DockPanel Margin="0,0,0,10">
                                         <CheckBox IsChecked="{Binding Settings.EnableCoverImageRandomSelect}"
-                                                  DockPanel.Dock="Left"
-                                              Content="{DynamicResource LOCBcEnableRandomSelect}" />
-                                        
-                                        <RadioButton IsChecked="{Binding Settings.EnableCoverImageRandomOnSelect}" 
-                                                  DockPanel.Dock="Right" GroupName="CoverRandom"
-                                                  IsEnabled="{Binding ElementName=CbAutoChanger, Path=IsChecked, Converter={StaticResource InvertedBoolenConverter}}"
-                                                  Content="{DynamicResource LOCBcRandomOnSelect}" />
+                                                  DockPanel.Dock="Left" Name="cbCoverRandom"
+                                                  Content="{DynamicResource LOCBcEnableRandomSelect}" />
 
-                                        <RadioButton IsChecked="{Binding Settings.EnableCoverImageRandomOnStart}" 
-                                                  HorizontalAlignment="Right" Margin="0,0,20,0" GroupName="CoverRandom"
-                                                  IsEnabled="{Binding ElementName=CbAutoChanger, Path=IsChecked, Converter={StaticResource InvertedBoolenConverter}}"
-                                                  Content="{DynamicResource LOCBcRandomOnStart}" />
+                                        <RadioButton DockPanel.Dock="Right" GroupName="CoverRandom"
+                                                     Name="rbCoverOnSelect" Click="rb_Click"
+                                                     Content="{DynamicResource LOCBcRandomOnSelect}">
+                                            <RadioButton.Style>
+                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
+                                                    <Style.Triggers>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding IsChecked, ElementName=CbAutoChanger}" Value="True" />
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </MultiDataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding IsChecked, ElementName=cbCoverRandom}" Value="False" />
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </MultiDataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </RadioButton.Style>
+                                        </RadioButton>
+
+                                        <RadioButton HorizontalAlignment="Right" Margin="0,0,20,0" GroupName="CoverRandom"
+                                                     Name="rbCoverOnStart" Click="rb_Click"
+                                                     Content="{DynamicResource LOCBcRandomOnStart}">
+                                            <RadioButton.Style>
+                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
+                                                    <Style.Triggers>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding IsChecked, ElementName=CbAutoChanger}" Value="True" />
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </MultiDataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding IsChecked, ElementName=cbCoverRandom}" Value="False" />
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </MultiDataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </RadioButton.Style>
+                                        </RadioButton>
                                     </DockPanel>
 
                                     <CheckBox Name="CbAutoChanger" IsChecked="{Binding Settings.EnableCoverImageAutoChanger}" Margin="0,0,0,10"

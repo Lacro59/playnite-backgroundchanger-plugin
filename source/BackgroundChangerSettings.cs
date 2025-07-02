@@ -1,4 +1,5 @@
 ﻿using BackgroundChanger.Models;
+using BackgroundChanger.Views;
 using CommonPluginsShared.Plugins;
 using Playnite.SDK;
 using Playnite.SDK.Data;
@@ -181,6 +182,11 @@ namespace BackgroundChanger
         // This method should save settings made to Option1 and Option2.
         public void EndEdit()
         {
+            Settings.EnableBackgroundImageRandomOnSelect = BackgroundChangerSettingsView.BackgroundOnSelect;
+            Settings.EnableBackgroundImageRandomOnStart = BackgroundChangerSettingsView.BackgroundOnStart;
+            Settings.EnableCoverImageRandomOnSelect = BackgroundChangerSettingsView.CoverOnSelect;
+            Settings.EnableCoverImageRandomOnStart = BackgroundChangerSettingsView.CoverOnStart;
+
             Plugin.SavePluginSettings(Settings);
             BackgroundChanger.PluginDatabase.PluginSettings = this;
             this.OnPropertyChanged();
