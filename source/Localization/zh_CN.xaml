@@ -34,6 +34,8 @@
 
     <sys:String x:Key="LOCBcSteamGridDbSelect">从 SteamGridDB 选择</sys:String>
     <sys:String x:Key="LOCBcGoogleImageSelect">从谷歌图像中选择</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrl">Add from url</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrlDescription">Enter the url to the image</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg 路径</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo 路径</sys:String>
 
