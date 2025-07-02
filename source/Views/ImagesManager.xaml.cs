@@ -30,6 +30,8 @@ namespace BackgroundChanger.Views
     /// </summary>
     public partial class ImagesManager : UserControl
     {
+        private static ILogger Logger => LogManager.GetLogger();
+
         private BackgroundChanger Plugin { get; }
         private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
 
@@ -516,6 +518,77 @@ namespace BackgroundChanger.Views
                         });
                     });
                 }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
+        }
+
+        private void PART_BtAddFromUrl_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                StringSelectionDialogResult urlSelection = API.Instance.Dialogs.SelectString(
+                    ResourceProvider.GetString("LOCBcAddFromUrlDescription"),
+                    ResourceProvider.GetString("LOCBcAddFromUrl"),
+                    string.Empty);
+
+                if (!urlSelection.Result)
+                {
+                    return;
+                }
+
+                GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(ResourceProvider.GetString("LOCCommonGettingData"))
+                {
+                    Cancelable = false,
+                    IsIndeterminate = true
+                };
+
+                GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+                {
+                    try
+                    {
+                        string cachedFile = HttpFileCache.GetWebFile(urlSelection.SelectedString);
+                        if (!cachedFile.IsNullOrEmpty())
+                        {
+                            List<string> validImageExtensions = new List<string> { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp" };
+                            string extension = Path.GetExtension(cachedFile).ToLower();
+
+                            if (validImageExtensions.Contains(extension))
+                            {
+                                EditedImages.Add(new ItemImage
+                                {
+                                    Name = cachedFile
+                                });
+                            }
+                            else
+                            {
+                                Logger.Warn($"The file {cachedFile} is not a valid image.");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                    }
+                }, globalProgressOptions);
+
+
+                _ = Task.Run(() =>
+                {
+                    while (!(bool)ProgressDownload.Result)
+                    {
+
+                    }
+                }).ContinueWith(antecedant =>
+                {
+                    _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
+                    {
+                        PART_LbBackgroundImages.ItemsSource = null;
+                        PART_LbBackgroundImages.ItemsSource = EditedImages;
+                    });
+                });
             }
             catch (Exception ex)
             {

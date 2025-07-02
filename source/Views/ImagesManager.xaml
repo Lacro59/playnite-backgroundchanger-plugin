@@ -196,10 +196,12 @@
                         Style="{StaticResource BottomButton}" Click="PART_BtAddSteamGridDb_Click" />
                 <Button TabIndex="3" Name="PART_BtAddGoogleImage" Content="{DynamicResource LOCBcGoogleImageSelect}" DockPanel.Dock="Left"
                         Style="{StaticResource BottomButton}" Click="PART_BtAddGoogleImage_Click" />
+                <Button TabIndex="4" Name="PART_BtAddFromUrl" Content="{DynamicResource LOCBcAddFromUrl}" DockPanel.Dock="Left"
+                        Style="{StaticResource BottomButton}" Click="PART_BtAddFromUrl_Click" />
 
-                <Button TabIndex="4" Name="PART_BtCancel" Content="{DynamicResource LOCCancelLabel}" DockPanel.Dock="Right" IsCancel="True"
+                <Button TabIndex="5" Name="PART_BtCancel" Content="{DynamicResource LOCCancelLabel}" DockPanel.Dock="Right" IsCancel="True"
                         Style="{StaticResource BottomButton}" Click="PART_BtCancel_Click" />
-                <Button TabIndex="5" Name="PART_BtOK" Content="{DynamicResource LOCSaveLabel}" DockPanel.Dock="Right" IsDefault="True"
+                <Button TabIndex="6" Name="PART_BtOK" Content="{DynamicResource LOCSaveLabel}" DockPanel.Dock="Right" IsDefault="True"
                         Style="{StaticResource BottomButton}" Click="PART_BtOK_Click" />
             </DockPanel>
         </Border>
