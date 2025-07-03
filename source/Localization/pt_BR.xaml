@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Usou a mesma configuração para o fundo do plug-in que o fundo do tema *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Ativar seleção aleatória</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Apenas ao iniciar Playnite</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">Na seleção do jogo</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Ativar mudança automática</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Intervalo de tempo</sys:String>
     <sys:String x:Key="LOCBcSeconds">segundos</sys:String>
@@ -32,9 +34,12 @@
 
     <sys:String x:Key="LOCBcSteamGridDbSelect">Selecionar do SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcGoogleImageSelect">Selecione do Google Imagens</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrl">Adicionar de URL</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrlDescription">Digite a URL da imagem</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">arquivo ffmpeg</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">arquivo webpinfo</sys:String>
-    
+
+    <sys:String x:Key="LOCBcFfmpegNotFound">FFmpeg não encontrado</sys:String>
     <sys:String x:Key="LOCBcFTooltTipConvert">Converter para mp4 (melhor desempenho)</sys:String>
 
 </ResourceDictionary>

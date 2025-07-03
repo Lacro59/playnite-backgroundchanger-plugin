@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Використовувати ті самі налаштування для фонового зображення гри плагіну, що й для фону теми *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Увімкнути випадковий вибір</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Лише при запуску Playnite</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">При виборі гри</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Увімкнути автоматичну зміну</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Часовий інтервал</sys:String>
     <sys:String x:Key="LOCBcSeconds">сек.</sys:String>
@@ -32,9 +34,12 @@
 
     <sys:String x:Key="LOCBcSteamGridDbSelect">Вибрати зі SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcGoogleImageSelect">Вибрати з Google Зображення</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrl">Add from url</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrlDescription">Enter the url to the image</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">файл ffmpeg</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">файл webpinfo</sys:String>
-    
+
+    <sys:String x:Key="LOCBcFfmpegNotFound">FFmpeg не знайдено</sys:String>
     <sys:String x:Key="LOCBcFTooltTipConvert">Конвертувати в mp4 (продуктивність поліпшена)</sys:String>
 
 </ResourceDictionary>
