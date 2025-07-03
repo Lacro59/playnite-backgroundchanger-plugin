@@ -184,6 +184,7 @@ namespace BackgroundChanger
         {
             Settings.EnableBackgroundImageRandomOnSelect = BackgroundChangerSettingsView.BackgroundOnSelect;
             Settings.EnableBackgroundImageRandomOnStart = BackgroundChangerSettingsView.BackgroundOnStart;
+
             Settings.EnableCoverImageRandomOnSelect = BackgroundChangerSettingsView.CoverOnSelect;
             Settings.EnableCoverImageRandomOnStart = BackgroundChangerSettingsView.CoverOnStart;
 
