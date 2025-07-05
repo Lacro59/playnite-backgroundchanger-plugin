@@ -96,7 +96,7 @@
                                                   Content="{DynamicResource LOCBcEnableRandomSelect}" />
                                         
                                         <RadioButton DockPanel.Dock="Right" GroupName="BcRandom"
-                                                     Name="rbBackgroundOnSelect" Click="rb_Click"
+                                                     Name="rbBackgroundOnSelect" Click="Rb_Click"
                                                      Content="{DynamicResource LOCBcRandomOnSelect}">
                                             <RadioButton.Style>
                                                 <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
@@ -119,7 +119,7 @@
                                         </RadioButton>
 
                                         <RadioButton HorizontalAlignment="Right" Margin="0,0,20,0" GroupName="BcRandom"
-                                                     Name="rbBackgroundOnStart" Click="rb_Click"
+                                                     Name="rbBackgroundOnStart" Click="Rb_Click"
                                                      Content="{DynamicResource LOCBcRandomOnStart}">
                                             <RadioButton.Style>
                                                 <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
@@ -202,7 +202,7 @@
                                                   Content="{DynamicResource LOCBcEnableRandomSelect}" />
 
                                         <RadioButton DockPanel.Dock="Right" GroupName="CoverRandom"
-                                                     Name="rbCoverOnSelect" Click="rb_Click"
+                                                     Name="rbCoverOnSelect" Click="Rb_Click"
                                                      Content="{DynamicResource LOCBcRandomOnSelect}">
                                             <RadioButton.Style>
                                                 <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
@@ -225,7 +225,7 @@
                                         </RadioButton>
 
                                         <RadioButton HorizontalAlignment="Right" Margin="0,0,20,0" GroupName="CoverRandom"
-                                                     Name="rbCoverOnStart" Click="rb_Click"
+                                                     Name="rbCoverOnStart" Click="Rb_Click"
                                                      Content="{DynamicResource LOCBcRandomOnStart}">
                                             <RadioButton.Style>
                                                 <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">

@@ -43,6 +43,8 @@ namespace BackgroundChanger.Controls
         private int Counter { get; set; } = 0;
         private GameBackgroundImages GameBackgroundImages { get; set; }
 
+        private static readonly Random _random = new Random();
+
         private bool WindowsIsActivated { get; set; } = true;
         private bool IsFirst { get; set; } = true;
 
@@ -206,8 +208,7 @@ namespace BackgroundChanger.Controls
                         }
                         else
                         {
-                            Random rnd = new Random();
-                            Counter = rnd.Next(0, GameBackgroundImages.ItemsCover.Count);
+                            Counter = _random.Next(0, GameBackgroundImages.ItemsCover.Count);
                             pathImage = GameBackgroundImages.ItemsCover[Counter].FullPath;
                         }
                     }

@@ -25,7 +25,7 @@ namespace BackgroundChanger.Views
             rbCoverOnSelect.IsChecked = PluginDatabase.PluginSettings.Settings.EnableCoverImageRandomOnSelect;
             rbCoverOnStart.IsChecked = PluginDatabase.PluginSettings.Settings.EnableCoverImageRandomOnStart;
 
-            rb_Click(null, null);
+            Rb_Click(null, null);
         }
 
         private void ButtonFfmpeg_Click(object sender, RoutedEventArgs e)
@@ -38,7 +38,7 @@ namespace BackgroundChanger.Views
             }
         }
 
-        private void rb_Click(object sender, RoutedEventArgs e)
+        private void Rb_Click(object sender, RoutedEventArgs e)
         {
             BackgroundOnSelect = (bool)rbBackgroundOnSelect.IsChecked;
             BackgroundOnStart = (bool)rbBackgroundOnStart.IsChecked;

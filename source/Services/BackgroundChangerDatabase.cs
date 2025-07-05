@@ -44,7 +44,7 @@ namespace BackgroundChanger.Services
             if (!gameBackgroundImages.BackgroundImage.IsNullOrEmpty() && gameBackgroundImages.Items.Find(x => x.IsDefault && !x.IsCover) == null)
             {
                 string pathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.BackgroundImage);
-                if (pathImage.IsNullOrEmpty() && !File.Exists(pathImage))
+                if (pathImage.IsNullOrEmpty() || !File.Exists(pathImage))
                 {
                     pathImage = API.Instance.Database.GetFullFilePath(gameBackgroundImages.BackgroundImage);
                 }
@@ -69,7 +69,7 @@ namespace BackgroundChanger.Services
             if (!gameBackgroundImages.CoverImage.IsNullOrEmpty() && gameBackgroundImages.Items.Find(x => x.IsDefault && x.IsCover) == null)
             {
                 string pathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.CoverImage);
-                if (pathImage.IsNullOrEmpty() && !File.Exists(pathImage))
+                if (pathImage.IsNullOrEmpty() || !File.Exists(pathImage))
                 {
                     pathImage = API.Instance.Database.GetFullFilePath(gameBackgroundImages.CoverImage);
                 }

@@ -539,6 +539,16 @@ namespace BackgroundChanger.Views
                     return;
                 }
 
+                // Validate URL format
+                if (!Uri.TryCreate(urlSelection.SelectedString, UriKind.Absolute, out Uri uriResult) ||
+                    (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
+                {
+                    API.Instance.Dialogs.ShowErrorMessage(
+                        ResourceProvider.GetString("LOCBcInvalidUrlFormat"),
+                        PluginDatabase.PluginName);
+                    return;
+                }
+
                 GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(ResourceProvider.GetString("LOCCommonGettingData"))
                 {
                     Cancelable = false,

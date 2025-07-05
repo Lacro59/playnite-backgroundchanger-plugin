@@ -30,6 +30,7 @@ namespace BackgroundChanger.Models
             {
                 if (_backgroundImageOnStart == null)
                 {
+                    if (ItemsBackground.Count == 0) return null;
                     Random rnd = new Random();
                     int counter = rnd.Next(0, ItemsBackground.Count);
                     _backgroundImageOnStart = ItemsBackground[counter];
@@ -46,6 +47,7 @@ namespace BackgroundChanger.Models
             {
                 if (_coverImageOnStart == null)
                 {
+                    if (ItemsCover.Count == 0) return null;
                     Random rnd = new Random();
                     int counter = rnd.Next(0, ItemsCover.Count);
                     _coverImageOnStart = ItemsCover[counter];
