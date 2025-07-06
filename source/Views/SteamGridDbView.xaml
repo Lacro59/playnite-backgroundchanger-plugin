@@ -116,7 +116,7 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
 
-                        <Label Margin="30,0,0,0" Content="{DynamicResource LOCCommonTypes}" />
+                        <Label Margin="10,0,0,0" Content="{DynamicResource LOCCommonTypes}" />
                         <ComboBox Margin="10,0,0,0" Name="PART_ComboTypes" IsEditable="true" IsReadOnly="true" Width="170">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -127,8 +127,8 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
 
-                        <Label Margin="30,0,0,0" Content="{DynamicResource LOCTagsLabel}" />
-                        <ComboBox Margin="-60,0,0,0" Name="PART_ComboTags" IsEditable="true" IsReadOnly="true" Width="170">
+                        <Label Margin="10,0,0,0" Content="{DynamicResource LOCTagsLabel}" />
+                        <ComboBox Margin="-55,0,0,0" Name="PART_ComboTags" IsEditable="true" IsReadOnly="true" Width="170">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <CheckBox Checked="ApplyFilter" Unchecked="ApplyFilter"
@@ -199,7 +199,7 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel x:Name="PART_ListContener">
-                            <controls2:TextBlockTrimmed Margin="0,2" Text="{Binding Name}" MaxWidth="{Binding ElementName=PART_ListContener, Path=ActualWidth}"/>
+                            <controls2:TextBlockTrimmed Margin="0,2" Text="{Binding Name}" Width="200"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
