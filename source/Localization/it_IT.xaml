@@ -42,4 +42,6 @@
     <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg non trovato</sys:String>
     <sys:String x:Key="LOCBcFTooltTipConvert">Converti in mp4 (prestazioni migliorate)</sys:String>
 
+    <sys:String x:Key="LOCBcInvalidUrlFormat">Invalid Url Format!</sys:String>
+
 </ResourceDictionary>

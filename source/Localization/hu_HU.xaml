@@ -42,4 +42,6 @@
     <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
     <sys:String x:Key="LOCBcFTooltTipConvert">Konvertálás mp4-be (javult a teljesítmény)</sys:String>
 
+    <sys:String x:Key="LOCBcInvalidUrlFormat">Invalid Url Format!</sys:String>
+
 </ResourceDictionary>
