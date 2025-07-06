@@ -42,6 +42,7 @@ namespace BackgroundChanger.Controls
         }
 
         private System.Timers.Timer BcTimer { get; set; }
+        private System.Timers.Timer BcTimerVideo { get; set; }
         private int Counter { get; set; } = 0;
         private GameBackgroundImages GameBackgroundImages { get; set; }
 
@@ -59,6 +60,12 @@ namespace BackgroundChanger.Controls
                 BcTimer.Stop();
                 BcTimer.Dispose();
                 BcTimer = null;
+            }
+            if (BcTimerVideo != null)
+            {
+                BcTimerVideo.Stop();
+                BcTimerVideo.Dispose();
+                BcTimerVideo = null;
             }
 
             ControlDataContext = new PluginBackgroundImageDataContext
@@ -237,7 +244,7 @@ namespace BackgroundChanger.Controls
         {
             string pathImage = string.Empty;
 
-            if (GameBackgroundImages.HasDataBackground && !PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
+            if (GameBackgroundImages.HasDataBackground)
             {
                 ItemImage ItemFavorite = GameBackgroundImages.ItemsBackground.FirstOrDefault(x => x.IsFavorite);
 
@@ -252,7 +259,7 @@ namespace BackgroundChanger.Controls
                         }
                         else
                         {
-                            Counter = _random.Next(0, GameBackgroundImages.ItemsCover.Count);
+                            Counter = _random.Next(0, GameBackgroundImages.ItemsBackground.Count);
                             pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
                         }
                     }
@@ -317,6 +324,16 @@ namespace BackgroundChanger.Controls
             {
                 SetDefaultBackgroundImage();
             }
+
+            if (PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
+            {
+                BcTimerVideo = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.videoDelayBackgroundImage * 1000)
+                {
+                    AutoReset = true
+                };
+                BcTimerVideo.Elapsed += new ElapsedEventHandler(OnTimedVideoEvent);
+                BcTimerVideo.Start();
+            }
         }
 
         public void SetDefaultBackgroundImage()
@@ -330,22 +347,6 @@ namespace BackgroundChanger.Controls
                 string pathImage = ImageSourceManager.GetImagePath(GameContext.BackgroundImage)
                     ?? API.Instance.Database.GetFullFilePath(GameContext.BackgroundImage);
                 SetBackgroundImage(pathImage);
-            }
-
-            if (PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
-            {
-                _ = Task.Run(() =>
-                {
-                    Thread.Sleep(1000 * PluginDatabase.PluginSettings.Settings.videoDelayBackgroundImage);
-                    _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-                    {
-                        string pathVideo = GameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo && x.Exist)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
-                        if (!pathVideo.IsNullOrEmpty())
-                        {
-                            SetBackgroundImage(pathVideo);
-                        }
-                    }));
-                });
             }
         }
 
@@ -833,6 +834,30 @@ namespace BackgroundChanger.Controls
                         }
 
                         SetBackgroundImage(pathImage);
+                    }
+                }));
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
+        }
+
+        private void OnTimedVideoEvent(object source, ElapsedEventArgs e)
+        {
+            if (!WindowsIsActivated)
+            {
+                return;
+            }
+
+            try
+            {
+                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                {
+                    string pathVideo = GameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo && x.Exist)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
+                    if (!pathVideo.IsNullOrEmpty())
+                    {
+                        SetBackgroundImage(pathVideo);
                     }
                 }));
             }

@@ -30,10 +30,20 @@ namespace BackgroundChanger.Models
             {
                 if (_backgroundImageOnStart == null)
                 {
-                    if (ItemsBackground.Count == 0) return null;
+                    List<ItemImage> items = ItemsBackground.Where(x => !x.IsVideo).ToList();
+                    if (items.Count == 0)
+                    {
+                        items = ItemsBackground;
+                    }
+
+                    if (items.Count == 0)
+                    {
+                        return null;
+                    }
+
                     Random rnd = new Random();
-                    int counter = rnd.Next(0, ItemsBackground.Count);
-                    _backgroundImageOnStart = ItemsBackground[counter];
+                    int counter = rnd.Next(0, items.Count);
+                    _backgroundImageOnStart = items[counter];
                 }
                 return _backgroundImageOnStart;
             }
@@ -47,10 +57,20 @@ namespace BackgroundChanger.Models
             {
                 if (_coverImageOnStart == null)
                 {
-                    if (ItemsCover.Count == 0) return null;
+                    List<ItemImage> items = ItemsCover.Where(x => !x.IsVideo).ToList();
+                    if (items.Count == 0)
+                    {
+                        items = ItemsCover;
+                    }
+
+                    if (items.Count == 0)
+                    {
+                        return null;
+                    }
+
                     Random rnd = new Random();
-                    int counter = rnd.Next(0, ItemsCover.Count);
-                    _coverImageOnStart = ItemsCover[counter];
+                    int counter = rnd.Next(0, items.Count);
+                    _coverImageOnStart = items[counter];
                 }
                 return _coverImageOnStart;
             }

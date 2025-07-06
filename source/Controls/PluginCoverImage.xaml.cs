@@ -40,6 +40,7 @@ namespace BackgroundChanger.Controls
         }
 
         private System.Timers.Timer BcTimer { get; set; }
+        private System.Timers.Timer BcTimerVideo { get; set; }
         private int Counter { get; set; } = 0;
         private GameBackgroundImages GameBackgroundImages { get; set; }
 
@@ -57,6 +58,12 @@ namespace BackgroundChanger.Controls
                 BcTimer.Stop();
                 BcTimer.Dispose();
                 BcTimer = null;
+            }
+            if (BcTimerVideo != null)
+            {
+                BcTimerVideo.Stop();
+                BcTimerVideo.Dispose();
+                BcTimerVideo = null;
             }
 
             ControlDataContext = new PluginCoverImageDataContext
@@ -113,7 +120,7 @@ namespace BackgroundChanger.Controls
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {winName} - {winIdProperty}", true, "BackgroundChanger");
+                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {winName} - {winIdProperty}", true, PluginDatabase.PluginName);
             }
         }
 
@@ -155,7 +162,7 @@ namespace BackgroundChanger.Controls
                             }
                             catch (Exception ex)
                             {
-                                Common.LogError(ex, false, true, "BackgroundChanger");
+                                Common.LogError(ex, false, true, PluginDatabase.PluginName);
                             }
                         }
                     }
@@ -184,7 +191,7 @@ namespace BackgroundChanger.Controls
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
         }
 
@@ -193,7 +200,7 @@ namespace BackgroundChanger.Controls
         {
             string pathImage = string.Empty;
 
-            if (GameBackgroundImages.HasDataCover && !PluginDatabase.PluginSettings.Settings.useVideoDelayCoverImage)
+            if (GameBackgroundImages.HasDataCover)
             {
                 ItemImage ItemFavorite = GameBackgroundImages.ItemsCover.FirstOrDefault(x => x.IsFavorite);
 
@@ -273,6 +280,16 @@ namespace BackgroundChanger.Controls
             {
                 SetDefaultCoverImage();
             }
+
+            if (PluginDatabase.PluginSettings.Settings.useVideoDelayCoverImage)
+            {
+                BcTimerVideo = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.videoDelayCoverImage * 1000)
+                {
+                    AutoReset = true
+                };
+                BcTimerVideo.Elapsed += new ElapsedEventHandler(OnTimedVideoEvent);
+                BcTimerVideo.Start();
+            }
         }
 
         public void SetDefaultCoverImage()
@@ -286,22 +303,6 @@ namespace BackgroundChanger.Controls
                 string pathImage = ImageSourceManager.GetImagePath(GameContext.CoverImage)
                     ?? API.Instance.Database.GetFullFilePath(GameContext.CoverImage);
                 SetCoverImage(pathImage);
-            }
-
-            if (PluginDatabase.PluginSettings.Settings.useVideoDelayCoverImage)
-            {
-                _ = Task.Run(() =>
-                {
-                    Thread.Sleep(1000 * PluginDatabase.PluginSettings.Settings.videoDelayCoverImage);
-                    _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-                    {
-                        string pathVideo = GameBackgroundImages?.ItemsCover?.Where(x => x.IsVideo && x.Exist)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
-                        if (!pathVideo.IsNullOrEmpty())
-                        {
-                            SetCoverImage(pathVideo);
-                        }
-                    }));
-                });
             }
         }
 
@@ -474,7 +475,31 @@ namespace BackgroundChanger.Controls
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "BackgroundChanger");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
+        }
+
+        private void OnTimedVideoEvent(object source, ElapsedEventArgs e)
+        {
+            if (!WindowsIsActivated)
+            {
+                return;
+            }
+
+            try
+            {
+                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                {
+                    string pathVideo = GameBackgroundImages?.ItemsCover?.Where(x => x.IsVideo && x.Exist)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
+                    if (!pathVideo.IsNullOrEmpty())
+                    {
+                        SetCoverImage(pathVideo);
+                    }
+                }));
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
         }
 
