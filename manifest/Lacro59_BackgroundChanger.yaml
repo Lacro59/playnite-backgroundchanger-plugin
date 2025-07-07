@@ -68,3 +68,15 @@ Packages:
       - 'Fixed: Images become blurred when switching to a different box art aspect ratio'
       - 'Added: Select all found results'
       - 'Added: Lazy loading'
+  - Version: 3.3
+    RequiredApiVersion: 6.11.0
+    ReleaseDate: 2025-07-07
+    PackageUrl: https://github.com/Lacro59/playnite-backgroundchanger-plugin/releases/download/v3.2/playnite-backgroundchanger-plugin_3_2.pext
+    Changelog:
+      - 'Updated: Localizations'
+      - 'Added: Option to randomize background and cover images only on Playnite start or on game selection'
+      - 'Added: Ability to add images from URLs directly in the image manager'
+      - 'Added: New filters and sorting options for external image source selection'
+      - 'Updated: Settings and image manager UI with simplified layouts and numeric inputs'
+      - 'Fixed: Detection and handling of image and video files with better extension checks'
+      - 'Fixed: UI errors and crashes during image loading and updates'
