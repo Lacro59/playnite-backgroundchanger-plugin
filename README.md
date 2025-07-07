@@ -51,5 +51,4 @@ The extension contains elements that can fit into a custom theme.
 [More informations](https://github.com/Lacro59/playnite-backgroundchanger-plugin/wiki/Addition-in-a-custom-theme)
 
 ## More
-Remember to support [Playnite](https://www.patreon.com/playnite) and the [data site](https://www.patreon.com/steamgriddb).  
-<a href='https://ko-fi.com/lacro59'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+Remember to support [Playnite](https://www.patreon.com/playnite) and the [SteamGridDB](https://www.patreon.com/steamgriddb).
