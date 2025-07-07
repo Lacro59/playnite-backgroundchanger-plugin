@@ -8,7 +8,8 @@
              xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
              xmlns:controlsAnimated="clr-namespace:wpf_animatedimage.Controls"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
-             xmlns:converters1="clr-namespace:CommonPlayniteShared.Converters" xmlns:controls="clr-namespace:CommonPluginsShared.Controls"
+             xmlns:converters1="clr-namespace:CommonPlayniteShared.Converters" 
+             xmlns:controls="clr-namespace:CommonPluginsShared.Controls"
              mc:Ignorable="d" 
              Height="700" Width="1100">
 
@@ -123,7 +124,7 @@
                                               ScrubbingEnabled="True" MediaOpened="Video_MediaOpened" 
                                               Source="{Binding FullPath}" LoadedBehavior="Stop" Name="Video"
                                               Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                    
+
                                     <TextBlock Margin="0,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Right" FontFamily="{DynamicResource FontIcoFont}">
                                         <TextBlock.Style>
                                             <Style TargetType="{x:Type TextBlock}">
@@ -140,7 +141,7 @@
                                             <DropShadowEffect Color="Black" Opacity="0.75" BlurRadius="3" ShadowDepth="0" />
                                         </TextBlock.Effect>
                                     </TextBlock>
-                                    
+
                                     <TextBlock MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
                                            Margin="5,5,0,0"
                                            VerticalAlignment="Top" HorizontalAlignment="Left"
@@ -195,10 +196,12 @@
                         Style="{StaticResource BottomButton}" Click="PART_BtAddSteamGridDb_Click" />
                 <Button TabIndex="3" Name="PART_BtAddGoogleImage" Content="{DynamicResource LOCBcGoogleImageSelect}" DockPanel.Dock="Left"
                         Style="{StaticResource BottomButton}" Click="PART_BtAddGoogleImage_Click" />
+                <Button TabIndex="4" Name="PART_BtAddFromUrl" Content="{DynamicResource LOCBcAddFromUrl}" DockPanel.Dock="Left"
+                        Style="{StaticResource BottomButton}" Click="PART_BtAddFromUrl_Click" />
 
-                <Button TabIndex="4" Name="PART_BtCancel" Content="{DynamicResource LOCCancelLabel}" DockPanel.Dock="Right" IsCancel="True"
+                <Button TabIndex="5" Name="PART_BtCancel" Content="{DynamicResource LOCCancelLabel}" DockPanel.Dock="Right" IsCancel="True"
                         Style="{StaticResource BottomButton}" Click="PART_BtCancel_Click" />
-                <Button TabIndex="5" Name="PART_BtOK" Content="{DynamicResource LOCSaveLabel}" DockPanel.Dock="Right" IsDefault="True"
+                <Button TabIndex="6" Name="PART_BtOK" Content="{DynamicResource LOCSaveLabel}" DockPanel.Dock="Right" IsDefault="True"
                         Style="{StaticResource BottomButton}" Click="PART_BtOK_Click" />
             </DockPanel>
         </Border>

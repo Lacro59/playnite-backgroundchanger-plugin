@@ -2,22 +2,15 @@
 using BackgroundChanger.Services;
 using CommonPluginsControls.PlayniteControls;
 using CommonPluginsShared;
+using Playnite.SDK;
 using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace BackgroundChanger.Views
 {
@@ -26,6 +19,9 @@ namespace BackgroundChanger.Views
     /// </summary>
     public partial class SteamGridDbView : UserControl
     {
+        private BackgroundChanger Plugin { get; }
+        private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
+
         private SteamGridDbApi SteamGridDbApi { get; set; } = new SteamGridDbApi();
         private SteamGridDbType SteamGridDbType { get; set; }
 
@@ -35,88 +31,43 @@ namespace BackgroundChanger.Views
         private List<SteamGridDbResult> DataSearchFiltered { get; set; } = null;
 
 
-        public SteamGridDbView(string Name, SteamGridDbType steamGridDbType)
+        public SteamGridDbView(string name, SteamGridDbType steamGridDbType, BackgroundChanger plugin)
         {
             InitializeComponent();
 
-            this.SteamGridDbType = steamGridDbType;
+            Plugin = plugin;
+            SteamGridDbType = steamGridDbType;
 
-            SearchElement.Text = Name;
-            SearchData(Name);
+            SearchElement.Text = name;
+            SearchData(name);
 
 
-            if (steamGridDbType == SteamGridDbType.heroes)
+            if (SteamGridDbType == SteamGridDbType.heroes)
             {
-                // Set Dimensions
-                List<CheckData> CheckDimensions = new List<CheckData>
-                {
-                    new CheckData { Name="Steam - 96:31 - 1920x620", Data="1920x620" },
-                    new CheckData { Name="Steam - 96:31 - 3840x1240", Data="3840x1240" },
+                PART_ComboDimensions.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckDimensions);
+                PART_ComboStyles.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckStyles);
+                PART_ComboTypes.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckTypes);
+                PART_ComboTags.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckTags);
 
-                    new CheckData { Name="Galaxy 2.0 - 32:13 - 1600x650", Data="1600x650" }
-                };
-                PART_ComboDimensions.ItemsSource = CheckDimensions;
-
-
-                // Set Styles
-                List<CheckData> CheckStyles = new List<CheckData>
-                {
-                    new CheckData { Name="Alternate", Data="alternate" },
-                    new CheckData { Name="Material", Data="material" },
-                    new CheckData { Name="Blurred", Data="blurred" }
-                };
-                PART_ComboStyles.ItemsSource = CheckStyles;
+                PART_ButtonSortByDate_Asc.IsChecked = PluginDatabase.PluginSettings.Settings.SgHeroesFilters.SortByDateAsc;
+                PART_ButtonSortByDate_Desc.IsChecked = !PluginDatabase.PluginSettings.Settings.SgHeroesFilters.SortByDateAsc;
             }
             else
             {
-                // Set Dimensions
-                List<CheckData> CheckDimensions = new List<CheckData>
-                {
-                    new CheckData { Name="Steam Vertical - 2:3 - 600x900", Data="600x900" },
+                PART_ComboDimensions.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckDimensions);
+                PART_ComboStyles.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckStyles);
+                PART_ComboTypes.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckTypes);
+                PART_ComboTags.ItemsSource = Serialization.GetClone(PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckTags);
 
-                    new CheckData { Name="Steam Horizontal - 92:43 - 920x430", Data="920x430" },
-                    new CheckData { Name="Steam Horizontal - 92:43 - 460x215", Data="460x215" },
-
-                    new CheckData { Name="Square - 1:1 - 1024x1024", Data="1024x1024" },
-                    new CheckData { Name="Square - 1:1 - 512x512", Data="512x512" },
-
-                    new CheckData { Name="Galaxy 2.0 - 22:31 - 660x930", Data="660x930" },
-                    new CheckData { Name="Galaxy 2.0 - 22:31 - 342x482", Data="342x482" },
-                };
-                PART_ComboDimensions.ItemsSource = CheckDimensions;
-
-
-                // Set Styles
-                List<CheckData> CheckStyles = new List<CheckData>
-                {
-                    new CheckData { Name="Alternate", Data="alternate" },
-                    new CheckData { Name="White Logo", Data="white_logo" },
-                    new CheckData { Name="Material", Data="material" },
-                    new CheckData { Name="Blurred", Data="blurred" },
-                    new CheckData { Name="No Logo", Data="no_logo" }
-                };
-                PART_ComboStyles.ItemsSource = CheckStyles;
+                PART_ButtonSortByDate_Asc.IsChecked = PluginDatabase.PluginSettings.Settings.SgGridsFilters.SortByDateAsc;
+                PART_ButtonSortByDate_Desc.IsChecked = !PluginDatabase.PluginSettings.Settings.SgGridsFilters.SortByDateAsc;
             }
 
-            // Set Types
-            List<CheckData> CheckTypes = new List<CheckData>
-            {
-                new CheckData { Name="Static", Data="static" },
-                new CheckData { Name="Animated", Data="animated" }
-            };
-            PART_ComboTypes.ItemsSource = CheckTypes;
+            Combox_Changed();
+        }
 
-            // Set Tags
-            List<CheckData> CheckTags = new List<CheckData>
-            {
-                new CheckData { Name="Humor", Data="Humor" },
-                new CheckData { Name="Adult Content", Data="Adult Content", IsChecked=false },
-                new CheckData { Name="Epilepsy", Data="Epilepsy" },
-                new CheckData { Name="Untagged", Data="Untagged" }
-            };
-            PART_ComboTags.ItemsSource = CheckTags;
-
-
+        private void Combox_Changed()
+        {
             ComboBox_SelectionChanged(PART_ComboDimensions, null);
             ComboBox_SelectionChanged(PART_ComboStyles, null);
             ComboBox_SelectionChanged(PART_ComboTags, null);
@@ -124,57 +75,45 @@ namespace BackgroundChanger.Views
         }
 
 
-        private void SearchData(string Name)
+        private void SearchData(string name)
         {
             PART_SearchList.ItemsSource = null;
             PART_ElementList.ItemsSource = null;
-            PART_DataLoad.Visibility = Visibility.Visible;
-            PART_Data.IsEnabled = false;
 
             ButtonSelect.IsEnabled = false;
 
-            string GameSearch = Name;
-            _ = Task.Run(() =>
+            SteamGridDbSearchResultData dataSearch = null;
+            if (API.Instance.Dialogs.ActivateGlobalProgress((_) =>
             {
-                SteamGridDbSearchResultData DataSearch = null;
                 try
                 {
-                    DataSearch = SteamGridDbApi.SearchGame(GameSearch);
+                    dataSearch = SteamGridDbApi.SearchGame(name);
                 }
                 catch (Exception ex)
                 {
                     Common.LogError(ex, false, true, "BackgroundChanger");
                 }
-
-                _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
+            }, new GlobalProgressOptions("LOCDownloadingLabel")).Result == true)
+            {
+                if (dataSearch != null)
                 {
-                    if (DataSearch != null)
-                    {
-                        PART_SearchList.ItemsSource = DataSearch.Data;
-                    }
-
-                    PART_DataLoad.Visibility = Visibility.Collapsed;
-                    PART_Data.IsEnabled = true;
-                });
-            });
+                    PART_SearchList.ItemsSource = dataSearch.Data;
+                }
+            }
         }
 
-        private void SearchDataElements(int Id)
+        private void SearchDataElements(int id)
         {
             PART_ElementList.ItemsSource = null;
-            PART_DataLoad.Visibility = Visibility.Visible;
-            PART_Data.IsEnabled = false;
-
             ButtonSelect.IsEnabled = false;
 
-            string GameSearch = SearchElement.Text;
-            _ = Task.Run(() =>
+            DataSearch = null;
+            if (API.Instance.Dialogs.ActivateGlobalProgress((_) =>
             {
-                DataSearch = null;
                 try
                 {
                     SteamGridDbResultData steamGridDbResultData = null;
-                    steamGridDbResultData = SteamGridDbApi.SearchElement(Id, SteamGridDbType);
+                    steamGridDbResultData = SteamGridDbApi.SearchElement(id, SteamGridDbType);
                     DataSearch = new SteamGridDbResultData
                     {
                         Data = new List<SteamGridDbResult>()
@@ -185,43 +124,38 @@ namespace BackgroundChanger.Views
                     {
                         DataSearch.Data.AddRange(steamGridDbResultData.Data);
                         page++;
-                        steamGridDbResultData = SteamGridDbApi.SearchElement(Id, SteamGridDbType, page);
+                        steamGridDbResultData = SteamGridDbApi.SearchElement(id, SteamGridDbType, page);
                     }
                 }
                 catch (Exception ex)
                 {
                     Common.LogError(ex, false, true, "BackgroundChanger");
                 }
-
-                _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
+            }, new GlobalProgressOptions("LOCDownloadingLabel")).Result == true)
+            {
+                ButtonSelectAll.IsEnabled = DataSearch?.Data?.Count > 0;
+                if (DataSearch != null)
                 {
-                    ButtonSelectAll.IsEnabled = DataSearch?.Data?.Count > 0;
-                    if (DataSearch != null)
-                    {
-                        ApplyFilter(null, null);
-                    }
-
-                    PART_DataLoad.Visibility = Visibility.Collapsed;
-                    PART_Data.IsEnabled = true;
-                });
-            });
+                    ApplyFilter(null, null);
+                }
+            }
         }
 
 
         private void ButtonSelect_Click(object sender, RoutedEventArgs e)
         {
-            ((Window)this.Parent).Close();
+            ((Window)Parent).Close();
         }
 
         private void ButtonSelectAll_Click(object sender, RoutedEventArgs e)
         {
             PART_ElementList.SelectAll();
-            ((Window)this.Parent).Close();
+            ((Window)Parent).Close();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            ((Window)this.Parent).Close();
+            ((Window)Parent).Close();
         }
 
 
@@ -255,8 +189,8 @@ namespace BackgroundChanger.Views
             {
                 if (PART_SearchList?.Items?.Count > 0)
                 {
-                    int Id = ((SteamGridDbSearchResult)PART_SearchList.SelectedItem).Id;
-                    SearchDataElements(Id);
+                    int id = ((SteamGridDbSearchResult)PART_SearchList.SelectedItem).Id;
+                    SearchDataElements(id);
                 }
             }
             catch { }
@@ -339,85 +273,58 @@ namespace BackgroundChanger.Views
 
         private void PART_ButtonSort_Click(object sender, RoutedEventArgs e)
         {
-            if (DataSearchFiltered != null)
+            // Exit if there is no data to sort
+            if (DataSearchFiltered == null)
             {
-                if (sender != null)
-                {
-                    string BtName = ((ToggleButton)sender).Name;
-                    bool IsChecked = (bool)((ToggleButton)sender).IsChecked;
-
-                    if (BtName == "PART_ButtonSortByDate_Asc")
-                    {
-                        if (IsChecked)
-                        {
-                            PART_ButtonSortByDate_Desc.IsChecked = false;
-
-                            PART_ButtonSortByScore_Asc.IsChecked = false;
-                            PART_ButtonSortByScore_Desc.IsChecked = false;
-                        }
-                    }
-
-                    if (BtName == "PART_ButtonSortByDate_Desc")
-                    {
-                        if (IsChecked)
-                        {
-                            PART_ButtonSortByDate_Asc.IsChecked = false;
-
-                            PART_ButtonSortByScore_Asc.IsChecked = false;
-                            PART_ButtonSortByScore_Desc.IsChecked = false;
-                        }
-                    }
-
-
-                    if (BtName == "PART_ButtonSortByScore_Asc")
-                    {
-                        if (IsChecked)
-                        {
-                            PART_ButtonSortByDate_Asc.IsChecked = false;
-                            PART_ButtonSortByDate_Desc.IsChecked = false;
-
-                            PART_ButtonSortByScore_Desc.IsChecked = false;
-                        }
-                    }
-
-                    if (BtName == "PART_ButtonSortByScore_Desc")
-                    {
-                        if (IsChecked)
-                        {
-                            PART_ButtonSortByDate_Asc.IsChecked = false;
-                            PART_ButtonSortByDate_Desc.IsChecked = false;
-
-                            PART_ButtonSortByScore_Asc.IsChecked = false;
-                        }
-                    }
-                }
-
-
-                if ((bool)PART_ButtonSortByDate_Asc.IsChecked)
-                {
-                    DataSearchFiltered.Sort((x, y) => x.Id.CompareTo(y.Id));
-                }
-
-                if ((bool)PART_ButtonSortByDate_Desc.IsChecked)
-                {
-                    DataSearchFiltered.Sort((x, y) => y.Id.CompareTo(x.Id));
-                }
-
-
-                if ((bool)PART_ButtonSortByScore_Asc.IsChecked)
-                {
-                    DataSearchFiltered.Sort((x, y) => x.Score.CompareTo(y.Score));
-                }
-
-                if ((bool)PART_ButtonSortByScore_Desc.IsChecked)
-                {
-                    DataSearchFiltered.Sort((x, y) => y.Score.CompareTo(x.Score));
-                }
-
-
-                PART_ElementList.ItemsSource = null;
-                PART_ElementList.ItemsSource = DataSearchFiltered;
+                return;
             }
+
+            // Handle toggle button exclusivity (only one can be checked at a time)
+            if (sender is ToggleButton btn)
+            {
+                // List all sort buttons
+                var sortButtons = new[]
+                {
+                    PART_ButtonSortByDate_Asc,
+                    PART_ButtonSortByDate_Desc,
+                    //PART_ButtonSortByScore_Asc,
+                    //PART_ButtonSortByScore_Desc
+                };
+
+                // Uncheck all other buttons if the current one is checked
+                if (btn.IsChecked == true)
+                {
+                    foreach (var b in sortButtons)
+                    {
+                        if (b != btn)
+                        {
+                            b.IsChecked = false;
+                        }
+                    }
+                }
+            }
+
+            // Sort the filtered data according to the selected sort button
+            if (PART_ButtonSortByDate_Asc.IsChecked == true)
+            {
+                DataSearchFiltered.Sort((x, y) => x.Id.CompareTo(y.Id));
+            }
+            else if (PART_ButtonSortByDate_Desc.IsChecked == true)
+            {
+                DataSearchFiltered.Sort((x, y) => y.Id.CompareTo(x.Id));
+            }
+            //else if (PART_ButtonSortByScore_Asc.IsChecked == true)
+            //{
+            //    DataSearchFiltered.Sort((x, y) => x.Score.CompareTo(y.Score));
+            //}
+            //else if (PART_ButtonSortByScore_Desc.IsChecked == true)
+            //{
+            //    DataSearchFiltered.Sort((x, y) => y.Score.CompareTo(x.Score));
+            //}
+
+            // Refresh the item source to update the UI
+            PART_ElementList.ItemsSource = null;
+            PART_ElementList.ItemsSource = DataSearchFiltered;
         }
 
 
@@ -429,13 +336,103 @@ namespace BackgroundChanger.Views
 
             ((ComboBox)sender).Text = data;
         }
-    }
 
 
-    public class CheckData
-    {
-        public string Name { get; set; }
-        public string Data { get; set; }
-        public bool IsChecked { get; set; } = true;
+        private void ClearFilter_Click(object sender, RoutedEventArgs e)
+        {
+            if (SteamGridDbType == SteamGridDbType.heroes)
+            {
+                PART_ComboDimensions.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Steam - 96:31 - 1920x620", Data = "1920x620" },
+                    new CheckData { Name = "Steam - 96:31 - 3840x1240", Data = "3840x1240" },
+                    new CheckData { Name = "Galaxy 2.0 - 32:13 - 1600x650", Data = "1600x650" }
+                };
+
+                PART_ComboStyles.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Alternate", Data = "alternate" },
+                    new CheckData { Name = "Material", Data = "material" },
+                    new CheckData { Name = "Blurred", Data = "blurred" }
+                };
+
+                PART_ComboTypes.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Static", Data = "static" },
+                    new CheckData { Name = "Animated", Data = "animated" }
+                };
+
+                PART_ComboTags.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Humor", Data = "Humor" },
+                    new CheckData { Name = "Adult Content", Data = "Adult Content", IsChecked = false },
+                    new CheckData { Name = "Epilepsy", Data = "Epilepsy" },
+                    new CheckData { Name = "Untagged", Data = "Untagged" }
+                };
+            }
+            else
+            {
+                PART_ComboDimensions.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Steam Vertical - 2:3 - 600x900", Data = "600x900" },
+                    new CheckData { Name = "Steam Horizontal - 92:43 - 920x430", Data = "920x430" },
+                    new CheckData { Name = "Steam Horizontal - 92:43 - 460x215", Data = "460x215" },
+                    new CheckData { Name = "Square - 1:1 - 1024x1024", Data = "1024x1024" },
+                    new CheckData { Name = "Square - 1:1 - 512x512", Data = "512x512" },
+                    new CheckData { Name = "Galaxy 2.0 - 22:31 - 660x930", Data = "660x930" },
+                    new CheckData { Name = "Galaxy 2.0 - 22:31 - 342x482", Data = "342x482" }
+                };
+
+                PART_ComboStyles.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Alternate", Data = "alternate" },
+                    new CheckData { Name = "White Logo", Data = "white_logo" },
+                    new CheckData { Name = "Material", Data = "material" },
+                    new CheckData { Name = "Blurred", Data = "blurred" },
+                    new CheckData { Name = "No Logo", Data = "no_logo" }
+                };
+
+                PART_ComboTypes.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Static", Data = "static" },
+                    new CheckData { Name = "Animated", Data = "animated" }
+                };
+
+                PART_ComboTags.ItemsSource = new List<CheckData>
+                {
+                    new CheckData { Name = "Humor", Data = "Humor" },
+                    new CheckData { Name = "Adult Content", Data = "Adult Content", IsChecked = false },
+                    new CheckData { Name = "Epilepsy", Data = "Epilepsy" },
+                    new CheckData { Name = "Untagged", Data = "Untagged" }
+                };
+            }
+
+            Combox_Changed();
+        }
+
+        private void SavedFilter_Click(object sender, RoutedEventArgs e)
+        {
+            if (SteamGridDbType == SteamGridDbType.heroes)
+            {
+                PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckDimensions = (List<CheckData>)PART_ComboDimensions.ItemsSource;
+                PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckStyles = (List<CheckData>)PART_ComboStyles.ItemsSource;
+                PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckTypes = (List<CheckData>)PART_ComboTypes.ItemsSource;
+                PluginDatabase.PluginSettings.Settings.SgHeroesFilters.CheckTags = (List<CheckData>)PART_ComboTags.ItemsSource;
+
+                PluginDatabase.PluginSettings.Settings.SgHeroesFilters.SortByDateAsc = (bool)PART_ButtonSortByDate_Asc.IsChecked;
+            }
+            else
+            {
+                PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckDimensions = (List<CheckData>)PART_ComboDimensions.ItemsSource;
+                PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckStyles = (List<CheckData>)PART_ComboStyles.ItemsSource;
+                PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckTypes = (List<CheckData>)PART_ComboTypes.ItemsSource;
+                PluginDatabase.PluginSettings.Settings.SgGridsFilters.CheckTags = (List<CheckData>)PART_ComboTags.ItemsSource;
+
+                PluginDatabase.PluginSettings.Settings.SgGridsFilters.SortByDateAsc = (bool)PART_ButtonSortByDate_Asc.IsChecked;
+            }
+
+            Plugin.SavePluginSettings(PluginDatabase.PluginSettings.Settings);
+            Combox_Changed();
+        }
     }
 }

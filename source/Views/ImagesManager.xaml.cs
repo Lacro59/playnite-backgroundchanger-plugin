@@ -15,7 +15,6 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,25 +30,29 @@ namespace BackgroundChanger.Views
     /// </summary>
     public partial class ImagesManager : UserControl
     {
-        private BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
+        private static ILogger Logger => LogManager.GetLogger();
+
+        private BackgroundChanger Plugin { get; }
+        private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
 
         private GameBackgroundImages GameBackgroundImages { get; set; }
-        private List<ItemImage> BackgroundImages { get; set; }
-        private List<ItemImage> BackgroundImagesEdited { get; set; }
+        private List<ItemImage> CurrentImages { get; set; }
+        private List<ItemImage> EditedImages { get; set; }
         private bool IsCover { get; set; }
 
 
-        public ImagesManager(GameBackgroundImages gameBackgroundImages, bool isCover)
+        public ImagesManager(GameBackgroundImages gameBackgroundImages, bool isCover, BackgroundChanger plugin)
         {
             GameBackgroundImages = gameBackgroundImages;
-            BackgroundImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == isCover && x.Exist).ToList());
-            BackgroundImagesEdited = Serialization.GetClone(BackgroundImages);
+            CurrentImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == isCover && x.Exist).ToList());
+            EditedImages = Serialization.GetClone(CurrentImages);
             IsCover = isCover;
+            Plugin = plugin;
 
             InitializeComponent();
 
             PART_LbBackgroundImages.ItemsSource = null;
-            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+            PART_LbBackgroundImages.ItemsSource = EditedImages;
 
             PART_BackgroundImage.UseAnimated = true;
         }
@@ -57,55 +60,55 @@ namespace BackgroundChanger.Views
 
         private void PART_BtCancel_Click(object sender, RoutedEventArgs e)
         {
-            ((Window)this.Parent).Close();
+            ((Window)Parent).Close();
         }
 
         private void PART_BtOK_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                ItemImage originalDefault = BackgroundImages.FirstOrDefault(x => x.IsDefault);
+                ItemImage originalDefault = CurrentImages.FirstOrDefault(x => x.IsDefault);
 
                 // Delete removed
-                BackgroundImages.Where(x => !x.Name.IsEqual(originalDefault?.Name) && x.IsCover == IsCover)?.ForEach(y =>
+                CurrentImages.Where(x => !x.Name.IsEqual(originalDefault?.Name) && x.IsCover == IsCover)?.ForEach(y =>
                 {
-                    if (BackgroundImagesEdited.FirstOrDefault(x => x.FullPath == y.FullPath) == null)
+                    if (EditedImages.FirstOrDefault(x => x.FullPath == y.FullPath) == null)
                     {
                         FileSystem.DeleteFileSafe(y.FullPath);
                     }
                 });
 
                 // Add newed
-                for (int index = 0; index < BackgroundImagesEdited.Count; index++)
+                for (int index = 0; index < EditedImages.Count; index++)
                 {
-                    ItemImage itemImage = BackgroundImagesEdited[index];
+                    ItemImage itemImage = EditedImages[index];
 
                     if (itemImage.FolderName.IsNullOrEmpty() && !itemImage.Name.IsEqual(originalDefault?.Name))
                     {
-                        Guid ImageGuid = Guid.NewGuid();
-                        string OriginalPath = itemImage.Name;
-                        string ext = Path.GetExtension(OriginalPath);
+                        Guid imageGuid = Guid.NewGuid();
+                        string originalPath = itemImage.Name;
+                        string ext = Path.GetExtension(originalPath);
 
-                        itemImage.Name = ImageGuid.ToString() + ext;
+                        itemImage.Name = imageGuid.ToString() + ext;
                         itemImage.FolderName = GameBackgroundImages.Id.ToString();
                         itemImage.IsCover = IsCover;
 
-                        string Dir = Path.GetDirectoryName(itemImage.FullPath);
-                        FileSystem.CreateDirectory(Dir);
-                        File.Copy(OriginalPath, itemImage.FullPath);
+                        string dir = Path.GetDirectoryName(itemImage.FullPath);
+                        FileSystem.CreateDirectory(dir);
+                        File.Copy(originalPath, itemImage.FullPath);
                     }
                 }
 
                 // Default
-                ItemImage newDefault = BackgroundImagesEdited.FirstOrDefault(x => x.IsDefault);
+                ItemImage newDefault = EditedImages.FirstOrDefault(x => x.IsDefault);
                 if (!originalDefault?.Name.IsEqual(newDefault?.Name) ?? false)
                 {
                     // Copy old in exention data
-                    string FolderName = GameBackgroundImages.Id.ToString();
+                    string folderName = GameBackgroundImages.Id.ToString();
                     string newPath = Path.Combine(
                         PluginDatabase.Paths.PluginUserDataPath,
                         "Images",
-                        FolderName,
+                        folderName,
                         Path.GetFileName(originalDefault.Name)
                     );
                     File.Copy(originalDefault.Name, newPath);
@@ -116,11 +119,11 @@ namespace BackgroundChanger.Views
                     string filePath = API.Instance.Database.AddFile(newDefault.FullPath, game.Id);
                     FileSystem.DeleteFileSafe(newDefault.FullPath);
 
-                    ItemImage originalNew = BackgroundImages.FirstOrDefault(x => x.Name.IsEqual(newDefault.Name));
-                    ItemImage newOld = BackgroundImagesEdited.FirstOrDefault(x => x.Name.IsEqual(originalDefault.Name));
+                    ItemImage originalNew = CurrentImages.FirstOrDefault(x => x.Name.IsEqual(newDefault.Name));
+                    ItemImage newOld = EditedImages.FirstOrDefault(x => x.Name.IsEqual(originalDefault.Name));
 
                     newOld.Name = Path.GetFileName(originalDefault.Name);
-                    newOld.FolderName = FolderName;
+                    newOld.FolderName = folderName;
 
                     if (IsCover)
                     {
@@ -137,11 +140,11 @@ namespace BackgroundChanger.Views
 
                 // Saved
                 List<ItemImage> tmpList = Serialization.GetClone(GameBackgroundImages.Items.Where(x => x.IsCover != IsCover).ToList());
-                tmpList.AddRange(BackgroundImagesEdited);
+                tmpList.AddRange(EditedImages);
                 GameBackgroundImages.Items = tmpList;
                 BackgroundChanger.PluginDatabase.Update(GameBackgroundImages);
 
-                ((Window)this.Parent).Close();
+                ((Window)Parent).Close();
             }
             catch (Exception ex)
             {
@@ -160,9 +163,9 @@ namespace BackgroundChanger.Views
                 PART_LbBackgroundImages.ItemsSource = null;
 
                 int index = int.Parse(((Button)sender).Tag.ToString());
-                BackgroundImagesEdited.RemoveAt(index);
+                EditedImages.RemoveAt(index);
 
-                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+                PART_LbBackgroundImages.ItemsSource = EditedImages;
             }
             catch (Exception ex)
             {
@@ -174,21 +177,21 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                List<string> SelectedFiles = API.Instance.Dialogs.SelectFiles("(*.jpg, *.jpeg, *.png)|*.jpg; *.jpeg; *.png|(*.webp)|*.webp|(*.mp4)|*.mp4");
+                List<string> selectedFiles = API.Instance.Dialogs.SelectFiles("(*.jpg, *.jpeg, *.png)|*.jpg; *.jpeg; *.png|(*.webp)|*.webp|(*.mp4)|*.mp4");
 
-                if (SelectedFiles != null && SelectedFiles.Count > 0)
+                if (selectedFiles != null && selectedFiles.Count > 0)
                 {
-                    foreach(string FilePath in SelectedFiles)
+                    foreach (string filePath in selectedFiles)
                     {
-                        BackgroundImagesEdited.Add(new ItemImage
+                        EditedImages.Add(new ItemImage
                         {
-                            Name = FilePath
+                            Name = filePath
                         });
                     }
                 }
 
                 PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+                PART_LbBackgroundImages.ItemsSource = EditedImages;
             }
             catch (Exception ex)
             {
@@ -206,284 +209,26 @@ namespace BackgroundChanger.Views
                     steamGridDbType = SteamGridDbType.grids;
                 }
 
-                SteamGridDbView ViewExtension = new SteamGridDbView(GameBackgroundImages.Name, steamGridDbType);
-                Window windowExtension = PlayniteUiHelper.CreateExtensionWindow("SteamGridDB", ViewExtension);
+                SteamGridDbView viewExtension = new SteamGridDbView(GameBackgroundImages.Name, steamGridDbType, Plugin);
+                Window windowExtension = PlayniteUiHelper.CreateExtensionWindow("SteamGridDB", viewExtension);
                 _ = windowExtension.ShowDialog();
 
-                if (ViewExtension.SteamGridDbResults != null)
+                if (viewExtension.SteamGridDbResults != null)
                 {
-                    GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
-                        ResourceProvider.GetString("LOCCommonGettingData"),
-                        false
-                    );
-                    globalProgressOptions.IsIndeterminate = true;
+                    GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(ResourceProvider.GetString("LOCCommonGettingData"))
+                    {
+                        Cancelable = false,
+                        IsIndeterminate = true
+                    };
 
                     GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
                     {
-                        ViewExtension.SteamGridDbResults.ForEach(x =>
+                        viewExtension.SteamGridDbResults.ForEach(x =>
                         {
                             try
                             {
                                 string cachedFile = HttpFileCache.GetWebFile(x.Url);
-                                BackgroundImagesEdited.Add(new ItemImage
-                                {
-                                    Name = cachedFile
-                                });
-                            }
-                            catch (Exception ex)
-                            {
-                                Common.LogError(ex, false, true, PluginDatabase.PluginName);
-                            }
-                        });
-                    }, globalProgressOptions);
-
-
-                    _ = Task.Run(() =>
-                    {
-                        while (!(bool)ProgressDownload.Result)
-                        {
-
-                        }
-                    }).ContinueWith(antecedant => 
-                    {
-                        _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
-                        {
-                            PART_LbBackgroundImages.ItemsSource = null;
-                            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
-                        });
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginDatabase.PluginName);
-            }
-        }
-
-
-        private void PART_LbBackgroundImages_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (PART_LbBackgroundImages?.SelectedItem != null)
-            {
-                string FilePath = ((ItemImage)PART_LbBackgroundImages.SelectedItem).FullPath;
-                if (File.Exists(FilePath))
-                {
-                    if (Path.GetExtension(FilePath).ToLower().Contains("mp4"))
-                    {
-                        PART_BackgroundImage.Source = null;
-                        PART_Video.Source = new Uri(FilePath);
-                    }
-                    else
-                    {
-                        PART_BackgroundImage.Source = FilePath;
-                        PART_Video.Source = null;
-                    }
-                }
-            }
-        }
-
-
-        private void PART_BtUp_Click(object sender, RoutedEventArgs e)
-        {
-            int index = int.Parse(((Button)sender).Tag.ToString());
-            if (index > 1)
-            {
-                BackgroundImagesEdited.Insert(index - 1, BackgroundImagesEdited[index]);
-                BackgroundImagesEdited.RemoveAt(index + 1);
-
-                PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
-            }
-        }
-
-        private void PART_BtDown_Click(object sender, RoutedEventArgs e)
-        {
-            int index = int.Parse(((Button)sender).Tag.ToString());
-            if (index < BackgroundImagesEdited.Count - 1)
-            {
-                BackgroundImagesEdited.Insert(index + 2, BackgroundImagesEdited[index]);
-                BackgroundImagesEdited.RemoveAt(index);
-
-                PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
-            }
-        }
-
-        private void Video_MediaOpened(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                MediaElement Video = sender as MediaElement;
-                if (Video.NaturalDuration.HasTimeSpan && Video.NaturalDuration.TimeSpan.TotalSeconds > 2)
-                {
-                    Video.LoadedBehavior = MediaState.Play;
-                    Video.LoadedBehavior = MediaState.Pause;
-                    Video.Position = new TimeSpan(0, 0, (int)Video.NaturalDuration.TimeSpan.TotalSeconds / 2);
-                }
-
-                FrameworkElement ElementParent = (FrameworkElement)((FrameworkElement)sender).Parent;
-                if (ElementParent != null)
-                {
-                    var ElementWidth = ElementParent.FindName("PART_Width");
-                    var ElementHeight = ElementParent.FindName("PART_Height");
-                    ((Label)ElementWidth).Content = ((MediaElement)sender).NaturalVideoWidth;
-                    ((Label)ElementHeight).Content = ((MediaElement)sender).NaturalVideoHeight;
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginDatabase.PluginName);
-            }
-        }
-
-
-        private void TextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            int index = int.Parse(((TextBlock)sender).Tag.ToString());
-
-            bool newValue = !BackgroundImagesEdited[index].IsFavorite;
-            BackgroundImagesEdited.ForEach(c => c.IsFavorite = false);
-            BackgroundImagesEdited[index].IsFavorite = newValue;
-
-            PART_LbBackgroundImages.ItemsSource = null;
-            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
-        }
-
-
-        private string ExtractAnimatedImageAndConvert(string FilePath)
-        {
-            string VideoPath = string.Empty;
-
-            FileSystem.CreateDirectory(PluginDatabase.Paths.PluginCachePath, true);
-
-            try
-            {
-                if (FilePath != null && FilePath != string.Empty)
-                {
-                    if (Path.GetExtension(FilePath).ToLower().IndexOf("webp") > -1)
-                    {
-                        WebpAnim webPAnim = new WebpAnim();
-                        webPAnim.Load(FilePath);
-
-                        string FileName = Path.GetFileNameWithoutExtension(FilePath);
-                        int ActualFrame = 0;
-                        while (ActualFrame < webPAnim.FramesCount())
-                        {
-                            string PathTemp = Path.Combine(PluginDatabase.Paths.PluginCachePath, $"FileName_{ActualFrame:D4}.png");
-
-                            System.Drawing.Image img = System.Drawing.Image.FromStream(webPAnim.GetFrameStream(ActualFrame));
-                            img.Save(PathTemp, ImageFormat.Png);
-
-                            ActualFrame++;
-                        }
-
-
-                        double Width = webPAnim.GetFrameBitmapSource(0).Width;
-                        double Height = webPAnim.GetFrameBitmapSource(0).Height;
-
-                        string ffmpeg = $"-r 25 -f "
-                            + $"image2 -s {Width}x{Height} -i \"{PluginDatabase.Paths.PluginCachePath}\\FileName_%4d.png\" " 
-                            + $"-vcodec libx264 -crf 25 -pix_fmt yuv420p \"{PluginDatabase.Paths.PluginCachePath}\\{FileName}.mp4\"";
-
-                        Process process = new Process();
-                        process.StartInfo.FileName = PluginDatabase.PluginSettings.Settings.ffmpegFile;
-                        process.StartInfo.Arguments = ffmpeg;
-                        process.Start();
-                        process.WaitForExit();
-
-
-                        VideoPath = $"{PluginDatabase.Paths.PluginCachePath}\\{FileName}.mp4";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginDatabase.PluginName);
-            }
-
-            return VideoPath;
-        }
-
-        private void PART_BtConvert_Click(object sender, RoutedEventArgs e)
-        {
-            int index = int.Parse(((Button)sender).Tag.ToString());
-            string FilePath = BackgroundImagesEdited[index].FullPath;
-
-
-            string VideoPath = string.Empty;
-
-            GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
-                ResourceProvider.GetString("LOCCommonConverting"),
-                false
-            );
-            globalProgressOptions.IsIndeterminate = true;
-
-            GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
-            {
-                try
-                {
-                    VideoPath = ExtractAnimatedImageAndConvert(FilePath);
-                }
-                catch (Exception ex)
-                {
-                    Common.LogError(ex, false, true, PluginDatabase.PluginName);
-                }
-            }, globalProgressOptions);
-
-
-            if (!VideoPath.IsNullOrEmpty() && File.Exists(VideoPath))
-            {
-                PART_BtDelete_Click(sender, e);
-
-
-                BackgroundImagesEdited.Add(new ItemImage
-                {
-                    Name = VideoPath
-                });
-
-                PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
-            }
-        }
-
-        private void PART_BtDefault_Click(object sender, RoutedEventArgs e)
-        {
-            int index = int.Parse(((Button)sender).Tag.ToString());
-
-            BackgroundImagesEdited.ForEach(c => c.IsDefault = false);
-            BackgroundImagesEdited[index].IsDefault = true;
-
-            BackgroundImagesEdited.Insert(0, BackgroundImagesEdited[index]);
-            BackgroundImagesEdited.RemoveAt(index + 1);
-
-            PART_LbBackgroundImages.ItemsSource = null;
-            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
-        }
-
-        private void PART_BtAddGoogleImage_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                GoogleImageView ViewExtension = new GoogleImageView(GameBackgroundImages.Name);
-                Window windowExtension = PlayniteUiHelper.CreateExtensionWindow("Google Image", ViewExtension);
-                _ = windowExtension.ShowDialog();
-
-                if (ViewExtension.GoogleImageResults?.Count > 0)
-                {
-                    GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
-                        ResourceProvider.GetString("LOCCommonGettingData"),
-                        false
-                    );
-                    globalProgressOptions.IsIndeterminate = true;
-
-                    GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
-                    {
-                        ViewExtension.GoogleImageResults.ForEach(x =>
-                        {
-                            try
-                            {
-                                string cachedFile = HttpFileCache.GetWebFile(x.ImageUrl);
-                                BackgroundImagesEdited.Add(new ItemImage
+                                EditedImages.Add(new ItemImage
                                 {
                                     Name = cachedFile
                                 });
@@ -504,13 +249,356 @@ namespace BackgroundChanger.Views
                         }
                     }).ContinueWith(antecedant =>
                     {
-                        _ = Application.Current.Dispatcher?.BeginInvoke((Action)delegate
+                        _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
                         {
                             PART_LbBackgroundImages.ItemsSource = null;
-                            PART_LbBackgroundImages.ItemsSource = BackgroundImagesEdited;
+                            PART_LbBackgroundImages.ItemsSource = EditedImages;
                         });
                     });
                 }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
+        }
+
+
+        private void PART_LbBackgroundImages_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (PART_LbBackgroundImages?.SelectedItem != null)
+            {
+                string filePath = ((ItemImage)PART_LbBackgroundImages.SelectedItem).FullPath;
+                if (File.Exists(filePath))
+                {
+                    if (Path.GetExtension(filePath).IsEqual(".mp4"))
+                    {
+                        PART_BackgroundImage.Source = null;
+                        PART_Video.Source = new Uri(filePath);
+                    }
+                    else
+                    {
+                        PART_BackgroundImage.Source = filePath;
+                        PART_Video.Source = null;
+                    }
+                }
+            }
+        }
+
+
+        private void PART_BtUp_Click(object sender, RoutedEventArgs e)
+        {
+            int index = int.Parse(((Button)sender).Tag.ToString());
+            if (index > 1)
+            {
+                EditedImages.Insert(index - 1, EditedImages[index]);
+                EditedImages.RemoveAt(index + 1);
+
+                PART_LbBackgroundImages.ItemsSource = null;
+                PART_LbBackgroundImages.ItemsSource = EditedImages;
+            }
+        }
+
+        private void PART_BtDown_Click(object sender, RoutedEventArgs e)
+        {
+            int index = int.Parse(((Button)sender).Tag.ToString());
+            if (index < EditedImages.Count - 1)
+            {
+                EditedImages.Insert(index + 2, EditedImages[index]);
+                EditedImages.RemoveAt(index);
+
+                PART_LbBackgroundImages.ItemsSource = null;
+                PART_LbBackgroundImages.ItemsSource = EditedImages;
+            }
+        }
+
+        private void Video_MediaOpened(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                MediaElement video = sender as MediaElement;
+                if (video.NaturalDuration.HasTimeSpan && video.NaturalDuration.TimeSpan.TotalSeconds > 2)
+                {
+                    video.LoadedBehavior = MediaState.Play;
+                    video.LoadedBehavior = MediaState.Pause;
+                    video.Position = new TimeSpan(0, 0, (int)video.NaturalDuration.TimeSpan.TotalSeconds / 2);
+                }
+
+                FrameworkElement elementParent = (FrameworkElement)((FrameworkElement)sender).Parent;
+                if (elementParent != null)
+                {
+                    var elementWidth = elementParent.FindName("PART_Width");
+                    var elementHeight = elementParent.FindName("PART_Height");
+                    ((Label)elementWidth).Content = ((MediaElement)sender).NaturalVideoWidth;
+                    ((Label)elementHeight).Content = ((MediaElement)sender).NaturalVideoHeight;
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
+        }
+
+
+        private void TextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            int index = int.Parse(((TextBlock)sender).Tag.ToString());
+
+            bool newValue = !EditedImages[index].IsFavorite;
+            EditedImages.ForEach(c => c.IsFavorite = false);
+            EditedImages[index].IsFavorite = newValue;
+
+            PART_LbBackgroundImages.ItemsSource = null;
+            PART_LbBackgroundImages.ItemsSource = EditedImages;
+        }
+
+
+        private string ExtractAnimatedImageAndConvert(string filePath)
+        {
+            string videoPath = string.Empty;
+
+            FileSystem.CreateDirectory(PluginDatabase.Paths.PluginCachePath, true);
+
+            try
+            {
+                if (filePath != null && filePath != string.Empty)
+                {
+                    if (Path.GetExtension(filePath).IsEqual(".webp"))
+                    {
+                        WebpAnim webPAnim = new WebpAnim();
+                        webPAnim.Load(filePath);
+
+                        string fileName = Path.GetFileNameWithoutExtension(filePath);
+                        int actualFrame = 0;
+                        while (actualFrame < webPAnim.FramesCount())
+                        {
+                            string pathTemp = Path.Combine(PluginDatabase.Paths.PluginCachePath, $"FileName_{actualFrame:D4}.png");
+
+                            System.Drawing.Image img = System.Drawing.Image.FromStream(webPAnim.GetFrameStream(actualFrame));
+                            img.Save(pathTemp, ImageFormat.Png);
+
+                            actualFrame++;
+                        }
+
+
+                        double width = webPAnim.GetFrameBitmapSource(0).Width;
+                        double height = webPAnim.GetFrameBitmapSource(0).Height;
+
+                        string ffmpeg = $"-r 25 -f "
+                            + $"image2 -s {width}x{height} -i \"{PluginDatabase.Paths.PluginCachePath}\\FileName_%4d.png\" "
+                            + $"-vcodec libx264 -crf 25 -pix_fmt yuv420p \"{PluginDatabase.Paths.PluginCachePath}\\{fileName}.mp4\"";
+
+                        Process process = new Process();
+                        process.StartInfo.FileName = PluginDatabase.PluginSettings.Settings.ffmpegFile;
+                        process.StartInfo.Arguments = ffmpeg;
+                        _ = process.Start();
+                        process.WaitForExit();
+
+
+                        videoPath = $"{PluginDatabase.Paths.PluginCachePath}\\{fileName}.mp4";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
+
+            return videoPath;
+        }
+
+        private void PART_BtConvert_Click(object sender, RoutedEventArgs e)
+        {
+            int index = int.Parse(((Button)sender).Tag.ToString());
+            string filePath = EditedImages[index].FullPath;
+            string videoPath = string.Empty;
+
+            GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(ResourceProvider.GetString("LOCCommonConverting"))
+            {
+                Cancelable = false,
+                IsIndeterminate = true
+            };
+
+            GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+            {
+                try
+                {
+                    if (File.Exists(PluginDatabase.PluginSettings.Settings.ffmpegFile))
+                    {
+                        videoPath = ExtractAnimatedImageAndConvert(filePath);
+                    }
+                    else
+                    {
+                        API.Instance.Dialogs.ShowErrorMessage(ResourceProvider.GetString("LOCBcFfmpegNotFound"), PluginDatabase.PluginName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                }
+            }, globalProgressOptions);
+
+
+            if (!videoPath.IsNullOrEmpty() && File.Exists(videoPath))
+            {
+                PART_BtDelete_Click(sender, e);
+
+                EditedImages.Add(new ItemImage
+                {
+                    Name = videoPath
+                });
+
+                PART_LbBackgroundImages.ItemsSource = null;
+                PART_LbBackgroundImages.ItemsSource = EditedImages;
+            }
+        }
+
+        private void PART_BtDefault_Click(object sender, RoutedEventArgs e)
+        {
+            int index = int.Parse(((Button)sender).Tag.ToString());
+
+            EditedImages.ForEach(c => c.IsDefault = false);
+            EditedImages[index].IsDefault = true;
+
+            EditedImages.Insert(0, EditedImages[index]);
+            EditedImages.RemoveAt(index + 1);
+
+            PART_LbBackgroundImages.ItemsSource = null;
+            PART_LbBackgroundImages.ItemsSource = EditedImages;
+        }
+
+        private void PART_BtAddGoogleImage_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                GoogleImageView viewExtension = new GoogleImageView(GameBackgroundImages.Name);
+                Window windowExtension = PlayniteUiHelper.CreateExtensionWindow("Google Image", viewExtension);
+                _ = windowExtension.ShowDialog();
+
+                if (viewExtension.GoogleImageResults?.Count > 0)
+                {
+                    GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(ResourceProvider.GetString("LOCCommonGettingData"))
+                    {
+                        Cancelable = false,
+                        IsIndeterminate = true
+                    };
+
+                    GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+                    {
+                        viewExtension.GoogleImageResults.ForEach(x =>
+                        {
+                            try
+                            {
+                                string cachedFile = HttpFileCache.GetWebFile(x.ImageUrl);
+                                EditedImages.Add(new ItemImage
+                                {
+                                    Name = cachedFile
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                            }
+                        });
+                    }, globalProgressOptions);
+
+
+                    _ = Task.Run(() =>
+                    {
+                        while (!(bool)ProgressDownload.Result)
+                        {
+
+                        }
+                    }).ContinueWith(antecedant =>
+                    {
+                        _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
+                        {
+                            PART_LbBackgroundImages.ItemsSource = null;
+                            PART_LbBackgroundImages.ItemsSource = EditedImages;
+                        });
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
+        }
+
+        private void PART_BtAddFromUrl_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                StringSelectionDialogResult urlSelection = API.Instance.Dialogs.SelectString(
+                    ResourceProvider.GetString("LOCBcAddFromUrlDescription"),
+                    ResourceProvider.GetString("LOCBcAddFromUrl"),
+                    string.Empty);
+
+                if (!urlSelection.Result)
+                {
+                    return;
+                }
+
+                // Validate URL format
+                if (!Uri.TryCreate(urlSelection.SelectedString, UriKind.Absolute, out Uri uriResult) ||
+                    (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
+                {
+                    API.Instance.Dialogs.ShowErrorMessage(
+                        ResourceProvider.GetString("LOCBcInvalidUrlFormat"),
+                        PluginDatabase.PluginName);
+                    return;
+                }
+
+                GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(ResourceProvider.GetString("LOCCommonGettingData"))
+                {
+                    Cancelable = false,
+                    IsIndeterminate = true
+                };
+
+                GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+                {
+                    try
+                    {
+                        string cachedFile = HttpFileCache.GetWebFile(urlSelection.SelectedString);
+                        if (!cachedFile.IsNullOrEmpty())
+                        {
+                            List<string> validImageExtensions = new List<string> { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp" };
+                            string extension = Path.GetExtension(cachedFile).ToLower();
+
+                            if (validImageExtensions.Contains(extension))
+                            {
+                                EditedImages.Add(new ItemImage
+                                {
+                                    Name = cachedFile
+                                });
+                            }
+                            else
+                            {
+                                Logger.Warn($"The file {cachedFile} is not a valid image.");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                    }
+                }, globalProgressOptions);
+
+
+                _ = Task.Run(() =>
+                {
+                    while (!(bool)ProgressDownload.Result)
+                    {
+
+                    }
+                }).ContinueWith(antecedant =>
+                {
+                    _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
+                    {
+                        PART_LbBackgroundImages.ItemsSource = null;
+                        PART_LbBackgroundImages.ItemsSource = EditedImages;
+                    });
+                });
             }
             catch (Exception ex)
             {
@@ -527,17 +615,17 @@ namespace BackgroundChanger.Views
             {
                 if (value is string @string)
                 {
-                    if (Path.GetExtension(@string).ToLower().Contains("mp4"))
+                    if (Path.GetExtension(@string).IsEqual("mp4"))
                     {
                         return "\ueb13";
                     }
 
-                    if (Path.GetExtension(@string).ToLower().Contains("webp"))
+                    if (Path.GetExtension(@string).IsEqual("webp"))
                     {
                         return "\ueb16 \ueb13";
                     }
 
-                    if (Path.GetExtension(@string).ToLower().Contains("png"))
+                    if (Path.GetExtension(@string).IsEqual("png"))
                     {
                         try
                         {

@@ -5,52 +5,22 @@ using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Diagnostics;
-using CommonPluginsShared;
 
 namespace BackgroundChanger.Services
 {
     public class BackgroundChangerDatabase : PluginDatabaseObject<BackgroundChangerSettingsViewModel, BackgroundImagesCollection, GameBackgroundImages, ItemImage>
     {
-        public BackgroundChangerDatabase(BackgroundChangerSettingsViewModel PluginSettings, string PluginUserDataPath) : base(PluginSettings, "BackgroundChanger", PluginUserDataPath)
+        public BackgroundChangerDatabase(BackgroundChangerSettingsViewModel pluginSettings, string pluginUserDataPath) : base(pluginSettings, "BackgroundChanger", pluginUserDataPath)
         {
-
         }
 
-
-        protected override bool LoadDatabase()
+        public override GameBackgroundImages Get(Guid id, bool onlyCache = false, bool force = false)
         {
-            try
-            {
-                Stopwatch stopWatch = new Stopwatch();
-                stopWatch.Start();
-
-                Database = new BackgroundImagesCollection(Paths.PluginDatabasePath);
-                Database.SetGameInfo<ItemImage>();
-
-                stopWatch.Stop();
-                TimeSpan ts = stopWatch.Elapsed;
-                Logger.Info($"LoadDatabase with {Database.Count} items - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)}");
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginName);
-                return false;
-            }
-
-            return true;
-        }
-
-
-        public override GameBackgroundImages Get(Guid Id, bool OnlyCache = false, bool Force = false)
-        {
-            GameBackgroundImages gameBackgroundImages = GetOnlyCache(Id);
+            GameBackgroundImages gameBackgroundImages = GetOnlyCache(id);
 
             if (gameBackgroundImages == null)
             {
-                Game game = API.Instance.Database.Games.Get(Id);
+                Game game = API.Instance.Database.Games.Get(id);
                 if (game != null)
                 {
                     gameBackgroundImages = GetDefault(game);
@@ -65,23 +35,23 @@ namespace BackgroundChanger.Services
             // Check default background
             if (gameBackgroundImages.Items.Find(x => x.IsDefault && !x.IsCover) != null)
             {
-                int Index = gameBackgroundImages.Items.FindIndex(x => x.IsDefault && !x.IsCover);
-                if (Index != -1)
+                int index = gameBackgroundImages.Items.FindIndex(x => x.IsDefault && !x.IsCover);
+                if (index != -1)
                 {
-                    gameBackgroundImages.Items.RemoveAt(Index);
+                    gameBackgroundImages.Items.RemoveAt(index);
                 }
             }
             if (!gameBackgroundImages.BackgroundImage.IsNullOrEmpty() && gameBackgroundImages.Items.Find(x => x.IsDefault && !x.IsCover) == null)
             {
-                string PathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.BackgroundImage);
-                if (PathImage.IsNullOrEmpty() && !File.Exists(PathImage))
+                string pathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.BackgroundImage);
+                if (pathImage.IsNullOrEmpty() || !File.Exists(pathImage))
                 {
-                    PathImage = API.Instance.Database.GetFullFilePath(gameBackgroundImages.BackgroundImage);
+                    pathImage = API.Instance.Database.GetFullFilePath(gameBackgroundImages.BackgroundImage);
                 }
 
                 gameBackgroundImages.Items.Insert(0, new ItemImage
                 {
-                    Name = PathImage,
+                    Name = pathImage,
                     IsCover = false,
                     IsDefault = true
                 });
@@ -90,23 +60,23 @@ namespace BackgroundChanger.Services
             // Check default cover
             if (gameBackgroundImages.Items.Find(x => x.IsDefault && x.IsCover) != null)
             {
-                int Index = gameBackgroundImages.Items.FindIndex(x => x.IsDefault && x.IsCover);
-                if (Index != -1)
+                int index = gameBackgroundImages.Items.FindIndex(x => x.IsDefault && x.IsCover);
+                if (index != -1)
                 {
-                    gameBackgroundImages.Items.RemoveAt(Index);
+                    gameBackgroundImages.Items.RemoveAt(index);
                 }
             }
             if (!gameBackgroundImages.CoverImage.IsNullOrEmpty() && gameBackgroundImages.Items.Find(x => x.IsDefault && x.IsCover) == null)
             {
-                string PathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.CoverImage);
-                if (PathImage.IsNullOrEmpty() && !File.Exists(PathImage))
+                string pathImage = ImageSourceManager.GetImagePath(gameBackgroundImages.CoverImage);
+                if (pathImage.IsNullOrEmpty() || !File.Exists(pathImage))
                 {
-                    PathImage = API.Instance.Database.GetFullFilePath(gameBackgroundImages.CoverImage);
+                    pathImage = API.Instance.Database.GetFullFilePath(gameBackgroundImages.CoverImage);
                 }
 
                 gameBackgroundImages.Items.Insert(0, new ItemImage
                 {
-                    Name = PathImage,
+                    Name = pathImage,
                     IsCover = true,
                     IsDefault = true
                 });
@@ -114,7 +84,6 @@ namespace BackgroundChanger.Services
 
             return gameBackgroundImages;
         }
-
 
         public override void SetThemesResources(Game game)
         {

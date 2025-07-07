@@ -1,13 +1,6 @@
 ﻿using BackgroundChanger.Services;
-using CommonPlayniteShared.Common;
 using Playnite.SDK;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -15,99 +8,52 @@ namespace BackgroundChanger.Views
 {
     public partial class BackgroundChangerSettingsView : UserControl
     {
+        public static bool BackgroundOnSelect { get; set; }
+        public static bool BackgroundOnStart { get; set; }
+        public static bool CoverOnSelect { get; set; }
+        public static bool CoverOnStart { get; set; }
+
+
         private BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
 
         public BackgroundChangerSettingsView()
         {
             InitializeComponent();
 
-            HwBcSlider_ValueChanged(hwSlider, null);
-            HwSlider_ValueChanged(hwSlider, null);
+            rbBackgroundOnSelect.IsChecked = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomOnSelect;
+            rbBackgroundOnStart.IsChecked = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomOnStart;
+            rbCoverOnSelect.IsChecked = PluginDatabase.PluginSettings.Settings.EnableCoverImageRandomOnSelect;
+            rbCoverOnStart.IsChecked = PluginDatabase.PluginSettings.Settings.EnableCoverImageRandomOnStart;
+
+            Rb_Click(null, null);
         }
-
-
-        private void HwBcSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (sender == null)
-            {
-                return;
-            }
-
-            Slider slider = sender as Slider;
-            if (labelBcIntervalLabel_text?.Content != null)
-            {
-                labelBcIntervalLabel_text.Content = "(" + slider.Value + " " + ResourceProvider.GetString("LOCBcSeconds") + ")";
-            }
-        }
-
-        private void HwSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (sender == null)
-            {
-                return;
-            }
-
-            Slider slider = sender as Slider;
-            if (labelIntervalLabel_text?.Content != null)
-            {
-                labelIntervalLabel_text.Content = "(" + slider.Value + " " + ResourceProvider.GetString("LOCBcSeconds") + ")";
-            }
-        }
-
 
         private void ButtonFfmpeg_Click(object sender, RoutedEventArgs e)
         {
-            string SelectedFile = API.Instance.Dialogs.SelectFile("File|ffmpeg.exe");
-
-            if (!SelectedFile.IsNullOrEmpty())
+            string selectedFile = API.Instance.Dialogs.SelectFile("File|ffmpeg.exe");
+            if (!selectedFile.IsNullOrEmpty())
             {
-                PART_FfmpegFile.Text = SelectedFile;
-                ((BackgroundChangerSettingsViewModel)this.DataContext).Settings.ffmpegFile = SelectedFile;
+                PART_FfmpegFile.Text = selectedFile;
+                ((BackgroundChangerSettingsViewModel)DataContext).Settings.ffmpegFile = selectedFile;
             }
         }
 
-
-        private void ButtonWebpinfo_Click(object sender, RoutedEventArgs e)
+        private void Rb_Click(object sender, RoutedEventArgs e)
         {
-            string SelectedFile = API.Instance.Dialogs.SelectFile("File|webpinfo.exe");
-
-            if (!SelectedFile.IsNullOrEmpty())
-            {
-                string destFileName = System.IO.Path.Combine(PluginDatabase.Paths.PluginPath, "webpinfo.exe");
-
-                FileSystem.CopyFile(SelectedFile, destFileName, true);
-
-                PART_WebpinfoFile.Text = destFileName;
-                ((BackgroundChangerSettingsViewModel)this.DataContext).Settings.webpinfoFile = destFileName;
-            }
+            BackgroundOnSelect = (bool)rbBackgroundOnSelect.IsChecked;
+            BackgroundOnStart = (bool)rbBackgroundOnStart.IsChecked;
+            CoverOnSelect = (bool)rbCoverOnSelect.IsChecked;
+            CoverOnStart = (bool)rbCoverOnStart.IsChecked;
         }
 
-        private void hwBcVideoSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (sender == null)
-            {
-                return;
-            }
-
-            Slider slider = sender as Slider;
-            if (labelBcVideoIntervalLabel_text?.Content != null)
-            {
-                labelBcVideoIntervalLabel_text.Content = "(" + slider.Value + " " + ResourceProvider.GetString("LOCBcSeconds") + ")";
-            }
-        }
-
-        private void hwVideoSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (sender == null)
-            {
-                return;
-            }
-
-            Slider slider = sender as Slider;
-            if (labelVideoIntervalLabel_text?.Content != null)
-            {
-                labelVideoIntervalLabel_text.Content = "(" + slider.Value + " " + ResourceProvider.GetString("LOCBcSeconds") + ")";
-            }
-        }
+        //private void ButtonWebpinfo_Click(object sender, RoutedEventArgs e)
+        //{
+        //    string selectedFile = API.Instance.Dialogs.SelectFile("File|webpinfo.exe");
+        //    if (!selectedFile.IsNullOrEmpty())
+        //    {
+        //        PART_WebpinfoFile.Text = selectedFile;
+        //        ((BackgroundChangerSettingsViewModel)DataContext).Settings.webpinfoFile = selectedFile;
+        //    }
+        //}
     }
 }

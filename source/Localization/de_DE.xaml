@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Gleiche Einstellung für den Spielhintergrund des Plugins wie für den Hintergrund des Theme *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Zufällige Auswahl aktivieren</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Nur bei Playnite Start</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">Bei Auswahl des Spiels</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Automatische Änderung aktivieren</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Zeitintervall</sys:String>
     <sys:String x:Key="LOCBcSeconds">Sekunden</sys:String>
@@ -32,9 +34,14 @@
 
     <sys:String x:Key="LOCBcSteamGridDbSelect">Aus SteamGridDB auswählen</sys:String>
     <sys:String x:Key="LOCBcGoogleImageSelect">Aus Google Bilder auswählen</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrl">Aus Url hinzufügen</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrlDescription">Url zum Bild eingeben</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg Datei</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo Datei</sys:String>
-    
+
+    <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
     <sys:String x:Key="LOCBcFTooltTipConvert">In mp4 umwandeln (Leistung verbessert)</sys:String>
+
+    <sys:String x:Key="LOCBcInvalidUrlFormat">Invalid Url Format!</sys:String>
 
 </ResourceDictionary>

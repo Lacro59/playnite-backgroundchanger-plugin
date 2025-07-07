@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Utilitza la configuració del tema per configurar la imatge de fons de joc del complement *</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Activa la selecció aleatòria</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Activa el canvi automàtic</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Interval de temps</sys:String>
     <sys:String x:Key="LOCBcSeconds">segons</sys:String>
@@ -32,9 +34,14 @@
 
     <sys:String x:Key="LOCBcSteamGridDbSelect">Selecciona de SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcGoogleImageSelect">Selecciona de Imatges de Google</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrl">Add from url</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrlDescription">Enter the url to the image</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">fitxer ffmpeg</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">fitxer webpinfo</sys:String>
-    
+
+    <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
     <sys:String x:Key="LOCBcFTooltTipConvert">Convertir a mp4 (millor rendiment)</sys:String>
+
+    <sys:String x:Key="LOCBcInvalidUrlFormat">Invalid Url Format!</sys:String>
 
 </ResourceDictionary>

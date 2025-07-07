@@ -4,16 +4,15 @@ using CommonPlayniteShared;
 using CommonPluginsShared;
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
+using CommonPluginsShared.Extensions;
 using CommonPluginsShared.Interfaces;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -33,18 +32,21 @@ namespace BackgroundChanger.Controls
     public partial class PluginBackgroundImage : PluginUserControlExtend
     {
         private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
-        internal override IPluginDatabase pluginDatabase => PluginDatabase;
+        protected override IPluginDatabase pluginDatabase => PluginDatabase;
 
         private PluginBackgroundImageDataContext ControlDataContext = new PluginBackgroundImageDataContext();
-        internal override IDataContext controlDataContext
+        protected override IDataContext controlDataContext
         {
             get => ControlDataContext;
             set => ControlDataContext = (PluginBackgroundImageDataContext)controlDataContext;
         }
 
         private System.Timers.Timer BcTimer { get; set; }
+        private System.Timers.Timer BcTimerVideo { get; set; }
         private int Counter { get; set; } = 0;
-        private GameBackgroundImages gameBackgroundImages { get; set; }
+        private GameBackgroundImages GameBackgroundImages { get; set; }
+
+        private static readonly Random _random = new Random();
 
         private bool WindowsIsActivated { get; set; } = true;
         private bool IsFirst { get; set; } = true;
@@ -59,12 +61,20 @@ namespace BackgroundChanger.Controls
                 BcTimer.Dispose();
                 BcTimer = null;
             }
+            if (BcTimerVideo != null)
+            {
+                BcTimerVideo.Stop();
+                BcTimerVideo.Dispose();
+                BcTimerVideo = null;
+            }
 
             ControlDataContext = new PluginBackgroundImageDataContext
             {
                 IsActivated = PluginDatabase.PluginSettings.Settings.EnableBackgroundImage,
                 UseAnimated = PluginDatabase.PluginSettings.Settings.EnableImageAnimatedBackground,
                 EnableRandomSelect = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomSelect,
+                EnableRandomOnSelect = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomOnSelect,
+                EnableRandomOnStart = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomOnStart,
                 EnableAutoChanger = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageAutoChanger
             };
         }
@@ -73,7 +83,9 @@ namespace BackgroundChanger.Controls
         public PluginBackgroundImage()
         {
             InitializeComponent();
-            this.DataContext = ControlDataContext;
+
+            Delay = 0;
+            DataContext = ControlDataContext;
 
             Image1FadeIn = (Storyboard)TryFindResource("Image1FadeIn");
             Image2FadeIn = (Storyboard)TryFindResource("Image2FadeIn");
@@ -102,22 +114,22 @@ namespace BackgroundChanger.Controls
 
         private void WindowBase_UnloadedEvent(object sender, System.EventArgs e)
         {
-            string WinIdProperty = string.Empty;
-            string WinName = string.Empty;
+            string winIdProperty = string.Empty;
+            string winName = string.Empty;
 
             try
             {
-                WinIdProperty = ((Window)sender).GetValue(AutomationProperties.AutomationIdProperty).ToString();
-                WinName = ((Window)sender).Name;
+                winIdProperty = ((Window)sender).GetValue(AutomationProperties.AutomationIdProperty).ToString();
+                winName = ((Window)sender).Name;
 
-                if (WinIdProperty == "WindowSettings")
+                if (winIdProperty == "WindowSettings")
                 {
                     GetFadeImageProperties();
                 }
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {WinName} - {WinIdProperty}", true, PluginDatabase.PluginName);
+                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {winName} - {winIdProperty}", true, PluginDatabase.PluginName);
             }
         }
 
@@ -128,16 +140,39 @@ namespace BackgroundChanger.Controls
                 return;
             }
 
-            FrameworkElement PART_ImageBackground_4 = UI.SearchElementByName("ControlRoot", false, false, 4);
-            FrameworkElement PART_ImageBackground_3 = UI.SearchElementByName("ControlRoot", false, false, 3);
-            FrameworkElement PART_ImageBackground_2 = UI.SearchElementByName("ControlRoot", false, false, 2);
+            FrameworkElement PART_ImageBackground_4 = null;
+            try
+            {
+                PART_ImageBackground_4 = UI.SearchElementByName("ControlRoot", false, false, 4);
+            }
+            catch
+            {
+            }
+
+            FrameworkElement PART_ImageBackground_3 = null;
+            try
+            {
+                PART_ImageBackground_3 = UI.SearchElementByName("ControlRoot", false, false, 3);
+            }
+            catch
+            {
+            }
+
+            FrameworkElement PART_ImageBackground_2 = null;
+            try
+            {
+                PART_ImageBackground_2 = UI.SearchElementByName("ControlRoot", false, false, 2);
+            }
+            catch
+            {
+            }
 
             FrameworkElement PART_ImageBackground = PART_ImageBackground_4 ?? PART_ImageBackground_3 ?? PART_ImageBackground_2 ?? null;
 
             if (PART_ImageBackground != null)
             {
                 PropertyInfo[] ImageBackgroundProperties = PART_ImageBackground.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                PropertyInfo[] backChangerImageProperties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                PropertyInfo[] backChangerImageProperties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
                 List<string> UsedProperties = new List<string>
                 {
@@ -177,7 +212,7 @@ namespace BackgroundChanger.Controls
 
         public override void SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
         {
-            gameBackgroundImages = (GameBackgroundImages)PluginGameData;
+            GameBackgroundImages = (GameBackgroundImages)PluginGameData;
 
             Video1.Volume = PluginDatabase.PluginSettings.Settings.Volume / 10;
             Video2.Volume = PluginDatabase.PluginSettings.Settings.Volume / 10;
@@ -187,10 +222,10 @@ namespace BackgroundChanger.Controls
                 Video1.LoadedBehavior = MediaState.Stop;
                 Video2.LoadedBehavior = MediaState.Stop;
 
-                if (!gameBackgroundImages.HasDataBackground)
+                if (!GameBackgroundImages.HasDataBackground)
                 {
                     MustDisplay = false;
-                    this.DataContext = ControlDataContext;
+                    DataContext = ControlDataContext;
                     return;
                 }
 
@@ -207,11 +242,11 @@ namespace BackgroundChanger.Controls
 
         public void SetBackground()
         {
-            string PathImage = string.Empty;
+            string pathImage = string.Empty;
 
-            if (gameBackgroundImages.HasDataBackground && !PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
+            if (GameBackgroundImages.HasDataBackground)
             {
-                ItemImage ItemFavorite = gameBackgroundImages.ItemsBackground.Where(x => x.IsFavorite).FirstOrDefault();
+                ItemImage ItemFavorite = GameBackgroundImages.ItemsBackground.FirstOrDefault(x => x.IsFavorite);
 
                 if (ControlDataContext.EnableAutoChanger)
                 {
@@ -219,57 +254,65 @@ namespace BackgroundChanger.Controls
                     {
                         if (IsFirst && ItemFavorite != null)
                         {
-                            PathImage = ItemFavorite.FullPath;
-                            Counter = gameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
+                            pathImage = ItemFavorite.FullPath;
+                            Counter = GameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
                         }
                         else
                         {
-                            Random rnd = new Random();
-                            Counter = rnd.Next(0, gameBackgroundImages.ItemsBackground.Count);
-                            PathImage = gameBackgroundImages.ItemsBackground[Counter].FullPath;
+                            Counter = _random.Next(0, GameBackgroundImages.ItemsBackground.Count);
+                            pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
                         }
                     }
                     else
                     {
                         if (IsFirst && ItemFavorite != null)
                         {
-                            PathImage = ItemFavorite.FullPath;
-                            Counter = gameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
+                            pathImage = ItemFavorite.FullPath;
+                            Counter = GameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
                         }
                         else
                         {
-                            PathImage = gameBackgroundImages.ItemsBackground[Counter].FullPath;
+                            pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
                         }
                     }
 
-                    SetBackgroundImage(PathImage);
+                    SetBackgroundImage(pathImage);
 
-                    BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.BackgroundImageAutoChangerTimer * 1000);
-                    BcTimer.AutoReset = true;
+                    BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.BackgroundImageAutoChangerTimer * 1000)
+                    {
+                        AutoReset = true
+                    };
                     BcTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
                     BcTimer.Start();
                 }
                 else if (ControlDataContext.EnableRandomSelect)
                 {
-                    if (IsFirst && ItemFavorite != null)
+                    if (ControlDataContext.EnableRandomOnStart)
                     {
-                        PathImage = ItemFavorite.FullPath;
+                        pathImage = GameBackgroundImages.BackgroundImageOnStart.FullPath;
                     }
                     else
                     {
-                        Random rnd = new Random();
-                        int ImgSelected = rnd.Next(0, gameBackgroundImages.ItemsBackground.Count);
-                        PathImage = gameBackgroundImages.ItemsBackground[ImgSelected].FullPath;
+                        if (IsFirst && ItemFavorite != null)
+                        {
+                            pathImage = ItemFavorite.FullPath;
+                        }
+                        else
+                        {
+                            Random rnd = new Random();
+                            int imgSelected = rnd.Next(0, GameBackgroundImages.ItemsBackground.Count);
+                            pathImage = GameBackgroundImages.ItemsBackground[imgSelected].FullPath;
+                        }
                     }
 
-                    SetBackgroundImage(PathImage);
+                    SetBackgroundImage(pathImage);
                 }
                 else
                 {
                     if (ItemFavorite != null)
                     {
-                        PathImage = ItemFavorite.FullPath;
-                        SetBackgroundImage(PathImage);
+                        pathImage = ItemFavorite.FullPath;
+                        SetBackgroundImage(pathImage);
                     }
                     else
                     {
@@ -281,6 +324,16 @@ namespace BackgroundChanger.Controls
             {
                 SetDefaultBackgroundImage();
             }
+
+            if (PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
+            {
+                BcTimerVideo = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.videoDelayBackgroundImage * 1000)
+                {
+                    AutoReset = true
+                };
+                BcTimerVideo.Elapsed += new ElapsedEventHandler(OnTimedVideoEvent);
+                BcTimerVideo.Start();
+            }
         }
 
         public void SetDefaultBackgroundImage()
@@ -291,38 +344,21 @@ namespace BackgroundChanger.Controls
             }
             else
             {
-                string PathImage = ImageSourceManager.GetImagePath(GameContext.BackgroundImage);
-                if (PathImage.IsNullOrEmpty())
-                {
-                    PathImage = API.Instance.Database.GetFullFilePath(GameContext.BackgroundImage);
-                }
-
-                SetBackgroundImage(PathImage);
-            }
-
-            if (PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
-            {
-                _ = Task.Run(() =>
-                {
-                    Thread.Sleep(1000 * PluginDatabase.PluginSettings.Settings.videoDelayBackgroundImage);
-                    _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-                    {
-                        string PathImage = gameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
-                        SetBackgroundImage(PathImage);
-                    }));
-                });
+                string pathImage = ImageSourceManager.GetImagePath(GameContext.BackgroundImage)
+                    ?? API.Instance.Database.GetFullFilePath(GameContext.BackgroundImage);
+                SetBackgroundImage(pathImage);
             }
         }
 
-        public void SetBackgroundImage(string PathImage = null)
+        public void SetBackgroundImage(string pathImage = null)
         {
-            _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Render, (Action)delegate
+            _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Render, (Action)delegate
             {
-                if (!File.Exists(PathImage))
+                if (!File.Exists(pathImage))
                 {
-                    PathImage = null;
+                    pathImage = null;
                 }
-                this.Source = PathImage;
+                Source = pathImage;
             });
         }
 
@@ -475,7 +511,6 @@ namespace BackgroundChanger.Controls
             AnimatedImage1.UpdateLayout();
             Video1.Source = null;
             Video1.UpdateLayout();
-            GC.Collect();
         }
 
         private void Image2FadeOut_Completed(object sender, EventArgs e)
@@ -600,11 +635,13 @@ namespace BackgroundChanger.Controls
                     }
                     else
                     {
+                        PluginDatabase.PluginSettings.Settings.BackgroundIsVideo = Path.GetExtension(image).IsEqual(".mp4");
+
                         if (currentImage == CurrentImage.None)
                         {
                             Image1FadeOut.Stop();
 
-                            if (Path.GetExtension(image).ToLower().Contains("mp4"))
+                            if (Path.GetExtension(image).IsEqual(".mp4"))
                             {
                                 //AnimatedImage1.Source = null;
                                 //AnimatedImage2.Source = null;
@@ -630,7 +667,7 @@ namespace BackgroundChanger.Controls
                         {
                             Image2FadeOut.Stop();
 
-                            if (Path.GetExtension(image).ToLower().Contains("mp4"))
+                            if (Path.GetExtension(image).IsEqual(".mp4"))
                             {
                                 //AnimatedImage1.Source = null;
                                 //AnimatedImage2.Source = null;
@@ -657,7 +694,7 @@ namespace BackgroundChanger.Controls
                         {
                             Image1FadeOut.Stop();
 
-                            if (Path.GetExtension(image).ToLower().Contains("mp4"))
+                            if (Path.GetExtension(image).IsEqual(".mp4"))
                             {
                                 //AnimatedImage1.Source = null;
                                 //AnimatedImage2.Source = null;
@@ -686,7 +723,7 @@ namespace BackgroundChanger.Controls
                 {
                     if (currentImage == CurrentImage.Image1)
                     {
-                        if (image != null && Path.GetExtension(image).ToLower().Contains("mp4"))
+                        if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
                         {
                             AnimatedImage1.Source = null;
                             AnimatedImage2.Source = null;
@@ -705,7 +742,7 @@ namespace BackgroundChanger.Controls
                     }
                     else if (currentImage == CurrentImage.Image2)
                     {
-                        if (image != null && Path.GetExtension(image).ToLower().Contains("mp4"))
+                        if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
                         {
                             AnimatedImage1.Source = null;
                             AnimatedImage2.Source = null;
@@ -724,7 +761,7 @@ namespace BackgroundChanger.Controls
                     }
                     else
                     {
-                        if (image != null && Path.GetExtension(image).ToLower().Contains("mp4"))
+                        if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
                         {
                             AnimatedImage1.Source = null;
                             AnimatedImage2.Source = null;
@@ -761,42 +798,66 @@ namespace BackgroundChanger.Controls
 
             try
             {
-                _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
-                    string PathImage = string.Empty;
+                    string pathImage = string.Empty;
 
                     if (ControlDataContext.EnableRandomSelect)
                     {
-                        if (gameBackgroundImages.ItemsBackground.Count != 0)
+                        if (GameBackgroundImages.ItemsBackground.Count != 0)
                         {
                             Random rnd = new Random();
-                            int ImgSelected = rnd.Next(0, gameBackgroundImages.ItemsBackground.Count);
-                            while (ImgSelected == Counter && gameBackgroundImages.ItemsBackground.Count != 1)
+                            int imgSelected = rnd.Next(0, GameBackgroundImages.ItemsBackground.Count);
+                            while (imgSelected == Counter && GameBackgroundImages.ItemsBackground.Count != 1)
                             {
-                                ImgSelected = rnd.Next(0, gameBackgroundImages.ItemsBackground.Count);
+                                imgSelected = rnd.Next(0, GameBackgroundImages.ItemsBackground.Count);
                             }
-                            Counter = ImgSelected;
+                            Counter = imgSelected;
 
-                            PathImage = gameBackgroundImages.ItemsBackground[ImgSelected].FullPath;
+                            pathImage = GameBackgroundImages.ItemsBackground[imgSelected].FullPath;
                         }
 
-                        SetBackgroundImage(PathImage);
+                        SetBackgroundImage(pathImage);
                     }
                     else
                     {
                         Counter++;
 
-                        if (gameBackgroundImages.ItemsBackground.Count != 0)
+                        if (GameBackgroundImages.ItemsBackground.Count != 0)
                         {
-                            if (Counter == gameBackgroundImages.ItemsBackground.Count)
+                            if (Counter == GameBackgroundImages.ItemsBackground.Count)
                             {
                                 Counter = 0;
                             }
 
-                            PathImage = gameBackgroundImages.ItemsBackground[Counter].FullPath;
+                            pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
                         }
 
-                        SetBackgroundImage(PathImage);
+                        SetBackgroundImage(pathImage);
+                    }
+                }));
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
+        }
+
+        private void OnTimedVideoEvent(object source, ElapsedEventArgs e)
+        {
+            if (!WindowsIsActivated)
+            {
+                return;
+            }
+
+            try
+            {
+                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                {
+                    string pathVideo = GameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo && x.Exist)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
+                    if (!pathVideo.IsNullOrEmpty())
+                    {
+                        SetBackgroundImage(pathVideo);
                     }
                 }));
             }
@@ -820,12 +881,13 @@ namespace BackgroundChanger.Controls
 
 
         #region Activate/Deactivated animation
+
         private void Application_Deactivated(object sender, EventArgs e)
         {
             _ = Task.Run(() =>
             {
                 Thread.Sleep(1000);
-                _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
                     WindowsIsActivated = false;
                     Video1.LoadedBehavior = MediaState.Pause;
@@ -844,7 +906,7 @@ namespace BackgroundChanger.Controls
             _ = Task.Run(() =>
             {
                 Thread.Sleep(1000);
-                _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
                     WindowsIsActivated = true;
                     Video1.LoadedBehavior = MediaState.Play;
@@ -873,6 +935,7 @@ namespace BackgroundChanger.Controls
                     break;
             }
         }
+
         #endregion
     }
 
@@ -882,6 +945,8 @@ namespace BackgroundChanger.Controls
         public bool IsActivated { get; set; }
         public bool UseAnimated { get; set; }
         public bool EnableRandomSelect { get; set; }
+        public bool EnableRandomOnSelect { get; set; }
+        public bool EnableRandomOnStart { get; set; }
         public bool EnableAutoChanger { get; set; }
     }
 }

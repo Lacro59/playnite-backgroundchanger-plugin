@@ -1,9 +1,5 @@
 ﻿using Playnite.SDK.Data;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BackgroundChanger.Models
 {
@@ -14,6 +10,7 @@ namespace BackgroundChanger.Models
         [SerializationPropertyName("data")]
         public List<SteamGridDbSearchResult> Data { get; set; }
     }
+
 
     public class SteamGridDbSearchResult
     {

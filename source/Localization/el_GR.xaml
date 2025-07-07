@@ -18,6 +18,8 @@
     <sys:String x:Key="LOCBcBackgroundSameSettings">Χρήση της ίδιας ρύθμισης για το φόντο του παιχνιδιού από το πρόσθετο, παρά από το φόντο του θέματος</sys:String>
     
     <sys:String x:Key="LOCBcEnableRandomSelect">Ενεργοποίηση τυχαίας επιλογής</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Μόνο κατά την εκκίνηση του Playnite</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">Κατά την επιλογή παιχνιδιού</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Ενεργοποίηση αυτόματης αλλαγής</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Χρονικό διάστημα</sys:String>
     <sys:String x:Key="LOCBcSeconds">δευτ.</sys:String>
@@ -32,9 +34,14 @@
 
     <sys:String x:Key="LOCBcSteamGridDbSelect">Επιλογή από το SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcGoogleImageSelect">Επιλογή από την εικόνα Google</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrl">Προσθήκη από διεύθυνση URL</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrlDescription">Εισάγετε τη διεύθυνση URL στην εικόνα</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">αρχείο ffmpeg</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">αρχείο webpinfo</sys:String>
-    
+
+    <sys:String x:Key="LOCBcFfmpegNotFound">To FFmpeg δεν βρέθηκε</sys:String>
     <sys:String x:Key="LOCBcFTooltTipConvert">Μετατροπή σε mp4 (βελτιωμένη απόδοση)</sys:String>
+
+    <sys:String x:Key="LOCBcInvalidUrlFormat">Invalid Url Format!</sys:String>
 
 </ResourceDictionary>
