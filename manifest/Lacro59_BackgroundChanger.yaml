@@ -71,7 +71,7 @@ Packages:
   - Version: 3.3
     RequiredApiVersion: 6.11.0
     ReleaseDate: 2025-07-07
-    PackageUrl: https://github.com/Lacro59/playnite-backgroundchanger-plugin/releases/download/v3.2/playnite-backgroundchanger-plugin_3_2.pext
+    PackageUrl: https://github.com/Lacro59/playnite-backgroundchanger-plugin/releases/download/v3.3/playnite-backgroundchanger-plugin_3_3.pext
     Changelog:
       - 'Updated: Localizations'
       - 'Added: Option to randomize background and cover images only on Playnite start or on game selection'
