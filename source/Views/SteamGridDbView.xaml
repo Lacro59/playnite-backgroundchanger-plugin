@@ -33,7 +33,7 @@
                 </Grid.ColumnDefinitions>
 
                 <playnitecontrols:SearchBox Grid.Column="0" x:Name="SearchElement" KeyUp="SearchElement_KeyUp" />
-                <Button Name="PART_BtSearch" Grid.Column="3" Content="{DynamicResource LOCSearchLabel}" Click="PART_BtSearch_Click"
+                <Button Name="PART_BtSearch" Grid.Column="2" Content="{DynamicResource LOCSearchLabel}" Click="PART_BtSearch_Click"
                         IsEnabled="{Binding ElementName=SearchElement, Path=Text, Converter={StaticResource StringNullOrEmptyToBoolConverter}}"/>
             </Grid>
 
