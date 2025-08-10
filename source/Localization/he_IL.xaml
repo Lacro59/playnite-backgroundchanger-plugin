@@ -3,45 +3,45 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
+    <sys:String x:Key="LOCBc">משנהרקע</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">Manage background images</sys:String>
-    <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">ניהול תמונות רקע</sys:String>
+    <sys:String x:Key="LOCBcManageCover">ניהול תמונות כיסוי</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api key</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">מפתח api של SteamGridDB</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">הצגת תמונת הרקע של ה-Plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">הצגת תמונת הכיסוי של ה-Plugin</sys:String>
 
-    <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
+    <sys:String x:Key="LOCBcBackgroundSameSettings">שימוש בהגדרות זהות עבור רקע משחק Plugin כמו רקע ערכת הנושא *</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">Enable random selection</sys:String>
-    <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
-    <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
-    <sys:String x:Key="LOCBcTimeInterval">Time interval</sys:String>
-    <sys:String x:Key="LOCBcSeconds">seconds</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">איפשר בחירה אקראית</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">רק בהתחלת Playnite</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">בעת בחירת משחק</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">איפשר שינוי אוטומטי</sys:String>
+    <sys:String x:Key="LOCBcTimeInterval">מרווח זמן</sys:String>
+    <sys:String x:Key="LOCBcSeconds">שניות</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">איפשר רקע מונפש</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">איפשר כיסוי מונפש</sys:String>
     
-    <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">איפשר עיכוב וידאו</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">השתמשו באפשרות זו אם ברצונכם להציג את תמונת ברירת המחדל לפני וידאו.</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
-    <sys:String x:Key="LOCBcAddFromUrl">Add from url</sys:String>
-    <sys:String x:Key="LOCBcAddFromUrlDescription">Enter the url to the image</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
-    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">בחירה מתוך SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">בחירה מתוך Google Image</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrl">הוספה מ-url</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrlDescription">הכניסו את ה-url לתמונה</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">קובץ ffmpeg</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">קובץ webpinfo</sys:String>
 
-    <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
-    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
+    <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg לא נמצא</sys:String>
+    <sys:String x:Key="LOCBcFTooltTipConvert">המר ל-mp4 (ביצועים משופרים)</sys:String>
 
-    <sys:String x:Key="LOCBcInvalidUrlFormat">Invalid Url Format!</sys:String>
+    <sys:String x:Key="LOCBcInvalidUrlFormat">פורמט Url בלתי תקין!</sys:String>
 
 </ResourceDictionary>
