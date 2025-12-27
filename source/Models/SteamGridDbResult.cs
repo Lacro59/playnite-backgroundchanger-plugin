@@ -13,6 +13,7 @@ namespace BackgroundChanger.Models
     {
         [SerializationPropertyName("success")]
         public bool Success { get; set; }
+
         [SerializationPropertyName("data")]
         public List<SteamGridDbResult> Data { get; set; }
     }
@@ -24,36 +25,52 @@ namespace BackgroundChanger.Models
 
         [SerializationPropertyName("id")]
         public int Id { get; set; }
+
         [SerializationPropertyName("score")]
         public int Score { get; set; }
+
         [SerializationPropertyName("style")]
         public string Style { get; set; }
+
         [SerializationPropertyName("width")]
         public int Width { get; set; }
+
         [SerializationPropertyName("height")]
         public int Height { get; set; }
+
         [SerializationPropertyName("nsfw")]
         public bool Nsfw { get; set; }
+
         [SerializationPropertyName("humor")]
         public bool Humor { get; set; }
+
         [SerializationPropertyName("notes")]
         public string Notes { get; set; }
+
         [SerializationPropertyName("mime")]
         public string Mime { get; set; }
+
         [SerializationPropertyName("language")]
         public string Language { get; set; }
+
         [SerializationPropertyName("url")]
         public string Url { get; set; }
+
         [SerializationPropertyName("thumb")]
         public string Thumb { get; set; }
+
         [SerializationPropertyName("lock")]
         public bool IsLock { get; set; }
+
         [SerializationPropertyName("epilepsy")]
         public bool Epilepsy { get; set; }
+
         [SerializationPropertyName("upvotes")]
         public int Upvotes { get; set; }
+
         [SerializationPropertyName("downvotes")]
         public int Downvotes { get; set; }
+
         [SerializationPropertyName("author")]
         public Author Author { get; set; }
 
@@ -79,16 +96,16 @@ namespace BackgroundChanger.Models
 
                 if (File.Exists(PluginDatabase.PluginSettings.Settings.ffmpegFile))
                 {
-                    string VideoFile = Path.Combine(PluginDatabase.Paths.PluginCachePath, $"{Id}.mp4");
-                    if (File.Exists(VideoFile))
+                    string videoFile = Path.Combine(PluginDatabase.Paths.PluginCachePath, $"{Id}.mp4");
+                    if (File.Exists(videoFile))
                     {
-                        this.VideoFile = VideoFile;
+                        this.VideoFile = videoFile;
                         return true;
                     }
 
                     _ = Task.Run(() =>
                     {
-                        string ffmpeg = $"-i {Thumb} {VideoFile}";
+                        string ffmpeg = $"-i {Thumb} {videoFile}";
 
                         Process process = new Process();
                         process.StartInfo.FileName = PluginDatabase.PluginSettings.Settings.ffmpegFile;
@@ -105,9 +122,9 @@ namespace BackgroundChanger.Models
             }
         }
 
-        private string _videoFile = string.Empty;
+        private string videoFile = string.Empty;
         [DontSerialize]
-        public string VideoFile { get => _videoFile; set => SetValue(ref _videoFile, value); }
+        public string VideoFile { get => videoFile; set => SetValue(ref videoFile, value); }
     }
 
 
@@ -115,8 +132,10 @@ namespace BackgroundChanger.Models
     {
         [SerializationPropertyName("name")]
         public string Name { get; set; }
+
         [SerializationPropertyName("steam64")]
         public string Steam64 { get; set; }
+
         [SerializationPropertyName("avatar")]
         public string Avatar { get; set; }
     }

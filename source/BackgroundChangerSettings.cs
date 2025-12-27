@@ -12,8 +12,8 @@ namespace BackgroundChanger
     {
         #region Settings variables
 
-        private bool _enableBackgroundImage = true;
-        public bool EnableBackgroundImage { get => _enableBackgroundImage; set => SetValue(ref _enableBackgroundImage, value); }
+        private bool enableBackgroundImage = true;
+        public bool EnableBackgroundImage { get => enableBackgroundImage; set => SetValue(ref enableBackgroundImage, value); }
 
         public bool BackgroundImageSameSettings { get; set; } = true;
 
@@ -23,14 +23,14 @@ namespace BackgroundChanger
         public bool EnableBackgroundImageAutoChanger { get; set; } = false;
         public int BackgroundImageAutoChangerTimer { get; set; } = 10;
 
-        private bool _enableImageAnimatedBackground = false;
-        public bool EnableImageAnimatedBackground { get => _enableImageAnimatedBackground; set => SetValue(ref _enableImageAnimatedBackground, value); }
+        private bool enableImageAnimatedBackground = false;
+        public bool EnableImageAnimatedBackground { get => enableImageAnimatedBackground; set => SetValue(ref enableImageAnimatedBackground, value); }
 
         public double Volume { get; set; } = 0;
 
 
-        private bool _enableCoverImage = true;
-        public bool EnableCoverImage { get => _enableCoverImage; set => SetValue(ref _enableCoverImage, value); }
+        private bool enableCoverImage = true;
+        public bool EnableCoverImage { get => enableCoverImage; set => SetValue(ref enableCoverImage, value); }
 
         public bool EnableCoverImageRandomSelect { get; set; } = false;
         public bool EnableCoverImageRandomOnStart { get; set; } = true;
@@ -38,8 +38,8 @@ namespace BackgroundChanger
         public bool EnableCoverImageAutoChanger { get; set; } = false;
         public int CoverImageAutoChangerTimer { get; set; } = 10;
 
-        private bool _enableImageAnimatedCover = false;
-        public bool EnableImageAnimatedCover { get => _enableImageAnimatedCover; set => SetValue(ref _enableImageAnimatedCover, value); }
+        private bool enableImageAnimatedCover = false;
+        public bool EnableImageAnimatedCover { get => enableImageAnimatedCover; set => SetValue(ref enableImageAnimatedCover, value); }
 
 
         public string SteamGridDbApiKey { get; set; } = string.Empty;
@@ -124,21 +124,21 @@ namespace BackgroundChanger
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
         #region Variables exposed
 
-        private bool _hasDataBackground = false;
+        private bool hasDataBackground = false;
         [DontSerialize]
-        public bool HasDataBackground { get => _hasDataBackground; set => SetValue(ref _hasDataBackground, value); }
+        public bool HasDataBackground { get => hasDataBackground; set => SetValue(ref hasDataBackground, value); }
 
-        private bool _hasDataCover = false;
+        private bool hasDataCover = false;
         [DontSerialize]
-        public bool HasDataCover { get => _hasDataCover; set => SetValue(ref _hasDataCover, value); }
+        public bool HasDataCover { get => hasDataCover; set => SetValue(ref hasDataCover, value); }
 
-        private bool _backgroundIsVideo = false;
+        private bool backgroundIsVideo = false;
         [DontSerialize]
-        public bool BackgroundIsVideo { get => _backgroundIsVideo; set => SetValue(ref _backgroundIsVideo, value); }
+        public bool BackgroundIsVideo { get => backgroundIsVideo; set => SetValue(ref backgroundIsVideo, value); }
 
-        private bool _coverIsVideo = false;
+        private bool coverIsVideo = false;
         [DontSerialize]
-        public bool CoverIsVideo { get => _coverIsVideo; set => SetValue(ref _coverIsVideo, value); }
+        public bool CoverIsVideo { get => coverIsVideo; set => SetValue(ref coverIsVideo, value); }
 
         #endregion
     }
@@ -149,8 +149,8 @@ namespace BackgroundChanger
         private readonly BackgroundChanger Plugin;
         private BackgroundChangerSettings EditingClone { get; set; }
 
-        private BackgroundChangerSettings _settings;
-        public BackgroundChangerSettings Settings { get => _settings; set => SetValue(ref _settings, value); }
+        private BackgroundChangerSettings settings;
+        public BackgroundChangerSettings Settings { get => settings; set => SetValue(ref settings, value); }
 
 
         public BackgroundChangerSettingsViewModel(BackgroundChanger plugin)

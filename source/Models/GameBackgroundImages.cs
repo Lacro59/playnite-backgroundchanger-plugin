@@ -22,13 +22,13 @@ namespace BackgroundChanger.Models
         public List<ItemImage> ItemsCover => Items?.Where(x => x.IsCover && x.Exist)?.ToList() ?? new List<ItemImage>();
 
 
-        private ItemImage _backgroundImageOnStart;
+        private ItemImage backgroundImageOnStart;
         [DontSerialize]
         public ItemImage BackgroundImageOnStart
         {
             get
             {
-                if (_backgroundImageOnStart == null)
+                if (backgroundImageOnStart == null)
                 {
                     List<ItemImage> items = ItemsBackground.Where(x => !x.IsVideo).ToList();
                     if (items.Count == 0)
@@ -43,19 +43,19 @@ namespace BackgroundChanger.Models
 
                     Random rnd = new Random();
                     int counter = rnd.Next(0, items.Count);
-                    _backgroundImageOnStart = items[counter];
+                    backgroundImageOnStart = items[counter];
                 }
-                return _backgroundImageOnStart;
+                return backgroundImageOnStart;
             }
         }
 
-        private ItemImage _coverImageOnStart;
+        private ItemImage coverImageOnStart;
         [DontSerialize]
         public ItemImage CoverImageOnStart
         {
             get
             {
-                if (_coverImageOnStart == null)
+                if (coverImageOnStart == null)
                 {
                     List<ItemImage> items = ItemsCover.Where(x => !x.IsVideo).ToList();
                     if (items.Count == 0)
@@ -70,9 +70,9 @@ namespace BackgroundChanger.Models
 
                     Random rnd = new Random();
                     int counter = rnd.Next(0, items.Count);
-                    _coverImageOnStart = items[counter];
+                    coverImageOnStart = items[counter];
                 }
-                return _coverImageOnStart;
+                return coverImageOnStart;
             }
         }
     }

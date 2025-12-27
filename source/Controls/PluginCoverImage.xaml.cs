@@ -44,7 +44,7 @@ namespace BackgroundChanger.Controls
         private int Counter { get; set; } = 0;
         private GameBackgroundImages GameBackgroundImages { get; set; }
 
-        private static readonly Random _random = new Random();
+        private static readonly Random random = new Random();
 
         private bool WindowsIsActivated { get; set; } = true;
         private bool IsFirst { get; set; } = true;
@@ -215,7 +215,7 @@ namespace BackgroundChanger.Controls
                         }
                         else
                         {
-                            Counter = _random.Next(0, GameBackgroundImages.ItemsCover.Count);
+                            Counter = random.Next(0, GameBackgroundImages.ItemsCover.Count);
                             pathImage = GameBackgroundImages.ItemsCover[Counter].FullPath;
                         }
                     }
@@ -339,6 +339,7 @@ namespace BackgroundChanger.Controls
 
 
         #region Source
+
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(
             nameof(Source),
             typeof(object),
@@ -350,9 +351,11 @@ namespace BackgroundChanger.Controls
             get => GetValue(SourceProperty);
             set => SetValue(SourceProperty, value);
         }
+
         #endregion Source
 
         #region Stretch
+
         public static readonly DependencyProperty StretchProperty = DependencyProperty.Register(
             nameof(Stretch),
             typeof(Stretch),
@@ -364,9 +367,11 @@ namespace BackgroundChanger.Controls
             get => (Stretch)GetValue(StretchProperty);
             set => SetValue(StretchProperty, value);
         }
+
         #endregion Strech
 
         #region StretchDirection
+
         public static readonly DependencyProperty StretchDirectionProperty = DependencyProperty.Register(
             nameof(StretchDirection),
             typeof(StretchDirection),
@@ -378,6 +383,7 @@ namespace BackgroundChanger.Controls
             get => (StretchDirection)GetValue(StretchDirectionProperty);
             set => SetValue(StretchDirectionProperty, value);
         }
+
         #endregion StretchDirection
 
 
@@ -517,6 +523,7 @@ namespace BackgroundChanger.Controls
 
 
         #region Activate/Deactivated animation
+
         private void Application_Deactivated(object sender, EventArgs e)
         {
             Task.Run(() =>
@@ -566,6 +573,7 @@ namespace BackgroundChanger.Controls
                     break;
             }
         }
+
         #endregion
     }
 

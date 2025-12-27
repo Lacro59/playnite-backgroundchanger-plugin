@@ -46,7 +46,7 @@ namespace BackgroundChanger.Controls
         private int Counter { get; set; } = 0;
         private GameBackgroundImages GameBackgroundImages { get; set; }
 
-        private static readonly Random _random = new Random();
+        private static readonly Random random = new Random();
 
         private bool WindowsIsActivated { get; set; } = true;
         private bool IsFirst { get; set; } = true;
@@ -259,7 +259,7 @@ namespace BackgroundChanger.Controls
                         }
                         else
                         {
-                            Counter = _random.Next(0, GameBackgroundImages.ItemsBackground.Count);
+                            Counter = random.Next(0, GameBackgroundImages.ItemsBackground.Count);
                             pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
                         }
                     }
@@ -380,6 +380,7 @@ namespace BackgroundChanger.Controls
         internal Storyboard BorderDarkenFadeOut;
 
         #region AnimationEnabled
+
         public static readonly DependencyProperty AnimationEnabledProperty = DependencyProperty.Register(
             nameof(AnimationEnabled),
             typeof(bool),
@@ -391,9 +392,11 @@ namespace BackgroundChanger.Controls
             get => (bool)GetValue(AnimationEnabledProperty);
             set => SetValue(AnimationEnabledProperty, value);
         }
+
         #endregion
 
         #region Source
+
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(
             nameof(Source),
             typeof(object),
@@ -405,9 +408,11 @@ namespace BackgroundChanger.Controls
             get => GetValue(SourceProperty);
             set => SetValue(SourceProperty, value);
         }
+
         #endregion
 
         #region ImageOpacityMask
+
         public static readonly DependencyProperty ImageOpacityMaskProperty = DependencyProperty.Register(
             nameof(ImageOpacityMask),
             typeof(Brush),
@@ -419,9 +424,11 @@ namespace BackgroundChanger.Controls
             get => (Brush)GetValue(ImageOpacityMaskProperty);
             set => SetValue(ImageOpacityMaskProperty, value);
         }
+
         #endregion
 
         #region ImageDarkeningBrush
+
         public static readonly DependencyProperty ImageDarkeningBrushProperty = DependencyProperty.Register(
             nameof(ImageDarkeningBrush),
             typeof(Brush),
@@ -433,9 +440,11 @@ namespace BackgroundChanger.Controls
             get => (Brush)GetValue(ImageDarkeningBrushProperty);
             set => SetValue(ImageDarkeningBrushProperty, value);
         }
+
         #endregion
 
         #region Stretch
+
         public static readonly DependencyProperty StretchProperty = DependencyProperty.Register(
             nameof(Stretch),
             typeof(Stretch),
@@ -447,9 +456,11 @@ namespace BackgroundChanger.Controls
             get => (Stretch)GetValue(StretchProperty);
             set => SetValue(StretchProperty, value);
         }
+
         #endregion
 
         #region StretchDirection
+
         public static readonly DependencyProperty StretchDirectionProperty = DependencyProperty.Register(
             nameof(StretchDirection),
             typeof(StretchDirection),
@@ -461,9 +472,11 @@ namespace BackgroundChanger.Controls
             get => (StretchDirection)GetValue(StretchProperty);
             set => SetValue(StretchProperty, value);
         }
+
         #endregion
 
         #region IsBlurEnabled
+
         public static readonly DependencyProperty IsBlurEnabledProperty = DependencyProperty.Register(
             nameof(IsBlurEnabled),
             typeof(bool),
@@ -475,9 +488,11 @@ namespace BackgroundChanger.Controls
             get => (bool)GetValue(IsBlurEnabledProperty);
             set => SetValue(IsBlurEnabledProperty, value);
         }
+
         #endregion
 
         #region BlurAmount
+
         public static readonly DependencyProperty BlurAmountProperty = DependencyProperty.Register(
             nameof(BlurAmount),
             typeof(int),
@@ -489,9 +504,11 @@ namespace BackgroundChanger.Controls
             get => (int)GetValue(BlurAmountProperty);
             set => SetValue(BlurAmountProperty, value);
         }
+
         #endregion
 
         #region HighQualityBlur
+
         public static readonly DependencyProperty HighQualityBlurProperty = DependencyProperty.Register(
             nameof(HighQualityBlurProperty),
             typeof(bool),
@@ -503,6 +520,7 @@ namespace BackgroundChanger.Controls
             get => (bool)GetValue(HighQualityBlurProperty);
             set => SetValue(HighQualityBlurProperty, value);
         }
+
         #endregion
 
         private void Image1FadeOut_Completed(object sender, EventArgs e)
