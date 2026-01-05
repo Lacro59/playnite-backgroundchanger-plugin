@@ -3,7 +3,7 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
+    <sys:String x:Key="LOCBc">バックスクリーンチェンジャー</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">背景画像の管理</sys:String>
     <sys:String x:Key="LOCBcManageCover">カバー画像の管理</sys:String>
