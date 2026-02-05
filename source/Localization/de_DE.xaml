@@ -10,7 +10,7 @@
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB API Key</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">&quot;SteamGridDB&quot; API Key</sys:String>
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Plugin Hintergrundbild anzeigen</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Plugin Titelbild anzeigen</sys:String>
