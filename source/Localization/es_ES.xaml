@@ -3,44 +3,44 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">Cambiador de fondo</sys:String>
+    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">Administrar imágenes de fondo</sys:String>
-    <sys:String x:Key="LOCBcManageCover">Administrar imágenes de portada</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">Manage background images</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">Clave API de SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api key</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">Mostrar la imagen de fondo del plugin</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Mostrar la imagen de portada del plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
 
-    <sys:String x:Key="LOCBcBackgroundSameSettings">Utilizar el mismo ajuste para el fondo del juego del plugin que el fondo del tema *</sys:String>
+    <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">Habilitar selección aleatoria</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">Enable random selection</sys:String>
     <sys:String x:Key="LOCBcRandomOnStart">Solo al iniciar Playnite</sys:String>
     <sys:String x:Key="LOCBcRandomOnSelect">En selección de juego</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">Habilitar cambio automático</sys:String>
-    <sys:String x:Key="LOCBcTimeInterval">Intervalo de tiempo</sys:String>
-    <sys:String x:Key="LOCBcSeconds">segundos</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
+    <sys:String x:Key="LOCBcTimeInterval">Time interval</sys:String>
+    <sys:String x:Key="LOCBcSeconds">seconds</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Habilitar fondo animado</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Habilitar portada animada</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
     
-    <sys:String x:Key="LOCBcEnableVideoDelay">Habilitar retardo de vídeo</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">Utilice esta opción si desea mostrar la imagen predeterminada antes de un vídeo.</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelect">Selecciona de SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcGoogleImageSelect">Seleccionar desde imagen de Google</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
     <sys:String x:Key="LOCBcAddFromUrl">Agregar desde URL</sys:String>
     <sys:String x:Key="LOCBcAddFromUrlDescription">Introduzca la URL a la imagen</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">archivo ffmpeg</sys:String>
-    <sys:String x:Key="LOCBcWebpinfoFile">Archivo webpinfo</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
 
     <sys:String x:Key="LOCBcFfmpegNotFound">FFmpeg no encontrado</sys:String>
-    <sys:String x:Key="LOCBcFTooltTipConvert">Convertir a mp4 (rendimiento mejorado)</sys:String>
+    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
 
     <sys:String x:Key="LOCBcInvalidUrlFormat">¡Formato de URL inválido!</sys:String>
 
