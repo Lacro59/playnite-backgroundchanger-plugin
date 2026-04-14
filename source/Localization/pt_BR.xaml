@@ -3,44 +3,44 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">Trocador de fundo</sys:String>
+    <sys:String x:Key="LOCBc">Alterador</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">Gerenciar imagens de fundo</sys:String>
-    <sys:String x:Key="LOCBcManageCover">Gerenciar imagens de capa</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">Gerir imagens de fundo</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">Chave de api SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api key</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">Exibir a imagem de fundo do plugin</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Exibir a imagem de fundo do plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
 
-    <sys:String x:Key="LOCBcBackgroundSameSettings">Usou a mesma configuração para o fundo do plug-in que o fundo do tema *</sys:String>
+    <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">Ativar seleção aleatória</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">Enable random selection</sys:String>
     <sys:String x:Key="LOCBcRandomOnStart">Apenas ao iniciar Playnite</sys:String>
     <sys:String x:Key="LOCBcRandomOnSelect">Na seleção do jogo</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">Ativar mudança automática</sys:String>
-    <sys:String x:Key="LOCBcTimeInterval">Intervalo de tempo</sys:String>
-    <sys:String x:Key="LOCBcSeconds">segundos</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
+    <sys:String x:Key="LOCBcTimeInterval">Time interval</sys:String>
+    <sys:String x:Key="LOCBcSeconds">seconds</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Ativar fundo animado</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Ativar capa animada</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
     
-    <sys:String x:Key="LOCBcEnableVideoDelay">Habilitar atraso de vídeo</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">Use esta opção se você quiser exibir a imagem padrão antes de um vídeo.</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelect">Selecionar do SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcGoogleImageSelect">Selecione do Google Imagens</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
     <sys:String x:Key="LOCBcAddFromUrl">Adicionar de URL</sys:String>
     <sys:String x:Key="LOCBcAddFromUrlDescription">Digite a URL da imagem</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">arquivo ffmpeg</sys:String>
-    <sys:String x:Key="LOCBcWebpinfoFile">arquivo webpinfo</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
 
     <sys:String x:Key="LOCBcFfmpegNotFound">FFmpeg não encontrado</sys:String>
-    <sys:String x:Key="LOCBcFTooltTipConvert">Converter para mp4 (melhor desempenho)</sys:String>
+    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
 
     <sys:String x:Key="LOCBcInvalidUrlFormat">Formato de URL inválido!</sys:String>
 
