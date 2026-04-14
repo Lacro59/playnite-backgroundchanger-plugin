@@ -3,44 +3,44 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">Сменщик фонов</sys:String>
+    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">Управление фоновыми изображениями</sys:String>
-    <sys:String x:Key="LOCBcManageCover">Управление обложками</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">Manage background images</sys:String>
+    <sys:String x:Key="LOCBcManageCover">Manage cover images</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">API ключ SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api key</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">Отображать фоновое изображение плагина</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Отображать изображение обложки плагина</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
 
-    <sys:String x:Key="LOCBcBackgroundSameSettings">Используется тот же параметр для фона игры плагина, чем фон темы *</sys:String>
+    <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     
-    <sys:String x:Key="LOCBcEnableRandomSelect">Включить случайный выбор</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">Enable random selection</sys:String>
     <sys:String x:Key="LOCBcRandomOnStart">Только при запуске Playnite</sys:String>
     <sys:String x:Key="LOCBcRandomOnSelect">При выборе игры</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">Включить автоматическое изменение</sys:String>
-    <sys:String x:Key="LOCBcTimeInterval">Временной интервал</sys:String>
-    <sys:String x:Key="LOCBcSeconds">секунд(ы)</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
+    <sys:String x:Key="LOCBcTimeInterval">Time interval</sys:String>
+    <sys:String x:Key="LOCBcSeconds">seconds</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Включить анимированный фон</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Включить анимированную обложку</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
+    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
     
-    <sys:String x:Key="LOCBcEnableVideoDelay">Включить задержку видео</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">Используйте этот параметр, если вы хотите перед видео отобразить дефолтное изображение.</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelect">Выбрать из SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcGoogleImageSelect">Выбрать из Google Image</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
     <sys:String x:Key="LOCBcAddFromUrl">Добавить из URL</sys:String>
     <sys:String x:Key="LOCBcAddFromUrlDescription">Введите URL к изображению</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg файл</sys:String>
-    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo файл</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
 
     <sys:String x:Key="LOCBcFfmpegNotFound">FFmpeg не найден</sys:String>
-    <sys:String x:Key="LOCBcFTooltTipConvert">Преобразовать в mp4 (улучшена производительность)</sys:String>
+    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
 
     <sys:String x:Key="LOCBcInvalidUrlFormat">Неверный формат URL!</sys:String>
 
