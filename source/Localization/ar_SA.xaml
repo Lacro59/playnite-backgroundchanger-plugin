@@ -10,7 +10,7 @@
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">مفتاح SteamGridDB API</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB api key</sys:String>
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">عرض صورة خلفية الإضافة</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">عرض صورة غلاف الإضافة</sys:String>
@@ -27,8 +27,8 @@
     <sys:String x:Key="LOCBcEnableImageAnimatedBackground">تفعيل الخلفية المتحركة</sys:String>
     <sys:String x:Key="LOCBcEnableImageAnimatedCover">تفعيل الغلاف المتحرك</sys:String>
     
-    <sys:String x:Key="LOCBcEnableVideoDelay">تمكين تأخير الفيدي</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">استخدم هذا الخيار إذا كنت ترغب في عرض الصورة الافتراضية قبل الفيديو.</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
 
     <!-- ImagesManagerView -->
 
@@ -36,11 +36,11 @@
     <sys:String x:Key="LOCBcGoogleImageSelect">اختر من صور جوجل</sys:String>
     <sys:String x:Key="LOCBcAddFromUrl">إضافة من الرابط</sys:String>
     <sys:String x:Key="LOCBcAddFromUrlDescription">أدخل الرابط إلى الصورة</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">ملف ffmpeg</sys:String>
-    <sys:String x:Key="LOCBcWebpinfoFile">ملف webpinfo</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
+    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
 
     <sys:String x:Key="LOCBcFfmpegNotFound">لم يعثر على Ffmpeg</sys:String>
-    <sys:String x:Key="LOCBcFTooltTipConvert">تحويل إلى mp4 (تحسين الأداء)</sys:String>
+    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
 
     <sys:String x:Key="LOCBcInvalidUrlFormat">تنسيق الرابط غير صحيح!</sys:String>
 
