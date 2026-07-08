@@ -49,7 +49,7 @@ namespace BackgroundChanger.Services
         /// </summary>
         public SteamGridDbApi()
         {
-            ApiKey = PluginDatabase.PluginSettings.Settings.SteamGridDbApiKey;
+            ApiKey = PluginDatabase.PluginSettings.SteamGridDbApiKey;
         }
 
         /// <summary>

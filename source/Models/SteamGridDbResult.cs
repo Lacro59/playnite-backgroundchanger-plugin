@@ -94,7 +94,7 @@ namespace BackgroundChanger.Models
                     return false;
                 }
 
-                if (File.Exists(PluginDatabase.PluginSettings.Settings.ffmpegFile))
+                if (File.Exists(PluginDatabase.PluginSettings.ffmpegFile))
                 {
                     string videoFile = Path.Combine(PluginDatabase.Paths.PluginCachePath, $"{Id}.mp4");
                     if (File.Exists(videoFile))
@@ -108,7 +108,7 @@ namespace BackgroundChanger.Models
                         string ffmpeg = $"-i {Thumb} {videoFile}";
 
                         Process process = new Process();
-                        process.StartInfo.FileName = PluginDatabase.PluginSettings.Settings.ffmpegFile;
+                        process.StartInfo.FileName = PluginDatabase.PluginSettings.ffmpegFile;
                         process.StartInfo.Arguments = ffmpeg;
                         process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         _ = process.Start();

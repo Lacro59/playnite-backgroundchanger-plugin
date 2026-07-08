@@ -389,7 +389,7 @@ namespace BackgroundChanger.Views
                             + $"-vcodec libx264 -crf 25 -pix_fmt yuv420p \"{PluginDatabase.Paths.PluginCachePath}\\{fileName}.mp4\"";
 
                         Process process = new Process();
-                        process.StartInfo.FileName = PluginDatabase.PluginSettings.Settings.ffmpegFile;
+                        process.StartInfo.FileName = PluginDatabase.PluginSettings.ffmpegFile;
                         process.StartInfo.Arguments = ffmpeg;
                         _ = process.Start();
                         process.WaitForExit();
@@ -423,7 +423,7 @@ namespace BackgroundChanger.Views
             {
                 try
                 {
-                    if (File.Exists(PluginDatabase.PluginSettings.Settings.ffmpegFile))
+                    if (File.Exists(PluginDatabase.PluginSettings.ffmpegFile))
                     {
                         videoPath = ExtractAnimatedImageAndConvert(filePath);
                     }

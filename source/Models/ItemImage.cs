@@ -2,6 +2,7 @@
 using CommonPlayniteShared.Common;
 using CommonPluginsShared;
 using CommonPluginsShared.Extensions;
+using CommonPluginsShared.Utilities;
 using Playnite.SDK.Data;
 using System;
 using System.IO;
@@ -90,7 +91,7 @@ namespace BackgroundChanger.Models
                 if (File.Exists(FullPath))
                 {
                     FileInfo fi = new FileInfo(FullPath);
-                    return Tools.SizeSuffix(fi.Length);
+                    return UtilityTools.SizeSuffix(fi.Length);
                 }
                 else
                 {

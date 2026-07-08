@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace BackgroundChanger.Models
 {
-    public class GameBackgroundImages : PluginDataBaseGame<ItemImage>
+    public class GameBackgroundImages : PluginGameCollection<ItemImage>
     {
         [DontSerialize]
         public bool HasDataBackground => Items?.Where(x => !x.IsCover && x.Exist)?.Count() > 0;

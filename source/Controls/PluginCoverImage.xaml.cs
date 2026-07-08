@@ -6,6 +6,7 @@ using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
 using CommonPluginsShared.Extensions;
 using CommonPluginsShared.Interfaces;
+using CommonPluginsShared.UI;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
@@ -49,6 +50,24 @@ namespace BackgroundChanger.Controls
         private bool WindowsIsActivated { get; set; } = true;
         private bool IsFirst { get; set; } = true;
 
+        protected override void AttachStaticEvents()
+        {
+            base.AttachStaticEvents();
+
+            // Attach once per plugin to avoid subscribing multiple times across theme control instances.
+            if (PluginDatabase == null || PluginDatabase.PluginSettings == null)
+            {
+                return;
+            }
+
+            AttachPluginEvents(PluginDatabase.PluginName, () =>
+            {
+                PluginDatabase.PluginSettings.PropertyChanged += CreatePluginSettingsHandler();
+                PluginDatabase.DatabaseItemUpdated += CreateDatabaseItemUpdatedHandler<GameBackgroundImages>();
+                PluginDatabase.DatabaseItemCollectionChanged += CreateDatabaseCollectionChangedHandler<GameBackgroundImages>();
+            });
+        }
+
 
         public override void SetDefaultDataContext()
         {
@@ -68,12 +87,12 @@ namespace BackgroundChanger.Controls
 
             ControlDataContext = new PluginCoverImageDataContext
             {
-                IsActivated = PluginDatabase.PluginSettings.Settings.EnableCoverImage,
-                UseAnimated = PluginDatabase.PluginSettings.Settings.EnableImageAnimatedCover,
-                EnableRandomSelect = PluginDatabase.PluginSettings.Settings.EnableCoverImageRandomSelect,
-                EnableRandomOnSelect = PluginDatabase.PluginSettings.Settings.EnableCoverImageRandomOnSelect,
-                EnableRandomOnStart = PluginDatabase.PluginSettings.Settings.EnableCoverImageRandomOnStart,
-                EnableAutoChanger = PluginDatabase.PluginSettings.Settings.EnableCoverImageAutoChanger,
+                IsActivated = PluginDatabase.PluginSettings.EnableCoverImage,
+                UseAnimated = PluginDatabase.PluginSettings.EnableImageAnimatedCover,
+                EnableRandomSelect = PluginDatabase.PluginSettings.EnableCoverImageRandomSelect,
+                EnableRandomOnSelect = PluginDatabase.PluginSettings.EnableCoverImageRandomOnSelect,
+                EnableRandomOnStart = PluginDatabase.PluginSettings.EnableCoverImageRandomOnStart,
+                EnableAutoChanger = PluginDatabase.PluginSettings.EnableCoverImageAutoChanger,
 
                 ImageSource = null,
                 VideoSource = null
@@ -87,14 +106,7 @@ namespace BackgroundChanger.Controls
 
             Delay = 0;
             DataContext = ControlDataContext;
-
-            PluginDatabase.PluginSettings.PropertyChanged += PluginSettings_PropertyChanged;
-            PluginDatabase.Database.ItemUpdated += Database_ItemUpdated;
-            PluginDatabase.Database.ItemCollectionChanged += Database_ItemCollectionChanged;
-            API.Instance.Database.Games.ItemUpdated += Games_ItemUpdated;
-
-            // Apply settings
-            PluginSettings_PropertyChanged(null, null);
+            Loaded += OnLoaded;
 
             if (API.Instance.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {
@@ -128,7 +140,7 @@ namespace BackgroundChanger.Controls
         private void GetCoverProperties()
         {
             DependencyObject thisParent = ((FrameworkElement)((FrameworkElement)((FrameworkElement)this.Parent).Parent).Parent).Parent;
-            FrameworkElement PART_ImageCover = UI.SearchElementByName("PART_ImageCover", thisParent, false, false);
+            FrameworkElement PART_ImageCover = UIHelper.SearchElementByName("PART_ImageCover", thisParent, false, false);
 
             if (PART_ImageCover != null)
             {
@@ -171,7 +183,7 @@ namespace BackgroundChanger.Controls
         }
 
 
-        public override void SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
+        public override void SetData(Game newContext, PluginGameEntry PluginGameData)
         {
             GameBackgroundImages = (GameBackgroundImages)PluginGameData;
 
@@ -234,7 +246,7 @@ namespace BackgroundChanger.Controls
 
                     SetCoverImage(pathImage);
 
-                    BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.CoverImageAutoChangerTimer * 1000)
+                    BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.CoverImageAutoChangerTimer * 1000)
                     {
                         AutoReset = true
                     };
@@ -281,9 +293,9 @@ namespace BackgroundChanger.Controls
                 SetDefaultCoverImage();
             }
 
-            if (PluginDatabase.PluginSettings.Settings.useVideoDelayCoverImage)
+            if (PluginDatabase.PluginSettings.useVideoDelayCoverImage)
             {
-                BcTimerVideo = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.videoDelayCoverImage * 1000)
+                BcTimerVideo = new System.Timers.Timer(PluginDatabase.PluginSettings.videoDelayCoverImage * 1000)
                 {
                     AutoReset = true
                 };
@@ -315,7 +327,11 @@ namespace BackgroundChanger.Controls
                 return;
             }
 
-            PluginDatabase.PluginSettings.Settings.CoverIsVideo = Path.GetExtension(pathImage).IsEqual(".mp4");
+            bool isVideo = Path.GetExtension(pathImage).IsEqual(".mp4");
+            if (PluginDatabase.PluginSettings.CoverIsVideo != isVideo)
+            {
+                PluginDatabase.PluginSettings.CoverIsVideo = isVideo;
+            }
 
             if (Path.GetExtension(pathImage).IsEqual(".mp4"))
             {

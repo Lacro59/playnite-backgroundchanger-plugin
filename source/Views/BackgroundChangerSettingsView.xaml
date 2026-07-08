@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:commonPlugin="clr-namespace:CommonPluginsShared"
+             xmlns:commonPlugin="clr-namespace:CommonPluginsShared.Commands"
              xmlns:AttachedProperties="clr-namespace:CommonPluginsShared.Controls" 
              xmlns:backgroundchanger="clr-namespace:BackgroundChanger" 
-             xmlns:pcmd="clr-namespace:CommonPluginsShared" 
+             xmlns:pcmd="clr-namespace:CommonPluginsShared.Commands" 
              xmlns:playnitecontrols="clr-namespace:CommonPluginsControls.PlayniteControls" 
              xmlns:converters="clr-namespace:CommonPlayniteShared.Converters"
              mc:Ignorable="d" d:DesignWidth="800"
@@ -39,7 +39,7 @@
                     <Label Grid.Column="0" Grid.Row="0" Content="{DynamicResource LOCBcSteamGridDbApiKey}" />
                     <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Settings.SteamGridDbApiKey}" />
                     <Button Grid.Column="5" Grid.Row="0" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}"
-                            Command="{x:Static commonPlugin:Commands.NavigateUrl}"
+                            Command="{x:Static commonPlugin:CommandsNavigation.NavigateUrl}"
                             CommandParameter="https://www.steamgriddb.com/profile/preferences/api" />
 
                     <Label Grid.Column="0" Grid.Row="2" Content="{DynamicResource LOCBcFfmpegFile}" />
@@ -47,7 +47,7 @@
                     <Button Grid.Column="3" Grid.Row="2" Content="&#xeb12;" FontFamily="{DynamicResource FontIcoFont}" HorizontalAlignment="Right"
                             Click="ButtonFfmpeg_Click" />
                     <Button Grid.Column="5" Grid.Row="2" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}"
-                            Command="{x:Static commonPlugin:Commands.NavigateUrl}"
+                            Command="{x:Static commonPlugin:CommandsNavigation.NavigateUrl}"
                             CommandParameter="https://www.ffmpeg.org/" />
 
                     <!--Label Grid.Column="0" Grid.Row="4" Content="{DynamicResource LOCBcWebpinfoFile}" />
@@ -86,7 +86,7 @@
 				                    BorderThickness="{DynamicResource PopupBorderThickness}">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Settings.BackgroundImageSameSettings}" Margin="0,0,0,10"
-                                              Command="{x:Static pcmd:Commands.RestartRequired}" 
+                                              Command="{x:Static pcmd:CommandsPlugin.CmdRestartRequired}" 
                                               CommandParameter="{Binding RelativeSource={RelativeSource Self}}"
                                               Content="{DynamicResource LOCBcBackgroundSameSettings}" />
 

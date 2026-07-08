@@ -8,9 +8,9 @@ using System.IO;
 
 namespace BackgroundChanger.Services
 {
-    public class BackgroundChangerDatabase : PluginDatabaseObject<BackgroundChangerSettingsViewModel, BackgroundImagesCollection, GameBackgroundImages, ItemImage>
+    public class BackgroundChangerDatabase : PluginDatabaseObject<BackgroundChangerSettings, GameBackgroundImages, ItemImage>
     {
-        public BackgroundChangerDatabase(BackgroundChangerSettingsViewModel pluginSettings, string pluginUserDataPath) : base(pluginSettings, "BackgroundChanger", pluginUserDataPath)
+        public BackgroundChangerDatabase(BackgroundChangerSettings pluginSettings, string pluginUserDataPath) : base(pluginSettings, "BackgroundChanger", pluginUserDataPath)
         {
         }
 
@@ -91,14 +91,14 @@ namespace BackgroundChanger.Services
 
             if (gameBackgroundImages == null)
             {
-                PluginSettings.Settings.HasDataBackground = false;
-                PluginSettings.Settings.HasDataCover = false;
+                PluginSettings.HasDataBackground = false;
+                PluginSettings.HasDataCover = false;
 
                 return;
             }
 
-            PluginSettings.Settings.HasDataBackground = gameBackgroundImages.HasDataBackground;
-            PluginSettings.Settings.HasDataCover = gameBackgroundImages.HasDataCover;
+            PluginSettings.HasDataBackground = gameBackgroundImages.HasDataBackground;
+            PluginSettings.HasDataCover = gameBackgroundImages.HasDataCover;
         }
     }
 }

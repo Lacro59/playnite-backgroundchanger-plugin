@@ -1,5 +1,6 @@
 ﻿using BackgroundChanger.Models;
 using BackgroundChanger.Views;
+using CommonPluginsShared.Interfaces;
 using CommonPluginsShared.Plugins;
 using Playnite.SDK;
 using Playnite.SDK.Data;
@@ -15,28 +16,48 @@ namespace BackgroundChanger
         private bool enableBackgroundImage = true;
         public bool EnableBackgroundImage { get => enableBackgroundImage; set => SetValue(ref enableBackgroundImage, value); }
 
-        public bool BackgroundImageSameSettings { get; set; } = true;
+        private bool backgroundImageSameSettings = true;
+        public bool BackgroundImageSameSettings { get => backgroundImageSameSettings; set => SetValue(ref backgroundImageSameSettings, value); }
 
-        public bool EnableBackgroundImageRandomSelect { get; set; } = false;
-        public bool EnableBackgroundImageRandomOnStart { get; set; } = true;
-        public bool EnableBackgroundImageRandomOnSelect { get; set; } = false;
-        public bool EnableBackgroundImageAutoChanger { get; set; } = false;
-        public int BackgroundImageAutoChangerTimer { get; set; } = 10;
+        private bool enableBackgroundImageRandomSelect = false;
+        public bool EnableBackgroundImageRandomSelect { get => enableBackgroundImageRandomSelect; set => SetValue(ref enableBackgroundImageRandomSelect, value); }
+
+        private bool enableBackgroundImageRandomOnStart = true;
+        public bool EnableBackgroundImageRandomOnStart { get => enableBackgroundImageRandomOnStart; set => SetValue(ref enableBackgroundImageRandomOnStart, value); }
+
+        private bool enableBackgroundImageRandomOnSelect = false;
+        public bool EnableBackgroundImageRandomOnSelect { get => enableBackgroundImageRandomOnSelect; set => SetValue(ref enableBackgroundImageRandomOnSelect, value); }
+
+        private bool enableBackgroundImageAutoChanger = false;
+        public bool EnableBackgroundImageAutoChanger { get => enableBackgroundImageAutoChanger; set => SetValue(ref enableBackgroundImageAutoChanger, value); }
+
+        private int backgroundImageAutoChangerTimer = 10;
+        public int BackgroundImageAutoChangerTimer { get => backgroundImageAutoChangerTimer; set => SetValue(ref backgroundImageAutoChangerTimer, value); }
 
         private bool enableImageAnimatedBackground = false;
         public bool EnableImageAnimatedBackground { get => enableImageAnimatedBackground; set => SetValue(ref enableImageAnimatedBackground, value); }
 
-        public double Volume { get; set; } = 0;
+        private double volume = 0;
+        public double Volume { get => volume; set => SetValue(ref volume, value); }
 
 
         private bool enableCoverImage = true;
         public bool EnableCoverImage { get => enableCoverImage; set => SetValue(ref enableCoverImage, value); }
 
-        public bool EnableCoverImageRandomSelect { get; set; } = false;
-        public bool EnableCoverImageRandomOnStart { get; set; } = true;
-        public bool EnableCoverImageRandomOnSelect { get; set; } = false;
-        public bool EnableCoverImageAutoChanger { get; set; } = false;
-        public int CoverImageAutoChangerTimer { get; set; } = 10;
+        private bool enableCoverImageRandomSelect = false;
+        public bool EnableCoverImageRandomSelect { get => enableCoverImageRandomSelect; set => SetValue(ref enableCoverImageRandomSelect, value); }
+
+        private bool enableCoverImageRandomOnStart = true;
+        public bool EnableCoverImageRandomOnStart { get => enableCoverImageRandomOnStart; set => SetValue(ref enableCoverImageRandomOnStart, value); }
+
+        private bool enableCoverImageRandomOnSelect = false;
+        public bool EnableCoverImageRandomOnSelect { get => enableCoverImageRandomOnSelect; set => SetValue(ref enableCoverImageRandomOnSelect, value); }
+
+        private bool enableCoverImageAutoChanger = false;
+        public bool EnableCoverImageAutoChanger { get => enableCoverImageAutoChanger; set => SetValue(ref enableCoverImageAutoChanger, value); }
+
+        private int coverImageAutoChangerTimer = 10;
+        public int CoverImageAutoChangerTimer { get => coverImageAutoChangerTimer; set => SetValue(ref coverImageAutoChangerTimer, value); }
 
         private bool enableImageAnimatedCover = false;
         public bool EnableImageAnimatedCover { get => enableImageAnimatedCover; set => SetValue(ref enableImageAnimatedCover, value); }
@@ -49,10 +70,17 @@ namespace BackgroundChanger
         public string webpinfoFile { get; set; } = string.Empty;
 
 
-        public bool useVideoDelayBackgroundImage { get; set; } = false;
-        public int videoDelayBackgroundImage { get; set; } = 5;
-        public bool useVideoDelayCoverImage { get; set; } = false;
-        public int videoDelayCoverImage { get; set; } = 5;
+        private bool _useVideoDelayBackgroundImage = false;
+        public bool useVideoDelayBackgroundImage { get => _useVideoDelayBackgroundImage; set => SetValue(ref _useVideoDelayBackgroundImage, value); }
+
+        private int _videoDelayBackgroundImage = 5;
+        public int videoDelayBackgroundImage { get => _videoDelayBackgroundImage; set => SetValue(ref _videoDelayBackgroundImage, value); }
+
+        private bool _useVideoDelayCoverImage = false;
+        public bool useVideoDelayCoverImage { get => _useVideoDelayCoverImage; set => SetValue(ref _useVideoDelayCoverImage, value); }
+
+        private int _videoDelayCoverImage = 5;
+        public int videoDelayCoverImage { get => _videoDelayCoverImage; set => SetValue(ref _videoDelayCoverImage, value); }
 
         #endregion
 
@@ -144,13 +172,15 @@ namespace BackgroundChanger
     }
 
 
-    public class BackgroundChangerSettingsViewModel : ObservableObject, ISettings
+    public class BackgroundChangerSettingsViewModel : PluginSettingsViewModel, IPluginSettingsViewModel
     {
         private readonly BackgroundChanger Plugin;
         private BackgroundChangerSettings EditingClone { get; set; }
 
         private BackgroundChangerSettings settings;
-        public BackgroundChangerSettings Settings { get => settings; set => SetValue(ref settings, value); }
+        public BackgroundChangerSettings Settings { get => settings; }
+
+        IPluginSettings IPluginSettingsViewModel.Settings => Settings;
 
 
         public BackgroundChangerSettingsViewModel(BackgroundChanger plugin)
@@ -162,7 +192,7 @@ namespace BackgroundChanger
             BackgroundChangerSettings savedSettings = plugin.LoadPluginSettings<BackgroundChangerSettings>();
 
             // LoadPluginSettings returns null if not saved data is available.
-            Settings = savedSettings ?? new BackgroundChangerSettings();
+            settings = savedSettings ?? new BackgroundChangerSettings();
         }
 
         // Code executed when settings view is opened and user starts editing values.
@@ -175,7 +205,7 @@ namespace BackgroundChanger
         // This method should revert any changes made to Option1 and Option2.
         public void CancelEdit()
         {
-            Settings = EditingClone;
+            CopySettingsValues(EditingClone, Settings);
         }
 
         // Code executed when user decides to confirm changes made since BeginEdit was called.
@@ -189,8 +219,6 @@ namespace BackgroundChanger
             Settings.EnableCoverImageRandomOnStart = BackgroundChangerSettingsView.CoverOnStart;
 
             Plugin.SavePluginSettings(Settings);
-            BackgroundChanger.PluginDatabase.PluginSettings = this;
-            this.OnPropertyChanged();
         }
 
         // Code execute when user decides to confirm changes made since BeginEdit was called.

@@ -6,6 +6,7 @@ using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
 using CommonPluginsShared.Extensions;
 using CommonPluginsShared.Interfaces;
+using CommonPluginsShared.UI;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
@@ -51,6 +52,24 @@ namespace BackgroundChanger.Controls
         private bool WindowsIsActivated { get; set; } = true;
         private bool IsFirst { get; set; } = true;
 
+        protected override void AttachStaticEvents()
+        {
+            base.AttachStaticEvents();
+
+            // Attach once per plugin to avoid subscribing multiple times across theme control instances.
+            if (PluginDatabase == null || PluginDatabase.PluginSettings == null)
+            {
+                return;
+            }
+
+            AttachPluginEvents(PluginDatabase.PluginName, () =>
+            {
+                PluginDatabase.PluginSettings.PropertyChanged += CreatePluginSettingsHandler();
+                PluginDatabase.DatabaseItemUpdated += CreateDatabaseItemUpdatedHandler<GameBackgroundImages>();
+                PluginDatabase.DatabaseItemCollectionChanged += CreateDatabaseCollectionChangedHandler<GameBackgroundImages>();
+            });
+        }
+
 
         public override void SetDefaultDataContext()
         {
@@ -70,12 +89,12 @@ namespace BackgroundChanger.Controls
 
             ControlDataContext = new PluginBackgroundImageDataContext
             {
-                IsActivated = PluginDatabase.PluginSettings.Settings.EnableBackgroundImage,
-                UseAnimated = PluginDatabase.PluginSettings.Settings.EnableImageAnimatedBackground,
-                EnableRandomSelect = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomSelect,
-                EnableRandomOnSelect = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomOnSelect,
-                EnableRandomOnStart = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomOnStart,
-                EnableAutoChanger = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageAutoChanger
+                IsActivated = PluginDatabase.PluginSettings.EnableBackgroundImage,
+                UseAnimated = PluginDatabase.PluginSettings.EnableImageAnimatedBackground,
+                EnableRandomSelect = PluginDatabase.PluginSettings.EnableBackgroundImageRandomSelect,
+                EnableRandomOnSelect = PluginDatabase.PluginSettings.EnableBackgroundImageRandomOnSelect,
+                EnableRandomOnStart = PluginDatabase.PluginSettings.EnableBackgroundImageRandomOnStart,
+                EnableAutoChanger = PluginDatabase.PluginSettings.EnableBackgroundImageAutoChanger
             };
         }
 
@@ -96,14 +115,7 @@ namespace BackgroundChanger.Controls
             Image2FadeOut.Completed += Image2FadeOut_Completed;
             BorderDarkenFadeOut.Completed += BorderDarkenOut_Completed;
 
-
-            PluginDatabase.PluginSettings.PropertyChanged += PluginSettings_PropertyChanged;
-            PluginDatabase.Database.ItemUpdated += Database_ItemUpdated;
-            PluginDatabase.Database.ItemCollectionChanged += Database_ItemCollectionChanged;
-            API.Instance.Database.Games.ItemUpdated += Games_ItemUpdated;
-
-            // Apply settings
-            PluginSettings_PropertyChanged(null, null);
+            Loaded += OnLoaded;
 
             if (API.Instance.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {
@@ -135,7 +147,7 @@ namespace BackgroundChanger.Controls
 
         private void GetFadeImageProperties()
         {
-            if (!PluginDatabase.PluginSettings.Settings.BackgroundImageSameSettings)
+            if (!PluginDatabase.PluginSettings.BackgroundImageSameSettings)
             {
                 return;
             }
@@ -143,7 +155,7 @@ namespace BackgroundChanger.Controls
             FrameworkElement PART_ImageBackground_4 = null;
             try
             {
-                PART_ImageBackground_4 = UI.SearchElementByName("ControlRoot", false, false, 4);
+                PART_ImageBackground_4 = UIHelper.SearchElementByName("ControlRoot", false, false, 4);
             }
             catch
             {
@@ -152,7 +164,7 @@ namespace BackgroundChanger.Controls
             FrameworkElement PART_ImageBackground_3 = null;
             try
             {
-                PART_ImageBackground_3 = UI.SearchElementByName("ControlRoot", false, false, 3);
+                PART_ImageBackground_3 = UIHelper.SearchElementByName("ControlRoot", false, false, 3);
             }
             catch
             {
@@ -161,7 +173,7 @@ namespace BackgroundChanger.Controls
             FrameworkElement PART_ImageBackground_2 = null;
             try
             {
-                PART_ImageBackground_2 = UI.SearchElementByName("ControlRoot", false, false, 2);
+                PART_ImageBackground_2 = UIHelper.SearchElementByName("ControlRoot", false, false, 2);
             }
             catch
             {
@@ -210,12 +222,12 @@ namespace BackgroundChanger.Controls
         }
 
 
-        public override void SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
+        public override void SetData(Game newContext, PluginGameEntry PluginGameData)
         {
             GameBackgroundImages = (GameBackgroundImages)PluginGameData;
 
-            Video1.Volume = PluginDatabase.PluginSettings.Settings.Volume / 10;
-            Video2.Volume = PluginDatabase.PluginSettings.Settings.Volume / 10;
+            Video1.Volume = PluginDatabase.PluginSettings.Volume / 10;
+            Video2.Volume = PluginDatabase.PluginSettings.Volume / 10;
 
             try
             {
@@ -278,7 +290,7 @@ namespace BackgroundChanger.Controls
 
                     SetBackgroundImage(pathImage);
 
-                    BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.BackgroundImageAutoChangerTimer * 1000)
+                    BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.BackgroundImageAutoChangerTimer * 1000)
                     {
                         AutoReset = true
                     };
@@ -325,9 +337,9 @@ namespace BackgroundChanger.Controls
                 SetDefaultBackgroundImage();
             }
 
-            if (PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
+            if (PluginDatabase.PluginSettings.useVideoDelayBackgroundImage)
             {
-                BcTimerVideo = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.videoDelayBackgroundImage * 1000)
+                BcTimerVideo = new System.Timers.Timer(PluginDatabase.PluginSettings.videoDelayBackgroundImage * 1000)
                 {
                     AutoReset = true
                 };
@@ -653,7 +665,11 @@ namespace BackgroundChanger.Controls
                     }
                     else
                     {
-                        PluginDatabase.PluginSettings.Settings.BackgroundIsVideo = Path.GetExtension(image).IsEqual(".mp4");
+                        bool isVideo = Path.GetExtension(image).IsEqual(".mp4");
+                        if (PluginDatabase.PluginSettings.BackgroundIsVideo != isVideo)
+                        {
+                            PluginDatabase.PluginSettings.BackgroundIsVideo = isVideo;
+                        }
 
                         if (currentImage == CurrentImage.None)
                         {

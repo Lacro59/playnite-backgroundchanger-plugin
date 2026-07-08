@@ -20,10 +20,10 @@ namespace BackgroundChanger.Views
         {
             InitializeComponent();
 
-            rbBackgroundOnSelect.IsChecked = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomOnSelect;
-            rbBackgroundOnStart.IsChecked = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomOnStart;
-            rbCoverOnSelect.IsChecked = PluginDatabase.PluginSettings.Settings.EnableCoverImageRandomOnSelect;
-            rbCoverOnStart.IsChecked = PluginDatabase.PluginSettings.Settings.EnableCoverImageRandomOnStart;
+            rbBackgroundOnSelect.IsChecked = PluginDatabase.PluginSettings.EnableBackgroundImageRandomOnSelect;
+            rbBackgroundOnStart.IsChecked = PluginDatabase.PluginSettings.EnableBackgroundImageRandomOnStart;
+            rbCoverOnSelect.IsChecked = PluginDatabase.PluginSettings.EnableCoverImageRandomOnSelect;
+            rbCoverOnStart.IsChecked = PluginDatabase.PluginSettings.EnableCoverImageRandomOnStart;
 
             Rb_Click(null, null);
         }
