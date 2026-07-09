@@ -1,4 +1,5 @@
 ﻿using BackgroundChanger.Models;
+using BackgroundChangerPlugin.Controls;
 using BackgroundChanger.Services;
 using CommonPlayniteShared;
 using CommonPluginsShared;
@@ -14,21 +15,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
+using System.Threading;
 
 namespace BackgroundChanger.Controls
 {
     /// <summary>
     /// Logique d'interaction pour PluginCoverImage.xaml
     /// </summary>
-    public partial class PluginCoverImage : PluginUserControlExtend
+    public partial class PluginCoverImage : PluginMediaLifecycleControlBase
     {
         private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
         protected override IPluginDatabase pluginDatabase => PluginDatabase;
@@ -47,7 +47,6 @@ namespace BackgroundChanger.Controls
 
         private static readonly Random random = new Random();
 
-        private bool WindowsIsActivated { get; set; } = true;
         private bool IsFirst { get; set; } = true;
 
         protected override void AttachStaticEvents()
@@ -71,19 +70,7 @@ namespace BackgroundChanger.Controls
 
         public override void SetDefaultDataContext()
         {
-            if (BcTimer != null)
-            {
-                Counter = 0;
-                BcTimer.Stop();
-                BcTimer.Dispose();
-                BcTimer = null;
-            }
-            if (BcTimerVideo != null)
-            {
-                BcTimerVideo.Stop();
-                BcTimerVideo.Dispose();
-                BcTimerVideo = null;
-            }
+            DisposeBcTimers();
 
             ControlDataContext = new PluginCoverImageDataContext
             {
@@ -107,6 +94,7 @@ namespace BackgroundChanger.Controls
             Delay = 0;
             DataContext = ControlDataContext;
             Loaded += OnLoaded;
+            InitializeMediaLifecycleHooks();
 
             if (API.Instance.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {
@@ -193,6 +181,8 @@ namespace BackgroundChanger.Controls
 
                 if (!GameBackgroundImages.HasDataCover)
                 {
+                    DisposeBcTimers();
+                    PauseVideos();
                     MustDisplay = false;
                     return;
                 }
@@ -251,7 +241,10 @@ namespace BackgroundChanger.Controls
                         AutoReset = true
                     };
                     BcTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-                    BcTimer.Start();
+                    if (IsMediaLifecycleActive())
+                    {
+                        BcTimer.Start();
+                    }
                 }
                 else if (ControlDataContext.EnableRandomSelect)
                 {
@@ -300,7 +293,10 @@ namespace BackgroundChanger.Controls
                     AutoReset = true
                 };
                 BcTimerVideo.Elapsed += new ElapsedEventHandler(OnTimedVideoEvent);
-                BcTimerVideo.Start();
+                if (IsMediaLifecycleActive())
+                {
+                    BcTimerVideo.Start();
+                }
             }
         }
 
@@ -338,7 +334,7 @@ namespace BackgroundChanger.Controls
                 ControlDataContext.ImageSource = null;
                 ControlDataContext.VideoSource = pathImage;
 
-                Video1.LoadedBehavior = MediaState.Play;
+                Video1.LoadedBehavior = VideoStateForLifecycle();
             }
             else
             {
@@ -419,7 +415,7 @@ namespace BackgroundChanger.Controls
             {
                 if (Video1.Source != null)
                 {
-                    Video1.LoadedBehavior = MediaState.Play;
+                    Video1.LoadedBehavior = VideoStateForLifecycle();
                 }
 
                 return;
@@ -437,7 +433,7 @@ namespace BackgroundChanger.Controls
                 Image1.Source = null;
                 Video1.Source = new Uri(image);
 
-                Video1.LoadedBehavior = MediaState.Play;
+                Video1.LoadedBehavior = VideoStateForLifecycle();
             }
             else
             {
@@ -449,14 +445,9 @@ namespace BackgroundChanger.Controls
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-            if (!WindowsIsActivated)
-            {
-                return;
-            }
-
             try
             {
-                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() => 
+                InvokeOnUiIfLifecycleActive(() =>
                 {
                     string pathImage = string.Empty;
 
@@ -493,7 +484,7 @@ namespace BackgroundChanger.Controls
 
                         SetCoverImage(pathImage);
                     }
-                }));
+                });
             }
             catch (Exception ex)
             {
@@ -503,21 +494,16 @@ namespace BackgroundChanger.Controls
 
         private void OnTimedVideoEvent(object source, ElapsedEventArgs e)
         {
-            if (!WindowsIsActivated)
-            {
-                return;
-            }
-
             try
             {
-                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                InvokeOnUiIfLifecycleActive(() =>
                 {
                     string pathVideo = GameBackgroundImages?.ItemsCover?.Where(x => x.IsVideo && x.Exist)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
                     if (!pathVideo.IsNullOrEmpty())
                     {
                         SetCoverImage(pathVideo);
                     }
-                }));
+                });
             }
             catch (Exception ex)
             {
@@ -531,66 +517,122 @@ namespace BackgroundChanger.Controls
             // Copy FadeImage properties
             GetCoverProperties();
 
-            // Activate/Deactivated animation
-            Application.Current.Activated += Application_Activated;
-            Application.Current.Deactivated += Application_Deactivated;
-            Application.Current.MainWindow.StateChanged += MainWindow_StateChanged;
+            AttachApplicationFocusEvents();
         }
 
 
-        #region Activate/Deactivated animation
+        #region Media lifecycle
 
-        private void Application_Deactivated(object sender, EventArgs e)
+        /// <summary>
+        /// Whether auto-change timers and video playback are allowed for this control instance.
+        /// </summary>
+        private bool IsMediaLifecycleActive()
         {
-            Task.Run(() =>
-            {
-                Thread.Sleep(1000);
-                this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-                {
-                    WindowsIsActivated = false;
-                    Video1.LoadedBehavior = MediaState.Pause;
-
-                    if (BcTimer != null)
-                    {
-                        BcTimer.Stop();
-                    }
-                }));
-            });
+            return IsLifecycleDisplayActive();
         }
 
-        private void Application_Activated(object sender, EventArgs e)
+        private MediaState VideoStateForLifecycle()
         {
-            Task.Run(() =>
-            {
-                Thread.Sleep(1000);
-                this.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-                {
-                    WindowsIsActivated = true;
-                    Video1.LoadedBehavior = MediaState.Play;
-
-                    if (BcTimer != null)
-                    {
-                        BcTimer.Start();
-                    }
-                }));
-            });
+            return IsMediaLifecycleActive() ? MediaState.Play : MediaState.Pause;
         }
 
-        private void MainWindow_StateChanged(object sender, EventArgs e)
+        private void DisposeBcTimers()
         {
-            switch (((Window)sender).WindowState)
+            if (BcTimer != null)
             {
-                case WindowState.Normal:
-                case WindowState.Maximized:
-                    Application_Activated(sender, e);
-                    break;
-                case WindowState.Minimized:
-                    Application_Deactivated(sender, e);
-                    break;
+                Counter = 0;
+                BcTimer.Stop();
+                BcTimer.Dispose();
+                BcTimer = null;
+            }
+
+            if (BcTimerVideo != null)
+            {
+                BcTimerVideo.Stop();
+                BcTimerVideo.Dispose();
+                BcTimerVideo = null;
+            }
+        }
+
+        private void StopBcTimers()
+        {
+            BcTimer?.Stop();
+            BcTimerVideo?.Stop();
+        }
+
+        private void StartBcTimersIfConfigured()
+        {
+            if (!IsMediaLifecycleActive())
+            {
+                return;
+            }
+
+            if (ControlDataContext.EnableAutoChanger && BcTimer != null)
+            {
+                BcTimer.Start();
+            }
+
+            if (PluginDatabase.PluginSettings.useVideoDelayCoverImage && BcTimerVideo != null)
+            {
+                BcTimerVideo.Start();
+            }
+        }
+
+        private void PauseVideos()
+        {
+            Video1.LoadedBehavior = MediaState.Pause;
+        }
+
+        private void ResumeVideosIfLifecycleActive()
+        {
+            if (!IsMediaLifecycleActive())
+            {
+                return;
+            }
+
+            if (Video1.Source != null)
+            {
+                Video1.LoadedBehavior = MediaState.Play;
+            }
+        }
+
+        private void PauseMediaActivity()
+        {
+            StopBcTimers();
+            PauseVideos();
+        }
+
+        private void ResumeMediaActivityIfAllowed()
+        {
+            if (!IsMediaLifecycleActive())
+            {
+                return;
+            }
+
+            ResumeVideosIfLifecycleActive();
+            StartBcTimersIfConfigured();
+        }
+
+        protected override void OnMediaLifecycleStateChanged()
+        {
+            if (IsMediaLifecycleActive())
+            {
+                LogControlTrace("Media activity", "resume timers/video");
+                ResumeMediaActivityIfAllowed();
+            }
+            else
+            {
+                LogControlTrace("Media activity", "pause timers/video");
+                PauseMediaActivity();
             }
         }
 
         #endregion
+
+        protected override void OnMediaLifecycleUnloadedCore()
+        {
+            DisposeBcTimers();
+        }
     }
 
 

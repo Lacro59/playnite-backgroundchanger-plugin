@@ -1,4 +1,4 @@
-﻿<controls:PluginUserControlExtend
+﻿<lifecycle:PluginMediaLifecycleControlBase
         xmlns:controls="clr-namespace:CommonPluginsShared.Controls"
         x:Class="BackgroundChanger.Controls.PluginCoverImage"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:local="clr-namespace:BackgroundChanger.Controls"
+        xmlns:lifecycle="clr-namespace:BackgroundChangerPlugin.Controls"
         xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
         xmlns:controlsAnimated="clr-namespace:wpf_animatedimage.Controls"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:PluginCoverImageDataContext, IsDesignTimeCreatable=True}"
@@ -42,4 +43,4 @@
                       HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
                       VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}" />
     </Grid>
-</controls:PluginUserControlExtend>
+</lifecycle:PluginMediaLifecycleControlBase>

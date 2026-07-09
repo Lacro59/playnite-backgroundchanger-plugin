@@ -1,4 +1,5 @@
 ﻿using BackgroundChanger.Models;
+using BackgroundChangerPlugin.Controls;
 using BackgroundChanger.Services;
 using CommonPlayniteShared;
 using CommonPluginsShared;
@@ -14,8 +15,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Automation;
@@ -30,7 +29,7 @@ namespace BackgroundChanger.Controls
     /// <summary>
     /// Logique d'interaction pour PluginBackgroundImage.xaml
     /// </summary>
-    public partial class PluginBackgroundImage : PluginUserControlExtend
+    public partial class PluginBackgroundImage : PluginMediaLifecycleControlBase
     {
         private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
         protected override IPluginDatabase pluginDatabase => PluginDatabase;
@@ -49,7 +48,6 @@ namespace BackgroundChanger.Controls
 
         private static readonly Random random = new Random();
 
-        private bool WindowsIsActivated { get; set; } = true;
         private bool IsFirst { get; set; } = true;
 
         protected override void AttachStaticEvents()
@@ -73,19 +71,7 @@ namespace BackgroundChanger.Controls
 
         public override void SetDefaultDataContext()
         {
-            if (BcTimer != null)
-            {
-                Counter = 0;
-                BcTimer.Stop();
-                BcTimer.Dispose();
-                BcTimer = null;
-            }
-            if (BcTimerVideo != null)
-            {
-                BcTimerVideo.Stop();
-                BcTimerVideo.Dispose();
-                BcTimerVideo = null;
-            }
+            DisposeBcTimers();
 
             ControlDataContext = new PluginBackgroundImageDataContext
             {
@@ -116,6 +102,7 @@ namespace BackgroundChanger.Controls
             BorderDarkenFadeOut.Completed += BorderDarkenOut_Completed;
 
             Loaded += OnLoaded;
+            InitializeMediaLifecycleHooks();
 
             if (API.Instance.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {
@@ -236,6 +223,8 @@ namespace BackgroundChanger.Controls
 
                 if (!GameBackgroundImages.HasDataBackground)
                 {
+                    DisposeBcTimers();
+                    PauseVideos();
                     MustDisplay = false;
                     DataContext = ControlDataContext;
                     return;
@@ -295,7 +284,10 @@ namespace BackgroundChanger.Controls
                         AutoReset = true
                     };
                     BcTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-                    BcTimer.Start();
+                    if (IsMediaLifecycleActive())
+                    {
+                        BcTimer.Start();
+                    }
                 }
                 else if (ControlDataContext.EnableRandomSelect)
                 {
@@ -344,7 +336,10 @@ namespace BackgroundChanger.Controls
                     AutoReset = true
                 };
                 BcTimerVideo.Elapsed += new ElapsedEventHandler(OnTimedVideoEvent);
-                BcTimerVideo.Start();
+                if (IsMediaLifecycleActive())
+                {
+                    BcTimerVideo.Start();
+                }
             }
         }
 
@@ -564,17 +559,7 @@ namespace BackgroundChanger.Controls
                 return;
             }
 
-            int blurAmount = control.BlurAmount;
-            bool blurEnabled = control.IsBlurEnabled;
-            bool highQuality = control.HighQualityBlur;
-            control.ImageHolder.Effect = blurEnabled
-                ? new BlurEffect()
-                {
-                    KernelType = KernelType.Gaussian,
-                    Radius = blurAmount,
-                    RenderingBias = highQuality ? RenderingBias.Quality : RenderingBias.Performance
-                }
-                : null;
+            control.ApplyAdaptiveBlurEffect();
         }
 
         private static void SourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
@@ -587,21 +572,17 @@ namespace BackgroundChanger.Controls
         {
             try
             {
-                int blurAmount = BlurAmount;
-                bool blurEnabled = IsBlurEnabled;
-                bool highQuality = HighQualityBlur;
-
                 string image = null;
 
                 if (newSource?.Equals(currentSource) == true)
                 {
                     if (Video1.Source != null)
                     {
-                        Video1.LoadedBehavior = MediaState.Play;
+                        Video1.LoadedBehavior = VideoStateForLifecycle();
                     }
                     if (Video2.Source != null)
                     {
-                        Video2.LoadedBehavior = MediaState.Play;
+                        Video2.LoadedBehavior = VideoStateForLifecycle();
                     }
 
                     return;
@@ -621,25 +602,7 @@ namespace BackgroundChanger.Controls
                     }
                 }
 
-                if (blurEnabled)
-                {
-                    if (ImageHolder.Effect == null)
-                    {
-                        ImageHolder.Effect = new BlurEffect()
-                        {
-                            KernelType = KernelType.Gaussian,
-                            Radius = blurAmount,
-                            RenderingBias = highQuality ? RenderingBias.Quality : RenderingBias.Performance
-                        };
-                    }
-                }
-                else
-                {
-                    if (ImageHolder.Effect != null)
-                    {
-                        ImageHolder.Effect = null;
-                    }
-                }
+                ApplyAdaptiveBlurEffect();
 
                 if (AnimationEnabled)
                 {
@@ -682,7 +645,7 @@ namespace BackgroundChanger.Controls
                                 Video1.Source = new Uri(image);
                                 //Video2.Source = null;
 
-                                Video1.LoadedBehavior = MediaState.Play;
+                                Video1.LoadedBehavior = VideoStateForLifecycle();
                             }
                             else
                             {
@@ -708,7 +671,7 @@ namespace BackgroundChanger.Controls
                                 //Video1.Source = null;
                                 Video2.Source = new Uri(image);
 
-                                Video2.LoadedBehavior = MediaState.Play;
+                                Video2.LoadedBehavior = VideoStateForLifecycle();
                             }
                             else
                             {
@@ -735,7 +698,7 @@ namespace BackgroundChanger.Controls
                                 Video1.Source = new Uri(image);
                                 //Video2.Source = null;
 
-                                Video1.LoadedBehavior = MediaState.Play;
+                                Video1.LoadedBehavior = VideoStateForLifecycle();
                             }
                             else
                             {
@@ -764,7 +727,7 @@ namespace BackgroundChanger.Controls
                             Video1.Source = new Uri(image);
                             Video2.Source = null;
 
-                            Video1.LoadedBehavior = MediaState.Play;
+                            Video1.LoadedBehavior = VideoStateForLifecycle();
                         }
                         else
                         {
@@ -783,7 +746,7 @@ namespace BackgroundChanger.Controls
                             Video1.Source = null;
                             Video2.Source = new Uri(image);
 
-                            Video2.LoadedBehavior = MediaState.Play;
+                            Video2.LoadedBehavior = VideoStateForLifecycle();
                         }
                         else
                         {
@@ -802,7 +765,7 @@ namespace BackgroundChanger.Controls
                             Video1.Source = new Uri(image);
                             Video2.Source = null;
 
-                            Video1.LoadedBehavior = MediaState.Play;
+                            Video1.LoadedBehavior = VideoStateForLifecycle();
                         }
                         else
                         {
@@ -825,14 +788,9 @@ namespace BackgroundChanger.Controls
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-            if (!WindowsIsActivated)
-            {
-                return;
-            }
-
             try
             {
-                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                InvokeOnUiIfLifecycleActive(() =>
                 {
                     string pathImage = string.Empty;
 
@@ -869,7 +827,7 @@ namespace BackgroundChanger.Controls
 
                         SetBackgroundImage(pathImage);
                     }
-                }));
+                });
             }
             catch (Exception ex)
             {
@@ -879,21 +837,16 @@ namespace BackgroundChanger.Controls
 
         private void OnTimedVideoEvent(object source, ElapsedEventArgs e)
         {
-            if (!WindowsIsActivated)
-            {
-                return;
-            }
-
             try
             {
-                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                InvokeOnUiIfLifecycleActive(() =>
                 {
                     string pathVideo = GameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo && x.Exist)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
                     if (!pathVideo.IsNullOrEmpty())
                     {
                         SetBackgroundImage(pathVideo);
                     }
-                }));
+                });
             }
             catch (Exception ex)
             {
@@ -907,70 +860,196 @@ namespace BackgroundChanger.Controls
             // Copy FadeImage properties
             GetFadeImageProperties();
 
-            // Activate/Deactivated animation
-            Application.Current.Activated += Application_Activated;
-            Application.Current.Deactivated += Application_Deactivated;
-            Application.Current.MainWindow.StateChanged += MainWindow_StateChanged;
+            AttachApplicationFocusEvents();
         }
 
 
-        #region Activate/Deactivated animation
+        #region Media lifecycle
 
-        private void Application_Deactivated(object sender, EventArgs e)
+        /// <summary>
+        /// Whether auto-change timers and video playback are allowed for this control instance.
+        /// </summary>
+        private bool IsMediaLifecycleActive()
         {
-            _ = Task.Run(() =>
+            return IsLifecycleDisplayActive();
+        }
+
+        private MediaState VideoStateForLifecycle()
+        {
+            return IsMediaLifecycleActive() ? MediaState.Play : MediaState.Pause;
+        }
+
+        /// <summary>
+        /// Applies blur with an adaptive quality profile.
+        /// Auto-changer prefers a balanced quality/performance profile and falls back to performance.
+        /// </summary>
+        private void ApplyAdaptiveBlurEffect()
+        {
+            if (!IsBlurEnabled)
             {
-                Thread.Sleep(1000);
-                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                if (ImageHolder.Effect != null)
                 {
-                    WindowsIsActivated = false;
-                    Video1.LoadedBehavior = MediaState.Pause;
-                    Video2.LoadedBehavior = MediaState.Pause;
+                    ImageHolder.Effect = null;
+                }
+                return;
+            }
 
-                    if (BcTimer != null)
-                    {
-                        BcTimer.Stop();
-                    }
-                }));
-            });
-        }
+            bool isAutoChangerEnabled = ControlDataContext != null && ControlDataContext.EnableAutoChanger;
+            bool hasVideoSource = (Video1?.Source != null) || (Video2?.Source != null);
+            int blurRadius = Math.Max(0, BlurAmount);
+            RenderingBias renderingBias = ResolveAdaptiveBlurBias(isAutoChangerEnabled, hasVideoSource, blurRadius);
 
-        private void Application_Activated(object sender, EventArgs e)
-        {
-            _ = Task.Run(() =>
+            try
             {
-                Thread.Sleep(1000);
-                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                ImageHolder.Effect = new BlurEffect
                 {
-                    WindowsIsActivated = true;
-                    Video1.LoadedBehavior = MediaState.Play;
-                    Video2.LoadedBehavior = MediaState.Play;
+                    KernelType = KernelType.Gaussian,
+                    Radius = blurRadius,
+                    RenderingBias = renderingBias
+                };
 
-                    if (BcTimer != null)
-                    {
-                        BcTimer.Start();
-                    }
-                }));
-            });
+                LogControlTrace(
+                    "Adaptive blur applied",
+                    string.Format(
+                        "autoChanger={0}, hasVideo={1}, radius={2}, bias={3}",
+                        isAutoChangerEnabled,
+                        hasVideoSource,
+                        blurRadius,
+                        renderingBias));
+            }
+            catch (Exception ex)
+            {
+                // Runtime fallback: if quality profile fails, force performance profile.
+                Common.LogError(ex, true, "Adaptive blur fallback to performance mode", true, PluginDatabase.PluginName);
+                ImageHolder.Effect = new BlurEffect
+                {
+                    KernelType = KernelType.Gaussian,
+                    Radius = blurRadius,
+                    RenderingBias = RenderingBias.Performance
+                };
+            }
         }
 
-        private void MainWindow_StateChanged(object sender, EventArgs e)
+        private RenderingBias ResolveAdaptiveBlurBias(bool isAutoChangerEnabled, bool hasVideoSource, int blurRadius)
         {
-            switch (((Window)sender).WindowState)
+            if (!isAutoChangerEnabled)
             {
-                case WindowState.Normal:
-                case WindowState.Maximized:
-                    Application_Activated(sender, e);
-                    break;
-                case WindowState.Minimized:
-                    Application_Deactivated(sender, e);
-                    break;
-                default:
-                    break;
+                return HighQualityBlur ? RenderingBias.Quality : RenderingBias.Performance;
+            }
+
+            const int intermediateRadiusThreshold = 12;
+            bool canUseIntermediateQuality = !hasVideoSource
+                && blurRadius <= intermediateRadiusThreshold
+                && !AnimationEnabled;
+
+            return canUseIntermediateQuality
+                ? RenderingBias.Quality
+                : RenderingBias.Performance;
+        }
+
+        private void DisposeBcTimers()
+        {
+            if (BcTimer != null)
+            {
+                Counter = 0;
+                BcTimer.Stop();
+                BcTimer.Dispose();
+                BcTimer = null;
+            }
+
+            if (BcTimerVideo != null)
+            {
+                BcTimerVideo.Stop();
+                BcTimerVideo.Dispose();
+                BcTimerVideo = null;
+            }
+        }
+
+        private void StopBcTimers()
+        {
+            BcTimer?.Stop();
+            BcTimerVideo?.Stop();
+        }
+
+        private void StartBcTimersIfConfigured()
+        {
+            if (!IsMediaLifecycleActive())
+            {
+                return;
+            }
+
+            if (ControlDataContext.EnableAutoChanger && BcTimer != null)
+            {
+                BcTimer.Start();
+            }
+
+            if (PluginDatabase.PluginSettings.useVideoDelayBackgroundImage && BcTimerVideo != null)
+            {
+                BcTimerVideo.Start();
+            }
+        }
+
+        private void PauseVideos()
+        {
+            Video1.LoadedBehavior = MediaState.Pause;
+            Video2.LoadedBehavior = MediaState.Pause;
+        }
+
+        private void ResumeVideosIfLifecycleActive()
+        {
+            if (!IsMediaLifecycleActive())
+            {
+                return;
+            }
+
+            if (Video1.Source != null)
+            {
+                Video1.LoadedBehavior = MediaState.Play;
+            }
+
+            if (Video2.Source != null)
+            {
+                Video2.LoadedBehavior = MediaState.Play;
+            }
+        }
+
+        private void PauseMediaActivity()
+        {
+            StopBcTimers();
+            PauseVideos();
+        }
+
+        private void ResumeMediaActivityIfAllowed()
+        {
+            if (!IsMediaLifecycleActive())
+            {
+                return;
+            }
+
+            ResumeVideosIfLifecycleActive();
+            StartBcTimersIfConfigured();
+        }
+
+        protected override void OnMediaLifecycleStateChanged()
+        {
+            if (IsMediaLifecycleActive())
+            {
+                LogControlTrace("Media activity", "resume timers/video");
+                ResumeMediaActivityIfAllowed();
+            }
+            else
+            {
+                LogControlTrace("Media activity", "pause timers/video");
+                PauseMediaActivity();
             }
         }
 
         #endregion
+
+        protected override void OnMediaLifecycleUnloadedCore()
+        {
+            DisposeBcTimers();
+        }
     }
 
 

@@ -100,6 +100,7 @@
   <ItemGroup>
     <Compile Include="BackgroundChanger.cs" />
     <Compile Include="BackgroundChangerSettings.cs" />
+    <Compile Include="Controls\PluginMediaLifecycleControlBase.cs" />
     <Compile Include="Controls\PluginCoverImage.xaml.cs">
       <DependentUpon>PluginCoverImage.xaml</DependentUpon>
     </Compile>
