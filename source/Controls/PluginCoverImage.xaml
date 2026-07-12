@@ -30,7 +30,6 @@
                                         RenderOptions.BitmapScalingMode="Fant" 
                                         Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         StretchDirection="{Binding StretchDirection, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        UseAnimated="{Binding UseAnimated}"
                                         UseBitmapImage="True" 
                                         Source="{Binding ImageSource, IsAsync=True}">
         </controlsAnimated:AnimatedImage>

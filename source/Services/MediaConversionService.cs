@@ -18,6 +18,7 @@ namespace BackgroundChanger.Services
 {
     /// <summary>
     /// Centralizes detection and FFmpeg conversion of animated media to MP4 (H.264 / yuv420p).
+    /// Alpha transparency is not preserved; most animated library art does not rely on it.
     /// </summary>
     public class MediaConversionService
     {

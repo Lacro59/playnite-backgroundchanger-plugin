@@ -73,7 +73,6 @@
                                             VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}"
                                             RenderOptions.BitmapScalingMode="Fant" 
                                             Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            UseAnimated="{Binding UseAnimated}"
                                             OpacityMask="{Binding ImageOpacityMask, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             UseBitmapImage="True">
             </controlsAnimated:AnimatedImage>
@@ -91,7 +90,6 @@
                                             VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}"
                                             RenderOptions.BitmapScalingMode="Fant" 
                                             Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            UseAnimated="{Binding UseAnimated}"
                                             OpacityMask="{Binding ImageOpacityMask, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             UseBitmapImage="True">
             </controlsAnimated:AnimatedImage>

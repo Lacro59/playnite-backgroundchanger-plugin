@@ -45,6 +45,7 @@
     <sys:String x:Key="LOCBcMediaConversionCrf">CRF (0 = utiliser la valeur par défaut)</sys:String>
     <sys:String x:Key="LOCBcMediaConversionCrfToolTip">Facteur de débit constant H.264 (0–51). Une valeur basse améliore la qualité et augmente la taille du fichier. Mettez 0 pour utiliser le CRF par défaut ci-dessus.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionCrfDescription">Le CRF règle le compromis entre qualité et taille du MP4 : une valeur plus basse améliore l'image (fichier plus lourd), une valeur plus haute réduit la taille (qualité moindre). 23 convient en général.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionAlphaNote">La sortie utilise H.264 yuv420p, qui ne conserve pas la transparence. Cela convient à la plupart des fonds et pochettes animés, qui utilisent rarement le canal alpha.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionAnimatedWebp">WebP animé</sys:String>
     <sys:String x:Key="LOCBcMediaConversionWebm">WebM</sys:String>
     <sys:String x:Key="LOCBcMediaConversionApng">PNG animé (APNG)</sys:String>

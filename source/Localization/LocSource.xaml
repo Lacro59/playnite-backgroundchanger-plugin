@@ -42,6 +42,7 @@
     <sys:String x:Key="LOCBcMediaConversionCrf">CRF (0 = use default)</sys:String>
     <sys:String x:Key="LOCBcMediaConversionCrfToolTip">H.264 constant rate factor (0–51). Lower values yield higher quality and larger files. Set 0 to use the default CRF above.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionCrfDescription">The CRF sets the trade-off between MP4 quality and file size: a lower value improves image quality (larger file), a higher value reduces file size (lower quality). 23 is a good starting point for most users.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionAlphaNote">Output uses H.264 yuv420p, which does not preserve transparency. This is acceptable for most animated backgrounds and covers, which rarely rely on alpha.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionAnimatedWebp">Animated WebP</sys:String>
     <sys:String x:Key="LOCBcMediaConversionWebm">WebM</sys:String>
     <sys:String x:Key="LOCBcMediaConversionApng">Animated PNG (APNG)</sys:String>

@@ -61,6 +61,12 @@
                     <StackPanel Grid.Column="0" Grid.ColumnSpan="6" Grid.Row="6" Margin="0,10,0,0">
                         <TextBlock Text="{DynamicResource LOCBcMediaConversionSection}" Style="{DynamicResource SectionHeaderText}" Margin="0,0,0,8" />
 
+                        <TextBlock Margin="0,0,0,10"
+                                   Style="{DynamicResource BaseTextBlockStyle}"
+                                   Text="{DynamicResource LOCBcMediaConversionAlphaNote}"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource GlyphBrush}" />
+
                         <Grid Margin="0,0,0,6">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />

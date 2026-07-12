@@ -59,8 +59,6 @@ namespace BackgroundChanger.Views
 
             PART_LbBackgroundImages.ItemsSource = null;
             PART_LbBackgroundImages.ItemsSource = EditedImages;
-
-            PART_BackgroundImage.UseAnimated = false;
         }
 
 
