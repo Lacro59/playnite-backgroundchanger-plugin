@@ -76,7 +76,7 @@ namespace BackgroundChanger.Controls
             ControlDataContext = new PluginBackgroundImageDataContext
             {
                 IsActivated = PluginDatabase.PluginSettings.EnableBackgroundImage,
-                UseAnimated = PluginDatabase.PluginSettings.EnableImageAnimatedBackground,
+                UseAnimated = false,
                 EnableRandomSelect = PluginDatabase.PluginSettings.EnableBackgroundImageRandomSelect,
                 EnableRandomOnSelect = PluginDatabase.PluginSettings.EnableBackgroundImageRandomOnSelect,
                 EnableRandomOnStart = PluginDatabase.PluginSettings.EnableBackgroundImageRandomOnStart,

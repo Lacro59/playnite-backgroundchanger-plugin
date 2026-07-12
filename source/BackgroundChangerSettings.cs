@@ -34,9 +34,6 @@ namespace BackgroundChanger
         private int backgroundImageAutoChangerTimer = 10;
         public int BackgroundImageAutoChangerTimer { get => backgroundImageAutoChangerTimer; set => SetValue(ref backgroundImageAutoChangerTimer, value); }
 
-        private bool enableImageAnimatedBackground = false;
-        public bool EnableImageAnimatedBackground { get => enableImageAnimatedBackground; set => SetValue(ref enableImageAnimatedBackground, value); }
-
         private double volume = 0;
         public double Volume { get => volume; set => SetValue(ref volume, value); }
 
@@ -59,15 +56,17 @@ namespace BackgroundChanger
         private int coverImageAutoChangerTimer = 10;
         public int CoverImageAutoChangerTimer { get => coverImageAutoChangerTimer; set => SetValue(ref coverImageAutoChangerTimer, value); }
 
-        private bool enableImageAnimatedCover = false;
-        public bool EnableImageAnimatedCover { get => enableImageAnimatedCover; set => SetValue(ref enableImageAnimatedCover, value); }
-
 
         public string SteamGridDbApiKey { get; set; } = string.Empty;
 
 
         public string ffmpegFile { get; set; } = string.Empty;
         public string webpinfoFile { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets per-format animated media conversion parameters.
+        /// </summary>
+        public MediaConversionSettings MediaConversion { get; set; } = new MediaConversionSettings();
 
 
         private bool _useVideoDelayBackgroundImage = false;
@@ -193,6 +192,11 @@ namespace BackgroundChanger
 
             // LoadPluginSettings returns null if not saved data is available.
             settings = savedSettings ?? new BackgroundChangerSettings();
+
+            if (settings.MediaConversion == null)
+            {
+                settings.MediaConversion = new MediaConversionSettings();
+            }
         }
 
         // Code executed when settings view is opened and user starts editing values.
@@ -227,7 +231,47 @@ namespace BackgroundChanger
         public bool VerifySettings(out List<string> errors)
         {
             errors = new List<string>();
-            return true;
+
+            if (Settings?.MediaConversion == null)
+            {
+                return true;
+            }
+
+            MediaConversionSettings conversion = Settings.MediaConversion;
+
+            if (!MediaConversionSettings.IsValidDefaultCrf(conversion.Defaults?.Crf ?? MediaConversionDefaults.DefaultCrf))
+            {
+                errors.Add(ResourceProvider.GetString("LOCBcMediaConversionCrfInvalid"));
+            }
+
+            ValidateFormatCrf(conversion.AnimatedWebp, errors);
+            ValidateFormatCrf(conversion.Webm, errors);
+            ValidateFormatCrf(conversion.Apng, errors);
+            ValidateFormatCrf(conversion.Gif, errors);
+
+            ValidateFormatFramerate(conversion.AnimatedWebp, errors);
+            ValidateFormatFramerate(conversion.Apng, errors);
+            ValidateFormatFramerate(conversion.Gif, errors);
+
+            return errors.Count == 0;
+        }
+
+        private static void ValidateFormatCrf(MediaConversionFormatSettings formatSettings, List<string> errors)
+        {
+            if (formatSettings != null && !MediaConversionSettings.IsValidCrf(formatSettings.Crf))
+            {
+                errors.Add(ResourceProvider.GetString("LOCBcMediaConversionCrfInvalid"));
+            }
+        }
+
+        private static void ValidateFormatFramerate(MediaConversionFormatSettings formatSettings, List<string> errors)
+        {
+            if (formatSettings != null
+                && !formatSettings.UseAutoFramerate
+                && !MediaConversionSettings.IsValidFramerate(formatSettings.FixedFramerate))
+            {
+                errors.Add(ResourceProvider.GetString("LOCBcMediaConversionFramerateInvalid"));
+            }
         }
     }
 

@@ -118,11 +118,5 @@ namespace BackgroundChanger.Models
         /// </summary>
         [DontSerialize]
         public bool IsVideo => !FullPath.IsNullOrEmpty() && Path.GetExtension(FullPath).IsEqual(".mp4");
-
-        /// <summary>
-        /// Indicates whether the image is in WebP format and thus eligible for conversion.
-        /// </summary>
-        [DontSerialize]
-        public bool IsConvertable => !FullPath.IsNullOrEmpty() && Path.GetExtension(FullPath).IsEqual(".webp");
     }
 }

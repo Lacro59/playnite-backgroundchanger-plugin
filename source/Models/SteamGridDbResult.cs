@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using BackgroundChanger.Services;
 using Playnite.SDK.Data;
 
 namespace BackgroundChanger.Models
@@ -21,8 +16,6 @@ namespace BackgroundChanger.Models
 
     public class SteamGridDbResult : ObservableObject
     {
-        private BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
-
         [SerializationPropertyName("id")]
         public int Id { get; set; }
 
@@ -77,54 +70,31 @@ namespace BackgroundChanger.Models
         [DontSerialize]
         public bool Untagged => !Nsfw && !Humor && !Epilepsy;
 
-
+        /// <summary>
+        /// SteamGridDB animated heroes are often served as WebM; conversion to MP4 happens at import via <see cref="Services.MediaConversionService"/>.
+        /// </summary>
         [DontSerialize]
-        public bool IsVideo => !Thumb.IsNullOrEmpty() && Thumb.Contains(".webm", StringComparison.InvariantCultureIgnoreCase);
-
-        [DontSerialize]
-        public string Thumbnail => IsVideo ? Url : Thumb;
-
-        [DontSerialize]
-        public bool IsVideoConverted
+        public bool IsVideo
         {
             get
             {
-                if (!IsVideo)
+                if (!Mime.IsNullOrEmpty() && Mime.StartsWith("video/", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    return false;
+                    return true;
                 }
 
-                if (File.Exists(PluginDatabase.PluginSettings.ffmpegFile))
-                {
-                    string videoFile = Path.Combine(PluginDatabase.Paths.PluginCachePath, $"{Id}.mp4");
-                    if (File.Exists(videoFile))
-                    {
-                        this.VideoFile = videoFile;
-                        return true;
-                    }
-
-                    _ = Task.Run(() =>
-                    {
-                        string ffmpeg = $"-i {Thumb} {videoFile}";
-
-                        Process process = new Process();
-                        process.StartInfo.FileName = PluginDatabase.PluginSettings.ffmpegFile;
-                        process.StartInfo.Arguments = ffmpeg;
-                        process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                        _ = process.Start();
-                        process.WaitForExit();
-
-                        return true;
-                    });
-                }
-
-                return false;
+                return !Thumb.IsNullOrEmpty() && Thumb.Contains(".webm", StringComparison.InvariantCultureIgnoreCase);
             }
         }
 
-        private string videoFile = string.Empty;
+        /// <summary>
+        /// Animated SteamGridDB assets: animated WebP grids or WebM heroes.
+        /// </summary>
         [DontSerialize]
-        public string VideoFile { get => videoFile; set => SetValue(ref videoFile, value); }
+        public bool IsAnimated => Mime == "image/webp" || IsVideo;
+
+        [DontSerialize]
+        public string Thumbnail => IsVideo ? Url : Thumb;
     }
 
 

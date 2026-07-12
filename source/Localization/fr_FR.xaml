@@ -37,7 +37,24 @@
     <sys:String x:Key="LOCBcAddFromUrl">Ajouter depuis une url</sys:String>
     <sys:String x:Key="LOCBcAddFromUrlDescription">Saisir l'url de l'image</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">fichier ffmpeg</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFileDescription">Nécessaire pour importer des médias animés (WebP, WebM, APNG, GIF). Les fichiers sont automatiquement convertis en MP4 à l'import et au démarrage.</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">fichier webpinfo</sys:String>
+
+    <sys:String x:Key="LOCBcMediaConversionSection">Conversion des médias</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionDefaultsCrf">CRF par défaut (qualité)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrf">CRF (0 = utiliser la valeur par défaut)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfToolTip">Facteur de débit constant H.264 (0–51). Une valeur basse améliore la qualité et augmente la taille du fichier. Mettez 0 pour utiliser le CRF par défaut ci-dessus.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfDescription">Le CRF règle le compromis entre qualité et taille du MP4 : une valeur plus basse améliore l'image (fichier plus lourd), une valeur plus haute réduit la taille (qualité moindre). 23 convient en général.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionAnimatedWebp">WebP animé</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionWebm">WebM</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionApng">PNG animé (APNG)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionGif">GIF animé</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionUseAutoFramerate">Utiliser le rythme d'images de la source</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionFixedFramerate">Images par seconde (fps) fixe</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionForceReencode">Toujours réencoder en H.264</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionForceReencodeToolTip">Si désactivé, FFmpeg tente de copier le flux vidéo lorsque le WebM est déjà compatible H.264.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfInvalid">Le CRF doit être 0 (hériter du défaut) ou compris entre 0 et 51. Le CRF par défaut doit être entre 0 et 51.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">Le nombre d'images par seconde doit être compris entre 1 et 120.</sys:String>
 
     <sys:String x:Key="LOCBcFfmpegNotFound">FFmpeg non trouvé</sys:String>
     <sys:String x:Key="LOCBcFTooltTipConvert">Convertir en mp4 (meilleures performances)</sys:String>

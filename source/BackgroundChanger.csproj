@@ -111,6 +111,7 @@
     <Compile Include="Models\ItemImage.cs" />
     <Compile Include="Models\BackgroundImagesCollection.cs" />
     <Compile Include="Models\GameBackgroundImages.cs" />
+    <Compile Include="Models\MediaConversionSettings.cs" />
     <Compile Include="Models\GoogleImage.cs" />
     <Compile Include="Models\SteamGridDbResult.cs" />
     <Compile Include="Models\SteamGridDbSearchResult.cs" />
@@ -148,6 +149,8 @@
       <DependentUpon>TransfertData.xaml</DependentUpon>
     </Compile>
     <Compile Include="Services\BackgroundChangerDatabase.cs" />
+    <Compile Include="Services\MediaConversionService.cs" />
+    <Compile Include="Services\MediaConversionStartupService.cs" />
     <Compile Include="Services\BackgroundChangerMenus.cs" />
     <Compile Include="Services\BackgroundChangerWindows.cs" />
     <Compile Include="Services\SteamGridDbApi.cs" />

@@ -60,20 +60,6 @@
                                         ToolTip="{DynamicResource LOCRemoveTitle}" FontFamily="{DynamicResource CommonFont}"
                                         Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}" />
 
-
-                                <Button Name="PART_BtConvert" Content="&#xe97b;" Click="PART_BtConvert_Click" 
-                                        DockPanel.Dock="Bottom"
-                                        ToolTip="{DynamicResource LOCBcFTooltTipConvert}" FontFamily="{DynamicResource CommonFont}"
-                                        Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}">
-                                    <Button.IsEnabled>
-                                        <MultiBinding Converter="{StaticResource TwoBooleanToBooleanConverter}">
-                                            <Binding Path="IsConvertable"/>
-                                            <Binding Path="IsDefault" />
-                                            <MultiBinding.ConverterParameter>firsttrue</MultiBinding.ConverterParameter>
-                                        </MultiBinding>
-                                    </Button.IsEnabled>
-                                </Button>
-
                                 <Grid>
                                     <Button Name="PART_BtDefault" Content="&#xE807;" Click="PART_BtDefault_Click" 
                                             VerticalAlignment="Center"

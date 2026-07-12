@@ -11,6 +11,8 @@ using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -22,6 +24,7 @@ namespace BackgroundChanger
 
         public static FrameworkElement PART_ImageBackground = null;
         private readonly BackgroundChangerMenus menus;
+        private readonly MediaConversionStartupService _mediaConversionStartupService = new MediaConversionStartupService();
 
         public BackgroundChanger(IPlayniteAPI api) : base(api, nameof(BackgroundChanger))
         {
@@ -137,9 +140,38 @@ namespace BackgroundChanger
 
         #region Application event
 
+        private const int StartupBatchDatabaseWaitMs = 120000;
+        private const int StartupBatchDatabasePollMs = 200;
+
         // Add code to be executed when Playnite is initialized.
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
+            Task.Run(() =>
+            {
+                try
+                {
+                    int elapsed = 0;
+                    while (!PluginDatabase.IsDatabaseReady() && elapsed < StartupBatchDatabaseWaitMs)
+                    {
+                        Thread.Sleep(StartupBatchDatabasePollMs);
+                        elapsed += StartupBatchDatabasePollMs;
+                    }
+
+                    if (!PluginDatabase.IsDatabaseReady())
+                    {
+                        Common.LogDebug(
+                            false,
+                            "[MediaConversionStartup] Database not ready after timeout, startup batch skipped.");
+                        return;
+                    }
+
+                    _mediaConversionStartupService.RunStartupBatch(PluginDatabase, Id);
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                }
+            });
         }
 
         // Add code to be executed when Playnite is shutting down.

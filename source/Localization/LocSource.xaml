@@ -24,9 +24,6 @@
     <sys:String x:Key="LOCBcTimeInterval">Time interval</sys:String>
     <sys:String x:Key="LOCBcSeconds">seconds</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Enable animated background</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Enable animated cover</sys:String>
-    
     <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
     <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
 
@@ -37,11 +34,28 @@
     <sys:String x:Key="LOCBcAddFromUrl">Add from url</sys:String>
     <sys:String x:Key="LOCBcAddFromUrlDescription">Enter the url to the image</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFileDescription">Required to import animated media (WebP, WebM, APNG, GIF). Files are automatically converted to MP4 at import and on startup.</sys:String>
     <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
 
-    <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
-    <sys:String x:Key="LOCBcFTooltTipConvert">Convert to mp4 (performance improved)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionSection">Media conversion</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionDefaultsCrf">Default CRF (quality)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrf">CRF (0 = use default)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfToolTip">H.264 constant rate factor (0–51). Lower values yield higher quality and larger files. Set 0 to use the default CRF above.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfDescription">The CRF sets the trade-off between MP4 quality and file size: a lower value improves image quality (larger file), a higher value reduces file size (lower quality). 23 is a good starting point for most users.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionAnimatedWebp">Animated WebP</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionWebm">WebM</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionApng">Animated PNG (APNG)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionGif">Animated GIF</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionUseAutoFramerate">Use source frame timing</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionFixedFramerate">Fixed frame rate (fps)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionForceReencode">Always re-encode to H.264</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionForceReencodeToolTip">When disabled, FFmpeg attempts to copy the video stream when the WebM is already H.264 compatible.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfInvalid">Media conversion CRF must be 0 (inherit default) or between 0 and 51. Default CRF must be between 0 and 51.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">Media conversion frame rate must be between 1 and 120 fps.</sys:String>
 
+    <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
+    <sys:String x:Key="LOCBcFfmpegPathNotConfigured">not configured</sys:String>
+    <sys:String x:Key="LOCBcFfmpegStartupNotification">FFmpeg is not configured or the executable was not found at "{0}". Animated media cannot be imported or converted until FFmpeg is set in plugin settings.</sys:String>
     <sys:String x:Key="LOCBcInvalidUrlFormat">Invalid Url Format!</sys:String>
 
 </ResourceDictionary>

@@ -10,8 +10,6 @@ using Playnite.SDK.Models;
 using QSoft.Apng;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -20,7 +18,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using wpf_animatedimage;
 using Path = System.IO.Path;
 
 namespace BackgroundChanger.Views
@@ -40,6 +37,15 @@ namespace BackgroundChanger.Views
         private List<ItemImage> EditedImages { get; set; }
         private bool IsCover { get; set; }
 
+        private readonly MediaConversionService _mediaConversionService = new MediaConversionService();
+
+        private const string ImportLogPrefix = "[ImagesManager]";
+
+        private static readonly string[] ValidImportExtensions =
+        {
+            ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".webm"
+        };
+
 
         public ImagesManager(GameBackgroundImages gameBackgroundImages, bool isCover, BackgroundChanger plugin)
         {
@@ -54,8 +60,151 @@ namespace BackgroundChanger.Views
             PART_LbBackgroundImages.ItemsSource = null;
             PART_LbBackgroundImages.ItemsSource = EditedImages;
 
-            PART_BackgroundImage.UseAnimated = true;
+            PART_BackgroundImage.UseAnimated = false;
         }
+
+
+        #region Media import
+
+        private void RefreshEditedImagesList()
+        {
+            PART_LbBackgroundImages.ItemsSource = null;
+            PART_LbBackgroundImages.ItemsSource = EditedImages;
+        }
+
+        private void WaitProgressAndRefreshList(GlobalProgressResult progressDownload)
+        {
+            _ = Task.Run(() =>
+            {
+                while (!(bool)progressDownload.Result)
+                {
+                }
+            }).ContinueWith(antecedent =>
+            {
+                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
+                {
+                    RefreshEditedImagesList();
+                });
+            });
+        }
+
+        private void ShowFfmpegNotFoundIfNeeded(ref bool ffmpegErrorShown)
+        {
+            if (ffmpegErrorShown)
+            {
+                return;
+            }
+
+            API.Instance.Dialogs.ShowErrorMessage(
+                ResourceProvider.GetString("LOCBcFfmpegNotFound"),
+                PluginDatabase.PluginName);
+            ffmpegErrorShown = true;
+        }
+
+        private bool IsValidImportExtension(string extension)
+        {
+            if (extension.IsNullOrEmpty())
+            {
+                return false;
+            }
+
+            foreach (string validExtension in ValidImportExtensions)
+            {
+                if (validExtension.IsEqual(extension))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Converts animated media to MP4 when required. Caller must ensure FFmpeg is configured.
+        /// </summary>
+        private string PrepareImportedMediaPathSync(string sourcePath)
+        {
+            if (sourcePath.IsNullOrWhiteSpace() || !File.Exists(sourcePath))
+            {
+                LogImportDebug(string.Format("Import conversion skipped, source missing: {0}", sourcePath));
+                return null;
+            }
+
+            if (!_mediaConversionService.ShouldConvert(sourcePath))
+            {
+                return sourcePath;
+            }
+
+            FileSystem.CreateDirectory(PluginDatabase.Paths.PluginCachePath);
+            string outputPath = Path.Combine(PluginDatabase.Paths.PluginCachePath, Guid.NewGuid().ToString() + ".mp4");
+
+            try
+            {
+                string convertedPath = _mediaConversionService.ConvertToMp4Async(sourcePath, outputPath)
+                    .ConfigureAwait(false)
+                    .GetAwaiter()
+                    .GetResult();
+
+                if (convertedPath.IsNullOrEmpty() || !File.Exists(convertedPath))
+                {
+                    LogImportDebug(string.Format("Import conversion failed: {0} -> {1}", sourcePath, outputPath));
+                    return null;
+                }
+
+                FileSystem.DeleteFileSafe(sourcePath);
+                LogImportDebug(string.Format("Import converted to MP4: {0} -> {1}", sourcePath, convertedPath));
+                return convertedPath;
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                return null;
+            }
+        }
+
+        private void TryAddImportedItem(string sourcePath, ref bool ffmpegErrorShown)
+        {
+            if (sourcePath.IsNullOrEmpty() || !File.Exists(sourcePath))
+            {
+                LogImportDebug(string.Format("Import skipped, file missing: {0}", sourcePath));
+                return;
+            }
+
+            if (_mediaConversionService.ShouldConvert(sourcePath) && !_mediaConversionService.IsFfmpegConfigured())
+            {
+                LogImportDebug(string.Format("Import blocked, FFmpeg not configured: {0}", sourcePath));
+                ShowFfmpegNotFoundIfNeeded(ref ffmpegErrorShown);
+                return;
+            }
+
+            string preparedPath = _mediaConversionService.ShouldConvert(sourcePath)
+                ? PrepareImportedMediaPathSync(sourcePath)
+                : sourcePath;
+
+            if (!preparedPath.IsNullOrEmpty())
+            {
+                EditedImages.Add(new ItemImage
+                {
+                    Name = preparedPath
+                });
+
+                if (Path.GetExtension(sourcePath).IsEqual(".webp") && preparedPath.IsEqual(sourcePath))
+                {
+                    LogImportDebug(string.Format("Import added as static WebP (no conversion): {0}", sourcePath));
+                }
+            }
+            else
+            {
+                LogImportDebug(string.Format("Import item skipped, no output produced: {0}", sourcePath));
+            }
+        }
+
+        private static void LogImportDebug(string message)
+        {
+            Common.LogDebug(false, ImportLogPrefix + " " + message);
+        }
+
+        #endregion
 
 
         private void PART_BtCancel_Click(object sender, RoutedEventArgs e)
@@ -85,6 +234,25 @@ namespace BackgroundChanger.Views
 
                     if (itemImage.FolderName.IsNullOrEmpty() && !itemImage.Name.IsEqual(originalDefault?.Name))
                     {
+                        if (_mediaConversionService.ShouldConvert(itemImage.Name))
+                        {
+                            if (!_mediaConversionService.IsFfmpegConfigured())
+                            {
+                                API.Instance.Dialogs.ShowErrorMessage(
+                                    ResourceProvider.GetString("LOCBcFfmpegNotFound"),
+                                    PluginDatabase.PluginName);
+                                return;
+                            }
+
+                            string convertedPath = PrepareImportedMediaPathSync(itemImage.Name);
+                            if (convertedPath.IsNullOrEmpty())
+                            {
+                                return;
+                            }
+
+                            itemImage.Name = convertedPath;
+                        }
+
                         Guid imageGuid = Guid.NewGuid();
                         string originalPath = itemImage.Name;
                         string ext = Path.GetExtension(originalPath);
@@ -177,21 +345,72 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                List<string> selectedFiles = API.Instance.Dialogs.SelectFiles("(*.jpg, *.jpeg, *.png)|*.jpg; *.jpeg; *.png|(*.webp)|*.webp|(*.mp4)|*.mp4");
+                List<string> selectedFiles = API.Instance.Dialogs.SelectFiles("(*.jpg, *.jpeg, *.png)|*.jpg; *.jpeg; *.png|(*.webp)|*.webp|(*.gif)|*.gif|(*.webm)|*.webm|(*.mp4)|*.mp4");
 
-                if (selectedFiles != null && selectedFiles.Count > 0)
+                if (selectedFiles == null || selectedFiles.Count == 0)
                 {
-                    foreach (string filePath in selectedFiles)
+                    return;
+                }
+
+                bool ffmpegErrorShown = false;
+                List<string> pendingFiles = new List<string>();
+                foreach (string filePath in selectedFiles)
+                {
+                    if (_mediaConversionService.ShouldConvert(filePath) && !_mediaConversionService.IsFfmpegConfigured())
+                    {
+                        ShowFfmpegNotFoundIfNeeded(ref ffmpegErrorShown);
+                        continue;
+                    }
+
+                    pendingFiles.Add(filePath);
+                }
+
+                if (pendingFiles.Count == 0)
+                {
+                    return;
+                }
+
+                bool needsConversion = false;
+                foreach (string filePath in pendingFiles)
+                {
+                    if (_mediaConversionService.ShouldConvert(filePath))
+                    {
+                        needsConversion = true;
+                        break;
+                    }
+                }
+
+                if (needsConversion)
+                {
+                    GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(ResourceProvider.GetString("LOCCommonConverting"))
+                    {
+                        Cancelable = false,
+                        IsIndeterminate = true
+                    };
+
+                    GlobalProgressResult progressDownload = API.Instance.Dialogs.ActivateGlobalProgress(activateGlobalProgress =>
+                    {
+                        bool unusedFfmpegErrorShown = false;
+                        foreach (string filePath in pendingFiles)
+                        {
+                            TryAddImportedItem(filePath, ref unusedFfmpegErrorShown);
+                        }
+                    }, globalProgressOptions);
+
+                    WaitProgressAndRefreshList(progressDownload);
+                }
+                else
+                {
+                    foreach (string filePath in pendingFiles)
                     {
                         EditedImages.Add(new ItemImage
                         {
                             Name = filePath
                         });
                     }
-                }
 
-                PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = EditedImages;
+                    RefreshEditedImagesList();
+                }
             }
             catch (Exception ex)
             {
@@ -223,15 +442,13 @@ namespace BackgroundChanger.Views
 
                     GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
                     {
+                        bool ffmpegErrorShown = false;
                         viewExtension.SteamGridDbResults.ForEach(x =>
                         {
                             try
                             {
                                 string cachedFile = HttpFileCache.GetWebFile(x.Url);
-                                EditedImages.Add(new ItemImage
-                                {
-                                    Name = cachedFile
-                                });
+                                TryAddImportedItem(cachedFile, ref ffmpegErrorShown);
                             }
                             catch (Exception ex)
                             {
@@ -241,20 +458,7 @@ namespace BackgroundChanger.Views
                     }, globalProgressOptions);
 
 
-                    _ = Task.Run(() =>
-                    {
-                        while (!(bool)ProgressDownload.Result)
-                        {
-
-                        }
-                    }).ContinueWith(antecedant =>
-                    {
-                        _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
-                        {
-                            PART_LbBackgroundImages.ItemsSource = null;
-                            PART_LbBackgroundImages.ItemsSource = EditedImages;
-                        });
-                    });
+                    WaitProgressAndRefreshList(ProgressDownload);
                 }
             }
             catch (Exception ex)
@@ -353,106 +557,6 @@ namespace BackgroundChanger.Views
         }
 
 
-        private string ExtractAnimatedImageAndConvert(string filePath)
-        {
-            string videoPath = string.Empty;
-
-            FileSystem.CreateDirectory(PluginDatabase.Paths.PluginCachePath, true);
-
-            try
-            {
-                if (filePath != null && filePath != string.Empty)
-                {
-                    if (Path.GetExtension(filePath).IsEqual(".webp"))
-                    {
-                        WebpAnim webPAnim = new WebpAnim();
-                        webPAnim.Load(filePath);
-
-                        string fileName = Path.GetFileNameWithoutExtension(filePath);
-                        int actualFrame = 0;
-                        while (actualFrame < webPAnim.FramesCount())
-                        {
-                            string pathTemp = Path.Combine(PluginDatabase.Paths.PluginCachePath, $"FileName_{actualFrame:D4}.png");
-
-                            System.Drawing.Image img = System.Drawing.Image.FromStream(webPAnim.GetFrameStream(actualFrame));
-                            img.Save(pathTemp, ImageFormat.Png);
-
-                            actualFrame++;
-                        }
-
-
-                        double width = webPAnim.GetFrameBitmapSource(0).Width;
-                        double height = webPAnim.GetFrameBitmapSource(0).Height;
-
-                        string ffmpeg = $"-r 25 -f "
-                            + $"image2 -s {width}x{height} -i \"{PluginDatabase.Paths.PluginCachePath}\\FileName_%4d.png\" "
-                            + $"-vcodec libx264 -crf 25 -pix_fmt yuv420p \"{PluginDatabase.Paths.PluginCachePath}\\{fileName}.mp4\"";
-
-                        Process process = new Process();
-                        process.StartInfo.FileName = PluginDatabase.PluginSettings.ffmpegFile;
-                        process.StartInfo.Arguments = ffmpeg;
-                        _ = process.Start();
-                        process.WaitForExit();
-
-
-                        videoPath = $"{PluginDatabase.Paths.PluginCachePath}\\{fileName}.mp4";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginDatabase.PluginName);
-            }
-
-            return videoPath;
-        }
-
-        private void PART_BtConvert_Click(object sender, RoutedEventArgs e)
-        {
-            int index = int.Parse(((Button)sender).Tag.ToString());
-            string filePath = EditedImages[index].FullPath;
-            string videoPath = string.Empty;
-
-            GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(ResourceProvider.GetString("LOCCommonConverting"))
-            {
-                Cancelable = false,
-                IsIndeterminate = true
-            };
-
-            GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
-            {
-                try
-                {
-                    if (File.Exists(PluginDatabase.PluginSettings.ffmpegFile))
-                    {
-                        videoPath = ExtractAnimatedImageAndConvert(filePath);
-                    }
-                    else
-                    {
-                        API.Instance.Dialogs.ShowErrorMessage(ResourceProvider.GetString("LOCBcFfmpegNotFound"), PluginDatabase.PluginName);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Common.LogError(ex, false, true, PluginDatabase.PluginName);
-                }
-            }, globalProgressOptions);
-
-
-            if (!videoPath.IsNullOrEmpty() && File.Exists(videoPath))
-            {
-                PART_BtDelete_Click(sender, e);
-
-                EditedImages.Add(new ItemImage
-                {
-                    Name = videoPath
-                });
-
-                PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = EditedImages;
-            }
-        }
-
         private void PART_BtDefault_Click(object sender, RoutedEventArgs e)
         {
             int index = int.Parse(((Button)sender).Tag.ToString());
@@ -485,15 +589,13 @@ namespace BackgroundChanger.Views
 
                     GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
                     {
+                        bool ffmpegErrorShown = false;
                         viewExtension.GoogleImageResults.ForEach(x =>
                         {
                             try
                             {
                                 string cachedFile = HttpFileCache.GetWebFile(x.ImageUrl);
-                                EditedImages.Add(new ItemImage
-                                {
-                                    Name = cachedFile
-                                });
+                                TryAddImportedItem(cachedFile, ref ffmpegErrorShown);
                             }
                             catch (Exception ex)
                             {
@@ -503,20 +605,7 @@ namespace BackgroundChanger.Views
                     }, globalProgressOptions);
 
 
-                    _ = Task.Run(() =>
-                    {
-                        while (!(bool)ProgressDownload.Result)
-                        {
-
-                        }
-                    }).ContinueWith(antecedant =>
-                    {
-                        _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
-                        {
-                            PART_LbBackgroundImages.ItemsSource = null;
-                            PART_LbBackgroundImages.ItemsSource = EditedImages;
-                        });
-                    });
+                    WaitProgressAndRefreshList(ProgressDownload);
                 }
             }
             catch (Exception ex)
@@ -560,23 +649,20 @@ namespace BackgroundChanger.Views
                     try
                     {
                         string cachedFile = HttpFileCache.GetWebFile(urlSelection.SelectedString);
-                        if (!cachedFile.IsNullOrEmpty())
+                        if (cachedFile.IsNullOrEmpty())
                         {
-                            List<string> validImageExtensions = new List<string> { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp" };
-                            string extension = Path.GetExtension(cachedFile).ToLower();
-
-                            if (validImageExtensions.Contains(extension))
-                            {
-                                EditedImages.Add(new ItemImage
-                                {
-                                    Name = cachedFile
-                                });
-                            }
-                            else
-                            {
-                                Logger.Warn($"The file {cachedFile} is not a valid image.");
-                            }
+                            return;
                         }
+
+                        string extension = Path.GetExtension(cachedFile).ToLower();
+                        if (!IsValidImportExtension(extension))
+                        {
+                            Logger.Warn($"The file {cachedFile} is not a valid image.");
+                            return;
+                        }
+
+                        bool ffmpegErrorShown = false;
+                        TryAddImportedItem(cachedFile, ref ffmpegErrorShown);
                     }
                     catch (Exception ex)
                     {
@@ -585,20 +671,7 @@ namespace BackgroundChanger.Views
                 }, globalProgressOptions);
 
 
-                _ = Task.Run(() =>
-                {
-                    while (!(bool)ProgressDownload.Result)
-                    {
-
-                    }
-                }).ContinueWith(antecedant =>
-                {
-                    _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
-                    {
-                        PART_LbBackgroundImages.ItemsSource = null;
-                        PART_LbBackgroundImages.ItemsSource = EditedImages;
-                    });
-                });
+                WaitProgressAndRefreshList(ProgressDownload);
             }
             catch (Exception ex)
             {

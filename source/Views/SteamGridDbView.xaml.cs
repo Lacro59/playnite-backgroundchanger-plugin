@@ -245,11 +245,11 @@ namespace BackgroundChanger.Views
                 List<CheckData> ListTypes = PART_ComboTypes.ItemsSource as List<CheckData>;
                 if (ListTypes[0].IsChecked && !ListTypes[1].IsChecked)
                 {
-                    DataSearchFiltered = DataSearchFiltered.Where(x => ListTypes.Any(y => x.Mime != "image/webp" && y.IsChecked)).ToList();
+                    DataSearchFiltered = DataSearchFiltered.Where(x => !x.IsAnimated).ToList();
                 }
                 else if (!ListTypes[0].IsChecked && ListTypes[1].IsChecked)
                 {
-                    DataSearchFiltered = DataSearchFiltered.Where(x => ListTypes.Any(y => x.Mime == "image/webp" && y.IsChecked)).ToList();
+                    DataSearchFiltered = DataSearchFiltered.Where(x => x.IsAnimated).ToList();
                 }
 
 
