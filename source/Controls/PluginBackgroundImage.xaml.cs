@@ -531,16 +531,16 @@ namespace BackgroundChanger.Controls
 
         private void Image1FadeOut_Completed(object sender, EventArgs e)
         {
-            AnimatedImage1.Source = null;
-            AnimatedImage1.UpdateLayout();
+            Image1.Source = null;
+            Image1.UpdateLayout();
             Video1.Source = null;
             Video1.UpdateLayout();
         }
 
         private void Image2FadeOut_Completed(object sender, EventArgs e)
         {
-            AnimatedImage2.Source = null;
-            AnimatedImage2.UpdateLayout();
+            Image2.Source = null;
+            Image2.UpdateLayout();
             Video2.Source = null;
             Video2.UpdateLayout();
         }
@@ -639,8 +639,8 @@ namespace BackgroundChanger.Controls
 
                             if (Path.GetExtension(image).IsEqual(".mp4"))
                             {
-                                //AnimatedImage1.Source = null;
-                                //AnimatedImage2.Source = null;
+                                //Image1.Source = null;
+                                //Image2.Source = null;
                                 Video1.Source = new Uri(image);
                                 //Video2.Source = null;
 
@@ -650,8 +650,8 @@ namespace BackgroundChanger.Controls
                             {
                                 //Video1.Source = null;
                                 //Video2.Source = null;
-                                AnimatedImage1.Source = image;
-                                //AnimatedImage2.Source = null;
+                                Image1.Source = image;
+                                //Image2.Source = null;
                             }
 
                             Image1FadeIn.Begin();
@@ -665,8 +665,8 @@ namespace BackgroundChanger.Controls
 
                             if (Path.GetExtension(image).IsEqual(".mp4"))
                             {
-                                //AnimatedImage1.Source = null;
-                                //AnimatedImage2.Source = null;
+                                //Image1.Source = null;
+                                //Image2.Source = null;
                                 //Video1.Source = null;
                                 Video2.Source = new Uri(image);
 
@@ -676,8 +676,8 @@ namespace BackgroundChanger.Controls
                             {
                                 //Video1.Source = null;
                                 //Video2.Source = null;
-                                //AnimatedImage1.Source = null;
-                                AnimatedImage2.Source = image;
+                                //Image1.Source = null;
+                                Image2.Source = image;
                             }
 
                             Image2FadeIn.Begin();
@@ -692,8 +692,8 @@ namespace BackgroundChanger.Controls
 
                             if (Path.GetExtension(image).IsEqual(".mp4"))
                             {
-                                //AnimatedImage1.Source = null;
-                                //AnimatedImage2.Source = null;
+                                //Image1.Source = null;
+                                //Image2.Source = null;
                                 Video1.Source = new Uri(image);
                                 //Video2.Source = null;
 
@@ -703,8 +703,8 @@ namespace BackgroundChanger.Controls
                             {
                                 //Video1.Source = null;
                                 //Video2.Source = null;
-                                AnimatedImage1.Source = image;
-                                //AnimatedImage2.Source = null;
+                                Image1.Source = image;
+                                //Image2.Source = null;
                             }
 
                             Image1FadeIn.Begin();
@@ -721,8 +721,8 @@ namespace BackgroundChanger.Controls
                     {
                         if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
                         {
-                            AnimatedImage1.Source = null;
-                            AnimatedImage2.Source = null;
+                            Image1.Source = null;
+                            Image2.Source = null;
                             Video1.Source = new Uri(image);
                             Video2.Source = null;
 
@@ -732,16 +732,16 @@ namespace BackgroundChanger.Controls
                         {
                             Video1.Source = null;
                             Video2.Source = null;
-                            AnimatedImage1.Source = image;
-                            AnimatedImage2.Source = null;
+                            Image1.Source = image;
+                            Image2.Source = null;
                         }
                     }
                     else if (currentImage == CurrentImage.Image2)
                     {
                         if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
                         {
-                            AnimatedImage1.Source = null;
-                            AnimatedImage2.Source = null;
+                            Image1.Source = null;
+                            Image2.Source = null;
                             Video1.Source = null;
                             Video2.Source = new Uri(image);
 
@@ -751,16 +751,16 @@ namespace BackgroundChanger.Controls
                         {
                             Video1.Source = null;
                             Video2.Source = null;
-                            AnimatedImage1.Source = null;
-                            AnimatedImage2.Source = image;
+                            Image1.Source = null;
+                            Image2.Source = image;
                         }
                     }
                     else
                     {
                         if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
                         {
-                            AnimatedImage1.Source = null;
-                            AnimatedImage2.Source = null;
+                            Image1.Source = null;
+                            Image2.Source = null;
                             Video1.Source = new Uri(image);
                             Video2.Source = null;
 
@@ -770,8 +770,8 @@ namespace BackgroundChanger.Controls
                         {
                             Video1.Source = null;
                             Video2.Source = null;
-                            AnimatedImage1.Source = image;
-                            AnimatedImage2.Source = null;
+                            Image1.Source = image;
+                            Image2.Source = null;
                         }
 
                         currentImage = CurrentImage.Image1;

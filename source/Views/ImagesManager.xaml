@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:BackgroundChanger.Views"
              xmlns:converters="clr-namespace:CommonPlayniteShared.Converters"
              xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
-             xmlns:controlsAnimated="clr-namespace:wpf_animatedimage.Controls"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
              xmlns:converters1="clr-namespace:CommonPlayniteShared.Converters" 
              xmlns:controls="clr-namespace:CommonPluginsShared.Controls"
@@ -20,7 +19,7 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" />
         <converters1:TwoBooleanToBooleanConverter x:Key="TwoBooleanToBooleanConverter" />
-        <local:GetMediaTypeConverter x:Key="GetMediaTypeConverter" />
+        <commonpluginsshared:GetMediaTypeConverter x:Key="GetMediaTypeConverter" />
     </UserControl.Resources>
 
     <Grid Margin="10">
@@ -169,8 +168,7 @@
         </Grid>
 
         <Grid Grid.Column="2" Grid.Row="0">
-            <!--Image Name="PART_BackgroundImage" Stretch="Uniform" Grid.Row="0" /-->
-            <controlsAnimated:AnimatedImage x:Name="PART_BackgroundImage" Stretch="Uniform" Grid.Row="0" UseBitmapImage="True" />
+            <controls:ImageAsync x:Name="PART_BackgroundImage" Stretch="Uniform" Grid.Row="0" />
             <MediaElement Stretch="Uniform" Grid.Row="0" Name="PART_Video" pbeh:MediaElementBehaviors.Repeat="True" />
         </Grid>
 

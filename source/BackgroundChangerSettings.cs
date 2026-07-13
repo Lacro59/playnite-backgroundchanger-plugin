@@ -61,7 +61,7 @@ namespace BackgroundChanger
 
 
         public string ffmpegFile { get; set; } = string.Empty;
-        public string webpinfoFile { get; set; } = string.Empty;
+        public string ffprobeFile { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets per-format animated media conversion parameters.

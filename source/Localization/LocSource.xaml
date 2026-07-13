@@ -34,8 +34,8 @@
     <sys:String x:Key="LOCBcAddFromUrl">Add from url</sys:String>
     <sys:String x:Key="LOCBcAddFromUrlDescription">Enter the url to the image</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg file</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFileDescription">Required to import animated media (WebP, WebM, APNG, GIF). Files are automatically converted to MP4 at import and on startup.</sys:String>
-    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo file</sys:String>
+    <sys:String x:Key="LOCBcFfprobeFile">ffprobe file</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFileDescription">Required to import animated media (WebP, WebM, APNG, GIF). Configure FFmpeg and ffprobe (usually in the same folder). Files are automatically converted to MP4 at import and on startup.</sys:String>
 
     <sys:String x:Key="LOCBcMediaConversionSection">Media conversion</sys:String>
     <sys:String x:Key="LOCBcMediaConversionDefaultsCrf">Default CRF (quality)</sys:String>
@@ -54,9 +54,13 @@
     <sys:String x:Key="LOCBcMediaConversionCrfInvalid">Media conversion CRF must be 0 (inherit default) or between 0 and 51. Default CRF must be between 0 and 51.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">Media conversion frame rate must be between 1 and 120 fps.</sys:String>
 
-    <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
+    <sys:String x:Key="LOCBcFfmpegNotFound">FFmpeg or ffprobe not found</sys:String>
+    <sys:String x:Key="LOCBcFfmpegOutdated">FFmpeg or ffprobe version is too old</sys:String>
     <sys:String x:Key="LOCBcFfmpegPathNotConfigured">not configured</sys:String>
     <sys:String x:Key="LOCBcFfmpegStartupNotification">FFmpeg is not configured or the executable was not found at "{0}". Animated media cannot be imported or converted until FFmpeg is set in plugin settings.</sys:String>
+    <sys:String x:Key="LOCBcMediaToolkitStartupNotification">FFmpeg and ffprobe must be configured for animated media import and conversion. FFmpeg: {0}. ffprobe: {1}.</sys:String>
+    <sys:String x:Key="LOCBcMediaToolkitOutdatedNotification">Animated media import and conversion require FFmpeg {0} or newer (detected: {1}). Update your FFmpeg and ffprobe install in plugin settings.</sys:String>
+    <sys:String x:Key="LOCBcFfmpegConversionFailed">Conversion to MP4 failed. Detected toolchain: {0}. Animated WebP requires FFmpeg {1} or newer with libwebp animated decode support.</sys:String>
     <sys:String x:Key="LOCBcInvalidUrlFormat">Invalid Url Format!</sys:String>
 
 </ResourceDictionary>

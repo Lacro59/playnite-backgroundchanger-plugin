@@ -150,6 +150,8 @@
     </Compile>
     <Compile Include="Services\BackgroundChangerDatabase.cs" />
     <Compile Include="Services\MediaConversionService.cs" />
+    <Compile Include="Services\MediaImportService.cs" />
+    <Compile Include="Services\MediaToolkitVersion.cs" />
     <Compile Include="Services\MediaConversionStartupService.cs" />
     <Compile Include="Services\BackgroundChangerMenus.cs" />
     <Compile Include="Services\BackgroundChangerWindows.cs" />
@@ -167,11 +169,6 @@
     <Compile Include="Views\SteamGridDbView.xaml.cs">
       <DependentUpon>SteamGridDbView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="wpf-animatedimage\Controls\AnimatedImage.xaml.cs">
-      <DependentUpon>AnimatedImage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="wpf-animatedimage\WebP\WebpAnim.cs" />
-    <Compile Include="wpf-animatedimage\WebP\WebPWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="extension.yaml">
@@ -438,10 +435,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="wpf-animatedimage\Controls\AnimatedImage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <None Include="icon.png">
@@ -449,10 +442,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="APNG\QSoft.Apng\QSoft.Apng.csproj">
-      <Project>{9B5C14B0-AAD8-47BB-9C8D-9F6C8D975897}</Project>
-      <Name>QSoft.Apng</Name>
-    </ProjectReference>
     <ProjectReference Include="playnite-plugincommon\CommonPluginsResources\CommonPluginsResources.csproj">
       <Project>{4effe926-9c64-4750-a399-f344710edc09}</Project>
       <Name>CommonPluginsResources</Name>
@@ -461,7 +450,6 @@
   <ItemGroup />
   <Import Project="playnite-plugincommon\CommonPlayniteShared\CommonPlayniteShared.projitems" Label="Shared" />
   <Import Project="playnite-plugincommon\CommonPluginsShared\CommonPluginsShared.projitems" Label="Shared" />
-  <Import Project="SharedDLL\SharedDLL.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>powershell -ExecutionPolicy Unrestricted $(SolutionDir)..\build\build.ps1 -ConfigurationName $(ConfigurationName) -OutDir $(SolutionDir)$(OutDir) -SolutionDir $(SolutionDir)</PostBuildEvent>

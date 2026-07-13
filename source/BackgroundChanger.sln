@@ -11,10 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonPluginsResources", "p
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CommonPluginsShared", "playnite-plugincommon\CommonPluginsShared\CommonPluginsShared.shproj", "{27E5D35B-F3CE-4A3F-9705-4564674615A5}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedDLL", "SharedDLL\SharedDLL.shproj", "{29CA4BCB-4361-4CF2-879E-5F5C66637E11}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.Apng", "APNG\QSoft.Apng\QSoft.Apng.csproj", "{9B5C14B0-AAD8-47BB-9C8D-9F6C8D975897}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,14 +35,6 @@ Global
 		{4EFFE926-9C64-4750-A399-F344710EDC09}.Debug-Release|Any CPU.Build.0 = Debug-Release|Any CPU
 		{4EFFE926-9C64-4750-A399-F344710EDC09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EFFE926-9C64-4750-A399-F344710EDC09}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B5C14B0-AAD8-47BB-9C8D-9F6C8D975897}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B5C14B0-AAD8-47BB-9C8D-9F6C8D975897}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B5C14B0-AAD8-47BB-9C8D-9F6C8D975897}.DebugFS|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B5C14B0-AAD8-47BB-9C8D-9F6C8D975897}.DebugFS|Any CPU.Build.0 = Debug|Any CPU
-		{9B5C14B0-AAD8-47BB-9C8D-9F6C8D975897}.Debug-Release|Any CPU.ActiveCfg = Debug-Release|Any CPU
-		{9B5C14B0-AAD8-47BB-9C8D-9F6C8D975897}.Debug-Release|Any CPU.Build.0 = Debug-Release|Any CPU
-		{9B5C14B0-AAD8-47BB-9C8D-9F6C8D975897}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B5C14B0-AAD8-47BB-9C8D-9F6C8D975897}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,9 +45,7 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		playnite-plugincommon\CommonPlayniteShared\CommonPlayniteShared.projitems*{0d7dbc82-26af-49ad-8ed5-0e11aa56bce0}*SharedItemsImports = 13
 		playnite-plugincommon\CommonPluginsShared\CommonPluginsShared.projitems*{27e5d35b-f3ce-4a3f-9705-4564674615a5}*SharedItemsImports = 13
-		SharedDLL\SharedDLL.projitems*{29ca4bcb-4361-4cf2-879e-5f5c66637e11}*SharedItemsImports = 13
 		playnite-plugincommon\CommonPlayniteShared\CommonPlayniteShared.projitems*{4fdf1e89-5bc3-4c72-8fda-0d580e7a5d5f}*SharedItemsImports = 4
 		playnite-plugincommon\CommonPluginsShared\CommonPluginsShared.projitems*{4fdf1e89-5bc3-4c72-8fda-0d580e7a5d5f}*SharedItemsImports = 4
-		SharedDLL\SharedDLL.projitems*{4fdf1e89-5bc3-4c72-8fda-0d580e7a5d5f}*SharedItemsImports = 4
 	EndGlobalSection
 EndGlobal

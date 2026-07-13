@@ -7,16 +7,13 @@ using CommonPluginsShared.Extensions;
 using Playnite.SDK;
 using Playnite.SDK.Data;
 using Playnite.SDK.Models;
-using QSoft.Apng;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using Path = System.IO.Path;
 
@@ -37,14 +34,7 @@ namespace BackgroundChanger.Views
         private List<ItemImage> EditedImages { get; set; }
         private bool IsCover { get; set; }
 
-        private readonly MediaConversionService _mediaConversionService = new MediaConversionService();
-
-        private const string ImportLogPrefix = "[ImagesManager]";
-
-        private static readonly string[] ValidImportExtensions =
-        {
-            ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".webm"
-        };
+        private readonly MediaImportService _mediaImportService = new MediaImportService();
 
 
         public ImagesManager(GameBackgroundImages gameBackgroundImages, bool isCover, BackgroundChanger plugin)
@@ -99,107 +89,78 @@ namespace BackgroundChanger.Views
             ffmpegErrorShown = true;
         }
 
-        private bool IsValidImportExtension(string extension)
+        private void ShowFfmpegOutdatedIfNeeded(ref bool ffmpegOutdatedShown)
         {
-            if (extension.IsNullOrEmpty())
+            if (ffmpegOutdatedShown)
             {
-                return false;
-            }
-
-            foreach (string validExtension in ValidImportExtensions)
-            {
-                if (validExtension.IsEqual(extension))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Converts animated media to MP4 when required. Caller must ensure FFmpeg is configured.
-        /// </summary>
-        private string PrepareImportedMediaPathSync(string sourcePath)
-        {
-            if (sourcePath.IsNullOrWhiteSpace() || !File.Exists(sourcePath))
-            {
-                LogImportDebug(string.Format("Import conversion skipped, source missing: {0}", sourcePath));
-                return null;
-            }
-
-            if (!_mediaConversionService.ShouldConvert(sourcePath))
-            {
-                return sourcePath;
-            }
-
-            FileSystem.CreateDirectory(PluginDatabase.Paths.PluginCachePath);
-            string outputPath = Path.Combine(PluginDatabase.Paths.PluginCachePath, Guid.NewGuid().ToString() + ".mp4");
-
-            try
-            {
-                string convertedPath = _mediaConversionService.ConvertToMp4Async(sourcePath, outputPath)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
-
-                if (convertedPath.IsNullOrEmpty() || !File.Exists(convertedPath))
-                {
-                    LogImportDebug(string.Format("Import conversion failed: {0} -> {1}", sourcePath, outputPath));
-                    return null;
-                }
-
-                FileSystem.DeleteFileSafe(sourcePath);
-                LogImportDebug(string.Format("Import converted to MP4: {0} -> {1}", sourcePath, convertedPath));
-                return convertedPath;
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginDatabase.PluginName);
-                return null;
-            }
-        }
-
-        private void TryAddImportedItem(string sourcePath, ref bool ffmpegErrorShown)
-        {
-            if (sourcePath.IsNullOrEmpty() || !File.Exists(sourcePath))
-            {
-                LogImportDebug(string.Format("Import skipped, file missing: {0}", sourcePath));
                 return;
             }
 
-            if (_mediaConversionService.ShouldConvert(sourcePath) && !_mediaConversionService.IsFfmpegConfigured())
+            string message = string.Format(
+                ResourceProvider.GetString("LOCBcMediaToolkitOutdatedNotification"),
+                _mediaImportService.GetMinimumMediaToolkitVersionDisplay(),
+                _mediaImportService.GetMediaToolkitVersionSummary());
+
+            API.Instance.Dialogs.ShowErrorMessage(message, PluginDatabase.PluginName);
+            ffmpegOutdatedShown = true;
+        }
+
+        private void ShowFfmpegConversionFailedIfNeeded(ref bool conversionFailedShown)
+        {
+            if (conversionFailedShown)
             {
-                LogImportDebug(string.Format("Import blocked, FFmpeg not configured: {0}", sourcePath));
-                ShowFfmpegNotFoundIfNeeded(ref ffmpegErrorShown);
                 return;
             }
 
-            string preparedPath = _mediaConversionService.ShouldConvert(sourcePath)
-                ? PrepareImportedMediaPathSync(sourcePath)
-                : sourcePath;
+            string message = string.Format(
+                ResourceProvider.GetString("LOCBcFfmpegConversionFailed"),
+                _mediaImportService.GetMediaToolkitVersionSummary(),
+                _mediaImportService.GetMinimumMediaToolkitVersionDisplay());
 
-            if (!preparedPath.IsNullOrEmpty())
-            {
-                EditedImages.Add(new ItemImage
-                {
-                    Name = preparedPath
-                });
-
-                if (Path.GetExtension(sourcePath).IsEqual(".webp") && preparedPath.IsEqual(sourcePath))
-                {
-                    LogImportDebug(string.Format("Import added as static WebP (no conversion): {0}", sourcePath));
-                }
-            }
-            else
-            {
-                LogImportDebug(string.Format("Import item skipped, no output produced: {0}", sourcePath));
-            }
+            API.Instance.Dialogs.ShowErrorMessage(message, PluginDatabase.PluginName);
+            conversionFailedShown = true;
         }
 
-        private static void LogImportDebug(string message)
+        private void TryAddImportedItem(string sourcePath, ref bool ffmpegErrorShown, ref bool ffmpegOutdatedShown, ref bool conversionFailedShown)
         {
-            Common.LogDebug(false, ImportLogPrefix + " " + message);
+            MediaImportService.ImportPrepareResult result = _mediaImportService.TryPrepareImportPath(sourcePath);
+
+            switch (result.Status)
+            {
+                case MediaImportService.ImportPrepareStatus.BlockedMissingToolkit:
+                    Common.LogDebug(false, string.Format("[ImagesManager] Import blocked, media toolkit not configured: {0}", sourcePath));
+                    ShowFfmpegNotFoundIfNeeded(ref ffmpegErrorShown);
+                    return;
+
+                case MediaImportService.ImportPrepareStatus.BlockedOutdatedToolkit:
+                    Common.LogDebug(false, string.Format("[ImagesManager] Import blocked, media toolkit version outdated: {0}", sourcePath));
+                    ShowFfmpegOutdatedIfNeeded(ref ffmpegOutdatedShown);
+                    return;
+
+                case MediaImportService.ImportPrepareStatus.MissingSource:
+                    Common.LogDebug(false, string.Format("[ImagesManager] Import skipped, file missing: {0}", sourcePath));
+                    return;
+
+                case MediaImportService.ImportPrepareStatus.ConversionFailed:
+                    Common.LogDebug(false, string.Format("[ImagesManager] Import item skipped, no output produced: {0}", sourcePath));
+                    ShowFfmpegConversionFailedIfNeeded(ref conversionFailedShown);
+                    return;
+
+                case MediaImportService.ImportPrepareStatus.Success:
+                    if (!result.PreparedPath.IsNullOrEmpty())
+                    {
+                        EditedImages.Add(new ItemImage
+                        {
+                            Name = result.PreparedPath
+                        });
+
+                        if (Path.GetExtension(sourcePath).IsEqual(".webp") && result.PreparedPath.IsEqual(sourcePath))
+                        {
+                            Common.LogDebug(false, string.Format("[ImagesManager] Import added as static WebP (no conversion): {0}", sourcePath));
+                        }
+                    }
+                    break;
+            }
         }
 
         #endregion
@@ -232,9 +193,9 @@ namespace BackgroundChanger.Views
 
                     if (itemImage.FolderName.IsNullOrEmpty() && !itemImage.Name.IsEqual(originalDefault?.Name))
                     {
-                        if (_mediaConversionService.ShouldConvert(itemImage.Name))
+                        if (_mediaImportService.RequiresConversion(itemImage.Name))
                         {
-                            if (!_mediaConversionService.IsFfmpegConfigured())
+                            if (_mediaImportService.IsBlockedByMissingToolkit(itemImage.Name))
                             {
                                 API.Instance.Dialogs.ShowErrorMessage(
                                     ResourceProvider.GetString("LOCBcFfmpegNotFound"),
@@ -242,13 +203,37 @@ namespace BackgroundChanger.Views
                                 return;
                             }
 
-                            string convertedPath = PrepareImportedMediaPathSync(itemImage.Name);
-                            if (convertedPath.IsNullOrEmpty())
+                            if (_mediaImportService.IsBlockedByOutdatedToolkit(itemImage.Name))
+                            {
+                                API.Instance.Dialogs.ShowErrorMessage(
+                                    string.Format(
+                                        ResourceProvider.GetString("LOCBcMediaToolkitOutdatedNotification"),
+                                        _mediaImportService.GetMinimumMediaToolkitVersionDisplay(),
+                                        _mediaImportService.GetMediaToolkitVersionSummary()),
+                                    PluginDatabase.PluginName);
+                                return;
+                            }
+
+                            MediaImportService.ImportPrepareResult prepareResult =
+                                _mediaImportService.TryPrepareImportPath(itemImage.Name);
+                            if (prepareResult.Status == MediaImportService.ImportPrepareStatus.ConversionFailed)
+                            {
+                                API.Instance.Dialogs.ShowErrorMessage(
+                                    string.Format(
+                                        ResourceProvider.GetString("LOCBcFfmpegConversionFailed"),
+                                        _mediaImportService.GetMediaToolkitVersionSummary(),
+                                        _mediaImportService.GetMinimumMediaToolkitVersionDisplay()),
+                                    PluginDatabase.PluginName);
+                                return;
+                            }
+
+                            if (prepareResult.Status != MediaImportService.ImportPrepareStatus.Success
+                                || prepareResult.PreparedPath.IsNullOrEmpty())
                             {
                                 return;
                             }
 
-                            itemImage.Name = convertedPath;
+                            itemImage.Name = prepareResult.PreparedPath;
                         }
 
                         Guid imageGuid = Guid.NewGuid();
@@ -351,12 +336,19 @@ namespace BackgroundChanger.Views
                 }
 
                 bool ffmpegErrorShown = false;
+                bool ffmpegOutdatedShown = false;
                 List<string> pendingFiles = new List<string>();
                 foreach (string filePath in selectedFiles)
                 {
-                    if (_mediaConversionService.ShouldConvert(filePath) && !_mediaConversionService.IsFfmpegConfigured())
+                    if (_mediaImportService.IsBlockedByMissingToolkit(filePath))
                     {
                         ShowFfmpegNotFoundIfNeeded(ref ffmpegErrorShown);
+                        continue;
+                    }
+
+                    if (_mediaImportService.IsBlockedByOutdatedToolkit(filePath))
+                    {
+                        ShowFfmpegOutdatedIfNeeded(ref ffmpegOutdatedShown);
                         continue;
                     }
 
@@ -371,7 +363,7 @@ namespace BackgroundChanger.Views
                 bool needsConversion = false;
                 foreach (string filePath in pendingFiles)
                 {
-                    if (_mediaConversionService.ShouldConvert(filePath))
+                    if (_mediaImportService.RequiresConversion(filePath))
                     {
                         needsConversion = true;
                         break;
@@ -389,9 +381,15 @@ namespace BackgroundChanger.Views
                     GlobalProgressResult progressDownload = API.Instance.Dialogs.ActivateGlobalProgress(activateGlobalProgress =>
                     {
                         bool unusedFfmpegErrorShown = false;
+                        bool unusedFfmpegOutdatedShown = false;
+                        bool unusedConversionFailedShown = false;
                         foreach (string filePath in pendingFiles)
                         {
-                            TryAddImportedItem(filePath, ref unusedFfmpegErrorShown);
+                            TryAddImportedItem(
+                                filePath,
+                                ref unusedFfmpegErrorShown,
+                                ref unusedFfmpegOutdatedShown,
+                                ref unusedConversionFailedShown);
                         }
                     }, globalProgressOptions);
 
@@ -441,12 +439,18 @@ namespace BackgroundChanger.Views
                     GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
                     {
                         bool ffmpegErrorShown = false;
+                        bool ffmpegOutdatedShown = false;
+                        bool conversionFailedShown = false;
                         viewExtension.SteamGridDbResults.ForEach(x =>
                         {
                             try
                             {
                                 string cachedFile = HttpFileCache.GetWebFile(x.Url);
-                                TryAddImportedItem(cachedFile, ref ffmpegErrorShown);
+                                TryAddImportedItem(
+                                    cachedFile,
+                                    ref ffmpegErrorShown,
+                                    ref ffmpegOutdatedShown,
+                                    ref conversionFailedShown);
                             }
                             catch (Exception ex)
                             {
@@ -588,12 +592,18 @@ namespace BackgroundChanger.Views
                     GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
                     {
                         bool ffmpegErrorShown = false;
+                        bool ffmpegOutdatedShown = false;
+                        bool conversionFailedShown = false;
                         viewExtension.GoogleImageResults.ForEach(x =>
                         {
                             try
                             {
                                 string cachedFile = HttpFileCache.GetWebFile(x.ImageUrl);
-                                TryAddImportedItem(cachedFile, ref ffmpegErrorShown);
+                                TryAddImportedItem(
+                                    cachedFile,
+                                    ref ffmpegErrorShown,
+                                    ref ffmpegOutdatedShown,
+                                    ref conversionFailedShown);
                             }
                             catch (Exception ex)
                             {
@@ -653,14 +663,20 @@ namespace BackgroundChanger.Views
                         }
 
                         string extension = Path.GetExtension(cachedFile).ToLower();
-                        if (!IsValidImportExtension(extension))
+                        if (!_mediaImportService.IsValidImportExtension(extension))
                         {
                             Logger.Warn($"The file {cachedFile} is not a valid image.");
                             return;
                         }
 
                         bool ffmpegErrorShown = false;
-                        TryAddImportedItem(cachedFile, ref ffmpegErrorShown);
+                        bool ffmpegOutdatedShown = false;
+                        bool conversionFailedShown = false;
+                        TryAddImportedItem(
+                            cachedFile,
+                            ref ffmpegErrorShown,
+                            ref ffmpegOutdatedShown,
+                            ref conversionFailedShown);
                     }
                     catch (Exception ex)
                     {
@@ -675,64 +691,6 @@ namespace BackgroundChanger.Views
             {
                 Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
-        }
-    }
-
-    public class GetMediaTypeConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            try
-            {
-                if (value is string @string)
-                {
-                    if (Path.GetExtension(@string).IsEqual("mp4"))
-                    {
-                        return "\ueb13";
-                    }
-
-                    if (Path.GetExtension(@string).IsEqual("webp"))
-                    {
-                        return "\ueb16 \ueb13";
-                    }
-
-                    if (Path.GetExtension(@string).IsEqual("png"))
-                    {
-                        try
-                        {
-                            Png_Reader pngr = new Png_Reader();
-                            Dictionary<fcTL, MemoryStream> m_Apng;
-                            using (Stream fStream = FileSystem.OpenReadFileStreamSafe(@string))
-                            {
-                                m_Apng = pngr.Open(fStream).SpltAPng();
-                            }
-
-                            // Animated
-                            if (m_Apng.Count > 0)
-                            {
-                                return "\ueb16 \ueb13";
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Common.LogError(ex, true);
-                        }
-                    }
-
-                    return "\ueb16";
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, "BackgroundChanger");
-            }
-
-            return string.Empty;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotSupportedException();
         }
     }
 }

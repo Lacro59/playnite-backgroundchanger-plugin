@@ -2,17 +2,13 @@ using BackgroundChanger.Models;
 using CommonPlayniteShared.Common;
 using CommonPluginsShared;
 using CommonPluginsShared.Extensions;
-using QSoft.Apng;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using wpf_animatedimage;
 
 namespace BackgroundChanger.Services
 {
@@ -24,8 +20,9 @@ namespace BackgroundChanger.Services
     {
         private const int MaxStderrLogLength = 2000;
         private const string LogPrefix = "[MediaConversionService]";
-        private const string WebpinfoFileName = "webpinfo.exe";
+        private const string FfprobeFileName = "ffprobe.exe";
         private const byte Vp8xAnimationFlag = 0x10;
+        private const int ApngActlScanMaxBytes = 65536;
 
         private enum MediaConversionInputFormat
         {
@@ -49,6 +46,124 @@ namespace BackgroundChanger.Services
         {
             string ffmpegPath = PluginDatabase.PluginSettings.ffmpegFile;
             return !ffmpegPath.IsNullOrWhiteSpace() && File.Exists(ffmpegPath);
+        }
+
+        /// <summary>
+        /// Determines whether ffprobe is available from settings or next to the configured FFmpeg executable.
+        /// </summary>
+        /// <returns><c>true</c> when a resolved ffprobe path points to an existing file.</returns>
+        public bool IsFfprobeConfigured()
+        {
+            string ffprobePath = ResolveFfprobePath();
+            return !ffprobePath.IsNullOrWhiteSpace() && File.Exists(ffprobePath);
+        }
+
+        /// <summary>
+        /// Determines whether both FFmpeg and ffprobe are configured and their executables exist.
+        /// </summary>
+        /// <returns><c>true</c> when the full media conversion toolchain is available.</returns>
+        public bool IsMediaToolkitConfigured()
+        {
+            return IsFfmpegConfigured() && IsFfprobeConfigured();
+        }
+
+        /// <summary>
+        /// Determines whether configured FFmpeg and ffprobe builds meet the minimum version for animated WebP conversion.
+        /// Unparseable development builds (for example <c>N-xxxxx</c>) are treated as supported.
+        /// </summary>
+        /// <returns><c>true</c> when the toolchain is configured and versions are supported or unknown.</returns>
+        public bool IsMediaToolkitVersionSupported()
+        {
+            if (!IsMediaToolkitConfigured())
+            {
+                return false;
+            }
+
+            MediaToolkitVersion minimumVersion = MediaToolkitVersion.MinimumForAnimatedWebp;
+
+            MediaToolkitVersion ffmpegVersion;
+            if (TryGetFfmpegVersion(out ffmpegVersion) && !ffmpegVersion.IsAtLeast(minimumVersion))
+            {
+                return false;
+            }
+
+            MediaToolkitVersion ffprobeVersion;
+            if (TryGetFfprobeVersion(out ffprobeVersion) && !ffprobeVersion.IsAtLeast(minimumVersion))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Gets the minimum FFmpeg/ffprobe version required for animated WebP conversion.
+        /// </summary>
+        /// <returns>Minimum version as a display string (for example <c>7.2.0</c>).</returns>
+        public string GetMinimumMediaToolkitVersionDisplay()
+        {
+            return MediaToolkitVersion.MinimumForAnimatedWebp.ToString();
+        }
+
+        /// <summary>
+        /// Gets a short summary of detected FFmpeg and ffprobe versions for user-facing messages.
+        /// </summary>
+        /// <returns>Detected versions or <c>unknown</c> when parsing failed.</returns>
+        public string GetMediaToolkitVersionSummary()
+        {
+            return string.Format(
+                "FFmpeg {0}, ffprobe {1}",
+                GetDetectedToolkitVersionDisplay(PluginDatabase.PluginSettings.ffmpegFile, IsFfmpegConfigured(), TryGetFfmpegVersion),
+                GetDetectedToolkitVersionDisplay(ResolveFfprobePath(), IsFfprobeConfigured(), TryGetFfprobeVersion));
+        }
+
+        /// <summary>
+        /// Attempts to read the semantic version of the configured FFmpeg executable.
+        /// </summary>
+        /// <param name="version">Parsed version when successful.</param>
+        /// <returns><c>true</c> when the version was parsed from <c>ffmpeg -version</c> output.</returns>
+        public bool TryGetFfmpegVersion(out MediaToolkitVersion version)
+        {
+            return TryGetToolkitVersion(PluginDatabase.PluginSettings.ffmpegFile, out version);
+        }
+
+        /// <summary>
+        /// Attempts to read the semantic version of the configured ffprobe executable.
+        /// </summary>
+        /// <param name="version">Parsed version when successful.</param>
+        /// <returns><c>true</c> when the version was parsed from <c>ffprobe -version</c> output.</returns>
+        public bool TryGetFfprobeVersion(out MediaToolkitVersion version)
+        {
+            return TryGetToolkitVersion(ResolveFfprobePath(), out version);
+        }
+
+        /// <summary>
+        /// Resolves the ffprobe executable path from plugin settings or the FFmpeg install directory.
+        /// </summary>
+        /// <returns>The absolute ffprobe path when found; otherwise <c>null</c>.</returns>
+        public string ResolveFfprobePath()
+        {
+            string configuredPath = PluginDatabase.PluginSettings.ffprobeFile;
+            if (!configuredPath.IsNullOrWhiteSpace() && File.Exists(configuredPath))
+            {
+                return configuredPath;
+            }
+
+            string ffmpegPath = PluginDatabase.PluginSettings.ffmpegFile;
+            if (!ffmpegPath.IsNullOrWhiteSpace())
+            {
+                string ffmpegDirectory = Path.GetDirectoryName(ffmpegPath);
+                if (!ffmpegDirectory.IsNullOrEmpty())
+                {
+                    string siblingPath = Path.Combine(ffmpegDirectory, FfprobeFileName);
+                    if (File.Exists(siblingPath))
+                    {
+                        return siblingPath;
+                    }
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -94,9 +209,9 @@ namespace BackgroundChanger.Services
             string outputPath = null,
             CancellationToken cancellationToken = default)
         {
-            if (!IsFfmpegConfigured())
+            if (!IsMediaToolkitConfigured())
             {
-                LogDebugMessage("ConvertToMp4Async aborted: FFmpeg is not configured or the executable was not found.");
+                LogDebugMessage("ConvertToMp4Async aborted: FFmpeg/ffprobe toolchain is not fully configured.");
                 return null;
             }
 
@@ -212,12 +327,18 @@ namespace BackgroundChanger.Services
                 }
             }
 
-            return IndexOfFourCc(data, "ANMF") >= 0;
+            return IndexOfFourCc(data, data.Length, "ANMF") >= 0;
         }
 
-        private static int IndexOfFourCc(byte[] data, string fourCc)
+        private static int IndexOfFourCc(byte[] data, int length, string fourCc)
         {
-            if (fourCc == null || fourCc.Length != 4)
+            if (fourCc == null || fourCc.Length != 4 || data == null)
+            {
+                return -1;
+            }
+
+            int scanLength = Math.Min(length, data.Length);
+            if (scanLength < 4)
             {
                 return -1;
             }
@@ -227,7 +348,7 @@ namespace BackgroundChanger.Services
             byte b2 = (byte)fourCc[2];
             byte b3 = (byte)fourCc[3];
 
-            for (int i = 0; i <= data.Length - 4; i++)
+            for (int i = 0; i <= scanLength - 4; i++)
             {
                 if (data[i] == b0 && data[i + 1] == b1 && data[i + 2] == b2 && data[i + 3] == b3)
                 {
@@ -238,21 +359,91 @@ namespace BackgroundChanger.Services
             return -1;
         }
 
-        private static bool IsAnimatedPng(string filePath)
+        private static int IndexOfFourCc(byte[] data, string fourCc)
+        {
+            return IndexOfFourCc(data, data?.Length ?? 0, fourCc);
+        }
+
+        private bool IsAnimatedPng(string filePath)
         {
             try
             {
-                Png_Reader pngReader = new Png_Reader();
-                using (Stream stream = FileSystem.OpenReadFileStreamSafe(filePath))
+                if (IsFfprobeConfigured())
                 {
-                    Dictionary<fcTL, MemoryStream> apngFrames = pngReader.Open(stream).SpltAPng();
-                    return apngFrames.Count > 0;
+                    bool? ffprobeResult = TryDetectAnimatedPngWithFfprobe(filePath);
+                    if (ffprobeResult.HasValue)
+                    {
+                        LogDebugMessage(string.Format("APNG animation check (ffprobe): {0} -> {1}", filePath, ffprobeResult.Value));
+                        return ffprobeResult.Value;
+                    }
+
+                    LogDebugMessage(string.Format("APNG ffprobe inconclusive for {0}, falling back to acTL scan.", filePath));
                 }
+
+                bool animated = IsAnimatedPngByActlChunk(filePath);
+                LogDebugMessage(string.Format("APNG animation check (acTL): {0} -> {1}", filePath, animated));
+                return animated;
             }
             catch (Exception ex)
             {
                 LogDetectionFailure("APNG", filePath, ex);
                 return false;
+            }
+        }
+
+        private bool? TryDetectAnimatedPngWithFfprobe(string filePath)
+        {
+            string ffprobePath = ResolveFfprobePath();
+            if (ffprobePath.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
+            string arguments = string.Format(
+                "-v error -show_entries format=format_name -of default=noprint_wrappers=1:nokey=1 \"{0}\"",
+                filePath);
+
+            if (!RunFfprobeProcess(ffprobePath, arguments, out string stdout, out string stderr))
+            {
+                LogDebugMessage(string.Format(
+                    "APNG ffprobe failed for {0}. Stderr: {1}",
+                    filePath,
+                    TruncateForLog(stderr)));
+                return null;
+            }
+
+            string formatName = stdout?.Trim();
+            if (formatName.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
+            return formatName.Equals("apng", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsAnimatedPngByActlChunk(string filePath)
+        {
+            using (Stream stream = FileSystem.OpenReadFileStreamSafe(filePath))
+            {
+                if (stream.Length < 8)
+                {
+                    return false;
+                }
+
+                int scanLength = (int)Math.Min(ApngActlScanMaxBytes, stream.Length);
+                byte[] data = new byte[scanLength];
+                int bytesRead = stream.Read(data, 0, scanLength);
+                if (bytesRead < 8)
+                {
+                    return false;
+                }
+
+                if (data[0] != 0x89 || data[1] != (byte)'P' || data[2] != (byte)'N' || data[3] != (byte)'G')
+                {
+                    return false;
+                }
+
+                return IndexOfFourCc(data, bytesRead, "acTL") >= 0;
             }
         }
 
@@ -287,12 +478,6 @@ namespace BackgroundChanger.Services
             CancellationToken cancellationToken)
         {
             MediaConversionInputFormat inputFormat = ResolveInputFormat(inputPath);
-
-            if (inputFormat == MediaConversionInputFormat.AnimatedWebp)
-            {
-                return ConvertAnimatedWebpToMp4(inputPath, outputPath, ffmpegPath, cancellationToken);
-            }
-
             return ConvertViaDirectFfmpeg(inputPath, outputPath, ffmpegPath, inputFormat, cancellationToken);
         }
 
@@ -355,127 +540,6 @@ namespace BackgroundChanger.Services
                 && IsAnimatedWebpByContainer(inputPath);
         }
 
-        /// <summary>
-        /// FFmpeg cannot decode animated WebP (ANIM/ANMF chunks). Frames are extracted via webpinfo + WebpAnim, then encoded to MP4.
-        /// </summary>
-        private string ConvertAnimatedWebpToMp4(
-            string inputPath,
-            string outputPath,
-            string ffmpegPath,
-            CancellationToken cancellationToken)
-        {
-            string webpinfoPath = ResolveWebpinfoPath();
-            if (webpinfoPath.IsNullOrEmpty() || !File.Exists(webpinfoPath))
-            {
-                LogDebugMessage(string.Format(
-                    "Animated WebP conversion aborted: webpinfo.exe not found (configured or next to plugin). Input: {0}",
-                    inputPath));
-                return null;
-            }
-
-            string tempFramesDirectory = Path.Combine(
-                PluginDatabase.Paths.PluginCachePath,
-                "webp-frames-" + Guid.NewGuid().ToString("N"));
-
-            try
-            {
-                FileSystem.CreateDirectory(tempFramesDirectory);
-
-                int frameCount;
-                int width;
-                int height;
-                int framerate;
-
-                using (WebpAnim webpAnim = new WebpAnim())
-                {
-                    webpAnim.SetWebpinfoExecutable(webpinfoPath);
-                    webpAnim.Load(inputPath);
-                    frameCount = webpAnim.FramesCount();
-
-                    if (frameCount == 0)
-                    {
-                        LogDebugMessage(string.Format(
-                            "Animated WebP conversion aborted: no frames parsed for {0} (webpinfo: {1}).",
-                            inputPath,
-                            webpinfoPath));
-                        return null;
-                    }
-
-                    framerate = GetWebpOutputFramerate(webpAnim, GetConversionSettings());
-                    width = 0;
-                    height = 0;
-
-                    for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        string framePath = Path.Combine(tempFramesDirectory, string.Format("frame_{0:D4}.png", frameIndex));
-                        using (Stream frameStream = webpAnim.GetFrameStream(frameIndex))
-                        using (Image frameImage = Image.FromStream(frameStream))
-                        {
-                            if (frameIndex == 0)
-                            {
-                                width = frameImage.Width;
-                                height = frameImage.Height;
-                            }
-
-                            frameImage.Save(framePath, ImageFormat.Png);
-                        }
-                    }
-                }
-
-                int crf = GetConversionSettings().ResolveCrf(GetFormatSettings(MediaConversionInputFormat.AnimatedWebp));
-                string framePattern = Path.Combine(tempFramesDirectory, "frame_%04d.png");
-                string arguments = string.Format(
-                    "-y -framerate {0} -f image2 -video_size {1}x{2} -i \"{3}\" -c:v libx264 -crf {4} -pix_fmt yuv420p -movflags +faststart \"{5}\"",
-                    framerate,
-                    width,
-                    height,
-                    framePattern,
-                    crf,
-                    outputPath);
-
-                LogDebugMessage(string.Format(
-                    "Animated WebP frame export complete ({0} frames, {1} fps). Encoding to MP4: {2}",
-                    frameCount,
-                    framerate,
-                    outputPath));
-
-                if (!RunFfmpegProcess(ffmpegPath, arguments, inputPath, outputPath, out string stderr))
-                {
-                    LogDebugMessage(string.Format(
-                        "FFmpeg failed on animated WebP frames (exit). Input: {0} Output: {1} Stderr: {2}",
-                        inputPath,
-                        outputPath,
-                        TruncateForLog(stderr)));
-                    return null;
-                }
-
-                LogDebugMessage(string.Format("Converted animated WebP to MP4: {0} -> {1}", inputPath, outputPath));
-                return outputPath;
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginDatabase.PluginName);
-                return null;
-            }
-            finally
-            {
-                try
-                {
-                    FileSystem.DeleteDirectory(tempFramesDirectory, true);
-                }
-                catch (Exception ex)
-                {
-                    LogDebugMessage(string.Format("Failed to delete temporary WebP frames directory {0}: {1}", tempFramesDirectory, ex.Message));
-                }
-            }
-        }
-
         private string ConvertViaDirectFfmpeg(
             string inputPath,
             string outputPath,
@@ -502,7 +566,9 @@ namespace BackgroundChanger.Services
                         outputPath);
                 }
                 else if (!formatSettings.UseAutoFramerate
-                    && (inputFormat == MediaConversionInputFormat.Apng || inputFormat == MediaConversionInputFormat.Gif))
+                    && (inputFormat == MediaConversionInputFormat.AnimatedWebp
+                        || inputFormat == MediaConversionInputFormat.Apng
+                        || inputFormat == MediaConversionInputFormat.Gif))
                 {
                     int framerate = conversionSettings.ResolveFramerate(formatSettings, MediaConversionDefaults.DefaultFramerate);
                     arguments = string.Format(
@@ -574,39 +640,91 @@ namespace BackgroundChanger.Services
             return process.ExitCode == 0 && File.Exists(outputPath);
         }
 
-        private string ResolveWebpinfoPath()
+        private delegate bool TryGetVersionDelegate(out MediaToolkitVersion version);
+
+        private static string GetDetectedToolkitVersionDisplay(
+            string executablePath,
+            bool isConfigured,
+            TryGetVersionDelegate tryGetVersion)
         {
-            string configuredPath = PluginDatabase.PluginSettings.webpinfoFile;
-            if (!configuredPath.IsNullOrWhiteSpace() && File.Exists(configuredPath))
+            if (!isConfigured)
             {
-                return configuredPath;
+                return "not configured";
             }
 
-            string pluginDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if (!pluginDirectory.IsNullOrEmpty())
+            MediaToolkitVersion version;
+            if (tryGetVersion(out version))
             {
-                string pluginLocalPath = Path.Combine(pluginDirectory, WebpinfoFileName);
-                if (File.Exists(pluginLocalPath))
-                {
-                    return pluginLocalPath;
-                }
+                return version.ToString();
             }
 
-            return null;
+            return executablePath.IsNullOrWhiteSpace() ? "unknown" : "unknown (" + Path.GetFileName(executablePath) + ")";
         }
 
-        private static int GetWebpOutputFramerate(WebpAnim webpAnim, MediaConversionSettings conversionSettings)
+        private bool TryGetToolkitVersion(string executablePath, out MediaToolkitVersion version)
         {
-            MediaConversionFormatSettings webpSettings = conversionSettings.AnimatedWebp ?? new MediaConversionFormatSettings();
-            int autoFramerate = MediaConversionDefaults.DefaultFramerate;
-            int frameDurationMs = webpAnim.FramesDuration();
+            version = default(MediaToolkitVersion);
 
-            if (frameDurationMs > 0)
+            if (executablePath.IsNullOrWhiteSpace() || !File.Exists(executablePath))
             {
-                autoFramerate = Math.Max(1, (int)Math.Round(1000.0 / frameDurationMs));
+                return false;
             }
 
-            return conversionSettings.ResolveFramerate(webpSettings, autoFramerate);
+            try
+            {
+                Process process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = executablePath,
+                        Arguments = "-version",
+                        CreateNoWindow = true,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        WindowStyle = ProcessWindowStyle.Hidden
+                    }
+                };
+
+                process.Start();
+                string stdout = process.StandardOutput.ReadToEnd();
+                string stderr = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+                return MediaToolkitVersion.TryParseFromVersionOutput(stdout + stderr, out version);
+            }
+            catch (Exception ex)
+            {
+                LogDebugMessage(string.Format(
+                    "Failed to read toolkit version for {0}: {1}",
+                    executablePath,
+                    ex.Message));
+                return false;
+            }
+        }
+
+        private static bool RunFfprobeProcess(string ffprobePath, string arguments, out string stdout, out string stderr)
+        {
+            Process process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = ffprobePath,
+                    Arguments = arguments,
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                }
+            };
+
+            process.Start();
+            stdout = process.StandardOutput.ReadToEnd();
+            stderr = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+
+            return process.ExitCode == 0;
         }
 
         private static void LogDebugMessage(string message)

@@ -17,6 +17,7 @@ namespace BackgroundChanger.Services
     public class MediaConversionStartupService
     {
         private const string FfmpegNotificationId = "BackgroundChanger-FfmpegMissing";
+        private const string FfmpegOutdatedNotificationId = "BackgroundChanger-FfmpegOutdated";
         private const string MigrationMarkerFileName = ".animated-media-migration.done";
         private const string LogPrefix = "[MediaConversionStartup]";
 
@@ -44,24 +45,51 @@ namespace BackgroundChanger.Services
             string migrationMarkerPath = GetMigrationMarkerPath(database);
             bool migrationComplete = IsMigrationComplete(migrationMarkerPath);
 
-            if (!_mediaConversionService.IsFfmpegConfigured())
+            if (!_mediaConversionService.IsMediaToolkitConfigured())
             {
                 List<PendingMediaConversion> pendingItems = CollectPendingConversions(database);
-                bool hasConfiguredPath = !database.PluginSettings.ffmpegFile.IsNullOrWhiteSpace();
+                bool hasConfiguredPath = !database.PluginSettings.ffmpegFile.IsNullOrWhiteSpace()
+                    || !database.PluginSettings.ffprobeFile.IsNullOrWhiteSpace();
 
                 if (pendingItems.Count > 0 || hasConfiguredPath)
                 {
-                    string configuredPath = hasConfiguredPath
-                        ? database.PluginSettings.ffmpegFile
-                        : "(not configured)";
+                    string ffmpegPath = FormatConfiguredPath(
+                        database.PluginSettings.ffmpegFile,
+                        _mediaConversionService.IsFfmpegConfigured());
+                    string ffprobePath = FormatConfiguredPath(
+                        database.PluginSettings.ffprobeFile,
+                        _mediaConversionService.IsFfprobeConfigured(),
+                        _mediaConversionService.ResolveFfprobePath());
 
                     LogDebugMessage(string.Format(
-                        "FFmpeg not configured or missing at {0}. Batch aborted with {1} pending item(s). Migration complete: {2}.",
-                        configuredPath,
+                        "Media toolkit incomplete (FFmpeg: {0}, ffprobe: {1}). Batch aborted with {2} pending item(s). Migration complete: {3}.",
+                        ffmpegPath,
+                        ffprobePath,
                         pendingItems.Count,
                         migrationComplete));
 
-                    NotifyFfmpegMissing(database.PluginName, database.PluginSettings.ffmpegFile, pluginId);
+                    NotifyMediaToolkitMissing(database.PluginName, ffmpegPath, ffprobePath, pluginId);
+                }
+
+                return;
+            }
+
+            if (!_mediaConversionService.IsMediaToolkitVersionSupported())
+            {
+                List<PendingMediaConversion> pendingItems = CollectPendingConversions(database);
+                bool hasConfiguredPath = !database.PluginSettings.ffmpegFile.IsNullOrWhiteSpace()
+                    || !database.PluginSettings.ffprobeFile.IsNullOrWhiteSpace();
+
+                if (pendingItems.Count > 0 || hasConfiguredPath)
+                {
+                    LogDebugMessage(string.Format(
+                        "Media toolkit version unsupported (detected: {0}, minimum: {1}). Batch aborted with {2} pending item(s). Migration complete: {3}.",
+                        _mediaConversionService.GetMediaToolkitVersionSummary(),
+                        _mediaConversionService.GetMinimumMediaToolkitVersionDisplay(),
+                        pendingItems.Count,
+                        migrationComplete));
+
+                    NotifyMediaToolkitOutdated(database.PluginName, pluginId);
                 }
 
                 return;
@@ -243,15 +271,34 @@ namespace BackgroundChanger.Services
             return true;
         }
 
-        private static void NotifyFfmpegMissing(string pluginName, string ffmpegPath, Guid pluginId)
+        private static void NotifyMediaToolkitOutdated(string pluginName, Guid pluginId)
         {
-            string configuredPath = ffmpegPath.IsNullOrWhiteSpace()
-                ? ResourceProvider.GetString("LOCBcFfmpegPathNotConfigured")
-                : ffmpegPath;
-
+            MediaConversionService mediaConversionService = new MediaConversionService();
             string message = string.Format(
-                ResourceProvider.GetString("LOCBcFfmpegStartupNotification"),
-                configuredPath);
+                ResourceProvider.GetString("LOCBcMediaToolkitOutdatedNotification"),
+                mediaConversionService.GetMinimumMediaToolkitVersionDisplay(),
+                mediaConversionService.GetMediaToolkitVersionSummary());
+
+            API.Instance.Notifications.Add(new NotificationMessage(
+                FfmpegOutdatedNotificationId,
+                pluginName + Environment.NewLine + message,
+                NotificationType.Error,
+                () =>
+                {
+                    Plugin plugin = API.Instance.Addons.Plugins.FirstOrDefault(x => x.Id == pluginId);
+                    if (plugin != null)
+                    {
+                        _ = plugin.OpenSettingsView();
+                    }
+                }));
+        }
+
+        private static void NotifyMediaToolkitMissing(string pluginName, string ffmpegPath, string ffprobePath, Guid pluginId)
+        {
+            string message = string.Format(
+                ResourceProvider.GetString("LOCBcMediaToolkitStartupNotification"),
+                ffmpegPath,
+                ffprobePath);
 
             API.Instance.Notifications.Add(new NotificationMessage(
                 FfmpegNotificationId,
@@ -265,6 +312,21 @@ namespace BackgroundChanger.Services
                         _ = plugin.OpenSettingsView();
                     }
                 }));
+        }
+
+        private static string FormatConfiguredPath(string configuredPath, bool isValid, string resolvedPath = null)
+        {
+            if (!configuredPath.IsNullOrWhiteSpace())
+            {
+                return isValid ? configuredPath : configuredPath + " (not found)";
+            }
+
+            if (!resolvedPath.IsNullOrWhiteSpace())
+            {
+                return resolvedPath + (isValid ? " (auto)" : " (not found)");
+            }
+
+            return ResourceProvider.GetString("LOCBcFfmpegPathNotConfigured");
         }
 
         private static void LogDebugMessage(string message)
