@@ -40,7 +40,8 @@ namespace BackgroundChanger.Views
         public ImagesManager(GameBackgroundImages gameBackgroundImages, bool isCover, BackgroundChanger plugin)
         {
             GameBackgroundImages = gameBackgroundImages;
-            CurrentImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == isCover && x.Exist).ToList());
+            CurrentImages = Serialization.GetClone(
+                gameBackgroundImages.Items.Where(x => x.IsCover == isCover && x.Exist).ToList());
             EditedImages = Serialization.GetClone(CurrentImages);
             IsCover = isCover;
             Plugin = plugin;
@@ -171,16 +172,38 @@ namespace BackgroundChanger.Views
             ((Window)Parent).Close();
         }
 
+        private static bool ItemImageIdentityMatches(ItemImage left, ItemImage right)
+        {
+            if (left == null || right == null)
+            {
+                return false;
+            }
+
+            return left.Name.IsEqual(right.Name)
+                && (left.FolderName ?? string.Empty).IsEqual(right.FolderName ?? string.Empty);
+        }
+
+        private static bool EditedImagesContains(List<ItemImage> editedImages, ItemImage candidate)
+        {
+            return editedImages.Exists(x => ItemImageIdentityMatches(x, candidate));
+        }
+
+        private static bool IsPlayniteLibraryMirror(ItemImage itemImage)
+        {
+            return BackgroundChangerDatabase.IsPlayniteLibraryMirror(itemImage);
+        }
+
         private void PART_BtOK_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 ItemImage originalDefault = CurrentImages.FirstOrDefault(x => x.IsDefault);
+                string playniteMediaReference = null;
 
                 // Delete removed
-                CurrentImages.Where(x => !x.Name.IsEqual(originalDefault?.Name) && x.IsCover == IsCover)?.ForEach(y =>
+                CurrentImages.Where(x => !ItemImageIdentityMatches(x, originalDefault) && x.IsCover == IsCover)?.ForEach(y =>
                 {
-                    if (EditedImages.FirstOrDefault(x => x.FullPath == y.FullPath) == null)
+                    if (!EditedImagesContains(EditedImages, y))
                     {
                         FileSystem.DeleteFileSafe(y.FullPath);
                     }
@@ -191,8 +214,13 @@ namespace BackgroundChanger.Views
                 {
                     ItemImage itemImage = EditedImages[index];
 
-                    if (itemImage.FolderName.IsNullOrEmpty() && !itemImage.Name.IsEqual(originalDefault?.Name))
+                    if (itemImage.FolderName.IsNullOrEmpty() && !ItemImageIdentityMatches(itemImage, originalDefault))
                     {
+                        if (IsPlayniteLibraryMirror(itemImage))
+                        {
+                            continue;
+                        }
+
                         if (_mediaImportService.RequiresConversion(itemImage.Name))
                         {
                             if (_mediaImportService.IsBlockedByMissingToolkit(itemImage.Name))
@@ -250,50 +278,81 @@ namespace BackgroundChanger.Views
                     }
                 }
 
-                // Default
+                // Default — originalDefault is the snapshot at open; newDefault is the user selection
                 ItemImage newDefault = EditedImages.FirstOrDefault(x => x.IsDefault);
-                if (!originalDefault?.Name.IsEqual(newDefault?.Name) ?? false)
+                if (newDefault != null && !ItemImageIdentityMatches(originalDefault, newDefault))
                 {
-                    // Copy old in exention data
                     string folderName = GameBackgroundImages.Id.ToString();
-                    string newPath = Path.Combine(
-                        PluginDatabase.Paths.PluginUserDataPath,
-                        "Images",
-                        folderName,
-                        Path.GetFileName(originalDefault.Name)
-                    );
-                    File.Copy(originalDefault.Name, newPath);
-                    FileSystem.DeleteFileSafe(originalDefault.Name);
 
-                    // Copy new in game data
-                    Game game = GameBackgroundImages.Game;
-                    string filePath = API.Instance.Database.AddFile(newDefault.FullPath, game.Id);
-                    FileSystem.DeleteFileSafe(newDefault.FullPath);
-
-                    ItemImage originalNew = CurrentImages.FirstOrDefault(x => x.Name.IsEqual(newDefault.Name));
-                    ItemImage newOld = EditedImages.FirstOrDefault(x => x.Name.IsEqual(originalDefault.Name));
-
-                    newOld.Name = Path.GetFileName(originalDefault.Name);
-                    newOld.FolderName = folderName;
-
-                    if (IsCover)
+                    if (originalDefault != null && originalDefault.Exist)
                     {
-                        game.CoverImage = filePath;
+                        string archivedFileName = Path.GetFileName(originalDefault.FullPath);
+                        string archivePath = Path.Combine(
+                            PluginDatabase.Paths.PluginUserDataPath,
+                            "Images",
+                            folderName,
+                            archivedFileName);
+                        FileSystem.CreateDirectory(Path.GetDirectoryName(archivePath));
+                        File.Copy(originalDefault.FullPath, archivePath, overwrite: true);
+                        FileSystem.DeleteFileSafe(originalDefault.FullPath);
+
+                        ItemImage archivedDefault = EditedImages.FirstOrDefault(x => ItemImageIdentityMatches(x, originalDefault));
+                        if (archivedDefault != null)
+                        {
+                            archivedDefault.Name = archivedFileName;
+                            archivedDefault.FolderName = folderName;
+                            archivedDefault.IsDefault = false;
+                            archivedDefault.IsCover = IsCover;
+                        }
+                        else
+                        {
+                            EditedImages.Add(new ItemImage
+                            {
+                                Name = archivedFileName,
+                                FolderName = folderName,
+                                IsCover = IsCover
+                            });
+                        }
                     }
-                    else
+
+                    if (!newDefault.FolderName.IsNullOrEmpty() && newDefault.Exist)
                     {
-                        game.BackgroundImage = filePath;
+                        playniteMediaReference = API.Instance.Database.AddFile(newDefault.FullPath, GameBackgroundImages.Game.Id);
+                        FileSystem.DeleteFileSafe(newDefault.FullPath);
+                        EditedImages.Remove(newDefault);
                     }
-                    API.Instance.Database.Games.Update(game);
-                    newDefault.Name = API.Instance.Database.GetFullFilePath(filePath);
-                    newDefault.FolderName = null;
                 }
+
+                EditedImages.RemoveAll(IsPlayniteLibraryMirror);
 
                 // Saved
                 List<ItemImage> tmpList = Serialization.GetClone(GameBackgroundImages.Items.Where(x => x.IsCover != IsCover).ToList());
                 tmpList.AddRange(EditedImages);
                 GameBackgroundImages.Items = tmpList;
                 BackgroundChanger.PluginDatabase.Update(GameBackgroundImages);
+
+                if (!playniteMediaReference.IsNullOrEmpty())
+                {
+                    Game game = GameBackgroundImages.Game;
+                    if (IsCover)
+                    {
+                        game.CoverImage = playniteMediaReference;
+                    }
+                    else
+                    {
+                        game.BackgroundImage = playniteMediaReference;
+                    }
+
+                    BackgroundChangerDatabase.SuppressGamesItemUpdatedPersist = true;
+                    try
+                    {
+                        API.Instance.Database.Games.Update(game);
+                    }
+                    finally
+                    {
+                        BackgroundChangerDatabase.SuppressGamesItemUpdatedPersist = false;
+                    }
+                }
 
                 ((Window)Parent).Close();
             }
@@ -549,6 +608,11 @@ namespace BackgroundChanger.Views
         private void TextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             int index = int.Parse(((TextBlock)sender).Tag.ToString());
+
+            if (!EditedImages[index].Exist)
+            {
+                return;
+            }
 
             bool newValue = !EditedImages[index].IsFavorite;
             EditedImages.ForEach(c => c.IsFavorite = false);
