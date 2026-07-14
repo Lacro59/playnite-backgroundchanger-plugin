@@ -93,8 +93,139 @@ namespace BackgroundChanger.Models
         [DontSerialize]
         public bool IsAnimated => Mime == "image/webp" || IsVideo;
 
+        /// <summary>
+        /// Gets whether a preview URL is available for list display.
+        /// </summary>
         [DontSerialize]
-        public string Thumbnail => IsVideo ? Url : Thumb;
+        public bool HasDisplayableThumbnail => !Thumbnail.IsNullOrEmpty();
+
+        private const double ThumbnailPreviewMaxWidth = 480;
+        private const double ThumbnailPreviewMaxHeight = 140;
+
+        /// <summary>
+        /// Gets the preview width for list thumbnails, derived from asset dimensions.
+        /// </summary>
+        [DontSerialize]
+        public double ThumbnailPreviewWidth
+        {
+            get
+            {
+                GetThumbnailPreviewSize(Width, Height, out double previewWidth, out double previewHeight);
+                return previewWidth;
+            }
+        }
+
+        /// <summary>
+        /// Gets the preview height for list thumbnails, derived from asset dimensions.
+        /// </summary>
+        [DontSerialize]
+        public double ThumbnailPreviewHeight
+        {
+            get
+            {
+                GetThumbnailPreviewSize(Width, Height, out double previewWidth, out double previewHeight);
+                return previewHeight;
+            }
+        }
+
+        private static void GetThumbnailPreviewSize(int width, int height, out double previewWidth, out double previewHeight)
+        {
+            if (width <= 0 || height <= 0)
+            {
+                previewWidth = 93;
+                previewHeight = ThumbnailPreviewMaxHeight;
+                return;
+            }
+
+            double aspect = (double)width / height;
+            double boxAspect = ThumbnailPreviewMaxWidth / ThumbnailPreviewMaxHeight;
+
+            if (aspect >= boxAspect)
+            {
+                previewWidth = ThumbnailPreviewMaxWidth;
+                previewHeight = ThumbnailPreviewMaxWidth / aspect;
+            }
+            else
+            {
+                previewHeight = ThumbnailPreviewMaxHeight;
+                previewWidth = ThumbnailPreviewMaxHeight * aspect;
+            }
+        }
+
+        /// <summary>
+        /// Preview URL for the SteamGridDB list. Prefers API <see cref="Thumb"/>, then a static image URL derived from <see cref="Url"/>.
+        /// Animated WebP uses the first frame; video assets use <c>hero_thumb</c> when available.
+        /// </summary>
+        [DontSerialize]
+        public string Thumbnail => ResolveThumbnailUrl();
+
+        private string ResolveThumbnailUrl()
+        {
+            string fromThumb = GetDisplayableUrl(Thumb);
+            if (!fromThumb.IsNullOrEmpty())
+            {
+                return fromThumb;
+            }
+
+            string fromUrl = GetDisplayableUrl(Url);
+            if (!fromUrl.IsNullOrEmpty())
+            {
+                return fromUrl;
+            }
+
+            return DeriveStaticThumbUrl(Url) ?? DeriveStaticThumbUrl(Thumb);
+        }
+
+        private static string GetDisplayableUrl(string url)
+        {
+            if (url.IsNullOrEmpty() || IsNonDisplayableMediaUrl(url))
+            {
+                return null;
+            }
+
+            return url;
+        }
+
+        private static string DeriveStaticThumbUrl(string url)
+        {
+            if (url.IsNullOrEmpty())
+            {
+                return null;
+            }
+
+            if (url.IndexOf("/hero/", StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                return null;
+            }
+
+            int lastSlash = url.LastIndexOf('/');
+            if (lastSlash < 0 || lastSlash >= url.Length - 1)
+            {
+                return null;
+            }
+
+            string fileName = url.Substring(lastSlash + 1);
+            int dotIndex = fileName.LastIndexOf('.');
+            if (dotIndex > 0)
+            {
+                fileName = fileName.Substring(0, dotIndex) + ".jpg";
+            }
+            else
+            {
+                fileName = fileName + ".jpg";
+            }
+
+            return url.Substring(0, url.IndexOf("/hero/", StringComparison.OrdinalIgnoreCase))
+                + "/hero_thumb/"
+                + fileName;
+        }
+
+        private static bool IsNonDisplayableMediaUrl(string url)
+        {
+            return url.Contains(".webm", StringComparison.OrdinalIgnoreCase)
+                || url.Contains(".mp4", StringComparison.OrdinalIgnoreCase)
+                || url.Contains(".mov", StringComparison.OrdinalIgnoreCase);
+        }
     }
 
 

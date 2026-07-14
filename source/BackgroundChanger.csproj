@@ -107,6 +107,9 @@
     <Compile Include="Controls\PluginBackgroundImage.xaml.cs">
       <DependentUpon>PluginBackgroundImage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\CheckListFilterBox.xaml.cs">
+      <DependentUpon>CheckListFilterBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Models\CheckData.cs" />
     <Compile Include="Models\ItemImage.cs" />
     <Compile Include="Models\BackgroundImagesCollection.cs" />
@@ -156,6 +159,7 @@
     <Compile Include="Services\BackgroundChangerMenus.cs" />
     <Compile Include="Services\BackgroundChangerWindows.cs" />
     <Compile Include="Services\SteamGridDbApi.cs" />
+    <Compile Include="Services\SteamGridFilterHelper.cs" />
     <Compile Include="Views\GoogleImageView.xaml.cs">
       <DependentUpon>GoogleImageView.xaml</DependentUpon>
     </Compile>
@@ -187,6 +191,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Page Include="Controls\PluginCoverImage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\CheckListFilterBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

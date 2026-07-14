@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:BackgroundChanger.Views"
+             xmlns:filtercontrols="clr-namespace:BackgroundChangerPlugin.Controls"
              xmlns:playnitecontrols="clr-namespace:CommonPluginsControls.PlayniteControls"
              xmlns:converters="clr-namespace:CommonPlayniteShared.Converters"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
@@ -24,11 +25,10 @@
         <StackPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
             <Separator Margin="0,0,0,10" />
 
-            <!-- Name -->
             <Grid Margin="0,0,0,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="6" />
+                    <ColumnDefinition Width="10" />
                     <ColumnDefinition Width="150" />
                 </Grid.ColumnDefinitions>
 
@@ -37,14 +37,13 @@
                         IsEnabled="{Binding ElementName=SearchElement, Path=Text, Converter={StaticResource StringNullOrEmptyToBoolConverter}}"/>
             </Grid>
 
-            <!-- Actions -->
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="6" />
+                    <ColumnDefinition Width="10" />
                     <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="6" />
+                    <ColumnDefinition Width="10" />
                     <ColumnDefinition Width="100" />
                 </Grid.ColumnDefinitions>
 
@@ -54,91 +53,134 @@
             </Grid>
         </StackPanel>
         
-        <DockPanel>
-            <Grid DockPanel.Dock="Right" Width="850">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="*" MinWidth="400" />
+            </Grid.ColumnDefinitions>
+
+            <ListBox Grid.Column="0"
+                     Name="PART_SearchList"
+                     SelectionChanged="PART_SearchList_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel x:Name="PART_ListContener">
+                            <controls2:TextBlockTrimmed Margin="0,2" Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="10" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <!-- Filter -->
-                <StackPanel Grid.Row="0">
-                    <DockPanel>
-                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                            <Label Content="{DynamicResource LOCCommonTotalFound}" />
-                            <Label Margin="10,0,0,0" Name="PART_TotalFound" />
-                        </StackPanel>
+                <Grid Grid.Row="0" Margin="0,0,0,4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                        <Label Content="{DynamicResource LOCCommonDimensions}" />
-                        <ComboBox Margin="10,0,0,0" Name="PART_ComboDimensions" IsEditable="true" IsReadOnly="true" Width="430">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox Checked="ApplyFilter" Unchecked="ApplyFilter"
-                                          Content="{Binding Name}" Tag="{Binding Data}" IsChecked="{Binding IsChecked}">
-                                    </CheckBox>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" MinWidth="220" />
+                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" MinWidth="40" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                        <Label Margin="30,0,0,0" Content="{DynamicResource LOCCommonSortByDate}" />
-                        <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
+                        <Label Grid.Column="0"
+                               Margin="0,0,10,0"
+                               Content="{DynamicResource LOCCommonDimensions}"
+                               VerticalAlignment="Center" />
+                        <filtercontrols:CheckListFilterBox Grid.Column="1"
+                                                     x:Name="PART_FilterDimensions"
+                                                     UseShortSummary="True"
+                                                     FilterChanged="ApplyFilter" />
+
+                        <Label Grid.Column="3"
+                               Margin="0,0,10,0"
+                               Content="{DynamicResource LOCCommonSortByDate}"
+                               VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="4"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center">
                             <ToggleButton Name="PART_ButtonSortByDate_Asc" Content="&#xea5a;" IsChecked="False"
-                                      Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
-                            <ToggleButton Name="PART_ButtonSortByDate_Desc" Content="&#xea59;" IsChecked="True" Margin="10,0,0,0"
-                                      Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
+                                          Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
+                            <ToggleButton Name="PART_ButtonSortByDate_Desc" Content="&#xea59;" IsChecked="True" Margin="8,0,0,0"
+                                          Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
                         </StackPanel>
 
-                        <!-- Impossible with api data -->
-                        <!--Label Grid.Row="0" Grid.Column="4" Content="{DynamicResource LOCCommonSortByScore}" />
-                        <StackPanel Grid.Row="2" Grid.Column="4" Margin="10,0,0,0" Orientation="Horizontal">
-                            <ToggleButton Name="PART_ButtonSortByScore_Asc" Content="&#xea5a;" IsChecked="False"
-                                          Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
-                            <ToggleButton Name="PART_ButtonSortByScore_Desc" Content="&#xea59;" IsChecked="False" Margin="10,0,0,0"
-                                          Click="PART_ButtonSort_Click" FontFamily="{DynamicResource CommonFont}" />
-                        </StackPanel-->
-                    </DockPanel>
-
-                    <DockPanel Margin="0,10,0,0">
-                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                            <Button Content="&#xEEBB;" FontFamily="{DynamicResource FontIcoFont}" ToolTip="{DynamicResource LOCCommonDefaultFilters}" Click="ClearFilter_Click" />
-                            <Button Content="&#xEF05;" FontFamily="{DynamicResource FontIcoFont}" ToolTip="{DynamicResource LOCCommonSaveFilters}" Click="SavedFilter_Click" Margin="10,0,0,0" />
+                        <StackPanel Grid.Column="6"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center">
+                            <Label Content="{DynamicResource LOCCommonTotalFound}" />
+                            <Label Margin="8,0,0,0" Name="PART_TotalFound" />
                         </StackPanel>
-                        
-                        <Label Content="{DynamicResource LOCCommonStyles}" />
-                        <ComboBox Margin="10,0,0,0" Name="PART_ComboStyles" IsEditable="true" IsReadOnly="true" Width="170">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox Checked="ApplyFilter" Unchecked="ApplyFilter"
-                                              Content="{Binding Name}" Tag="{Binding Data}" IsChecked="{Binding IsChecked}">
-                                    </CheckBox>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
+                    </Grid>
 
-                        <Label Margin="10,0,0,0" Content="{DynamicResource LOCCommonTypes}" />
-                        <ComboBox Margin="10,0,0,0" Name="PART_ComboTypes" IsEditable="true" IsReadOnly="true" Width="170">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox Checked="ApplyFilter" Unchecked="ApplyFilter"
-                                              Content="{Binding Name}" Tag="{Binding Data}" IsChecked="{Binding IsChecked}">
-                                    </CheckBox>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="2*" MinWidth="160" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="1.2*" MinWidth="130" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="1.2*" MinWidth="130" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                        <Label Margin="10,0,0,0" Content="{DynamicResource LOCTagsLabel}" />
-                        <ComboBox Margin="-55,0,0,0" Name="PART_ComboTags" IsEditable="true" IsReadOnly="true" Width="170">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox Checked="ApplyFilter" Unchecked="ApplyFilter"
-                                          Content="{Binding Name}" Tag="{Binding Data}" IsChecked="{Binding IsChecked}">
-                                    </CheckBox>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </DockPanel>
-                </StackPanel>
+                        <Label Grid.Column="0"
+                               Margin="0,0,10,0"
+                               Content="{DynamicResource LOCCommonStyles}"
+                               VerticalAlignment="Center" />
+                        <filtercontrols:CheckListFilterBox Grid.Column="1"
+                                                     x:Name="PART_FilterStyles"
+                                                     FilterChanged="ApplyFilter" />
+
+                        <Label Grid.Column="3"
+                               Margin="0,0,10,0"
+                               Content="{DynamicResource LOCCommonTypes}"
+                               VerticalAlignment="Center" />
+                        <filtercontrols:CheckListFilterBox Grid.Column="4"
+                                                     x:Name="PART_FilterTypes"
+                                                     FilterChanged="ApplyFilter" />
+
+                        <Label Grid.Column="6"
+                               Margin="0,0,10,0"
+                               Content="{DynamicResource LOCTagsLabel}"
+                               VerticalAlignment="Center" />
+                        <filtercontrols:CheckListFilterBox Grid.Column="7"
+                                                     x:Name="PART_FilterTags"
+                                                     FilterChanged="ApplyFilter" />
+
+                        <StackPanel Grid.Column="9"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center">
+                            <Button Content="&#xEEBB;"
+                                    FontFamily="{DynamicResource FontIcoFont}"
+                                    ToolTip="{DynamicResource LOCCommonDefaultFilters}"
+                                    Click="ClearFilter_Click" />
+                            <Button Content="&#xEF05;"
+                                    FontFamily="{DynamicResource FontIcoFont}"
+                                    ToolTip="{DynamicResource LOCCommonSaveFilters}"
+                                    Click="SavedFilter_Click"
+                                    Margin="10,0,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
 
                 <Grid Name="PART_GridElementContener" Grid.Row="2">
                     <ListBox Name="PART_ElementList" SelectionChanged="PART_ElementList_SelectionChanged"
@@ -147,21 +189,10 @@
                              Height="{Binding ElementName=PART_GridElementContener, Path=ActualHeight}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="0,2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="10" />
-                                        <ColumnDefinition Width="230" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <!--controls:AnimatedImage Stretch="Uniform"                                
-                                                            Source="{Binding thumbnail, Converter={StaticResource GetImageConverter}}" Height="140"
-                                                            RenderOptions.BitmapScalingMode="LowQuality"
-                                                            UseAnimated="False"
-                                                            DecodePixelWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}" /-->
-                                    <controls1:ImageAsync Stretch="Uniform" Source="{Binding Thumbnail}" Height="140" />
-
-                                    <Grid Grid.Column="2">
+                                <DockPanel Margin="0,2" LastChildFill="True">
+                                    <Grid DockPanel.Dock="Right"
+                                          Width="230"
+                                          Margin="12,0,0,0">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="auto" />
                                             <RowDefinition Height="10" />
@@ -188,22 +219,58 @@
                                                    Content="{Binding Mime, Converter={StaticResource StringRemoveConverter}, ConverterParameter='image/'}" />
                                         </StackPanel>
                                     </Grid>
-                                </Grid>
+
+                                    <Grid Width="{Binding ThumbnailPreviewWidth}"
+                                          Height="{Binding ThumbnailPreviewHeight}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center">
+                                        <Border Background="{DynamicResource NormalBrush}"
+                                                Opacity="0.3"
+                                                CornerRadius="{DynamicResource ControlCornerRadius}"
+                                                BorderBrush="{DynamicResource NormalBorderBrush}"
+                                                BorderThickness="{DynamicResource ControlBorderThickness}"
+                                                IsHitTestVisible="False"
+                                                Visibility="{Binding IsLoading, ElementName=PART_ItemThumbnail, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                                        <controls1:ImageAsync x:Name="PART_ItemThumbnail"
+                                                              Stretch="Uniform"
+                                                              Source="{Binding Thumbnail}"
+                                                              Width="{Binding ThumbnailPreviewWidth}"
+                                                              Height="{Binding ThumbnailPreviewHeight}"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center" />
+
+                                        <Border IsHitTestVisible="False"
+                                                Visibility="{Binding IsLoading, ElementName=PART_ItemThumbnail, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <StackPanel HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                                           Text="{DynamicResource LOCLoadingLabel}"
+                                                           FontSize="{DynamicResource FontSizeSmall}"
+                                                           Foreground="{DynamicResource TextBrushDarker}"
+                                                           HorizontalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom"
+                                                Margin="4"
+                                                Padding="6,2"
+                                                Background="#99000000"
+                                                CornerRadius="{DynamicResource ControlCornerRadius}"
+                                                Visibility="{Binding IsAnimated, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                                       Text="{DynamicResource LOCBcSteamGridDbAnimated}"
+                                                       Foreground="White"
+                                                       FontSize="{DynamicResource FontSizeSmall}" />
+                                        </Border>
+                                    </Grid>
+                                </DockPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
                 </Grid>
             </Grid>
-
-            <ListBox Name="PART_SearchList" SelectionChanged="PART_SearchList_SelectionChanged" Margin="0,0,10,0">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel x:Name="PART_ListContener">
-                            <controls2:TextBlockTrimmed Margin="0,2" Text="{Binding Name}" Width="200"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </DockPanel>
+        </Grid>
     </DockPanel>
 </UserControl>
