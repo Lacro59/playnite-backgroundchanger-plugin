@@ -26,6 +26,7 @@
         <controls:ImageAsync x:Name="Image1"
                              HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
                              VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}"
+                             Parameter="0"
                              RenderOptions.BitmapScalingMode="Fant"
                              Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
                              StretchDirection="{Binding StretchDirection, RelativeSource={RelativeSource AncestorType=UserControl}}"
