@@ -7,6 +7,7 @@
     
     <sys:String x:Key="LOCBcManageBackground">Керування фоновими зображеннями</sys:String>
     <sys:String x:Key="LOCBcManageCover">Керувати зображеннями обкладинок</sys:String>
+    <sys:String x:Key="LOCBcManageIcon">Керувати значками</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
@@ -14,6 +15,7 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Показувати фонове зображення плагіну</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Показувати зображення обкладинки плагіну</sys:String>
+    <sys:String x:Key="LOCBcEnableIconImage">Показувати значок плагіна</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">Використовувати ті самі налаштування для фонового зображення гри плагіну, що й для фону теми *</sys:String>
     

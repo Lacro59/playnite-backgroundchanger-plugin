@@ -9,17 +9,24 @@ namespace BackgroundChanger.Models
     public class GameBackgroundImages : PluginGameCollection<ItemImage>
     {
         [DontSerialize]
-        public bool HasDataBackground => Items?.Where(x => !x.IsCover && x.Exist)?.Count() > 0;
+        public bool HasDataBackground => Items?.Where(x => x.IsBackgroundMedia && x.Exist)?.Count() > 0;
 
         [DontSerialize]
-        public List<ItemImage> ItemsBackground => Items?.Where(x => !x.IsCover && x.Exist)?.ToList() ?? new List<ItemImage>();
+        public List<ItemImage> ItemsBackground => Items?.Where(x => x.IsBackgroundMedia && x.Exist)?.ToList() ?? new List<ItemImage>();
 
 
         [DontSerialize]
-        public bool HasDataCover => Items?.Where(x => x.IsCover && x.Exist)?.Count() > 0;
+        public bool HasDataCover => Items?.Where(x => x.IsCover && !x.IsIcon && x.Exist)?.Count() > 0;
 
         [DontSerialize]
-        public List<ItemImage> ItemsCover => Items?.Where(x => x.IsCover && x.Exist)?.ToList() ?? new List<ItemImage>();
+        public List<ItemImage> ItemsCover => Items?.Where(x => x.IsCover && !x.IsIcon && x.Exist)?.ToList() ?? new List<ItemImage>();
+
+
+        [DontSerialize]
+        public bool HasDataIcon => Items?.Where(x => x.IsIcon && x.Exist)?.Count() > 0;
+
+        [DontSerialize]
+        public List<ItemImage> ItemsIcon => Items?.Where(x => x.IsIcon && x.Exist)?.ToList() ?? new List<ItemImage>();
 
 
         private ItemImage backgroundImageOnStart;
@@ -73,6 +80,33 @@ namespace BackgroundChanger.Models
                     coverImageOnStart = items[counter];
                 }
                 return coverImageOnStart;
+            }
+        }
+
+        private ItemImage iconImageOnStart;
+        [DontSerialize]
+        public ItemImage IconImageOnStart
+        {
+            get
+            {
+                if (iconImageOnStart == null)
+                {
+                    List<ItemImage> items = ItemsIcon.Where(x => !x.IsVideo).ToList();
+                    if (items.Count == 0)
+                    {
+                        items = ItemsIcon;
+                    }
+
+                    if (items.Count == 0)
+                    {
+                        return null;
+                    }
+
+                    Random rnd = new Random();
+                    int counter = rnd.Next(0, items.Count);
+                    iconImageOnStart = items[counter];
+                }
+                return iconImageOnStart;
             }
         }
     }

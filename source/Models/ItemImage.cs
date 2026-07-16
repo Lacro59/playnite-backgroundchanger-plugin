@@ -10,8 +10,10 @@ using System.IO;
 namespace BackgroundChanger.Models
 {
     /// <summary>
-    /// Represents an image or video item used for background customization.
+    /// Represents an image or video item used for background, cover, or icon customization.
     /// Provides metadata such as file size, resolution, and type (video, convertable).
+    /// Media type is mutually exclusive: at most one of <see cref="IsCover"/> or <see cref="IsIcon"/> may be true;
+    /// when both are false the item is treated as a background.
     /// </summary>
     public class ItemImage
     {
@@ -37,8 +39,21 @@ namespace BackgroundChanger.Models
 
         /// <summary>
         /// Indicates whether this image is a cover.
+        /// Mutually exclusive with <see cref="IsIcon"/>; when false and <see cref="IsIcon"/> is false, the item is a background.
         /// </summary>
         public bool IsCover { get; set; }
+
+        /// <summary>
+        /// Indicates whether this image is a game icon.
+        /// Mutually exclusive with <see cref="IsCover"/>.
+        /// </summary>
+        public bool IsIcon { get; set; }
+
+        /// <summary>
+        /// Indicates whether this item belongs to the background media collection (not cover, not icon).
+        /// </summary>
+        [DontSerialize]
+        public bool IsBackgroundMedia => !IsCover && !IsIcon;
 
         /// <summary>
         /// Indicates whether this image is marked as favorite.

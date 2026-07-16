@@ -60,7 +60,20 @@ namespace BackgroundChanger.Services
                 });
             }
 
-            if (data != null && (data.HasDataBackground || data.HasDataCover))
+            if (_settings.EnableIconImage)
+            {
+                gameMenuItems.Add(new GameMenuItem
+                {
+                    MenuSection = ResourceProvider.GetString("LOCBc"),
+                    Description = ResourceProvider.GetString("LOCBcManageIcon"),
+                    Action = (gameMenuItem) => _windows.ShowImagesManagerWindow(
+                        gameMenu,
+                        BackgroundChangerDatabase.PluginMediaKind.Icon,
+                        _plugin)
+                });
+            }
+
+            if (data != null && (data.HasDataBackground || data.HasDataCover || data.HasDataIcon))
             {
                 if (gameMenuItems.Count > 0)
                 {

@@ -292,6 +292,47 @@ namespace BackgroundChanger.Controls
                 {
                     ItemImage ItemFavorite = GameBackgroundImages.ItemsBackground.FirstOrDefault(x => x.IsFavorite);
 
+                    int itemsCount = GameBackgroundImages.ItemsBackground.Count;
+                    int favIndex = ItemFavorite != null
+                        ? GameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite)
+                        : -1;
+
+                    bool timerMode = ControlDataContext.EnableAutoChanger;
+                    string modeName;
+                    if (timerMode)
+                    {
+                        modeName = ControlDataContext.EnableRandomSelect ? "Timer+Random" : "Timer+Sequential";
+                    }
+                    else if (ControlDataContext.EnableRandomSelect && ControlDataContext.EnableRandomOnStart)
+                    {
+                        modeName = "OnStart+Random";
+                    }
+                    else if (ControlDataContext.EnableRandomSelect)
+                    {
+                        modeName = "RandomOnSelect";
+                    }
+                    else if (ItemFavorite != null)
+                    {
+                        modeName = "Favorite";
+                    }
+                    else
+                    {
+                        modeName = "Default";
+                    }
+
+                    Common.LogDebug(
+                        true,
+                        string.Format(
+                            "[PluginBackgroundImage][Mode] game={0}, mode={1}, autoChanger={2}, randomSelect={3}, randomOnStart={4}, items={5}, favIndex={6}, isFirst={7}",
+                            MediaControlDiagnostics.FormatGameRef(GameContext),
+                            modeName,
+                            ControlDataContext.EnableAutoChanger,
+                            ControlDataContext.EnableRandomSelect,
+                            ControlDataContext.EnableRandomOnStart,
+                            itemsCount,
+                            favIndex,
+                            IsFirst));
+
                     if (ControlDataContext.EnableAutoChanger)
                     {
                         if (ControlDataContext.EnableRandomSelect)
@@ -301,12 +342,28 @@ namespace BackgroundChanger.Controls
                                 pathImage = ItemFavorite.FullPath;
                                 Counter = GameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
                                 LogMediaSelect("auto-changer-favorite-first", pathImage);
+                                Common.LogDebug(
+                                    true,
+                                    string.Format(
+                                        "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                        "auto-changer-favorite-first",
+                                        Counter,
+                                        itemsCount,
+                                        MediaControlDiagnostics.FormatFileName(pathImage)));
                             }
                             else
                             {
                                 Counter = random.Next(0, GameBackgroundImages.ItemsBackground.Count);
                                 pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
                                 LogMediaSelect("auto-changer-random", pathImage);
+                                Common.LogDebug(
+                                    true,
+                                    string.Format(
+                                        "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                        "auto-changer-random",
+                                        Counter,
+                                        itemsCount,
+                                        MediaControlDiagnostics.FormatFileName(pathImage)));
                             }
                         }
                         else
@@ -316,11 +373,27 @@ namespace BackgroundChanger.Controls
                                 pathImage = ItemFavorite.FullPath;
                                 Counter = GameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
                                 LogMediaSelect("auto-changer-favorite-first", pathImage);
+                                Common.LogDebug(
+                                    true,
+                                    string.Format(
+                                        "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                        "auto-changer-favorite-first",
+                                        Counter,
+                                        itemsCount,
+                                        MediaControlDiagnostics.FormatFileName(pathImage)));
                             }
                             else
                             {
                                 pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
                                 LogMediaSelect("auto-changer-sequential", pathImage);
+                                Common.LogDebug(
+                                    true,
+                                    string.Format(
+                                        "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                        "auto-changer-sequential",
+                                        Counter,
+                                        itemsCount,
+                                        MediaControlDiagnostics.FormatFileName(pathImage)));
                             }
                         }
 
@@ -342,6 +415,15 @@ namespace BackgroundChanger.Controls
                         {
                             pathImage = GameBackgroundImages.BackgroundImageOnStart.FullPath;
                             LogMediaSelect("random-on-start", pathImage);
+                            int onStartIndex = GameBackgroundImages.ItemsBackground.FindIndex(x => x.FullPath == pathImage);
+                            Common.LogDebug(
+                                true,
+                                string.Format(
+                                    "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                    "random-on-start",
+                                    onStartIndex,
+                                    itemsCount,
+                                    MediaControlDiagnostics.FormatFileName(pathImage)));
                         }
                         else
                         {
@@ -349,12 +431,28 @@ namespace BackgroundChanger.Controls
                             {
                                 pathImage = ItemFavorite.FullPath;
                                 LogMediaSelect("favorite", pathImage);
+                                Common.LogDebug(
+                                    true,
+                                    string.Format(
+                                        "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                        "favorite",
+                                        favIndex,
+                                        itemsCount,
+                                        MediaControlDiagnostics.FormatFileName(pathImage)));
                             }
                             else
                             {
                                 int imgSelected = random.Next(0, GameBackgroundImages.ItemsBackground.Count);
                                 pathImage = GameBackgroundImages.ItemsBackground[imgSelected].FullPath;
                                 LogMediaSelect("random-on-select", pathImage, imgSelected);
+                                Common.LogDebug(
+                                    true,
+                                    string.Format(
+                                        "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                        "random-on-select",
+                                        imgSelected,
+                                        itemsCount,
+                                        MediaControlDiagnostics.FormatFileName(pathImage)));
                             }
                         }
 
@@ -367,6 +465,14 @@ namespace BackgroundChanger.Controls
                             pathImage = ItemFavorite.FullPath;
                             LogMediaSelect("favorite", pathImage);
                             SetBackgroundImage(pathImage);
+                                Common.LogDebug(
+                                    true,
+                                    string.Format(
+                                        "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                        "favorite",
+                                        favIndex,
+                                        itemsCount,
+                                        MediaControlDiagnostics.FormatFileName(pathImage)));
                         }
                         else
                         {
@@ -400,6 +506,12 @@ namespace BackgroundChanger.Controls
             {
                 LogMediaSelect("default-playnite", null);
                 SetBackgroundImage();
+                Common.LogDebug(
+                    true,
+                    string.Format(
+                        "[PluginBackgroundImage][Change] branch={0}, file={1}",
+                        "default-playnite",
+                        "(null)"));
             }
             else
             {
@@ -407,6 +519,14 @@ namespace BackgroundChanger.Controls
                     ?? API.Instance.Database.GetFullFilePath(GameContext.BackgroundImage);
                 LogMediaSelect("default-playnite", pathImage);
                 SetBackgroundImage(pathImage);
+                Common.LogDebug(
+                    true,
+                    string.Format(
+                        "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                        "default-playnite",
+                        -1,
+                        -1,
+                        MediaControlDiagnostics.FormatFileName(pathImage)));
             }
         }
 
@@ -875,6 +995,7 @@ namespace BackgroundChanger.Controls
                 InvokeOnUiIfLifecycleActive(() =>
                 {
                     string pathImage = string.Empty;
+                    int fromCounter = Counter;
 
                     if (ControlDataContext.EnableRandomSelect)
                     {
@@ -890,6 +1011,13 @@ namespace BackgroundChanger.Controls
                             pathImage = GameBackgroundImages.ItemsBackground[imgSelected].FullPath;
                         }
 
+                        Common.LogDebug(
+                            true,
+                            string.Format(
+                                "[PluginBackgroundImage][TimerChange] random=true, fromCounter={0} toCounter={1}, file={2}",
+                                fromCounter,
+                                Counter,
+                                MediaControlDiagnostics.FormatFileName(pathImage)));
                         MediaControlDiagnostics.Trace(
                             LogControlTrace,
                             MediaControlDiagnostics.PhaseTimerTick,
@@ -911,6 +1039,13 @@ namespace BackgroundChanger.Controls
                             pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
                         }
 
+                        Common.LogDebug(
+                            true,
+                            string.Format(
+                                "[PluginBackgroundImage][TimerChange] random=false, fromCounter={0} toCounter={1}, file={2}",
+                                fromCounter,
+                                Counter,
+                                MediaControlDiagnostics.FormatFileName(pathImage)));
                         MediaControlDiagnostics.Trace(
                             LogControlTrace,
                             MediaControlDiagnostics.PhaseTimerTick,

@@ -7,6 +7,7 @@
     
     <sys:String x:Key="LOCBcManageBackground">Hantera bakgrundsbilder</sys:String>
     <sys:String x:Key="LOCBcManageCover">Hantera omslagsbilder</sys:String>
+    <sys:String x:Key="LOCBcManageIcon">Hantera ikoner</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
@@ -14,6 +15,7 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Visa plugin bakgrundsbild</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Visa plugin omslagsbild</sys:String>
+    <sys:String x:Key="LOCBcEnableIconImage">Visa plugin-ikon</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     

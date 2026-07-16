@@ -15,6 +15,16 @@ namespace BackgroundChanger.Services
         private const string LogPrefix = "[BackgroundChangerDatabase]";
 
         /// <summary>
+        /// Plugin media kinds stored in <see cref="GameBackgroundImages.Items"/>.
+        /// </summary>
+        public enum PluginMediaKind
+        {
+            Background,
+            Cover,
+            Icon
+        }
+
+        /// <summary>
         /// Outcome of an in-memory media refresh; drives whether the caller should persist to disk.
         /// </summary>
         private struct RefreshMediaResult
@@ -33,14 +43,39 @@ namespace BackgroundChanger.Services
         internal static bool SuppressGamesItemUpdatedPersist { get; set; }
 
         /// <summary>
-        /// Playnite library paths must not be stored in plugin JSON (re-injected on <see cref="Get"/>).
+        /// Ephemeral Playnite default mirrors must not be stored in plugin JSON (re-injected on <see cref="Get"/>).
+        /// Pending imports (file picker, SteamGridDB cache) also use rooted paths but are not mirrors.
         /// </summary>
         internal static bool IsPlayniteLibraryMirror(ItemImage item)
         {
-            return item != null
-                && item.FolderName.IsNullOrEmpty()
-                && !item.Name.IsNullOrEmpty()
-                && Path.IsPathRooted(item.Name);
+            if (item == null || !item.FolderName.IsNullOrEmpty() || item.Name.IsNullOrEmpty())
+            {
+                return false;
+            }
+
+            if (!Path.IsPathRooted(item.Name))
+            {
+                return false;
+            }
+
+            if (IsUnderPlayniteLibraryFiles(item.Name))
+            {
+                return true;
+            }
+
+            // Resolved default mirror outside library\files (e.g. alternate Playnite image location).
+            return item.IsDefault;
+        }
+
+        private static bool IsUnderPlayniteLibraryFiles(string path)
+        {
+            if (path.IsNullOrEmpty())
+            {
+                return false;
+            }
+
+            string normalized = path.Replace('/', '\\');
+            return normalized.IndexOf("\\library\\files\\", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         /// <inheritdoc/>
@@ -48,11 +83,12 @@ namespace BackgroundChanger.Services
         {
             PrepareItemsForSerialization(itemToUpdate);
             base.Update(itemToUpdate);
+            RefreshGameMediaItems(itemToUpdate, "Update");
         }
 
         /// <summary>
         /// Strips ephemeral Playnite default mirrors and <see cref="ItemImage.IsDefault"/> before JSON persistence.
-        /// Default mirrors are re-injected on the next <see cref="Get"/>.
+        /// Default mirrors are re-injected immediately after <see cref="Update"/> and on each <see cref="Get"/>.
         /// </summary>
         internal static void PrepareItemsForSerialization(GameBackgroundImages gameBackgroundImages)
         {
@@ -100,18 +136,21 @@ namespace BackgroundChanger.Services
         /// <returns>Purge and favorite-reapply flags; disk persist is caller responsibility.</returns>
         private RefreshMediaResult RefreshGameMediaItems(GameBackgroundImages gameBackgroundImages, string trigger = null)
         {
-            bool favoriteBackground = gameBackgroundImages.Items.Exists(x => x.IsFavorite && !x.IsCover && x.Exist);
-            bool favoriteCover = gameBackgroundImages.Items.Exists(x => x.IsFavorite && x.IsCover && x.Exist);
+            bool favoriteBackground = gameBackgroundImages.Items.Exists(x => x.IsFavorite && ItemMatchesMediaKind(x, PluginMediaKind.Background) && x.Exist);
+            bool favoriteCover = gameBackgroundImages.Items.Exists(x => x.IsFavorite && ItemMatchesMediaKind(x, PluginMediaKind.Cover) && x.Exist);
+            bool favoriteIcon = gameBackgroundImages.Items.Exists(x => x.IsFavorite && ItemMatchesMediaKind(x, PluginMediaKind.Icon) && x.Exist);
             int itemsCountBefore = gameBackgroundImages.Items.Count;
 
-            SyncDefaultMediaItem(gameBackgroundImages, isCover: false, gameBackgroundImages.BackgroundImage);
-            SyncDefaultMediaItem(gameBackgroundImages, isCover: true, gameBackgroundImages.CoverImage);
+            SyncDefaultMediaItem(gameBackgroundImages, PluginMediaKind.Background, gameBackgroundImages.BackgroundImage);
+            SyncDefaultMediaItem(gameBackgroundImages, PluginMediaKind.Cover, gameBackgroundImages.CoverImage);
+            SyncDefaultMediaItem(gameBackgroundImages, PluginMediaKind.Icon, gameBackgroundImages.Icon);
 
             int purgedCount = PurgeDeadMediaItems(gameBackgroundImages);
 
-            bool favoriteReappliedBackground = ReapplyFavoriteIfNeeded(gameBackgroundImages, isCover: false, wasFavorite: favoriteBackground);
-            bool favoriteReappliedCover = ReapplyFavoriteIfNeeded(gameBackgroundImages, isCover: true, wasFavorite: favoriteCover);
-            bool favoriteReapplied = favoriteReappliedBackground || favoriteReappliedCover;
+            bool favoriteReappliedBackground = ReapplyFavoriteIfNeeded(gameBackgroundImages, PluginMediaKind.Background, wasFavorite: favoriteBackground);
+            bool favoriteReappliedCover = ReapplyFavoriteIfNeeded(gameBackgroundImages, PluginMediaKind.Cover, wasFavorite: favoriteCover);
+            bool favoriteReappliedIcon = ReapplyFavoriteIfNeeded(gameBackgroundImages, PluginMediaKind.Icon, wasFavorite: favoriteIcon);
+            bool favoriteReapplied = favoriteReappliedBackground || favoriteReappliedCover || favoriteReappliedIcon;
 
             LogRefreshSummary(
                 gameBackgroundImages,
@@ -120,8 +159,10 @@ namespace BackgroundChanger.Services
                 purgedCount,
                 favoriteBackground,
                 favoriteCover,
+                favoriteIcon,
                 favoriteReappliedBackground,
-                favoriteReappliedCover);
+                favoriteReappliedCover,
+                favoriteReappliedIcon);
 
             return new RefreshMediaResult
             {
@@ -133,9 +174,9 @@ namespace BackgroundChanger.Services
         /// <summary>
         /// Replaces the persisted default item for the given media type with a mirror of the Playnite game image field.
         /// </summary>
-        private static void SyncDefaultMediaItem(GameBackgroundImages gameBackgroundImages, bool isCover, string gameImageReference)
+        private static void SyncDefaultMediaItem(GameBackgroundImages gameBackgroundImages, PluginMediaKind mediaKind, string gameImageReference)
         {
-            int defaultIndex = gameBackgroundImages.Items.FindIndex(x => x.IsDefault && x.IsCover == isCover);
+            int defaultIndex = gameBackgroundImages.Items.FindIndex(x => x.IsDefault && ItemMatchesMediaKind(x, mediaKind));
             if (defaultIndex != -1)
             {
                 gameBackgroundImages.Items.RemoveAt(defaultIndex);
@@ -146,7 +187,7 @@ namespace BackgroundChanger.Services
                 return;
             }
 
-            if (gameBackgroundImages.Items.Exists(x => x.IsDefault && x.IsCover == isCover))
+            if (gameBackgroundImages.Items.Exists(x => x.IsDefault && ItemMatchesMediaKind(x, mediaKind)))
             {
                 return;
             }
@@ -157,12 +198,13 @@ namespace BackgroundChanger.Services
                 return;
             }
 
-            gameBackgroundImages.Items.Insert(0, new ItemImage
+            ItemImage defaultItem = new ItemImage
             {
                 Name = pathImage,
-                IsCover = isCover,
                 IsDefault = true
-            });
+            };
+            SetItemMediaKind(defaultItem, mediaKind);
+            gameBackgroundImages.Items.Insert(0, defaultItem);
         }
 
         /// <summary>
@@ -183,19 +225,19 @@ namespace BackgroundChanger.Services
         /// Skips reapplication when a living extension item already carries the favorite for this media type.
         /// </summary>
         /// <returns><c>true</c> when the favorite flag was set on the default item.</returns>
-        private static bool ReapplyFavoriteIfNeeded(GameBackgroundImages gameBackgroundImages, bool isCover, bool wasFavorite)
+        private static bool ReapplyFavoriteIfNeeded(GameBackgroundImages gameBackgroundImages, PluginMediaKind mediaKind, bool wasFavorite)
         {
             if (!wasFavorite)
             {
                 return false;
             }
 
-            if (gameBackgroundImages.Items.Exists(x => x.IsCover == isCover && x.IsFavorite && x.Exist))
+            if (gameBackgroundImages.Items.Exists(x => ItemMatchesMediaKind(x, mediaKind) && x.IsFavorite && x.Exist))
             {
                 return false;
             }
 
-            ItemImage defaultItem = gameBackgroundImages.Items.Find(x => x.IsDefault && x.IsCover == isCover);
+            ItemImage defaultItem = gameBackgroundImages.Items.Find(x => x.IsDefault && ItemMatchesMediaKind(x, mediaKind));
             if (defaultItem != null && defaultItem.Exist)
             {
                 defaultItem.IsFavorite = true;
@@ -205,12 +247,51 @@ namespace BackgroundChanger.Services
             Common.LogDebug(
                 false,
                 string.Format(
-                    "{0} Favorite not reapplied — no default item (isCover={1}, game='{2}')",
+                    "{0} Favorite not reapplied — no default item (mediaKind={1}, game='{2}')",
                     LogPrefix,
-                    isCover,
+                    mediaKind,
                     gameBackgroundImages.Name));
 
             return false;
+        }
+
+        internal static bool ItemMatchesMediaKind(ItemImage item, PluginMediaKind mediaKind)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+
+            switch (mediaKind)
+            {
+                case PluginMediaKind.Background:
+                    return item.IsBackgroundMedia;
+                case PluginMediaKind.Cover:
+                    return item.IsCover && !item.IsIcon;
+                case PluginMediaKind.Icon:
+                    return item.IsIcon;
+                default:
+                    return false;
+            }
+        }
+
+        internal static void SetItemMediaKind(ItemImage item, PluginMediaKind mediaKind)
+        {
+            switch (mediaKind)
+            {
+                case PluginMediaKind.Background:
+                    item.IsCover = false;
+                    item.IsIcon = false;
+                    break;
+                case PluginMediaKind.Cover:
+                    item.IsCover = true;
+                    item.IsIcon = false;
+                    break;
+                case PluginMediaKind.Icon:
+                    item.IsCover = false;
+                    item.IsIcon = true;
+                    break;
+            }
         }
 
         private static string ResolveGameImagePath(string gameImageReference)
@@ -231,10 +312,12 @@ namespace BackgroundChanger.Services
             int purgedCount,
             bool favoriteBackground,
             bool favoriteCover,
+            bool favoriteIcon,
             bool favoriteReappliedBackground,
-            bool favoriteReappliedCover)
+            bool favoriteReappliedCover,
+            bool favoriteReappliedIcon)
         {
-            bool favoriteReapplied = favoriteReappliedBackground || favoriteReappliedCover;
+            bool favoriteReapplied = favoriteReappliedBackground || favoriteReappliedCover || favoriteReappliedIcon;
             bool significant = purgedCount > 0 || favoriteReapplied || !trigger.IsNullOrEmpty();
 
             if (!significant)
@@ -252,7 +335,7 @@ namespace BackgroundChanger.Services
             Common.LogDebug(
                 false,
                 string.Format(
-                    "{0} RefreshMedia game='{1}', trigger={2}, items {3}->{4}, purged={5}, favCaptured cover={6} bg={7}, favReapplied cover={8} bg={9}",
+                    "{0} RefreshMedia game='{1}', trigger={2}, items {3}->{4}, purged={5}, favCaptured cover={6} bg={7} icon={8}, favReapplied cover={9} bg={10} icon={11}",
                     LogPrefix,
                     gameBackgroundImages.Name,
                     trigger ?? "Get",
@@ -261,8 +344,10 @@ namespace BackgroundChanger.Services
                     purgedCount,
                     favoriteCover,
                     favoriteBackground,
+                    favoriteIcon,
                     favoriteReappliedCover,
-                    favoriteReappliedBackground));
+                    favoriteReappliedBackground,
+                    favoriteReappliedIcon));
         }
 
         /// <inheritdoc/>
@@ -275,7 +360,8 @@ namespace BackgroundChanger.Services
 
             bool coverChanged = !gameOld.CoverImage.IsEqual(gameNew.CoverImage);
             bool backgroundChanged = !gameOld.BackgroundImage.IsEqual(gameNew.BackgroundImage);
-            if (!coverChanged && !backgroundChanged)
+            bool iconChanged = !gameOld.Icon.IsEqual(gameNew.Icon);
+            if (!coverChanged && !backgroundChanged && !iconChanged)
             {
                 return;
             }
@@ -283,11 +369,12 @@ namespace BackgroundChanger.Services
             Common.LogDebug(
                 false,
                 string.Format(
-                    "{0} Games_ItemUpdated game='{1}', coverChanged={2}, backgroundChanged={3}",
+                    "{0} Games_ItemUpdated game='{1}', coverChanged={2}, backgroundChanged={3}, iconChanged={4}",
                     LogPrefix,
                     gameNew.Name,
                     coverChanged,
-                    backgroundChanged));
+                    backgroundChanged,
+                    iconChanged));
 
             GameBackgroundImages gameBackgroundImages = GetOnlyCache(gameNew.Id);
             if (gameBackgroundImages == null)
@@ -317,7 +404,8 @@ namespace BackgroundChanger.Services
             bool shouldPersist = refreshResult.PurgedCount > 0
                 || refreshResult.FavoriteReapplied
                 || coverChanged
-                || backgroundChanged;
+                || backgroundChanged
+                || iconChanged;
 
             if (shouldPersist)
             {
@@ -325,13 +413,14 @@ namespace BackgroundChanger.Services
                 Common.LogDebug(
                     false,
                     string.Format(
-                        "{0} Games_ItemUpdated persisted refresh for game='{1}' (purged={2}, favReapplied={3}, coverChanged={4}, bgChanged={5})",
+                        "{0} Games_ItemUpdated persisted refresh for game='{1}' (purged={2}, favReapplied={3}, coverChanged={4}, bgChanged={5}, iconChanged={6})",
                         LogPrefix,
                         gameNew.Name,
                         refreshResult.PurgedCount,
                         refreshResult.FavoriteReapplied,
                         coverChanged,
-                        backgroundChanged));
+                        backgroundChanged,
+                        iconChanged));
             }
             else
             {
@@ -352,12 +441,14 @@ namespace BackgroundChanger.Services
             {
                 PluginSettings.HasDataBackground = false;
                 PluginSettings.HasDataCover = false;
+                PluginSettings.HasDataIcon = false;
 
                 return;
             }
 
             PluginSettings.HasDataBackground = gameBackgroundImages.HasDataBackground;
             PluginSettings.HasDataCover = gameBackgroundImages.HasDataCover;
+            PluginSettings.HasDataIcon = gameBackgroundImages.HasDataIcon;
         }
     }
 }

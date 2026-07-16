@@ -7,6 +7,7 @@
     
     <sys:String x:Key="LOCBcManageBackground">Arkaplan resimlerini yönetin</sys:String>
     <sys:String x:Key="LOCBcManageCover">Kapak resimlerini yönetin</sys:String>
+    <sys:String x:Key="LOCBcManageIcon">Simge resimlerini yönetin</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
@@ -14,6 +15,7 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Eklenti arkaplan resmini görüntüle</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Eklenti kapak resmini görüntüle</sys:String>
+    <sys:String x:Key="LOCBcEnableIconImage">Eklenti simge resmini görüntüle</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">Eklenti oyun arka planı için tema arka planıyla aynı ayar kullanıldı *</sys:String>
     

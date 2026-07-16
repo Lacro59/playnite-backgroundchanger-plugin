@@ -32,18 +32,20 @@ namespace BackgroundChanger.Views
         private GameBackgroundImages GameBackgroundImages { get; set; }
         private List<ItemImage> CurrentImages { get; set; }
         private List<ItemImage> EditedImages { get; set; }
-        private bool IsCover { get; set; }
+        private ItemImage OpeningDefaultSnapshot { get; set; }
+        private BackgroundChangerDatabase.PluginMediaKind MediaKind { get; set; }
 
         private readonly MediaImportService _mediaImportService = new MediaImportService();
 
 
-        public ImagesManager(GameBackgroundImages gameBackgroundImages, bool isCover, BackgroundChanger plugin)
+        public ImagesManager(GameBackgroundImages gameBackgroundImages, BackgroundChangerDatabase.PluginMediaKind mediaKind, BackgroundChanger plugin)
         {
             GameBackgroundImages = gameBackgroundImages;
             CurrentImages = Serialization.GetClone(
-                gameBackgroundImages.Items.Where(x => x.IsCover == isCover && x.Exist).ToList());
+                gameBackgroundImages.Items.Where(x => BackgroundChangerDatabase.ItemMatchesMediaKind(x, mediaKind) && x.Exist).ToList());
             EditedImages = Serialization.GetClone(CurrentImages);
-            IsCover = isCover;
+            OpeningDefaultSnapshot = Serialization.GetClone(EditedImages.FirstOrDefault(x => x.IsDefault));
+            MediaKind = mediaKind;
             Plugin = plugin;
 
             InitializeComponent();
@@ -193,18 +195,70 @@ namespace BackgroundChanger.Views
             return BackgroundChangerDatabase.IsPlayniteLibraryMirror(itemImage);
         }
 
+        private static string FormatSaveItemLine(ItemImage item, int index)
+        {
+            if (item == null)
+            {
+                return string.Format("  [{0}] null", index);
+            }
+
+            return string.Format(
+                "  [{0}] name={1}, folder={2}, cover={3}, icon={4}, default={5}, fav={6}, exist={7}, mirror={8}",
+                index,
+                item.Name ?? string.Empty,
+                item.FolderName ?? string.Empty,
+                item.IsCover,
+                item.IsIcon,
+                item.IsDefault,
+                item.IsFavorite,
+                item.Exist,
+                IsPlayniteLibraryMirror(item));
+        }
+
+        private static void LogSaveItemsSnapshot(string phase, string gameName, BackgroundChangerDatabase.PluginMediaKind mediaKind, IList<ItemImage> items)
+        {
+            int count = items?.Count ?? 0;
+            Common.LogDebug(
+                false,
+                string.Format("[ImagesManager] Save {0} — game='{1}', mediaKind={2}, count={3}", phase, gameName, mediaKind, count));
+
+            if (items == null || count == 0)
+            {
+                return;
+            }
+
+            for (int i = 0; i < items.Count; i++)
+            {
+                Common.LogDebug(false, string.Format("[ImagesManager] Save {0} {1}", phase, FormatSaveItemLine(items[i], i)));
+            }
+        }
+
         private void PART_BtOK_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                ItemImage originalDefault = CurrentImages.FirstOrDefault(x => x.IsDefault);
-                string playniteMediaReference = null;
+                string gameName = GameBackgroundImages?.Name ?? GameBackgroundImages?.Id.ToString() ?? "?";
+                LogSaveItemsSnapshot("before-current", gameName, MediaKind, CurrentImages);
+                LogSaveItemsSnapshot("before-edited", gameName, MediaKind, EditedImages);
 
-                // Delete removed
-                CurrentImages.Where(x => !ItemImageIdentityMatches(x, originalDefault) && x.IsCover == IsCover)?.ForEach(y =>
+                ItemImage originalDefault = OpeningDefaultSnapshot;
+                string playniteMediaReference = null;
+                int importedCount = 0;
+                int skippedMirrorCount = 0;
+
+                // Delete removed — never delete Playnite library files (owned by Playnite metadata)
+                CurrentImages.Where(x => !ItemImageIdentityMatches(x, originalDefault) && BackgroundChangerDatabase.ItemMatchesMediaKind(x, MediaKind))?.ForEach(y =>
                 {
+                    if (IsPlayniteLibraryMirror(y))
+                    {
+                        return;
+                    }
+
                     if (!EditedImagesContains(EditedImages, y))
                     {
+                        Common.LogDebug(
+                            false,
+                            string.Format("[ImagesManager] Save delete removed file: {0}", y.FullPath ?? string.Empty));
                         FileSystem.DeleteFileSafe(y.FullPath);
                     }
                 });
@@ -216,8 +270,14 @@ namespace BackgroundChanger.Views
 
                     if (itemImage.FolderName.IsNullOrEmpty() && !ItemImageIdentityMatches(itemImage, originalDefault))
                     {
-                        if (IsPlayniteLibraryMirror(itemImage))
+                        if (itemImage.IsDefault && IsPlayniteLibraryMirror(itemImage))
                         {
+                            skippedMirrorCount++;
+                            Common.LogDebug(
+                                false,
+                                string.Format(
+                                    "[ImagesManager] Save import skipped (default mirror): {0}",
+                                    itemImage.Name ?? string.Empty));
                             continue;
                         }
 
@@ -270,11 +330,18 @@ namespace BackgroundChanger.Views
 
                         itemImage.Name = imageGuid.ToString() + ext;
                         itemImage.FolderName = GameBackgroundImages.Id.ToString();
-                        itemImage.IsCover = IsCover;
+                        BackgroundChangerDatabase.SetItemMediaKind(itemImage, MediaKind);
 
                         string dir = Path.GetDirectoryName(itemImage.FullPath);
                         FileSystem.CreateDirectory(dir);
                         File.Copy(originalPath, itemImage.FullPath);
+                        importedCount++;
+                        Common.LogDebug(
+                            false,
+                            string.Format(
+                                "[ImagesManager] Save import copied: {0} -> {1}",
+                                originalPath,
+                                itemImage.FullPath));
                     }
                 }
 
@@ -284,7 +351,7 @@ namespace BackgroundChanger.Views
                 {
                     string folderName = GameBackgroundImages.Id.ToString();
 
-                    if (originalDefault != null && originalDefault.Exist)
+                    if (originalDefault != null && originalDefault.Exist && !IsPlayniteLibraryMirror(originalDefault))
                     {
                         string archivedFileName = Path.GetFileName(originalDefault.FullPath);
                         string archivePath = Path.Combine(
@@ -302,17 +369,26 @@ namespace BackgroundChanger.Views
                             archivedDefault.Name = archivedFileName;
                             archivedDefault.FolderName = folderName;
                             archivedDefault.IsDefault = false;
-                            archivedDefault.IsCover = IsCover;
+                            BackgroundChangerDatabase.SetItemMediaKind(archivedDefault, MediaKind);
                         }
                         else
                         {
-                            EditedImages.Add(new ItemImage
+                            ItemImage archivedItem = new ItemImage
                             {
                                 Name = archivedFileName,
-                                FolderName = folderName,
-                                IsCover = IsCover
-                            });
+                                FolderName = folderName
+                            };
+                            BackgroundChangerDatabase.SetItemMediaKind(archivedItem, MediaKind);
+                            EditedImages.Add(archivedItem);
                         }
+                    }
+                    else if (originalDefault != null && IsPlayniteLibraryMirror(originalDefault))
+                    {
+                        Common.LogDebug(
+                            false,
+                            string.Format(
+                                "[ImagesManager] Save default swap — Playnite mirror left on disk: {0}",
+                                originalDefault.Name ?? string.Empty));
                     }
 
                     if (!newDefault.FolderName.IsNullOrEmpty() && newDefault.Exist)
@@ -323,24 +399,58 @@ namespace BackgroundChanger.Views
                     }
                 }
 
-                EditedImages.RemoveAll(IsPlayniteLibraryMirror);
+                LogSaveItemsSnapshot("after-edited", gameName, MediaKind, EditedImages);
 
                 // Saved
-                List<ItemImage> tmpList = Serialization.GetClone(GameBackgroundImages.Items.Where(x => x.IsCover != IsCover).ToList());
+                List<ItemImage> otherMediaItems = GameBackgroundImages.Items
+                    .Where(x => !BackgroundChangerDatabase.ItemMatchesMediaKind(x, MediaKind))
+                    .ToList();
+                List<ItemImage> tmpList = Serialization.GetClone(otherMediaItems);
                 tmpList.AddRange(EditedImages);
                 GameBackgroundImages.Items = tmpList;
+
+                int savedMediaCount = EditedImages.Count;
+                int otherMediaCount = otherMediaItems.Count;
+                Common.LogDebug(
+                    false,
+                    string.Format(
+                        "[ImagesManager] Save merge — game='{1}', mediaKind={2}, edited={0}, otherKinds={3}, total={4}, imported={5}, skippedMirror={6}, defaultSwap={7}",
+                        savedMediaCount,
+                        gameName,
+                        MediaKind,
+                        otherMediaCount,
+                        tmpList.Count,
+                        importedCount,
+                        skippedMirrorCount,
+                        !playniteMediaReference.IsNullOrEmpty()));
+
+                LogSaveItemsSnapshot("after-merged", gameName, MediaKind, EditedImages);
+
                 BackgroundChanger.PluginDatabase.Update(GameBackgroundImages);
+
+                Common.LogDebug(
+                    false,
+                    string.Format(
+                        "[ImagesManager] Save persisted — game='{0}', mediaKind={1}, totalItems={2}, playniteRef={3}",
+                        gameName,
+                        MediaKind,
+                        GameBackgroundImages.Items?.Count ?? 0,
+                        playniteMediaReference ?? "(none)"));
 
                 if (!playniteMediaReference.IsNullOrEmpty())
                 {
                     Game game = GameBackgroundImages.Game;
-                    if (IsCover)
+                    switch (MediaKind)
                     {
-                        game.CoverImage = playniteMediaReference;
-                    }
-                    else
-                    {
-                        game.BackgroundImage = playniteMediaReference;
+                        case BackgroundChangerDatabase.PluginMediaKind.Cover:
+                            game.CoverImage = playniteMediaReference;
+                            break;
+                        case BackgroundChangerDatabase.PluginMediaKind.Icon:
+                            game.Icon = playniteMediaReference;
+                            break;
+                        default:
+                            game.BackgroundImage = playniteMediaReference;
+                            break;
                     }
 
                     BackgroundChangerDatabase.SuppressGamesItemUpdatedPersist = true;
@@ -478,7 +588,8 @@ namespace BackgroundChanger.Views
             try
             {
                 SteamGridDbType steamGridDbType = SteamGridDbType.heroes;
-                if (IsCover)
+                if (MediaKind == BackgroundChangerDatabase.PluginMediaKind.Cover
+                    || MediaKind == BackgroundChangerDatabase.PluginMediaKind.Icon)
                 {
                     steamGridDbType = SteamGridDbType.grids;
                 }

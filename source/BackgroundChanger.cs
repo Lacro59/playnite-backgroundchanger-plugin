@@ -31,7 +31,7 @@ namespace BackgroundChanger
             // Custom elements integration
             AddCustomElementSupport(new AddCustomElementSupportArgs
             {
-                ElementList = new List<string> { "PluginBackgroundImage", "PluginCoverImage" },
+                ElementList = new List<string> { "PluginBackgroundImage", "PluginCoverImage", "PluginIconImage" },
                 SourceName = "BackgroundChanger"
             });
 
@@ -70,6 +70,11 @@ namespace BackgroundChanger
             if (args.Name == "PluginCoverImage")
             {
                 return new PluginCoverImage();
+            }
+
+            if (args.Name == "PluginIconImage")
+            {
+                return new PluginIconImage();
             }
 
             return null;

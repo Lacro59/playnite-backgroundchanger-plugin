@@ -7,6 +7,7 @@
     
     <sys:String x:Key="LOCBcManageBackground">背景画像の管理</sys:String>
     <sys:String x:Key="LOCBcManageCover">バー画像の管</sys:String>
+    <sys:String x:Key="LOCBcManageIcon">アイコンの管理</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
@@ -14,6 +15,7 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">ラグインの背景画像を表示</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">ラグインのカバー画像を表示</sys:String>
+    <sys:String x:Key="LOCBcEnableIconImage">プラグインのアイコンを表示</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">プラグインのゲーム背景をテーマ背景と同じ設定にした *。</sys:String>
     

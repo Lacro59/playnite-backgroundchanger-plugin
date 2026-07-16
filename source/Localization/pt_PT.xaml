@@ -7,6 +7,7 @@
     
     <sys:String x:Key="LOCBcManageBackground">Gerenciar imagens de fundo</sys:String>
     <sys:String x:Key="LOCBcManageCover">Gerenciar imagens de capa</sys:String>
+    <sys:String x:Key="LOCBcManageIcon">Gerir ícones</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
@@ -14,6 +15,7 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Exibir a imagem de fundo do plugin</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Exibir a imagem de capa do plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableIconImage">Exibir o ícone do plugin</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     

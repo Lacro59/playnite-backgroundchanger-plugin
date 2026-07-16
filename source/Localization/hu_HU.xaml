@@ -7,6 +7,7 @@
     
     <sys:String x:Key="LOCBcManageBackground">Háttérképek kezelése</sys:String>
     <sys:String x:Key="LOCBcManageCover">Borítóképek kezelése</sys:String>
+    <sys:String x:Key="LOCBcManageIcon">Ikonképek kezelése</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
@@ -14,6 +15,7 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">A bővítmény háttérképének megjelenítése</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">A bővítmény borítóképének megjelenítése</sys:String>
+    <sys:String x:Key="LOCBcEnableIconImage">A bővítmény ikonjának megjelenítése</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     

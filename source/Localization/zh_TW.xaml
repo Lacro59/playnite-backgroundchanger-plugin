@@ -7,6 +7,7 @@
     
     <sys:String x:Key="LOCBcManageBackground">管理背景圖像</sys:String>
     <sys:String x:Key="LOCBcManageCover">管理封面圖像</sys:String>
+    <sys:String x:Key="LOCBcManageIcon">管理圖標</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
@@ -14,6 +15,7 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Display the plugin background image</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Display the plugin cover image</sys:String>
+    <sys:String x:Key="LOCBcEnableIconImage">顯示外掛程式圖示</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
     

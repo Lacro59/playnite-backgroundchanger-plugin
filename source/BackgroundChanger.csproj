@@ -103,6 +103,9 @@
     <Compile Include="Controls\MediaControlDiagnostics.cs" />
     <Compile Include="Controls\MediaThemeSyncWindowHandler.cs" />
     <Compile Include="Controls\PluginMediaLifecycleControlBase.cs" />
+    <Compile Include="Controls\PluginIconImage.xaml.cs">
+      <DependentUpon>PluginIconImage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\PluginCoverImage.xaml.cs">
       <DependentUpon>PluginCoverImage.xaml</DependentUpon>
     </Compile>
@@ -192,6 +195,10 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Include="Controls\PluginIconImage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Controls\PluginCoverImage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

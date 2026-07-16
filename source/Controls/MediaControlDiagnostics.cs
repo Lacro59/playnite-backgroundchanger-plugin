@@ -6,7 +6,7 @@ using System.IO;
 namespace BackgroundChanger.Controls
 {
     /// <summary>
-    /// Shared diagnostics helper for <see cref="PluginBackgroundImage"/> and <see cref="PluginCoverImage"/>.
+    /// Shared diagnostics helper for <see cref="PluginBackgroundImage"/>, <see cref="PluginCoverImage"/>, and <see cref="PluginIconImage"/>.
     /// Provides unified log detail formatting, filename sanitization, and Stopwatch scopes.
     /// </summary>
     public static class MediaControlDiagnostics

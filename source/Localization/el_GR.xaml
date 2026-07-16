@@ -7,6 +7,7 @@
     
     <sys:String x:Key="LOCBcManageBackground">Διαχείριση εικόνων φόντου</sys:String>
     <sys:String x:Key="LOCBcManageCover">Διαχείριση εικόνων εξωφύλλου</sys:String>
+    <sys:String x:Key="LOCBcManageIcon">Διαχείριση εικονιδίων</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
@@ -14,6 +15,7 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Εμφάνιση της εικόνας φόντου του πρόσθετου</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Εμφάνιση εικόνας εξώφυλλου πρόσθετου</sys:String>
+    <sys:String x:Key="LOCBcEnableIconImage">Εμφάνιση εικονιδίου πρόσθετου</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">Χρήση της ίδιας ρύθμισης για το φόντο του παιχνιδιού από το πρόσθετο, παρά από το φόντο του θέματος</sys:String>
     

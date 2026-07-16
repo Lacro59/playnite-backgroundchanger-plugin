@@ -1,0 +1,39 @@
+<lifecycle:PluginMediaLifecycleControlBase
+        xmlns:controls="clr-namespace:CommonPluginsShared.Controls"
+        x:Class="BackgroundChanger.Controls.PluginIconImage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:local="clr-namespace:BackgroundChanger.Controls"
+        xmlns:lifecycle="clr-namespace:BackgroundChangerPlugin.Controls"
+        xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:PluginIconImageDataContext, IsDesignTimeCreatable=True}"
+        MinHeight="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MinHeight}"
+        Height="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Height}"
+        MaxHeight="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MaxHeight}"
+        MinWidth="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MinWidth}"
+        Width="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Width}"
+        MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MaxWidth}"
+        HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=HorizontalAlignment}"
+        VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=VerticalAlignment}">
+
+    <Grid Name="ImageHolder" Loaded="ImageHolder_Loaded">
+        <controls:ImageAsync x:Name="Image1"
+                             HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
+                             VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}"
+                             Parameter="0"
+                             RenderOptions.BitmapScalingMode="Fant"
+                             Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                             StretchDirection="{Binding StretchDirection, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                             Source="{Binding ImageSource}" />
+
+        <MediaElement x:Name="Video1" pbeh:MediaElementBehaviors.Repeat="True" Volume="0"
+                      Source="{Binding VideoSource, IsAsync=True}"
+                      Stretch="{Binding Stretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      StretchDirection="{Binding StretchDirection, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      OpacityMask="{Binding ImageOpacityMask, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=HorizontalAlignment}"
+                      VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=VerticalAlignment}" />
+    </Grid>
+</lifecycle:PluginMediaLifecycleControlBase>

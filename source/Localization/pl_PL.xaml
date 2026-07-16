@@ -7,6 +7,7 @@
     
     <sys:String x:Key="LOCBcManageBackground">Zarządzaj obrazami tła</sys:String>
     <sys:String x:Key="LOCBcManageCover">Zarządzaj obrazkami okładek</sys:String>
+    <sys:String x:Key="LOCBcManageIcon">Zarządzaj ikonami</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
@@ -14,6 +15,7 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Wyświetlaj obraz tła wtyczki</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Wyświetlaj obraz okładki wtyczki</sys:String>
+    <sys:String x:Key="LOCBcEnableIconImage">Wyświetlaj ikonę wtyczki</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">Użyto tego samego ustawienia dla tła gry wtyczki co dla tła motywu *</sys:String>
     

@@ -57,6 +57,25 @@ namespace BackgroundChanger
         public int CoverImageAutoChangerTimer { get => coverImageAutoChangerTimer; set => SetValue(ref coverImageAutoChangerTimer, value); }
 
 
+        private bool enableIconImage = false;
+        public bool EnableIconImage { get => enableIconImage; set => SetValue(ref enableIconImage, value); }
+
+        private bool enableIconImageRandomSelect = false;
+        public bool EnableIconImageRandomSelect { get => enableIconImageRandomSelect; set => SetValue(ref enableIconImageRandomSelect, value); }
+
+        private bool enableIconImageRandomOnStart = true;
+        public bool EnableIconImageRandomOnStart { get => enableIconImageRandomOnStart; set => SetValue(ref enableIconImageRandomOnStart, value); }
+
+        private bool enableIconImageRandomOnSelect = false;
+        public bool EnableIconImageRandomOnSelect { get => enableIconImageRandomOnSelect; set => SetValue(ref enableIconImageRandomOnSelect, value); }
+
+        private bool enableIconImageAutoChanger = false;
+        public bool EnableIconImageAutoChanger { get => enableIconImageAutoChanger; set => SetValue(ref enableIconImageAutoChanger, value); }
+
+        private int iconImageAutoChangerTimer = 10;
+        public int IconImageAutoChangerTimer { get => iconImageAutoChangerTimer; set => SetValue(ref iconImageAutoChangerTimer, value); }
+
+
         public string SteamGridDbApiKey { get; set; } = string.Empty;
 
 
@@ -159,6 +178,10 @@ namespace BackgroundChanger
         [DontSerialize]
         public bool HasDataCover { get => hasDataCover; set => SetValue(ref hasDataCover, value); }
 
+        private bool hasDataIcon = false;
+        [DontSerialize]
+        public bool HasDataIcon { get => hasDataIcon; set => SetValue(ref hasDataIcon, value); }
+
         private bool backgroundIsVideo = false;
         [DontSerialize]
         public bool BackgroundIsVideo { get => backgroundIsVideo; set => SetValue(ref backgroundIsVideo, value); }
@@ -221,6 +244,17 @@ namespace BackgroundChanger
 
             Settings.EnableCoverImageRandomOnSelect = BackgroundChangerSettingsView.CoverOnSelect;
             Settings.EnableCoverImageRandomOnStart = BackgroundChangerSettingsView.CoverOnStart;
+
+            if (Settings.EnableIconImageAutoChanger)
+            {
+                Settings.EnableIconImageRandomOnStart = false;
+            }
+            else if (Settings.EnableIconImageRandomSelect)
+            {
+                Settings.EnableIconImageRandomOnStart = true;
+            }
+
+            Settings.EnableIconImageRandomOnSelect = false;
 
             Plugin.SavePluginSettings(Settings);
         }

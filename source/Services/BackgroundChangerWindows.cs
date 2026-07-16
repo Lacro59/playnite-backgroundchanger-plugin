@@ -14,7 +14,7 @@ namespace BackgroundChanger.Services
         {
         }
 
-        public void ShowImagesManagerWindow(Game game, bool isCover, BackgroundChanger plugin)
+        public void ShowImagesManagerWindow(Game game, BackgroundChangerDatabase.PluginMediaKind mediaKind, BackgroundChanger plugin)
         {
             if (game == null)
             {
@@ -28,14 +28,39 @@ namespace BackgroundChanger.Services
                 return;
             }
 
-            ImagesManager viewExtension = new ImagesManager(gameData, isCover, plugin);
+            ImagesManager viewExtension = new ImagesManager(gameData, mediaKind, plugin);
+            string mediaTitleKey;
+            switch (mediaKind)
+            {
+                case BackgroundChangerDatabase.PluginMediaKind.Cover:
+                    mediaTitleKey = "LOCGameCoverImageTitle";
+                    break;
+                case BackgroundChangerDatabase.PluginMediaKind.Icon:
+                    mediaTitleKey = "LOCGameIconTitle";
+                    break;
+                default:
+                    mediaTitleKey = "LOCGameBackgroundTitle";
+                    break;
+            }
+
             string title = string.Format(
                 "{0} - {1}",
                 ResourceProvider.GetString("LOCBc"),
-                ResourceProvider.GetString(isCover ? "LOCGameCoverImageTitle" : "LOCGameBackgroundTitle"));
+                ResourceProvider.GetString(mediaTitleKey));
 
             Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(title, viewExtension);
             _ = windowExtension.ShowDialog();
+        }
+
+        /// <summary>
+        /// Opens the images manager for background or cover (legacy bool discriminant).
+        /// </summary>
+        public void ShowImagesManagerWindow(Game game, bool isCover, BackgroundChanger plugin)
+        {
+            ShowImagesManagerWindow(
+                game,
+                isCover ? BackgroundChangerDatabase.PluginMediaKind.Cover : BackgroundChangerDatabase.PluginMediaKind.Background,
+                plugin);
         }
     }
 }
