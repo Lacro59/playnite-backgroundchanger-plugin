@@ -84,6 +84,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="10" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0">
@@ -179,6 +180,24 @@
                                     Click="SavedFilter_Click"
                                     Margin="10,0,0,0" />
                         </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="3"
+                          x:Name="PART_MimesFilterRow"
+                          Margin="0,10,0,0"
+                          Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" MinWidth="200" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0"
+                               Margin="0,0,10,0"
+                               Content="{DynamicResource LOCBcSteamGridDbMimes}"
+                               VerticalAlignment="Center" />
+                        <filtercontrols:CheckListFilterBox Grid.Column="1"
+                                                     x:Name="PART_FilterMimes"
+                                                     FilterChanged="ApplyFilter" />
                     </Grid>
                 </Grid>
 

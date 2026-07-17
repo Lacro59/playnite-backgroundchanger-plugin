@@ -587,14 +587,12 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                SteamGridDbType steamGridDbType = SteamGridDbType.heroes;
-                if (MediaKind == BackgroundChangerDatabase.PluginMediaKind.Cover
-                    || MediaKind == BackgroundChangerDatabase.PluginMediaKind.Icon)
-                {
-                    steamGridDbType = SteamGridDbType.grids;
-                }
+                Common.LogDebug(false, string.Format(
+                    "[ImagesManager] Open SteamGridDB game={0} mediaKind={1}",
+                    GameBackgroundImages.Name,
+                    MediaKind));
 
-                SteamGridDbView viewExtension = new SteamGridDbView(GameBackgroundImages.Name, steamGridDbType, Plugin);
+                SteamGridDbView viewExtension = new SteamGridDbView(GameBackgroundImages.Name, MediaKind, Plugin);
                 Window windowExtension = PlayniteUiHelper.CreateExtensionWindow("SteamGridDB", viewExtension);
                 _ = windowExtension.ShowDialog();
 

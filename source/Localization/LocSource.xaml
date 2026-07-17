@@ -37,6 +37,7 @@
 
     <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbAnimated">Animated</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbMimes">MIME types</sys:String>
     <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
     <sys:String x:Key="LOCBcAddFromUrl">Add from url</sys:String>
     <sys:String x:Key="LOCBcAddFromUrlDescription">Enter the url to the image</sys:String>

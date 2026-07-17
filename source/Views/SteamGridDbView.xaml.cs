@@ -24,20 +24,31 @@ namespace BackgroundChanger.Views
         private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
 
         private SteamGridDbApi SteamGridDbApi { get; set; } = new SteamGridDbApi();
-        private SteamGridDbType SteamGridDbType { get; set; }
+        private BackgroundChangerDatabase.PluginMediaKind MediaKind { get; }
+        private SteamGridFilterSlot FilterSlot { get; }
+        private SteamGridDbType SteamGridDbType { get; }
 
         public List<SteamGridDbResult> SteamGridDbResults { get; set; }
 
         private SteamGridDbResultData DataSearch { get; set; } = null;
         private List<SteamGridDbResult> DataSearchFiltered { get; set; } = null;
+        private int? SelectedGameId { get; set; }
 
 
-        public SteamGridDbView(string name, SteamGridDbType steamGridDbType, BackgroundChanger plugin)
+        /// <summary>
+        /// Opens the SteamGridDB browser for the given game name and media context.
+        /// </summary>
+        /// <param name="name">Game name used for the initial search.</param>
+        /// <param name="mediaKind">Background, cover, or icon — drives API type and persisted filters.</param>
+        /// <param name="plugin">Plugin instance for settings persistence.</param>
+        public SteamGridDbView(string name, BackgroundChangerDatabase.PluginMediaKind mediaKind, BackgroundChanger plugin)
         {
             InitializeComponent();
 
             Plugin = plugin;
-            SteamGridDbType = steamGridDbType;
+            MediaKind = mediaKind;
+            FilterSlot = SteamGridFilterHelper.ResolveFilterSlot(mediaKind);
+            SteamGridDbType = SteamGridFilterHelper.ResolveApiType(mediaKind);
 
             SearchElement.Text = name;
             LoadFilters();
@@ -46,21 +57,33 @@ namespace BackgroundChanger.Views
 
         private void LoadFilters()
         {
-            SteamGridFilters savedFilters = SteamGridDbType == SteamGridDbType.heroes
-                ? PluginDatabase.PluginSettings.SgHeroesFilters
-                : PluginDatabase.PluginSettings.SgGridsFilters;
-
+            SteamGridFilters savedFilters = SteamGridFilterHelper.GetFilters(PluginDatabase.PluginSettings, FilterSlot);
             SteamGridFilters normalizedFilters = SteamGridFilterHelper.NormalizeFilters(savedFilters, SteamGridDbType);
 
             PART_FilterDimensions.ItemsSource = normalizedFilters.CheckDimensions;
             PART_FilterStyles.ItemsSource = normalizedFilters.CheckStyles;
             PART_FilterTypes.ItemsSource = normalizedFilters.CheckTypes;
             PART_FilterTags.ItemsSource = normalizedFilters.CheckTags;
+            PART_FilterMimes.ItemsSource = normalizedFilters.CheckMimes;
 
             PART_ButtonSortByDate_Asc.IsChecked = normalizedFilters.SortByDateAsc;
             PART_ButtonSortByDate_Desc.IsChecked = !normalizedFilters.SortByDateAsc;
 
+            ApplyContextualFilterPanels();
             RefreshFilterSummaries();
+
+            Common.LogDebug(false, string.Format(
+                "[SteamGridDbView] LoadFilters mediaKind={0} slot={1} apiType={2} active={3}",
+                MediaKind,
+                FilterSlot,
+                SteamGridDbType,
+                SteamGridFilterHelper.BuildActiveFiltersDebugSummary(normalizedFilters)));
+        }
+
+        private void ApplyContextualFilterPanels()
+        {
+            bool isIconContext = SteamGridDbType == SteamGridDbType.icons;
+            PART_MimesFilterRow.Visibility = isIconContext ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void RefreshFilterSummaries()
@@ -69,6 +92,10 @@ namespace BackgroundChanger.Views
             PART_FilterStyles.RefreshSummary();
             PART_FilterTypes.RefreshSummary();
             PART_FilterTags.RefreshSummary();
+            if (SteamGridDbType == SteamGridDbType.icons)
+            {
+                PART_FilterMimes.RefreshSummary();
+            }
         }
 
 
@@ -101,16 +128,34 @@ namespace BackgroundChanger.Views
 
         private void SearchDataElements(int id)
         {
+            SelectedGameId = id;
+            RefetchDataElements(id, "gameSelected");
+        }
+
+        private void RefetchDataElements(int id, string reason)
+        {
             PART_ElementList.ItemsSource = null;
             ButtonSelect.IsEnabled = false;
 
             DataSearch = null;
+            SteamGridFilters activeFilters = CollectActiveFiltersFromUi();
+
+            Common.LogDebug(false, string.Format(
+                "[SteamGridDbView] Refetch reason={0} gameId={1} mediaKind={2} slot={3} apiType={4} active={5} url={6}",
+                reason,
+                id,
+                MediaKind,
+                FilterSlot,
+                SteamGridDbType,
+                SteamGridFilterHelper.BuildActiveFiltersDebugSummary(activeFilters),
+                SteamGridDbApi.BuildSearchUrl(id, SteamGridDbType, activeFilters, 0)));
+
+            int pagesFetched = 0;
             if (API.Instance.Dialogs.ActivateGlobalProgress((_) =>
             {
                 try
                 {
-                    SteamGridDbResultData steamGridDbResultData = null;
-                    steamGridDbResultData = SteamGridDbApi.SearchElement(id, SteamGridDbType);
+                    SteamGridDbResultData steamGridDbResultData = SteamGridDbApi.SearchElement(id, SteamGridDbType, activeFilters);
                     DataSearch = new SteamGridDbResultData
                     {
                         Data = new List<SteamGridDbResult>()
@@ -120,8 +165,9 @@ namespace BackgroundChanger.Views
                     while (steamGridDbResultData?.Data?.Count > 0)
                     {
                         DataSearch.Data.AddRange(steamGridDbResultData.Data);
+                        pagesFetched++;
                         page++;
-                        steamGridDbResultData = SteamGridDbApi.SearchElement(id, SteamGridDbType, page);
+                        steamGridDbResultData = SteamGridDbApi.SearchElement(id, SteamGridDbType, activeFilters, page);
                     }
                 }
                 catch (Exception ex)
@@ -130,12 +176,35 @@ namespace BackgroundChanger.Views
                 }
             }, new GlobalProgressOptions("LOCDownloadingLabel")).Result == true)
             {
-                ButtonSelectAll.IsEnabled = DataSearch?.Data?.Count > 0;
+                int fetchedCount = DataSearch?.Data?.Count ?? 0;
+                Common.LogDebug(false, string.Format(
+                    "[SteamGridDbView] Refetch done reason={0} gameId={1} pages={2} fetched={3}",
+                    reason,
+                    id,
+                    pagesFetched,
+                    fetchedCount));
+
+                ButtonSelectAll.IsEnabled = fetchedCount > 0;
                 if (DataSearch != null)
                 {
-                    ApplyFilter(null, null);
+                    ApplyDisplayFilter();
                 }
             }
+        }
+
+        private SteamGridFilters CollectActiveFiltersFromUi()
+        {
+            return new SteamGridFilters
+            {
+                CheckDimensions = PART_FilterDimensions.ItemsSource,
+                CheckStyles = PART_FilterStyles.ItemsSource,
+                CheckTypes = PART_FilterTypes.ItemsSource,
+                CheckTags = PART_FilterTags.ItemsSource,
+                CheckMimes = SteamGridDbType == SteamGridDbType.icons
+                    ? PART_FilterMimes.ItemsSource
+                    : null,
+                SortByDateAsc = PART_ButtonSortByDate_Asc.IsChecked == true
+            };
         }
 
 
@@ -212,22 +281,26 @@ namespace BackgroundChanger.Views
 
         private void ApplyFilter(object sender, RoutedEventArgs e)
         {
+            if (sender != null && SelectedGameId.HasValue)
+            {
+                RefetchDataElements(SelectedGameId.Value, "filterChanged");
+                return;
+            }
+
+            ApplyDisplayFilter();
+        }
+
+        /// <summary>
+        /// Client-side pass after server fetch: tag OR-filter, static/animated edge cases, sort.
+        /// </summary>
+        private void ApplyDisplayFilter()
+        {
             DataSearchFiltered = null;
             PART_TotalFound.Content = "0";
 
             if (DataSearch != null)
             {
                 DataSearchFiltered = Serialization.GetClone(DataSearch.Data);
-
-                List<CheckData> listDimensions = PART_FilterDimensions.ItemsSource;
-                DataSearchFiltered = DataSearchFiltered
-                    .Where(x => listDimensions.Any(y => (x.Width + "x" + x.Height) == y.Data && y.IsChecked))
-                    .ToList();
-
-                List<CheckData> listStyles = PART_FilterStyles.ItemsSource;
-                DataSearchFiltered = DataSearchFiltered
-                    .Where(x => listStyles.Any(y => x.Style == y.Data && y.IsChecked))
-                    .ToList();
 
                 List<CheckData> listTags = PART_FilterTags.ItemsSource;
                 bool humor = IsFilterChecked(listTags, "Humor");
@@ -259,6 +332,10 @@ namespace BackgroundChanger.Views
             if (DataSearchFiltered != null)
             {
                 PART_TotalFound.Content = DataSearchFiltered.Count;
+                Common.LogDebug(false, string.Format(
+                    "[SteamGridDbView] DisplayFilter fetched={0} displayed={1}",
+                    DataSearch?.Data?.Count ?? 0,
+                    DataSearchFiltered.Count));
                 LogThumbnailStats(DataSearchFiltered);
             }
 
@@ -338,11 +415,19 @@ namespace BackgroundChanger.Views
             PART_FilterStyles.ItemsSource = defaultFilters.CheckStyles;
             PART_FilterTypes.ItemsSource = defaultFilters.CheckTypes;
             PART_FilterTags.ItemsSource = defaultFilters.CheckTags;
+            PART_FilterMimes.ItemsSource = defaultFilters.CheckMimes;
 
             PART_ButtonSortByDate_Asc.IsChecked = false;
             PART_ButtonSortByDate_Desc.IsChecked = true;
 
-            ApplyFilter(null, null);
+            if (SelectedGameId.HasValue)
+            {
+                RefetchDataElements(SelectedGameId.Value, "clearFilters");
+            }
+            else
+            {
+                ApplyDisplayFilter();
+            }
         }
 
         private void SavedFilter_Click(object sender, RoutedEventArgs e)
@@ -353,20 +438,21 @@ namespace BackgroundChanger.Views
                 CheckStyles = Serialization.GetClone(PART_FilterStyles.ItemsSource),
                 CheckTypes = Serialization.GetClone(PART_FilterTypes.ItemsSource),
                 CheckTags = Serialization.GetClone(PART_FilterTags.ItemsSource),
+                CheckMimes = SteamGridDbType == SteamGridDbType.icons
+                    ? Serialization.GetClone(PART_FilterMimes.ItemsSource)
+                    : null,
                 SortByDateAsc = PART_ButtonSortByDate_Asc.IsChecked == true
             };
 
-            if (SteamGridDbType == SteamGridDbType.heroes)
-            {
-                PluginDatabase.PluginSettings.SgHeroesFilters = filters;
-            }
-            else
-            {
-                PluginDatabase.PluginSettings.SgGridsFilters = filters;
-            }
-
+            SteamGridFilterHelper.SetFilters(PluginDatabase.PluginSettings, FilterSlot, filters);
             Plugin.SavePluginSettings(PluginDatabase.PluginSettings);
             RefreshFilterSummaries();
+
+            Common.LogDebug(false, string.Format(
+                "[SteamGridDbView] SavedFilter slot={0} mediaKind={1} active={2}",
+                FilterSlot,
+                MediaKind,
+                SteamGridFilterHelper.BuildActiveFiltersDebugSummary(filters)));
         }
     }
 }

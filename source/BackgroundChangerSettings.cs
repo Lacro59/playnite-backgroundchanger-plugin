@@ -1,4 +1,5 @@
 ﻿using BackgroundChanger.Models;
+using BackgroundChanger.Services;
 using BackgroundChanger.Views;
 using CommonPluginsShared.Interfaces;
 using CommonPluginsShared.Plugins;
@@ -251,6 +252,11 @@ namespace BackgroundChanger
             }
         };
 
+        /// <summary>
+        /// Persisted SteamGridDB filter preferences for icon browse (API icons). Null after upgrade until <see cref="SteamGridFilterHelper.EnsureFilterSlots"/> runs.
+        /// </summary>
+        public SteamGridFilters SgIconsFilters;
+
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
         #region Variables exposed
@@ -307,6 +313,7 @@ namespace BackgroundChanger
             }
 
             settings.CoerceExclusiveMediaSelectionModes();
+            SteamGridFilterHelper.EnsureFilterSlots(settings);
         }
 
         // Code executed when settings view is opened and user starts editing values.
@@ -388,6 +395,11 @@ namespace BackgroundChanger
         public List<CheckData> CheckStyles { get; set; }
         public List<CheckData> CheckTypes { get; set; }
         public List<CheckData> CheckTags { get; set; }
+
+        /// <summary>
+        /// MIME type filters for SteamGridDB icons (<c>image/png</c>, <c>image/vnd.microsoft.icon</c>). Unused for grids/heroes.
+        /// </summary>
+        public List<CheckData> CheckMimes { get; set; }
 
         public bool SortByDateAsc { get; set; }
     }

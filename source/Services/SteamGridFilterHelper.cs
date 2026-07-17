@@ -1,85 +1,178 @@
+using BackgroundChanger;
 using BackgroundChanger.Models;
+using CommonPluginsShared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Text;
 using SteamGridFilters = BackgroundChanger.SteamGridFilters;
 
 namespace BackgroundChanger.Services
 {
+    /// <summary>
+    /// Persisted SteamGridDB filter bucket (one slot per <see cref="BackgroundChangerDatabase.PluginMediaKind"/>).
+    /// </summary>
+    public enum SteamGridFilterSlot
+    {
+        /// <summary>Cover art — API grids.</summary>
+        Grids,
+
+        /// <summary>Background heroes — API heroes.</summary>
+        Heroes,
+
+        /// <summary>Game icons — API icons.</summary>
+        Icons
+    }
+
     /// <summary>
     /// Builds default SteamGridDB filter lists and merges persisted selections without duplicates.
     /// </summary>
     public static class SteamGridFilterHelper
     {
         /// <summary>
+        /// Maps a plugin media kind to the SteamGridDB API asset type.
+        /// </summary>
+        /// <param name="mediaKind">Background, cover, or icon context.</param>
+        /// <returns>The corresponding <see cref="SteamGridDbType"/>.</returns>
+        public static SteamGridDbType ResolveApiType(BackgroundChangerDatabase.PluginMediaKind mediaKind)
+        {
+            switch (mediaKind)
+            {
+                case BackgroundChangerDatabase.PluginMediaKind.Background:
+                    return SteamGridDbType.heroes;
+                case BackgroundChangerDatabase.PluginMediaKind.Cover:
+                    return SteamGridDbType.grids;
+                case BackgroundChangerDatabase.PluginMediaKind.Icon:
+                    return SteamGridDbType.icons;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mediaKind), mediaKind, null);
+            }
+        }
+
+        /// <summary>
+        /// Maps a plugin media kind to the settings filter slot used for load/save.
+        /// </summary>
+        /// <param name="mediaKind">Background, cover, or icon context.</param>
+        /// <returns>The persisted filter bucket identifier.</returns>
+        public static SteamGridFilterSlot ResolveFilterSlot(BackgroundChangerDatabase.PluginMediaKind mediaKind)
+        {
+            switch (mediaKind)
+            {
+                case BackgroundChangerDatabase.PluginMediaKind.Background:
+                    return SteamGridFilterSlot.Heroes;
+                case BackgroundChangerDatabase.PluginMediaKind.Cover:
+                    return SteamGridFilterSlot.Grids;
+                case BackgroundChangerDatabase.PluginMediaKind.Icon:
+                    return SteamGridFilterSlot.Icons;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mediaKind), mediaKind, null);
+            }
+        }
+
+        /// <summary>
+        /// Maps a filter slot to the SteamGridDB API asset type.
+        /// </summary>
+        /// <param name="filterSlot">Persisted filter bucket.</param>
+        /// <returns>The corresponding <see cref="SteamGridDbType"/>.</returns>
+        public static SteamGridDbType ResolveApiType(SteamGridFilterSlot filterSlot)
+        {
+            switch (filterSlot)
+            {
+                case SteamGridFilterSlot.Heroes:
+                    return SteamGridDbType.heroes;
+                case SteamGridFilterSlot.Grids:
+                    return SteamGridDbType.grids;
+                case SteamGridFilterSlot.Icons:
+                    return SteamGridDbType.icons;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(filterSlot), filterSlot, null);
+            }
+        }
+
+        /// <summary>
         /// Returns the canonical default filter lists for the given SteamGridDB asset type.
         /// </summary>
-        /// <param name="steamGridDbType">Heroes (backgrounds) or grids (covers).</param>
+        /// <param name="steamGridDbType">Heroes, grids, or icons.</param>
         public static SteamGridFilters CreateDefaultFilters(SteamGridDbType steamGridDbType)
         {
-            if (steamGridDbType == SteamGridDbType.heroes)
+            switch (steamGridDbType)
             {
-                return new SteamGridFilters
-                {
-                    CheckDimensions = new List<CheckData>
-                    {
-                        new CheckData { Name = "Steam - 96:31 - 1920x620", Data = "1920x620" },
-                        new CheckData { Name = "Steam - 96:31 - 3840x1240", Data = "3840x1240" },
-                        new CheckData { Name = "Galaxy 2.0 - 32:13 - 1600x650", Data = "1600x650" }
-                    },
-                    CheckStyles = new List<CheckData>
-                    {
-                        new CheckData { Name = "Alternate", Data = "alternate" },
-                        new CheckData { Name = "Material", Data = "material" },
-                        new CheckData { Name = "Blurred", Data = "blurred" }
-                    },
-                    CheckTypes = new List<CheckData>
-                    {
-                        new CheckData { Name = "Static", Data = "static" },
-                        new CheckData { Name = "Animated", Data = "animated" }
-                    },
-                    CheckTags = new List<CheckData>
-                    {
-                        new CheckData { Name = "Humor", Data = "Humor" },
-                        new CheckData { Name = "Adult Content", Data = "Adult Content", IsChecked = false },
-                        new CheckData { Name = "Epilepsy", Data = "Epilepsy" },
-                        new CheckData { Name = "Untagged", Data = "Untagged" }
-                    }
-                };
+                case SteamGridDbType.heroes:
+                    return CreateDefaultHeroesFilters();
+                case SteamGridDbType.icons:
+                    return CreateDefaultIconsFilters();
+                case SteamGridDbType.grids:
+                    return CreateDefaultGridsFilters();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(steamGridDbType), steamGridDbType, null);
+            }
+        }
+
+        /// <summary>
+        /// Ensures all SteamGridDB filter slots exist after settings load (migration from two-slot JSON).
+        /// </summary>
+        /// <param name="settings">Plugin settings instance.</param>
+        public static void EnsureFilterSlots(BackgroundChangerSettings settings)
+        {
+            if (settings == null)
+            {
+                return;
             }
 
-            return new SteamGridFilters
+            if (settings.SgIconsFilters == null)
             {
-                CheckDimensions = new List<CheckData>
-                {
-                    new CheckData { Name = "Steam Vertical - 2:3 - 600x900", Data = "600x900" },
-                    new CheckData { Name = "Steam Horizontal - 92:43 - 920x430", Data = "920x430" },
-                    new CheckData { Name = "Steam Horizontal - 92:43 - 460x215", Data = "460x215" },
-                    new CheckData { Name = "Square - 1:1 - 1024x1024", Data = "1024x1024" },
-                    new CheckData { Name = "Square - 1:1 - 512x512", Data = "512x512" },
-                    new CheckData { Name = "Galaxy 2.0 - 22:31 - 660x930", Data = "660x930" },
-                    new CheckData { Name = "Galaxy 2.0 - 22:31 - 342x482", Data = "342x482" }
-                },
-                CheckStyles = new List<CheckData>
-                {
-                    new CheckData { Name = "Alternate", Data = "alternate" },
-                    new CheckData { Name = "White Logo", Data = "white_logo" },
-                    new CheckData { Name = "Material", Data = "material" },
-                    new CheckData { Name = "Blurred", Data = "blurred" },
-                    new CheckData { Name = "No Logo", Data = "no_logo" }
-                },
-                CheckTypes = new List<CheckData>
-                {
-                    new CheckData { Name = "Static", Data = "static" },
-                    new CheckData { Name = "Animated", Data = "animated" }
-                },
-                CheckTags = new List<CheckData>
-                {
-                    new CheckData { Name = "Humor", Data = "Humor" },
-                    new CheckData { Name = "Adult Content", Data = "Adult Content", IsChecked = false },
-                    new CheckData { Name = "Epilepsy", Data = "Epilepsy" },
-                    new CheckData { Name = "Untagged", Data = "Untagged" }
-                }
-            };
+                settings.SgIconsFilters = CreateDefaultFilters(SteamGridDbType.icons);
+                Common.LogDebug(false, "[SteamGridFilterHelper] Migrated SgIconsFilters to icon defaults (legacy two-slot settings JSON)");
+            }
+        }
+
+        /// <summary>
+        /// Gets the persisted filter bucket for the given slot.
+        /// </summary>
+        /// <param name="settings">Plugin settings instance.</param>
+        /// <param name="filterSlot">Grids, heroes, or icons slot.</param>
+        public static SteamGridFilters GetFilters(BackgroundChangerSettings settings, SteamGridFilterSlot filterSlot)
+        {
+            EnsureFilterSlots(settings);
+
+            switch (filterSlot)
+            {
+                case SteamGridFilterSlot.Heroes:
+                    return settings.SgHeroesFilters;
+                case SteamGridFilterSlot.Grids:
+                    return settings.SgGridsFilters;
+                case SteamGridFilterSlot.Icons:
+                    return settings.SgIconsFilters;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(filterSlot), filterSlot, null);
+            }
+        }
+
+        /// <summary>
+        /// Assigns the persisted filter bucket for the given slot.
+        /// </summary>
+        /// <param name="settings">Plugin settings instance.</param>
+        /// <param name="filterSlot">Grids, heroes, or icons slot.</param>
+        /// <param name="filters">Filter lists to persist.</param>
+        public static void SetFilters(BackgroundChangerSettings settings, SteamGridFilterSlot filterSlot, SteamGridFilters filters)
+        {
+            EnsureFilterSlots(settings);
+
+            switch (filterSlot)
+            {
+                case SteamGridFilterSlot.Heroes:
+                    settings.SgHeroesFilters = filters;
+                    break;
+                case SteamGridFilterSlot.Grids:
+                    settings.SgGridsFilters = filters;
+                    break;
+                case SteamGridFilterSlot.Icons:
+                    settings.SgIconsFilters = filters;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(filterSlot), filterSlot, null);
+            }
         }
 
         /// <summary>
@@ -119,8 +212,115 @@ namespace BackgroundChanger.Services
                 CheckStyles = MergeWithDefaults(saved?.CheckStyles, defaults.CheckStyles),
                 CheckTypes = MergeWithDefaults(saved?.CheckTypes, defaults.CheckTypes),
                 CheckTags = MergeWithDefaults(saved?.CheckTags, defaults.CheckTags),
+                CheckMimes = defaults.CheckMimes != null
+                    ? MergeWithDefaults(saved?.CheckMimes, defaults.CheckMimes)
+                    : null,
                 SortByDateAsc = saved?.SortByDateAsc ?? defaults.SortByDateAsc
             };
+        }
+
+        /// <summary>
+        /// Builds the query string for a SteamGridDB asset search from active UI filter selections.
+        /// </summary>
+        /// <param name="assetType">Grids, heroes, or icons.</param>
+        /// <param name="filters">Active filter lists (checked items are serialized).</param>
+        /// <param name="page">Pagination index.</param>
+        public static string BuildSearchQueryString(SteamGridDbType assetType, SteamGridFilters filters, int page)
+        {
+            if (filters == null)
+            {
+                filters = CreateDefaultFilters(assetType);
+            }
+
+            StringBuilder query = new StringBuilder();
+
+            AppendQueryParam(query, "dimensions", JoinCheckedData(filters.CheckDimensions));
+            AppendQueryParam(query, "styles", JoinCheckedData(filters.CheckStyles));
+
+            string mimes = assetType == SteamGridDbType.icons
+                ? JoinCheckedData(filters.CheckMimes)
+                : "image/png,image/webp,image/jpeg";
+            AppendQueryParam(query, "mimes", mimes);
+
+            string types = JoinCheckedData(filters.CheckTypes);
+            AppendQueryParam(query, "types", string.IsNullOrEmpty(types) ? "static,animated" : types);
+
+            // Tag OR-logic stays client-side; broad fetch matches legacy behaviour.
+            AppendQueryParam(query, "nsfw", "any");
+            AppendQueryParam(query, "humor", "any");
+            AppendQueryParam(query, "epilepsy", "any");
+            AppendQueryParam(query, "page", page.ToString());
+
+            return query.ToString();
+        }
+
+        /// <summary>
+        /// Compact summary of checked filter values for debug logging during smoke tests.
+        /// </summary>
+        public static string BuildActiveFiltersDebugSummary(SteamGridFilters filters)
+        {
+            if (filters == null)
+            {
+                return "filters=null";
+            }
+
+            return string.Format(
+                "dimensions=[{0}] styles=[{1}] types=[{2}] mimes=[{3}] tags=[{4}]",
+                JoinCheckedData(filters.CheckDimensions) ?? "-",
+                JoinCheckedData(filters.CheckStyles) ?? "-",
+                JoinCheckedData(filters.CheckTypes) ?? "-",
+                JoinCheckedData(filters.CheckMimes) ?? "-",
+                JoinCheckedData(filters.CheckTags) ?? "-");
+        }
+
+        /// <summary>
+        /// Returns the API resource segment for the given asset type (<c>grids</c>, <c>heroes</c>, <c>icons</c>).
+        /// </summary>
+        public static string ResolveApiResource(SteamGridDbType assetType)
+        {
+            switch (assetType)
+            {
+                case SteamGridDbType.grids:
+                    return "grids";
+                case SteamGridDbType.heroes:
+                    return "heroes";
+                case SteamGridDbType.icons:
+                    return "icons";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(assetType), assetType, null);
+            }
+        }
+
+        private static void AppendQueryParam(StringBuilder query, string name, string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return;
+            }
+
+            if (query.Length > 0)
+            {
+                query.Append('&');
+            }
+
+            query.Append(name);
+            query.Append('=');
+            query.Append(WebUtility.UrlEncode(value));
+        }
+
+        private static string JoinCheckedData(List<CheckData> items)
+        {
+            if (items == null || items.Count == 0)
+            {
+                return null;
+            }
+
+            List<string> values = items
+                .Where(x => x.IsChecked && !string.IsNullOrEmpty(x.Data))
+                .Select(x => x.Data)
+                .ToList();
+
+            return values.Count > 0 ? string.Join(",", values) : null;
         }
 
         /// <summary>
@@ -142,6 +342,113 @@ namespace BackgroundChanger.Services
             }
 
             return string.Join(", ", checkedItems.Select(x => x.Name));
+        }
+
+        private static SteamGridFilters CreateDefaultHeroesFilters()
+        {
+            return new SteamGridFilters
+            {
+                CheckDimensions = new List<CheckData>
+                {
+                    new CheckData { Name = "Steam - 96:31 - 1920x620", Data = "1920x620" },
+                    new CheckData { Name = "Steam - 96:31 - 3840x1240", Data = "3840x1240" },
+                    new CheckData { Name = "Galaxy 2.0 - 32:13 - 1600x650", Data = "1600x650" }
+                },
+                CheckStyles = new List<CheckData>
+                {
+                    new CheckData { Name = "Alternate", Data = "alternate" },
+                    new CheckData { Name = "Material", Data = "material" },
+                    new CheckData { Name = "Blurred", Data = "blurred" }
+                },
+                CheckTypes = new List<CheckData>
+                {
+                    new CheckData { Name = "Static", Data = "static" },
+                    new CheckData { Name = "Animated", Data = "animated" }
+                },
+                CheckTags = CreateDefaultTags()
+            };
+        }
+
+        private static SteamGridFilters CreateDefaultGridsFilters()
+        {
+            return new SteamGridFilters
+            {
+                CheckDimensions = new List<CheckData>
+                {
+                    new CheckData { Name = "Steam Vertical - 2:3 - 600x900", Data = "600x900" },
+                    new CheckData { Name = "Steam Horizontal - 92:43 - 920x430", Data = "920x430" },
+                    new CheckData { Name = "Steam Horizontal - 92:43 - 460x215", Data = "460x215" },
+                    new CheckData { Name = "Square - 1:1 - 1024x1024", Data = "1024x1024" },
+                    new CheckData { Name = "Square - 1:1 - 512x512", Data = "512x512" },
+                    new CheckData { Name = "Galaxy 2.0 - 22:31 - 660x930", Data = "660x930" },
+                    new CheckData { Name = "Galaxy 2.0 - 22:31 - 342x482", Data = "342x482" }
+                },
+                CheckStyles = new List<CheckData>
+                {
+                    new CheckData { Name = "Alternate", Data = "alternate" },
+                    new CheckData { Name = "White Logo", Data = "white_logo" },
+                    new CheckData { Name = "Material", Data = "material" },
+                    new CheckData { Name = "Blurred", Data = "blurred" },
+                    new CheckData { Name = "No Logo", Data = "no_logo" }
+                },
+                CheckTypes = new List<CheckData>
+                {
+                    new CheckData { Name = "Static", Data = "static" },
+                    new CheckData { Name = "Animated", Data = "animated" }
+                },
+                CheckTags = CreateDefaultTags()
+            };
+        }
+
+        /// <summary>
+        /// Default filters for SteamGridDB icons API (scalar dimensions, official/custom styles).
+        /// </summary>
+        private static SteamGridFilters CreateDefaultIconsFilters()
+        {
+            return new SteamGridFilters
+            {
+                CheckDimensions = new List<CheckData>
+                {
+                    new CheckData { Name = "32 px", Data = "32" },
+                    new CheckData { Name = "64 px", Data = "64" },
+                    new CheckData { Name = "128 px", Data = "128" },
+                    new CheckData { Name = "256 px", Data = "256" },
+                    new CheckData { Name = "512 px", Data = "512" },
+                    new CheckData { Name = "1024 px", Data = "1024" }
+                },
+                CheckStyles = new List<CheckData>
+                {
+                    new CheckData { Name = "Official", Data = "official" },
+                    new CheckData { Name = "Custom", Data = "custom" }
+                },
+                CheckTypes = new List<CheckData>
+                {
+                    new CheckData { Name = "Static", Data = "static" },
+                    new CheckData { Name = "Animated", Data = "animated" }
+                },
+                CheckTags = CreateDefaultTags(),
+                CheckMimes = CreateDefaultIconMimes()
+            };
+        }
+
+        private static List<CheckData> CreateDefaultIconMimes()
+        {
+            return new List<CheckData>
+            {
+                new CheckData { Name = "PNG", Data = "image/png" },
+                new CheckData { Name = "ICO", Data = "image/vnd.microsoft.icon" }
+            };
+        }
+
+        private static List<CheckData> CreateDefaultTags()
+        {
+            return new List<CheckData>
+            {
+                new CheckData { Name = "Humor", Data = "Humor" },
+                new CheckData { Name = "Adult Content", Data = "Adult Content", IsChecked = false },
+                new CheckData { Name = "Epilepsy", Data = "Epilepsy" },
+                new CheckData { Name = "Untagged", Data = "Untagged" }
+            };
         }
 
         private static List<CheckData> DedupeByData(List<CheckData> items)
