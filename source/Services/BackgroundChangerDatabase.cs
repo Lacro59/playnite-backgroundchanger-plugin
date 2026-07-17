@@ -43,8 +43,11 @@ namespace BackgroundChanger.Services
         internal static bool SuppressGamesItemUpdatedPersist { get; set; }
 
         /// <summary>
-        /// Ephemeral Playnite default mirrors must not be stored in plugin JSON (re-injected on <see cref="Get"/>).
-        /// Pending imports (file picker, SteamGridDB cache) also use rooted paths but are not mirrors.
+        /// Ephemeral absolute-path items (empty <see cref="ItemImage.FolderName"/> + rooted <see cref="ItemImage.Name"/>):
+        /// Playnite default mirrors and unsaved picker/cache paths. Must not be stored in plugin JSON
+        /// (mirrors are re-injected on <see cref="Get"/>; pending imports must be copied first).
+        /// Must not key off <see cref="ItemImage.IsDefault"/> — file-picker imports often set default
+        /// before <see cref="ItemImage.FolderName"/> is assigned.
         /// </summary>
         internal static bool IsPlayniteLibraryMirror(ItemImage item)
         {
@@ -53,21 +56,13 @@ namespace BackgroundChanger.Services
                 return false;
             }
 
-            if (!Path.IsPathRooted(item.Name))
-            {
-                return false;
-            }
-
-            if (IsUnderPlayniteLibraryFiles(item.Name))
-            {
-                return true;
-            }
-
-            // Resolved default mirror outside library\files (e.g. alternate Playnite image location).
-            return item.IsDefault;
+            return Path.IsPathRooted(item.Name);
         }
 
-        private static bool IsUnderPlayniteLibraryFiles(string path)
+        /// <summary>
+        /// Returns true when <paramref name="path"/> is under Playnite's <c>library\files</c> media store.
+        /// </summary>
+        internal static bool IsUnderPlayniteLibraryFiles(string path)
         {
             if (path.IsNullOrEmpty())
             {

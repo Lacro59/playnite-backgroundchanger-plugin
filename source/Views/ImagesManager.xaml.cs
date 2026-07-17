@@ -193,8 +193,21 @@ namespace BackgroundChanger.Views
                 return false;
             }
 
-            return left.Name.IsEqual(right.Name)
-                && (left.FolderName ?? string.Empty).IsEqual(right.FolderName ?? string.Empty);
+            if (!left.Name.IsEqual(right.Name))
+            {
+                return false;
+            }
+
+            // IsEqual("", "") is false — treat both missing folder names as the same identity
+            // (Playnite mirrors and pending imports use an empty FolderName).
+            string leftFolder = left.FolderName ?? string.Empty;
+            string rightFolder = right.FolderName ?? string.Empty;
+            if (leftFolder.Length == 0 && rightFolder.Length == 0)
+            {
+                return true;
+            }
+
+            return leftFolder.IsEqual(rightFolder);
         }
 
         private static bool EditedImagesContains(List<ItemImage> editedImages, ItemImage candidate)
@@ -282,13 +295,16 @@ namespace BackgroundChanger.Views
 
                     if (itemImage.FolderName.IsNullOrEmpty() && !ItemImageIdentityMatches(itemImage, originalDefault))
                     {
-                        if (itemImage.IsDefault && IsPlayniteLibraryMirror(itemImage))
+                        // Playnite library\files paths are never materialized into plugin Images/.
+                        // Do not skip merely because IsDefault is set — file-picker imports often
+                        // mark default before FolderName is assigned (that used to look like a mirror).
+                        if (BackgroundChangerDatabase.IsUnderPlayniteLibraryFiles(itemImage.Name))
                         {
                             skippedMirrorCount++;
                             Common.LogDebug(
                                 false,
                                 string.Format(
-                                    "[ImagesManager] Save import skipped (default mirror): {0}",
+                                    "[ImagesManager] Save import skipped (Playnite library file): {0}",
                                     itemImage.Name ?? string.Empty));
                             continue;
                         }
@@ -363,17 +379,27 @@ namespace BackgroundChanger.Views
                 {
                     string folderName = GameBackgroundImages.Id.ToString();
 
-                    if (originalDefault != null && originalDefault.Exist && !IsPlayniteLibraryMirror(originalDefault))
+                    if (originalDefault != null && originalDefault.Exist)
                     {
-                        string archivedFileName = Path.GetFileName(originalDefault.FullPath);
+                        bool playniteOwnedMirror = IsPlayniteLibraryMirror(originalDefault);
+                        string sourcePath = originalDefault.FullPath;
+                        string archivedFileName = playniteOwnedMirror
+                            ? Guid.NewGuid().ToString() + Path.GetExtension(sourcePath)
+                            : Path.GetFileName(sourcePath);
                         string archivePath = Path.Combine(
                             PluginDatabase.Paths.PluginUserDataPath,
                             "Images",
                             folderName,
                             archivedFileName);
                         FileSystem.CreateDirectory(Path.GetDirectoryName(archivePath));
-                        File.Copy(originalDefault.FullPath, archivePath, overwrite: true);
-                        FileSystem.DeleteFileSafe(originalDefault.FullPath);
+                        File.Copy(sourcePath, archivePath, overwrite: true);
+
+                        // Playnite owns library\files — never delete those. Plugin-owned former
+                        // defaults are moved (copy then delete) into the Images folder.
+                        if (!playniteOwnedMirror)
+                        {
+                            FileSystem.DeleteFileSafe(sourcePath);
+                        }
 
                         ItemImage archivedDefault = EditedImages.FirstOrDefault(x => ItemImageIdentityMatches(x, originalDefault));
                         if (archivedDefault != null)
@@ -393,14 +419,14 @@ namespace BackgroundChanger.Views
                             BackgroundChangerDatabase.SetItemMediaKind(archivedItem, MediaKind);
                             EditedImages.Add(archivedItem);
                         }
-                    }
-                    else if (originalDefault != null && IsPlayniteLibraryMirror(originalDefault))
-                    {
+
                         Common.LogDebug(
                             false,
                             string.Format(
-                                "[ImagesManager] Save default swap — Playnite mirror left on disk: {0}",
-                                originalDefault.Name ?? string.Empty));
+                                "[ImagesManager] Save default swap — archived former default: {0} -> {1} (playniteOwned={2})",
+                                sourcePath,
+                                archivePath,
+                                playniteOwnedMirror));
                     }
 
                     if (!newDefault.FolderName.IsNullOrEmpty() && newDefault.Exist)
