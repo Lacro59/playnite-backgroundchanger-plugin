@@ -50,8 +50,20 @@ namespace BackgroundChanger.Views
 
             InitializeComponent();
 
+            PART_BackgroundImage.SizeChanged += PART_BackgroundImage_SizeChanged;
+
             PART_LbBackgroundImages.ItemsSource = null;
             PART_LbBackgroundImages.ItemsSource = EditedImages;
+        }
+
+        private void PART_BackgroundImage_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(PART_BackgroundImage?.Source))
+            {
+                return;
+            }
+
+            UpdatePreviewDecodePixelHeight();
         }
 
 
@@ -652,11 +664,46 @@ namespace BackgroundChanger.Views
                     }
                     else
                     {
+                        UpdatePreviewDecodePixelHeight();
                         PART_BackgroundImage.Source = filePath;
                         PART_Video.Source = null;
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Sets <see cref="CommonPluginsShared.Controls.ImageAsync.DecodePixelHeight"/> from the preview panel size
+        /// so <c>Parameter="0"</c> uses a resolution bucket matching the display area (avoids the default 200 px stretch blur).
+        /// </summary>
+        private void UpdatePreviewDecodePixelHeight()
+        {
+            if (PART_BackgroundImage == null)
+            {
+                return;
+            }
+
+            double displayHeight = PART_BackgroundImage.ActualHeight;
+            if (double.IsNaN(displayHeight) || displayHeight <= 0)
+            {
+                displayHeight = PART_BackgroundImage.RenderSize.Height;
+            }
+
+            if (displayHeight <= 0)
+            {
+                FrameworkElement parent = PART_BackgroundImage.Parent as FrameworkElement;
+                if (parent != null)
+                {
+                    displayHeight = parent.ActualHeight;
+                }
+            }
+
+            if (displayHeight <= 0)
+            {
+                return;
+            }
+
+            PART_BackgroundImage.DecodePixelHeight = Math.Max(256, Math.Round(displayHeight));
         }
 
 
