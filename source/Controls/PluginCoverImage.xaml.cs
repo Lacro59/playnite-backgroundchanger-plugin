@@ -42,6 +42,10 @@ namespace BackgroundChanger.Controls
         private System.Timers.Timer BcTimer { get; set; }
         private System.Timers.Timer BcTimerVideo { get; set; }
         private int Counter { get; set; } = 0;
+        private Guid? _stableCoverGameId;
+        private int _stableCoverIndex;
+        private string _pendingCoverVideoPath;
+        private bool _deferAutoChangerUntilVideoDelay;
         private GameBackgroundImages GameBackgroundImages { get; set; }
 
         private static readonly Random random = new Random();
@@ -51,8 +55,6 @@ namespace BackgroundChanger.Controls
 
         private int _lastLoggedDecodeHeight = -1;
         private bool _isCurrentMediaVideo;
-
-        private bool IsFirst { get; set; } = true;
 
         protected override void AttachStaticEvents()
         {
@@ -76,6 +78,7 @@ namespace BackgroundChanger.Controls
         public override void SetDefaultDataContext()
         {
             DisposeBcTimers();
+            _stableCoverGameId = null;
 
             ControlDataContext = new PluginCoverImageDataContext
             {
@@ -207,9 +210,7 @@ namespace BackgroundChanger.Controls
                         return;
                     }
 
-                    IsFirst = true;
                     SetCover();
-                    IsFirst = false;
                 }
                 catch (Exception ex)
                 {
@@ -249,7 +250,7 @@ namespace BackgroundChanger.Controls
                     }
                     else if (ControlDataContext.EnableRandomSelect)
                     {
-                        modeName = "RandomOnSelect";
+                        modeName = "OnSelect+Random";
                     }
                     else if (ItemFavorite != null)
                     {
@@ -263,88 +264,56 @@ namespace BackgroundChanger.Controls
                     Common.LogDebug(
                         true,
                         string.Format(
-                            "[PluginCoverImage][Mode] game={0}, mode={1}, autoChanger={2}, randomSelect={3}, randomOnStart={4}, items={5}, favIndex={6}, isFirst={7}",
+                            "[PluginCoverImage][Mode] game={0}, mode={1}, autoChanger={2}, randomSelect={3}, randomOnStart={4}, items={5}, favIndex={6}",
                             MediaControlDiagnostics.FormatGameRef(GameContext),
                             modeName,
                             ControlDataContext.EnableAutoChanger,
                             ControlDataContext.EnableRandomSelect,
                             ControlDataContext.EnableRandomOnStart,
                             itemsCount,
-                            favIndex,
-                            IsFirst));
+                            favIndex));
 
                     if (ControlDataContext.EnableAutoChanger)
                     {
-                        if (ControlDataContext.EnableRandomSelect)
+                        // Timer entry: favorite-first or one stable index; rotation only in OnTimedEvent.
+                        ResolveStableCoverIndex(ItemFavorite);
+                        Counter = _stableCoverIndex;
+                        pathImage = GameBackgroundImages.ItemsCover[Counter].FullPath;
+
+                        if (ItemFavorite != null)
                         {
-                            if (IsFirst && ItemFavorite != null)
-                            {
-                                pathImage = ItemFavorite.FullPath;
-                                Counter = GameBackgroundImages.ItemsCover.FindIndex(x => x.IsFavorite);
-                                LogMediaSelect("auto-changer-favorite-first", pathImage);
-                                Common.LogDebug(
-                                    true,
-                                    string.Format(
-                                        "[PluginCoverImage][Change] branch={0}, index={1}/{2}, file={3}",
-                                        "auto-changer-favorite-first",
-                                        Counter,
-                                        itemsCount,
-                                        MediaControlDiagnostics.FormatFileName(pathImage)));
-                            }
-                            else
-                            {
-                                Counter = random.Next(0, GameBackgroundImages.ItemsCover.Count);
-                                pathImage = GameBackgroundImages.ItemsCover[Counter].FullPath;
-                                LogMediaSelect("auto-changer-random", pathImage);
-                                Common.LogDebug(
-                                    true,
-                                    string.Format(
-                                        "[PluginCoverImage][Change] branch={0}, index={1}/{2}, file={3}",
-                                        "auto-changer-random",
-                                        Counter,
-                                        itemsCount,
-                                        MediaControlDiagnostics.FormatFileName(pathImage)));
-                            }
+                            LogMediaSelect("auto-changer-favorite-first", pathImage);
+                            Common.LogDebug(
+                                true,
+                                string.Format(
+                                    "[PluginCoverImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                    "auto-changer-favorite-first",
+                                    Counter,
+                                    itemsCount,
+                                    MediaControlDiagnostics.FormatFileName(pathImage)));
                         }
                         else
                         {
-                            if (IsFirst && ItemFavorite != null)
-                            {
-                                pathImage = ItemFavorite.FullPath;
-                                Counter = GameBackgroundImages.ItemsCover.FindIndex(x => x.IsFavorite);
-                                LogMediaSelect("auto-changer-favorite-first", pathImage);
-                                Common.LogDebug(
-                                    true,
-                                    string.Format(
-                                        "[PluginCoverImage][Change] branch={0}, index={1}/{2}, file={3}",
-                                        "auto-changer-favorite-first",
-                                        Counter,
-                                        itemsCount,
-                                        MediaControlDiagnostics.FormatFileName(pathImage)));
-                            }
-                            else
-                            {
-                                pathImage = GameBackgroundImages.ItemsCover[Counter].FullPath;
-                                LogMediaSelect("auto-changer-sequential", pathImage);
-                                Common.LogDebug(
-                                    true,
-                                    string.Format(
-                                        "[PluginCoverImage][Change] branch={0}, index={1}/{2}, file={3}",
-                                        "auto-changer-sequential",
-                                        Counter,
-                                        itemsCount,
-                                        MediaControlDiagnostics.FormatFileName(pathImage)));
-                            }
+                            LogMediaSelect("auto-changer-stable-entry", pathImage, Counter);
+                            Common.LogDebug(
+                                true,
+                                string.Format(
+                                    "[PluginCoverImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                    "auto-changer-stable-entry",
+                                    Counter,
+                                    itemsCount,
+                                    MediaControlDiagnostics.FormatFileName(pathImage)));
                         }
 
-                        SetCoverImage(pathImage);
+                        SetCoverImageWithOptionalVideoDelay(pathImage);
 
+                        DisposeBcTimer();
                         BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.CoverImageAutoChangerTimer * 1000)
                         {
                             AutoReset = true
                         };
                         BcTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-                        if (IsMediaLifecycleActive())
+                        if (!_deferAutoChangerUntilVideoDelay && IsMediaLifecycleActive())
                         {
                             BcTimer.Start();
                         }
@@ -367,36 +336,21 @@ namespace BackgroundChanger.Controls
                         }
                         else
                         {
-                            if (IsFirst && ItemFavorite != null)
-                            {
-                                pathImage = ItemFavorite.FullPath;
-                                LogMediaSelect("favorite", pathImage);
-                                Common.LogDebug(
-                                    true,
-                                    string.Format(
-                                        "[PluginCoverImage][Change] branch={0}, index={1}/{2}, file={3}",
-                                        "favorite",
-                                        favIndex,
-                                        itemsCount,
-                                        MediaControlDiagnostics.FormatFileName(pathImage)));
-                            }
-                            else
-                            {
-                                int imgSelected = random.Next(0, GameBackgroundImages.ItemsCover.Count);
-                                pathImage = GameBackgroundImages.ItemsCover[imgSelected].FullPath;
-                                LogMediaSelect("random-on-select", pathImage, imgSelected);
-                                Common.LogDebug(
-                                    true,
-                                    string.Format(
-                                        "[PluginCoverImage][Change] branch={0}, index={1}/{2}, file={3}",
-                                        "random-on-select",
-                                        imgSelected,
-                                        itemsCount,
-                                        MediaControlDiagnostics.FormatFileName(pathImage)));
-                            }
+                            // OnSelect: always re-roll; favorite applies only in Timer entry / default mode.
+                            int imgSelected = random.Next(0, GameBackgroundImages.ItemsCover.Count);
+                            pathImage = GameBackgroundImages.ItemsCover[imgSelected].FullPath;
+                            LogMediaSelect("random-on-select", pathImage, imgSelected);
+                            Common.LogDebug(
+                                true,
+                                string.Format(
+                                    "[PluginCoverImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                    "random-on-select",
+                                    imgSelected,
+                                    itemsCount,
+                                    MediaControlDiagnostics.FormatFileName(pathImage)));
                         }
 
-                        SetCoverImage(pathImage);
+                        SetCoverImageWithOptionalVideoDelay(pathImage);
                     }
                     else
                     {
@@ -404,7 +358,6 @@ namespace BackgroundChanger.Controls
                         {
                             pathImage = ItemFavorite.FullPath;
                             LogMediaSelect("favorite", pathImage);
-                            SetCoverImage(pathImage);
                             Common.LogDebug(
                                 true,
                                 string.Format(
@@ -413,29 +366,53 @@ namespace BackgroundChanger.Controls
                                     favIndex,
                                     itemsCount,
                                     MediaControlDiagnostics.FormatFileName(pathImage)));
+                            SetCoverImageWithOptionalVideoDelay(pathImage);
                         }
                         else
                         {
+                            DisposeBcTimerVideo();
                             SetDefaultCoverImage();
                         }
                     }
                 }
                 else
                 {
+                    DisposeBcTimerVideo();
                     SetDefaultCoverImage();
                 }
+            }
+        }
 
-                if (PluginDatabase.PluginSettings.useVideoDelayCoverImage)
+        /// <summary>
+        /// Picks a stable cover index for the current game (favorite, one random draw, or zero).
+        /// Reused across re-selections until the game context changes or the timer advances the index.
+        /// </summary>
+        private void ResolveStableCoverIndex(ItemImage itemFavorite)
+        {
+            if (GameContext == null
+                || GameBackgroundImages?.ItemsCover == null
+                || GameBackgroundImages.ItemsCover.Count == 0)
+            {
+                _stableCoverIndex = 0;
+                return;
+            }
+
+            if (_stableCoverGameId != GameContext.Id)
+            {
+                _stableCoverGameId = GameContext.Id;
+
+                if (itemFavorite != null)
                 {
-                    BcTimerVideo = new System.Timers.Timer(PluginDatabase.PluginSettings.videoDelayCoverImage * 1000)
-                    {
-                        AutoReset = true
-                    };
-                    BcTimerVideo.Elapsed += new ElapsedEventHandler(OnTimedVideoEvent);
-                    if (IsMediaLifecycleActive())
-                    {
-                        BcTimerVideo.Start();
-                    }
+                    int favIndex = GameBackgroundImages.ItemsCover.FindIndex(x => x.IsFavorite);
+                    _stableCoverIndex = favIndex >= 0 ? favIndex : 0;
+                }
+                else if (ControlDataContext.EnableRandomSelect)
+                {
+                    _stableCoverIndex = random.Next(0, GameBackgroundImages.ItemsCover.Count);
+                }
+                else
+                {
+                    _stableCoverIndex = 0;
                 }
             }
         }
@@ -463,6 +440,53 @@ namespace BackgroundChanger.Controls
                         -1,
                         MediaControlDiagnostics.FormatFileName(pathImage)));
             }
+        }
+
+        /// <summary>
+        /// Shows <paramref name="pathImage"/> immediately, or Playnite default then the video after the configured delay.
+        /// </summary>
+        /// <returns><c>true</c> when a one-shot video delay was armed.</returns>
+        private bool SetCoverImageWithOptionalVideoDelay(string pathImage)
+        {
+            DisposeBcTimerVideo();
+            _pendingCoverVideoPath = null;
+            _deferAutoChangerUntilVideoDelay = false;
+
+            if (PluginDatabase.PluginSettings.useVideoDelayCoverImage && IsExistingVideoPath(pathImage))
+            {
+                _pendingCoverVideoPath = pathImage;
+                _deferAutoChangerUntilVideoDelay = ControlDataContext.EnableAutoChanger;
+                SetDefaultCoverImage();
+                Common.LogDebug(
+                    true,
+                    string.Format(
+                        "[PluginCoverImage][Change] branch={0}, delaySec={1}, pending={2}",
+                        "video-delay-pending",
+                        PluginDatabase.PluginSettings.videoDelayCoverImage,
+                        MediaControlDiagnostics.FormatFileName(pathImage)));
+
+                BcTimerVideo = new System.Timers.Timer(PluginDatabase.PluginSettings.videoDelayCoverImage * 1000)
+                {
+                    AutoReset = false
+                };
+                BcTimerVideo.Elapsed += new ElapsedEventHandler(OnTimedVideoEvent);
+                if (IsMediaLifecycleActive())
+                {
+                    BcTimerVideo.Start();
+                }
+
+                return true;
+            }
+
+            SetCoverImage(pathImage);
+            return false;
+        }
+
+        private static bool IsExistingVideoPath(string pathImage)
+        {
+            return !pathImage.IsNullOrEmpty()
+                && File.Exists(pathImage)
+                && Path.GetExtension(pathImage).IsEqual(".mp4");
         }
 
         public void SetCoverImage(string pathImage = null)
@@ -668,6 +692,7 @@ namespace BackgroundChanger.Controls
                                 imgSelected = random.Next(0, (GameBackgroundImages.ItemsCover.Count));
                             }
                             Counter = imgSelected;
+                            _stableCoverIndex = imgSelected;
 
                             pathImage = GameBackgroundImages.ItemsCover[imgSelected].FullPath;
                         }
@@ -697,6 +722,7 @@ namespace BackgroundChanger.Controls
                                 Counter = 0;
                             }
 
+                            _stableCoverIndex = Counter;
                             pathImage = GameBackgroundImages.ItemsCover[Counter].FullPath;
                         }
 
@@ -730,7 +756,9 @@ namespace BackgroundChanger.Controls
 
                 InvokeOnUiIfLifecycleActive(() =>
                 {
-                    string pathVideo = GameBackgroundImages?.ItemsCover?.Where(x => x.IsVideo && x.Exist)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
+                    string pathVideo = _pendingCoverVideoPath;
+                    _pendingCoverVideoPath = null;
+                    BcTimerVideo?.Stop();
 
                     MediaControlDiagnostics.Trace(
                         LogControlTrace,
@@ -740,6 +768,15 @@ namespace BackgroundChanger.Controls
                     if (!pathVideo.IsNullOrEmpty())
                     {
                         SetCoverImage(pathVideo);
+                    }
+
+                    if (_deferAutoChangerUntilVideoDelay)
+                    {
+                        _deferAutoChangerUntilVideoDelay = false;
+                        if (ControlDataContext.EnableAutoChanger && BcTimer != null && IsMediaLifecycleActive())
+                        {
+                            BcTimer.Start();
+                        }
                     }
                 });
             }
@@ -821,22 +858,33 @@ namespace BackgroundChanger.Controls
             return IsMediaLifecycleActive() ? MediaState.Play : MediaState.Pause;
         }
 
-        private void DisposeBcTimers()
+        private void DisposeBcTimer()
         {
             if (BcTimer != null)
             {
-                Counter = 0;
                 BcTimer.Stop();
                 BcTimer.Dispose();
                 BcTimer = null;
             }
+        }
 
+        private void DisposeBcTimerVideo()
+        {
             if (BcTimerVideo != null)
             {
                 BcTimerVideo.Stop();
                 BcTimerVideo.Dispose();
                 BcTimerVideo = null;
             }
+        }
+
+        private void DisposeBcTimers()
+        {
+            DisposeBcTimer();
+            DisposeBcTimerVideo();
+            Counter = 0;
+            _pendingCoverVideoPath = null;
+            _deferAutoChangerUntilVideoDelay = false;
         }
 
         private void StopBcTimers()
@@ -852,12 +900,14 @@ namespace BackgroundChanger.Controls
                 return;
             }
 
-            if (ControlDataContext.EnableAutoChanger && BcTimer != null)
+            if (ControlDataContext.EnableAutoChanger && BcTimer != null && !_deferAutoChangerUntilVideoDelay)
             {
                 BcTimer.Start();
             }
 
-            if (PluginDatabase.PluginSettings.useVideoDelayCoverImage && BcTimerVideo != null)
+            if (PluginDatabase.PluginSettings.useVideoDelayCoverImage
+                && BcTimerVideo != null
+                && !_pendingCoverVideoPath.IsNullOrEmpty())
             {
                 BcTimerVideo.Start();
             }

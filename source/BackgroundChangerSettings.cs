@@ -34,9 +34,6 @@ namespace BackgroundChanger
         private int backgroundImageAutoChangerTimer = 10;
         public int BackgroundImageAutoChangerTimer { get => backgroundImageAutoChangerTimer; set => SetValue(ref backgroundImageAutoChangerTimer, value); }
 
-        private double volume = 0;
-        public double Volume { get => volume; set => SetValue(ref volume, value); }
-
 
         private bool enableCoverImage = true;
         public bool EnableCoverImage { get => enableCoverImage; set => SetValue(ref enableCoverImage, value); }
@@ -102,6 +99,95 @@ namespace BackgroundChanger
 
         #endregion
 
+        /// <summary>
+        /// Coerces exclusive selection-mode flags for background, cover, and icon
+        /// (Timer xor OnStart xor OnSelect xor default).
+        /// Icons: Default or OnStart only — no Timer (see <see cref="Controls.PluginIconImage"/> remarks).
+        /// Safe to call on load and before save.
+        /// </summary>
+        public void CoerceExclusiveMediaSelectionModes()
+        {
+            CoerceMediaFlags(
+                ref enableBackgroundImageAutoChanger,
+                ref enableBackgroundImageRandomSelect,
+                ref enableBackgroundImageRandomOnStart,
+                ref enableBackgroundImageRandomOnSelect,
+                allowOnSelect: true);
+
+            CoerceMediaFlags(
+                ref enableCoverImageAutoChanger,
+                ref enableCoverImageRandomSelect,
+                ref enableCoverImageRandomOnStart,
+                ref enableCoverImageRandomOnSelect,
+                allowOnSelect: true);
+
+            // Icon: no Timer mode. Legacy EnableIconImageAutoChanger (saved JSON) maps to OnStart so list + overview stay safe.
+            if (enableIconImageAutoChanger)
+            {
+                enableIconImageAutoChanger = false;
+                enableIconImageRandomSelect = true;
+                enableIconImageRandomOnStart = true;
+                enableIconImageRandomOnSelect = false;
+            }
+
+            CoerceMediaFlags(
+                ref enableIconImageAutoChanger,
+                ref enableIconImageRandomSelect,
+                ref enableIconImageRandomOnStart,
+                ref enableIconImageRandomOnSelect,
+                allowOnSelect: false);
+
+            OnPropertyChanged(nameof(EnableBackgroundImageAutoChanger));
+            OnPropertyChanged(nameof(EnableBackgroundImageRandomSelect));
+            OnPropertyChanged(nameof(EnableBackgroundImageRandomOnStart));
+            OnPropertyChanged(nameof(EnableBackgroundImageRandomOnSelect));
+            OnPropertyChanged(nameof(EnableCoverImageAutoChanger));
+            OnPropertyChanged(nameof(EnableCoverImageRandomSelect));
+            OnPropertyChanged(nameof(EnableCoverImageRandomOnStart));
+            OnPropertyChanged(nameof(EnableCoverImageRandomOnSelect));
+            OnPropertyChanged(nameof(EnableIconImageAutoChanger));
+            OnPropertyChanged(nameof(EnableIconImageRandomSelect));
+            OnPropertyChanged(nameof(EnableIconImageRandomOnStart));
+            OnPropertyChanged(nameof(EnableIconImageRandomOnSelect));
+        }
+
+        private static void CoerceMediaFlags(
+            ref bool autoChanger,
+            ref bool randomSelect,
+            ref bool onStart,
+            ref bool onSelect,
+            bool allowOnSelect)
+        {
+            if (!allowOnSelect)
+            {
+                onSelect = false;
+            }
+
+            if (autoChanger)
+            {
+                onStart = false;
+                onSelect = false;
+                // randomSelect remains the Timer tick strategy (random vs sequential).
+                return;
+            }
+
+            if (!randomSelect)
+            {
+                onStart = false;
+                onSelect = false;
+                return;
+            }
+
+            // Random without Timer: exactly one of OnStart / OnSelect.
+            if (onStart && onSelect)
+            {
+                onStart = false;
+            }
+            else if (!onStart && !onSelect)
+            {
+                onStart = true;
+            }
+        }
 
         public SteamGridFilters SgGridsFilters = new SteamGridFilters
         {
@@ -165,7 +251,6 @@ namespace BackgroundChanger
             }
         };
 
-
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
         #region Variables exposed
@@ -220,6 +305,8 @@ namespace BackgroundChanger
             {
                 settings.MediaConversion = new MediaConversionSettings();
             }
+
+            settings.CoerceExclusiveMediaSelectionModes();
         }
 
         // Code executed when settings view is opened and user starts editing values.
@@ -239,23 +326,8 @@ namespace BackgroundChanger
         // This method should save settings made to Option1 and Option2.
         public void EndEdit()
         {
-            Settings.EnableBackgroundImageRandomOnSelect = BackgroundChangerSettingsView.BackgroundOnSelect;
-            Settings.EnableBackgroundImageRandomOnStart = BackgroundChangerSettingsView.BackgroundOnStart;
-
-            Settings.EnableCoverImageRandomOnSelect = BackgroundChangerSettingsView.CoverOnSelect;
-            Settings.EnableCoverImageRandomOnStart = BackgroundChangerSettingsView.CoverOnStart;
-
-            if (Settings.EnableIconImageAutoChanger)
-            {
-                Settings.EnableIconImageRandomOnStart = false;
-            }
-            else if (Settings.EnableIconImageRandomSelect)
-            {
-                Settings.EnableIconImageRandomOnStart = true;
-            }
-
-            Settings.EnableIconImageRandomOnSelect = false;
-
+            BackgroundChangerSettingsView.ApplyActiveSelectionModes(Settings);
+            Settings.CoerceExclusiveMediaSelectionModes();
             Plugin.SavePluginSettings(Settings);
         }
 

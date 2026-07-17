@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -26,8 +25,14 @@ namespace BackgroundChanger.Controls
 {
     /// <summary>
     /// Theme control that displays shuffled game icons from the plugin collection.
-    /// Mirrors <see cref="PluginCoverImage"/> with OnStart xor Timer random modes.
     /// </summary>
+    /// <remarks>
+    /// Icons support <b>Default</b> and <b>OnStart</b> only — no Timer and no OnSelect (unlike cover/background).
+    /// BCThemes hosts one instance per game row in Details list view; a per-control timer would spawn dozens of
+    /// concurrent timers and cascade pause/resume through media lifecycle, breaking overview controls.
+    /// OnStart draws once per game session via <see cref="GameBackgroundImages.IconImageOnStart"/>, which is safe
+    /// when many rows are visible at once.
+    /// </remarks>
     public partial class PluginIconImage : PluginMediaLifecycleControlBase, IMediaThemeSyncTarget
     {
         private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
@@ -40,13 +45,7 @@ namespace BackgroundChanger.Controls
             set => ControlDataContext = (PluginIconImageDataContext)controlDataContext;
         }
 
-        private System.Timers.Timer BcTimer { get; set; }
-        private int Counter { get; set; } = 0;
-        private Guid? _stableIconGameId;
-        private int _stableIconIndex;
         private GameBackgroundImages GameBackgroundImages { get; set; }
-
-        private static readonly Random random = new Random();
 
         private const double MinDecodePixelHeight = 32;
         private const string ImageDecodeParameterAuto = "0";
@@ -73,15 +72,11 @@ namespace BackgroundChanger.Controls
 
         public override void SetDefaultDataContext()
         {
-            DisposeBcTimers();
-            _stableIconGameId = null;
-
             ControlDataContext = new PluginIconImageDataContext
             {
                 IsActivated = PluginDatabase.PluginSettings.EnableIconImage,
                 EnableRandomSelect = PluginDatabase.PluginSettings.EnableIconImageRandomSelect,
                 EnableRandomOnStart = PluginDatabase.PluginSettings.EnableIconImageRandomOnStart,
-                EnableAutoChanger = PluginDatabase.PluginSettings.EnableIconImageAutoChanger,
 
                 ImageSource = null,
                 VideoSource = null
@@ -194,7 +189,6 @@ namespace BackgroundChanger.Controls
 
                     if (!GameBackgroundImages.HasDataIcon)
                     {
-                        DisposeBcTimers();
                         PauseVideos();
                         MustDisplay = false;
                         return;
@@ -210,6 +204,13 @@ namespace BackgroundChanger.Controls
         }
 
 
+        /// <summary>
+        /// Resolves which icon file to show from plugin data and current selection-mode flags.
+        /// </summary>
+        /// <remarks>
+        /// Mode matrix: Default (favorite or Playnite icon), OnStart (one random pick per game, stable on
+        /// re-selection). Timer was removed — see class remarks.
+        /// </remarks>
         public void SetIcon()
         {
             string pathImage = string.Empty;
@@ -222,9 +223,7 @@ namespace BackgroundChanger.Controls
                 if (GameBackgroundImages.HasDataIcon)
                 {
                     ItemImage itemFavorite = GameBackgroundImages.ItemsIcon.FirstOrDefault(x => x.IsFavorite);
-                    bool timerMode = ControlDataContext.EnableAutoChanger;
-                    bool onStartMode = !timerMode
-                        && ControlDataContext.EnableRandomSelect
+                    bool onStartMode = ControlDataContext.EnableRandomSelect
                         && ControlDataContext.EnableRandomOnStart;
 
                     int itemsCount = GameBackgroundImages.ItemsIcon.Count;
@@ -233,17 +232,13 @@ namespace BackgroundChanger.Controls
                         : -1;
 
                     string modeName;
-                    if (timerMode)
-                    {
-                        modeName = ControlDataContext.EnableRandomSelect ? "Timer+Random" : "Timer+Sequential";
-                    }
-                    else if (onStartMode)
+                    if (onStartMode)
                     {
                         modeName = "OnStart+Random";
                     }
                     else if (ControlDataContext.EnableRandomSelect)
                     {
-                        modeName = "StableEntry+Random";
+                        modeName = "OnStart+Random";
                     }
                     else if (itemFavorite != null)
                     {
@@ -257,60 +252,16 @@ namespace BackgroundChanger.Controls
                     Common.LogDebug(
                         true,
                         string.Format(
-                            "[PluginIconImage][Mode] game={0}, mode={1}, autoChanger={2}, randomSelect={3}, randomOnStart={4}, items={5}, favIndex={6}",
+                            "[PluginIconImage][Mode] game={0}, mode={1}, randomSelect={2}, randomOnStart={3}, items={4}, favIndex={5}",
                             MediaControlDiagnostics.FormatGameRef(GameContext),
                             modeName,
-                            ControlDataContext.EnableAutoChanger,
                             ControlDataContext.EnableRandomSelect,
                             ControlDataContext.EnableRandomOnStart,
                             itemsCount,
                             favIndex));
 
-                    if (timerMode)
-                    {
-                        ResolveStableIconIndex(itemFavorite);
-                        Counter = _stableIconIndex;
-                        pathImage = GameBackgroundImages.ItemsIcon[Counter].FullPath;
-
-                        if (itemFavorite != null)
-                        {
-                            LogMediaSelect("auto-changer-favorite-first", pathImage);
-                            Common.LogDebug(
-                                true,
-                                string.Format(
-                                    "[PluginIconImage][Change] branch={0}, index={1}/{2}, file={3}",
-                                    "auto-changer-favorite-first",
-                                    Counter,
-                                    itemsCount,
-                                    MediaControlDiagnostics.FormatFileName(pathImage)));
-                        }
-                        else
-                        {
-                            LogMediaSelect("auto-changer-stable-entry", pathImage, Counter);
-                            Common.LogDebug(
-                                true,
-                                string.Format(
-                                    "[PluginIconImage][Change] branch={0}, index={1}/{2}, file={3}",
-                                    "auto-changer-stable-entry",
-                                    Counter,
-                                    itemsCount,
-                                    MediaControlDiagnostics.FormatFileName(pathImage)));
-                        }
-
-                        SetIconImage(pathImage);
-
-                        DisposeBcTimer();
-                        BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.IconImageAutoChangerTimer * 1000)
-                        {
-                            AutoReset = true
-                        };
-                        BcTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-                        if (IsMediaLifecycleActive())
-                        {
-                            BcTimer.Start();
-                        }
-                    }
-                    else if (onStartMode)
+                    // OnStart: IconImageOnStart is computed once when game data loads; stable across re-selections.
+                    if (onStartMode)
                     {
                         pathImage = GameBackgroundImages.IconImageOnStart.FullPath;
                         LogMediaSelect("random-on-start", pathImage);
@@ -327,35 +278,18 @@ namespace BackgroundChanger.Controls
                     }
                     else if (ControlDataContext.EnableRandomSelect)
                     {
-                        if (itemFavorite != null)
-                        {
-                            pathImage = itemFavorite.FullPath;
-                            LogMediaSelect("favorite", pathImage);
-                            Common.LogDebug(
-                                true,
-                                string.Format(
-                                    "[PluginIconImage][Change] branch={0}, index={1}/{2}, file={3}",
-                                    "favorite",
-                                    favIndex,
-                                    itemsCount,
-                                    MediaControlDiagnostics.FormatFileName(pathImage)));
-                        }
-                        else
-                        {
-                            ResolveStableIconIndex(null);
-                            Counter = _stableIconIndex;
-                            pathImage = GameBackgroundImages.ItemsIcon[Counter].FullPath;
-                            LogMediaSelect("stable-entry", pathImage, Counter);
-                            Common.LogDebug(
-                                true,
-                                string.Format(
-                                    "[PluginIconImage][Change] branch={0}, index={1}/{2}, file={3}",
-                                    "stable-entry",
-                                    Counter,
-                                    itemsCount,
-                                    MediaControlDiagnostics.FormatFileName(pathImage)));
-                        }
-
+                        // Legacy / coerce miss: treat as OnStart. Icons never use OnSelect or Timer.
+                        pathImage = GameBackgroundImages.IconImageOnStart.FullPath;
+                        LogMediaSelect("random-on-start", pathImage);
+                        int onStartIndex = GameBackgroundImages.ItemsIcon.FindIndex(x => x.FullPath == pathImage);
+                        Common.LogDebug(
+                            true,
+                            string.Format(
+                                "[PluginIconImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                "random-on-start",
+                                onStartIndex,
+                                itemsCount,
+                                MediaControlDiagnostics.FormatFileName(pathImage)));
                         SetIconImage(pathImage);
                     }
                     else
@@ -363,7 +297,7 @@ namespace BackgroundChanger.Controls
                         if (itemFavorite != null)
                         {
                             pathImage = itemFavorite.FullPath;
-                            LogMediaSelect("favorite", pathImage);
+                            LogMediaSelect("favorite", pathImage, favIndex, itemsCount);
                             SetIconImage(pathImage);
                             Common.LogDebug(
                                 true,
@@ -383,40 +317,6 @@ namespace BackgroundChanger.Controls
                 else
                 {
                     SetDefaultIconImage();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Picks a stable icon index for the current game (favorite, one random draw, or zero).
-        /// Reused across re-selections until the game context changes or the timer advances the index.
-        /// </summary>
-        private void ResolveStableIconIndex(ItemImage itemFavorite)
-        {
-            if (GameContext == null
-                || GameBackgroundImages?.ItemsIcon == null
-                || GameBackgroundImages.ItemsIcon.Count == 0)
-            {
-                _stableIconIndex = 0;
-                return;
-            }
-
-            if (_stableIconGameId != GameContext.Id)
-            {
-                _stableIconGameId = GameContext.Id;
-
-                if (itemFavorite != null)
-                {
-                    int favIndex = GameBackgroundImages.ItemsIcon.FindIndex(x => x.IsFavorite);
-                    _stableIconIndex = favIndex >= 0 ? favIndex : 0;
-                }
-                else if (ControlDataContext.EnableRandomSelect)
-                {
-                    _stableIconIndex = random.Next(0, GameBackgroundImages.ItemsIcon.Count);
-                }
-                else
-                {
-                    _stableIconIndex = 0;
                 }
             }
         }
@@ -626,86 +526,6 @@ namespace BackgroundChanger.Controls
         }
 
 
-        private void OnTimedEvent(object source, ElapsedEventArgs e)
-        {
-            try
-            {
-                LogTimerTickLifecycleIfInactive("auto-changer");
-
-                InvokeOnUiIfLifecycleActive(() =>
-                {
-                    string pathImage = string.Empty;
-                    int fromCounter = Counter;
-
-                    if (ControlDataContext.EnableRandomSelect)
-                    {
-                        if (GameBackgroundImages.ItemsIcon.Count != 0)
-                        {
-                            int imgSelected = random.Next(0, GameBackgroundImages.ItemsIcon.Count);
-                            while (imgSelected == Counter && GameBackgroundImages.ItemsIcon.Count != 1)
-                            {
-                                imgSelected = random.Next(0, GameBackgroundImages.ItemsIcon.Count);
-                            }
-
-                            Counter = imgSelected;
-                            _stableIconIndex = imgSelected;
-                            pathImage = GameBackgroundImages.ItemsIcon[imgSelected].FullPath;
-
-                            Common.LogDebug(
-                                true,
-                                string.Format(
-                                    "[PluginIconImage][TimerChange] random=true, fromCounter={0} toCounter={1}, file={2}",
-                                    fromCounter,
-                                    Counter,
-                                    MediaControlDiagnostics.FormatFileName(pathImage)));
-                        }
-
-                        MediaControlDiagnostics.Trace(
-                            LogControlTrace,
-                            MediaControlDiagnostics.PhaseTimerTick,
-                            MediaControlDiagnostics.FormatTimerTickDetail("auto-changer-random", pathImage, true));
-
-                        SetIconImage(pathImage);
-                    }
-                    else
-                    {
-                        Counter++;
-
-                        if (GameBackgroundImages.ItemsIcon.Count != 0)
-                        {
-                            if (Counter == GameBackgroundImages.ItemsIcon.Count)
-                            {
-                                Counter = 0;
-                            }
-
-                            _stableIconIndex = Counter;
-                            pathImage = GameBackgroundImages.ItemsIcon[Counter].FullPath;
-
-                            Common.LogDebug(
-                                true,
-                                string.Format(
-                                    "[PluginIconImage][TimerChange] random=false, fromCounter={0} toCounter={1}, file={2}",
-                                    fromCounter,
-                                    Counter,
-                                    MediaControlDiagnostics.FormatFileName(pathImage)));
-                        }
-
-                        MediaControlDiagnostics.Trace(
-                            LogControlTrace,
-                            MediaControlDiagnostics.PhaseTimerTick,
-                            MediaControlDiagnostics.FormatTimerTickDetail("auto-changer-sequential", pathImage, true));
-
-                        SetIconImage(pathImage);
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginDatabase.PluginName);
-            }
-        }
-
-
         private void ImageHolder_Loaded(object sender, RoutedEventArgs e)
         {
             GetIconProperties();
@@ -763,40 +583,7 @@ namespace BackgroundChanger.Controls
 
         #region Media lifecycle
 
-        private void DisposeBcTimer()
-        {
-            if (BcTimer != null)
-            {
-                BcTimer.Stop();
-                BcTimer.Dispose();
-                BcTimer = null;
-            }
-        }
-
-        private void DisposeBcTimers()
-        {
-            DisposeBcTimer();
-            Counter = 0;
-            _stableIconGameId = null;
-        }
-
-        private void StopBcTimer()
-        {
-            BcTimer?.Stop();
-        }
-
-        private void StartBcTimerIfConfigured()
-        {
-            if (!IsMediaLifecycleActive())
-            {
-                return;
-            }
-
-            if (ControlDataContext.EnableAutoChanger && BcTimer != null)
-            {
-                BcTimer.Start();
-            }
-        }
+        // No BcTimer here — icon random is OnStart-only (see class remarks). Lifecycle hooks pause/resume video only.
 
         private bool IsMediaLifecycleActive()
         {
@@ -828,7 +615,6 @@ namespace BackgroundChanger.Controls
 
         private void PauseMediaActivity()
         {
-            StopBcTimer();
             PauseVideos();
         }
 
@@ -840,19 +626,18 @@ namespace BackgroundChanger.Controls
             }
 
             ResumeVideosIfLifecycleActive();
-            StartBcTimerIfConfigured();
         }
 
         protected override void OnMediaLifecycleStateChanged()
         {
             if (IsMediaLifecycleActive())
             {
-                LogControlTrace("Media activity", "resume timers/video");
+                LogControlTrace("Media activity", "resume video");
                 ResumeMediaActivityIfAllowed();
             }
             else
             {
-                LogControlTrace("Media activity", "pause timers/video");
+                LogControlTrace("Media activity", "pause video");
                 PauseMediaActivity();
             }
         }
@@ -863,7 +648,7 @@ namespace BackgroundChanger.Controls
 
         private void LogMediaSelect(string branch, string pathImage, int index = -1, int total = -1)
         {
-            int itemIndex = index >= 0 ? index : Counter;
+            int itemIndex = index;
             int itemTotal = total >= 0 ? total : (GameBackgroundImages?.ItemsIcon?.Count ?? 0);
 
             MediaControlDiagnostics.Trace(
@@ -872,32 +657,11 @@ namespace BackgroundChanger.Controls
                 MediaControlDiagnostics.FormatMediaSelectDetail(GameContext, branch, itemIndex, itemTotal, pathImage));
         }
 
-        private void LogTimerTickLifecycleIfInactive(string timerType)
-        {
-            Dispatcher dispatcher = API.Instance?.MainView?.UIDispatcher ?? Dispatcher;
-            if (dispatcher == null)
-            {
-                return;
-            }
-
-            _ = dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-            {
-                if (!IsLifecycleDisplayActive())
-                {
-                    MediaControlDiagnostics.Issue(
-                        LogControlIssue,
-                        MediaControlDiagnostics.PhaseTimerTick,
-                        string.Format("timer={0}, lifecycle=inactive", timerType));
-                }
-            }));
-        }
-
         #endregion
 
         protected override void OnMediaLifecycleUnloadedCore()
         {
             MediaThemeSyncWindowHandler.Unregister(this);
-            DisposeBcTimers();
         }
     }
 
@@ -907,7 +671,6 @@ namespace BackgroundChanger.Controls
         public bool IsActivated { get; set; }
         public bool EnableRandomSelect { get; set; }
         public bool EnableRandomOnStart { get; set; }
-        public bool EnableAutoChanger { get; set; }
 
         public string ImageSource { get; set; }
         public string VideoSource { get; set; }

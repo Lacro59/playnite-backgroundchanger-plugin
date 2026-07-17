@@ -228,87 +228,50 @@
 				                    BorderThickness="{DynamicResource PopupBorderThickness}">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Settings.BackgroundImageSameSettings}" Margin="0,0,0,10"
-                                              Command="{x:Static pcmd:CommandsPlugin.CmdRestartRequired}" 
+                                              Command="{x:Static pcmd:CommandsPlugin.CmdRestartRequired}"
                                               CommandParameter="{Binding RelativeSource={RelativeSource Self}}"
                                               Content="{DynamicResource LOCBcBackgroundSameSettings}" />
 
-                                    <DockPanel Margin="0,0,0,10">
-                                        <CheckBox IsChecked="{Binding Settings.EnableBackgroundImageRandomSelect}" 
-                                                  DockPanel.Dock="Left" Name="cbBackgroundRandom"
-                                                  Content="{DynamicResource LOCBcEnableRandomSelect}" />
-                                        
-                                        <RadioButton DockPanel.Dock="Right" GroupName="BcRandom"
-                                                     Name="rbBackgroundOnSelect" Click="Rb_Click"
-                                                     Content="{DynamicResource LOCBcRandomOnSelect}">
-                                            <RadioButton.Style>
-                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
-                                                    <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=CbBcAutoChanger}" Value="True" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=cbBackgroundRandom}" Value="False" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </RadioButton.Style>
-                                        </RadioButton>
+                                    <TextBlock Text="{DynamicResource LOCBcSelectionMode}"
+                                               Style="{DynamicResource BaseTextBlockStyle}"
+                                               Margin="0,0,0,6" />
 
-                                        <RadioButton HorizontalAlignment="Right" Margin="0,0,20,0" GroupName="BcRandom"
-                                                     Name="rbBackgroundOnStart" Click="Rb_Click"
-                                                     Content="{DynamicResource LOCBcRandomOnStart}">
-                                            <RadioButton.Style>
-                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
-                                                    <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=CbBcAutoChanger}" Value="True" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=cbBackgroundRandom}" Value="False" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </RadioButton.Style>
-                                        </RadioButton>
-                                    </DockPanel>
+                                    <RadioButton GroupName="BcSelectionMode" Name="rbBackgroundDefault"
+                                                 Margin="0,0,0,4" Checked="OnBackgroundSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcModeDefault}" />
+                                    <RadioButton GroupName="BcSelectionMode" Name="rbBackgroundOnStart"
+                                                 Margin="0,0,0,4" Checked="OnBackgroundSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcRandomOnStart}" />
+                                    <RadioButton GroupName="BcSelectionMode" Name="rbBackgroundOnSelect"
+                                                 Margin="0,0,0,4" Checked="OnBackgroundSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcRandomOnSelect}" />
+                                    <RadioButton GroupName="BcSelectionMode" Name="rbBackgroundTimer"
+                                                 Margin="0,0,0,4" Checked="OnBackgroundSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcEnableAutoChanger}" />
 
-                                    <CheckBox Name="CbBcAutoChanger" IsChecked="{Binding Settings.EnableBackgroundImageAutoChanger}" Margin="0,0,0,10"
-                                              Content="{DynamicResource LOCBcEnableAutoChanger}" />
-                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal" 
-                                                IsEnabled="{Binding ElementName=CbBcAutoChanger, Path=IsChecked, TargetNullValue=false}">
-                                        <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
-                                        <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
-                                                                     LongValue="{Binding Settings.BackgroundImageAutoChangerTimer}" />
-                                        <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
+                                    <StackPanel Name="panelBackgroundTimer" Margin="24,0,0,10"
+                                                IsEnabled="{Binding ElementName=rbBackgroundTimer, Path=IsChecked, TargetNullValue=false}">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                            <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
+                                            <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
+                                                                         LongValue="{Binding Settings.BackgroundImageAutoChangerTimer}" />
+                                            <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
+                                        </StackPanel>
+                                        <CheckBox Name="cbBackgroundTimerRandom"
+                                                  Content="{DynamicResource LOCBcTimerRandomOrder}"
+                                                  ToolTip="{DynamicResource LOCBcTimerRandomOrderToolTip}"
+                                                  Checked="OnBackgroundTimerRandomChanged"
+                                                  Unchecked="OnBackgroundTimerRandomChanged" />
                                     </StackPanel>
 
                                     <CheckBox Name="CbBcVideoDelay" IsChecked="{Binding Settings.useVideoDelayBackgroundImage}" Margin="0,0,0,10"
                                               ToolTip="{DynamicResource LOCBcVideoDelayToolTip}"
                                               Content="{DynamicResource LOCBcEnableVideoDelay}" />
-                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal" 
+                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal"
                                                 IsEnabled="{Binding ElementName=CbBcVideoDelay, Path=IsChecked, TargetNullValue=false}">
                                         <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
                                         <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
                                                                      LongValue="{Binding Settings.videoDelayBackgroundImage}" />
-                                        <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                        <Label Content="{DynamicResource LOCSettingsMusiVolume}" VerticalAlignment="Center" Margin="0,0,20,0" />
-                                        <playnitecontrols:NumericBox MinLongValue="0" MaxLongValue="100" Width="40"
-                                                                     LongValue="{Binding Settings.Volume}" />
                                         <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
                                     </StackPanel>
 
@@ -335,72 +298,42 @@
 				                    BorderBrush="{DynamicResource PopupBorderBrush}"
 				                    BorderThickness="{DynamicResource PopupBorderThickness}">
                                 <StackPanel>
-                                    <DockPanel Margin="0,0,0,10">
-                                        <CheckBox IsChecked="{Binding Settings.EnableCoverImageRandomSelect}"
-                                                  DockPanel.Dock="Left" Name="cbCoverRandom"
-                                                  Content="{DynamicResource LOCBcEnableRandomSelect}" />
+                                    <TextBlock Text="{DynamicResource LOCBcSelectionMode}"
+                                               Style="{DynamicResource BaseTextBlockStyle}"
+                                               Margin="0,0,0,6" />
 
-                                        <RadioButton DockPanel.Dock="Right" GroupName="CoverRandom"
-                                                     Name="rbCoverOnSelect" Click="Rb_Click"
-                                                     Content="{DynamicResource LOCBcRandomOnSelect}">
-                                            <RadioButton.Style>
-                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
-                                                    <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=CbAutoChanger}" Value="True" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=cbCoverRandom}" Value="False" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </RadioButton.Style>
-                                        </RadioButton>
+                                    <RadioButton GroupName="CoverSelectionMode" Name="rbCoverDefault"
+                                                 Margin="0,0,0,4" Checked="OnCoverSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcModeDefault}" />
+                                    <RadioButton GroupName="CoverSelectionMode" Name="rbCoverOnStart"
+                                                 Margin="0,0,0,4" Checked="OnCoverSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcRandomOnStart}" />
+                                    <RadioButton GroupName="CoverSelectionMode" Name="rbCoverOnSelect"
+                                                 Margin="0,0,0,4" Checked="OnCoverSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcRandomOnSelect}" />
+                                    <RadioButton GroupName="CoverSelectionMode" Name="rbCoverTimer"
+                                                 Margin="0,0,0,4" Checked="OnCoverSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcEnableAutoChanger}" />
 
-                                        <RadioButton HorizontalAlignment="Right" Margin="0,0,20,0" GroupName="CoverRandom"
-                                                     Name="rbCoverOnStart" Click="Rb_Click"
-                                                     Content="{DynamicResource LOCBcRandomOnStart}">
-                                            <RadioButton.Style>
-                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
-                                                    <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=CbAutoChanger}" Value="True" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=cbCoverRandom}" Value="False" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </RadioButton.Style>
-                                        </RadioButton>
-                                    </DockPanel>
-
-                                    <CheckBox Name="CbAutoChanger" IsChecked="{Binding Settings.EnableCoverImageAutoChanger}" Margin="0,0,0,10"
-                                              Content="{DynamicResource LOCBcEnableAutoChanger}" />
-                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal" 
-                                                IsEnabled="{Binding ElementName=CbAutoChanger, Path=IsChecked, TargetNullValue=false}">
-                                        <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
-                                        <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
-                                                                     LongValue="{Binding Settings.CoverImageAutoChangerTimer}" />
-                                        <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
+                                    <StackPanel Name="panelCoverTimer" Margin="24,0,0,10"
+                                                IsEnabled="{Binding ElementName=rbCoverTimer, Path=IsChecked, TargetNullValue=false}">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                            <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
+                                            <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
+                                                                         LongValue="{Binding Settings.CoverImageAutoChangerTimer}" />
+                                            <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
+                                        </StackPanel>
+                                        <CheckBox Name="cbCoverTimerRandom"
+                                                  Content="{DynamicResource LOCBcTimerRandomOrder}"
+                                                  ToolTip="{DynamicResource LOCBcTimerRandomOrderToolTip}"
+                                                  Checked="OnCoverTimerRandomChanged"
+                                                  Unchecked="OnCoverTimerRandomChanged" />
                                     </StackPanel>
 
-                                    <CheckBox Name="CbVideoDelay" IsChecked="{Binding Settings.useVideoDelayCoverImage}"  Margin="0,0,0,10"
+                                    <CheckBox Name="CbVideoDelay" IsChecked="{Binding Settings.useVideoDelayCoverImage}" Margin="0,0,0,10"
                                               ToolTip="{DynamicResource LOCBcVideoDelayToolTip}"
                                               Content="{DynamicResource LOCBcEnableVideoDelay}" />
-                                    <StackPanel Grid.Row="8" Margin="50,0,0,10" Orientation="Horizontal" 
+                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal"
                                                 IsEnabled="{Binding ElementName=CbVideoDelay, Path=IsChecked, TargetNullValue=false}">
                                         <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
                                         <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
@@ -431,46 +364,17 @@
 				                    BorderBrush="{DynamicResource PopupBorderBrush}"
 				                    BorderThickness="{DynamicResource PopupBorderThickness}">
                                 <StackPanel>
-                                    <DockPanel Margin="0,0,0,10">
-                                        <CheckBox IsChecked="{Binding Settings.EnableIconImageRandomSelect}"
-                                                  DockPanel.Dock="Left" Name="cbIconRandom"
-                                                  Content="{DynamicResource LOCBcEnableRandomSelect}" />
+                                    <!-- Icon: Default + OnStart only (no Timer/OnSelect). Timer breaks Details list (N instances). -->
+                                    <TextBlock Text="{DynamicResource LOCBcSelectionMode}"
+                                               Style="{DynamicResource BaseTextBlockStyle}"
+                                               Margin="0,0,0,6" />
 
-                                        <RadioButton HorizontalAlignment="Right" Margin="0,0,20,0" GroupName="IconRandom"
-                                                     Name="rbIconOnStart" Click="RbIconOnStart_Click"
-                                                     IsChecked="{Binding Settings.EnableIconImageRandomOnStart}"
-                                                     Content="{DynamicResource LOCBcRandomOnStart}">
-                                            <RadioButton.Style>
-                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
-                                                    <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=CbIconAutoChanger}" Value="True" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=cbIconRandom}" Value="False" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </RadioButton.Style>
-                                        </RadioButton>
-                                    </DockPanel>
-
-                                    <CheckBox Name="CbIconAutoChanger" IsChecked="{Binding Settings.EnableIconImageAutoChanger}" Margin="0,0,0,10"
-                                              Checked="CbIconAutoChanger_Checked" Unchecked="CbIconAutoChanger_Unchecked"
-                                              Content="{DynamicResource LOCBcEnableAutoChanger}" />
-                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal"
-                                                IsEnabled="{Binding ElementName=CbIconAutoChanger, Path=IsChecked, TargetNullValue=false}">
-                                        <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
-                                        <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
-                                                                     LongValue="{Binding Settings.IconImageAutoChangerTimer}" />
-                                        <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
-                                    </StackPanel>
+                                    <RadioButton GroupName="IconSelectionMode" Name="rbIconDefault"
+                                                 Margin="0,0,0,4" Checked="OnIconSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcModeDefault}" />
+                                    <RadioButton GroupName="IconSelectionMode" Name="rbIconOnStart"
+                                                 Margin="0,0,0,4" Checked="OnIconSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcRandomOnStart}" />
                                 </StackPanel>
                             </Border>
                         </Expander.Content>
