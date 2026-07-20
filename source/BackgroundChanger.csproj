@@ -65,8 +65,21 @@
     <Reference Include="Ardalis.GuardClauses, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Ardalis.GuardClauses.5.0.0\lib\netstandard2.0\Ardalis.GuardClauses.dll</HintPath>
     </Reference>
+    <Reference Include="FuzzySharp, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\FuzzySharp.2.0.2\lib\net461\FuzzySharp.dll</HintPath>
+    </Reference>
     <Reference Include="Playnite.SDK, Version=6.16.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\PlayniteSDK.6.16.0\lib\net462\Playnite.SDK.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <HintPath>packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="SteamKit2, Version=1.8.3.0, Culture=neutral, PublicKeyToken=ed3ce47ed5aad940, processorArchitecture=MSIL">
+      <HintPath>packages\SteamKit2.1.8.3\lib\net45\SteamKit2.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -123,6 +136,7 @@
     <Compile Include="Models\GoogleImage.cs" />
     <Compile Include="Models\SteamGridDbResult.cs" />
     <Compile Include="Models\SteamGridDbSearchResult.cs" />
+    <Compile Include="Models\SteamOfficialMediaCandidate.cs" />
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Controls\TextBlockTrimmed.xaml.cs">
       <DependentUpon>TextBlockTrimmed.xaml</DependentUpon>
     </Compile>
@@ -165,6 +179,8 @@
     <Compile Include="Services\BackgroundChangerWindows.cs" />
     <Compile Include="Services\SteamGridDbApi.cs" />
     <Compile Include="Services\SteamGridFilterHelper.cs" />
+    <Compile Include="Services\SteamAnonymousProductInfoClient.cs" />
+    <Compile Include="Services\SteamOfficialMediaService.cs" />
     <Compile Include="Views\GoogleImageView.xaml.cs">
       <DependentUpon>GoogleImageView.xaml</DependentUpon>
     </Compile>
@@ -177,6 +193,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Views\SteamGridDbView.xaml.cs">
       <DependentUpon>SteamGridDbView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SteamSelectView.xaml.cs">
+      <DependentUpon>SteamSelectView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -452,6 +471,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\SteamSelectView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <None Include="icon.png">
@@ -467,6 +490,7 @@
   <ItemGroup />
   <Import Project="playnite-plugincommon\CommonPlayniteShared\CommonPlayniteShared.projitems" Label="Shared" />
   <Import Project="playnite-plugincommon\CommonPluginsShared\CommonPluginsShared.projitems" Label="Shared" />
+  <Import Project="playnite-plugincommon\CommonPluginsStores\CommonPluginsStores.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>powershell -ExecutionPolicy Unrestricted $(SolutionDir)..\build\build.ps1 -ConfigurationName $(ConfigurationName) -OutDir $(SolutionDir)$(OutDir) -SolutionDir $(SolutionDir)</PostBuildEvent>

@@ -35,6 +35,10 @@
 
     <!-- ImagesManagerView -->
 
+    <sys:String x:Key="LOCBcSteamSelect">Select from Steam</sys:String>
+    <sys:String x:Key="LOCBcSteamGet">Get from Steam</sys:String>
+    <sys:String x:Key="LOCBcSteamNoAppId">Could not find a Steam App ID for this game.</sys:String>
+    <sys:String x:Key="LOCBcSteamNoAssets">No official Steam media found for this game.</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbAnimated">Animated</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbMimes">MIME types</sys:String>

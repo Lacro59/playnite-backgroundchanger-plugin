@@ -51,9 +51,22 @@ namespace BackgroundChanger.Views
             InitializeComponent();
 
             PART_BackgroundImage.SizeChanged += PART_BackgroundImage_SizeChanged;
+            ConfigureSteamOfficialButton(mediaKind);
 
             PART_LbBackgroundImages.ItemsSource = null;
             PART_LbBackgroundImages.ItemsSource = EditedImages;
+        }
+
+        private void ConfigureSteamOfficialButton(BackgroundChangerDatabase.PluginMediaKind mediaKind)
+        {
+            if (mediaKind == BackgroundChangerDatabase.PluginMediaKind.Icon)
+            {
+                PART_BtAddSteamOfficial.Content = ResourceProvider.GetString("LOCBcSteamGet");
+            }
+            else
+            {
+                PART_BtAddSteamOfficial.Content = ResourceProvider.GetString("LOCBcSteamSelect");
+            }
         }
 
         private void PART_BackgroundImage_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -614,6 +627,112 @@ namespace BackgroundChanger.Views
 
                     RefreshEditedImagesList();
                 }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
+        }
+
+        private void ImportSteamOfficialCandidates(IList<SteamOfficialMediaCandidate> candidates)
+        {
+            if (candidates == null || candidates.Count == 0)
+            {
+                return;
+            }
+
+            Common.LogDebug(false, string.Format(
+                "[ImagesManager] Steam official import start game={0} mediaKind={1} count={2}",
+                GameBackgroundImages?.Name,
+                MediaKind,
+                candidates.Count));
+
+            GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(ResourceProvider.GetString("LOCCommonGettingData"))
+            {
+                Cancelable = false,
+                IsIndeterminate = true
+            };
+
+            GlobalProgressResult progressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+            {
+                bool ffmpegErrorShown = false;
+                bool ffmpegOutdatedShown = false;
+                bool conversionFailedShown = false;
+                foreach (SteamOfficialMediaCandidate candidate in candidates)
+                {
+                    try
+                    {
+                        Common.LogDebug(false, string.Format(
+                            "[ImagesManager] Steam official import item kind={0} url={1}",
+                            candidate.AssetKind,
+                            candidate.Url));
+
+                        string cachedFile = HttpFileCache.GetWebFile(candidate.Url);
+                        TryAddImportedItem(
+                            cachedFile,
+                            ref ffmpegErrorShown,
+                            ref ffmpegOutdatedShown,
+                            ref conversionFailedShown);
+
+                        Common.LogDebug(false, string.Format(
+                            "[ImagesManager] Steam official import cached kind={0} file={1}",
+                            candidate.AssetKind,
+                            cachedFile));
+                    }
+                    catch (Exception ex)
+                    {
+                        Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                    }
+                }
+            }, globalProgressOptions);
+
+            WaitProgressAndRefreshList(progressDownload);
+        }
+
+        private void PART_BtAddSteamOfficial_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Game game = GameBackgroundImages?.Game;
+                if (game == null)
+                {
+                    API.Instance.Dialogs.ShowErrorMessage(
+                        ResourceProvider.GetString("LOCBcSteamNoAppId"),
+                        PluginDatabase.PluginName);
+                    return;
+                }
+
+                Common.LogDebug(false, string.Format(
+                    "[ImagesManager] Steam official open search game={0} mediaKind={1}",
+                    GameBackgroundImages.Name,
+                    MediaKind));
+
+                SteamOfficialMediaService steamMediaService = new SteamOfficialMediaService();
+                SteamSelectView viewExtension = new SteamSelectView(
+                    GameBackgroundImages.Name,
+                    MediaKind,
+                    steamMediaService);
+                Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(
+                    ResourceProvider.GetString("LOCCommonStoreSteam"),
+                    viewExtension);
+                _ = windowExtension.ShowDialog();
+
+                if (viewExtension.SelectedResults == null || viewExtension.SelectedResults.Count == 0)
+                {
+                    Common.LogDebug(false, string.Format(
+                        "[ImagesManager] Steam official cancelled game={0} mediaKind={1}",
+                        GameBackgroundImages.Name,
+                        MediaKind));
+                    return;
+                }
+
+                Common.LogDebug(false, string.Format(
+                    "[ImagesManager] Steam official confirmed game={0} mediaKind={1} count={2}",
+                    GameBackgroundImages.Name,
+                    MediaKind,
+                    viewExtension.SelectedResults.Count));
+
+                ImportSteamOfficialCandidates(viewExtension.SelectedResults);
             }
             catch (Exception ex)
             {
