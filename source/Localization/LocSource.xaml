@@ -42,6 +42,12 @@
     <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbAnimated">Animated</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbMimes">MIME types</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKeyMissingNotification">Configure a SteamGridDB API key in plugin settings to search and download artwork.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbUnauthorizedNotification">SteamGridDB rejected the API key (401 Unauthorized). Verify the key in plugin settings (invalid, expired, or revoked).</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbForbiddenNotification">SteamGridDB denied access to this resource (403 Forbidden). Your API key may lack the required permissions.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbRateLimitNotification">SteamGridDB rate limit reached (429). Wait a moment and try again.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbParseErrorNotification">SteamGridDB returned an unexpected response. Try again or verify your API key in plugin settings.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbGenericErrorNotification">SteamGridDB request failed. See extensions.log for details.</sys:String>
     <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
     <sys:String x:Key="LOCBcAddFromUrl">Add from url</sys:String>
     <sys:String x:Key="LOCBcAddFromUrlDescription">Enter the url to the image</sys:String>

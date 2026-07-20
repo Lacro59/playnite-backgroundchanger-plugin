@@ -1,7 +1,10 @@
 ﻿using BackgroundChanger.Models;
 using CommonPluginsShared;
+using Playnite.SDK;
 using Playnite.SDK.Data;
+using Playnite.SDK.Plugins;
 using System;
+using System.Linq;
 using System.Net;
 using SteamGridFilters = BackgroundChanger.SteamGridFilters;
 
@@ -34,6 +37,16 @@ namespace BackgroundChanger.Services
     /// </summary>
     public class SteamGridDbApi
     {
+        private static readonly ILogger Logger = LogManager.GetLogger();
+        private static readonly Guid PluginId = Guid.Parse("3afdd02b-db6c-4b60-8faa-2971d6dfad2a");
+        private const string LogPrefix = "[SteamGridDbApi]";
+        private const string NotificationIdMissingApiKey = "BackgroundChanger-steamgriddb-missing-apikey";
+        private const string NotificationIdUnauthorized = "BackgroundChanger-steamgriddb-unauthorized";
+        private const string NotificationIdForbidden = "BackgroundChanger-steamgriddb-forbidden";
+        private const string NotificationIdRateLimit = "BackgroundChanger-steamgriddb-ratelimit";
+        private const string NotificationIdParseError = "BackgroundChanger-steamgriddb-parse-error";
+        private const string NotificationIdGenericError = "BackgroundChanger-steamgriddb-generic-error";
+
         /// <summary>
         /// Gets the plugin's database instance.
         /// </summary>
@@ -62,15 +75,48 @@ namespace BackgroundChanger.Services
         /// <returns>A <see cref="SteamGridDbSearchResultData"/> object containing the search results, or null if an error occurs.</returns>
         public SteamGridDbSearchResultData SearchGame(string name)
         {
+            if (!EnsureApiKeyConfigured("SearchGame"))
+            {
+                return null;
+            }
+
+            string url = string.Format(UrlSearch, WebUtility.UrlEncode(name));
+            string context = string.Format(
+                "operation=SearchGame endpoint=search/autocomplete term='{0}'",
+                name ?? string.Empty);
+
             try
             {
-                string response = Web.DownloadStringData(string.Format(UrlSearch, WebUtility.UrlEncode(name)), ApiKey).GetAwaiter().GetResult();
-                SteamGridDbSearchResultData resultData = Serialization.FromJson<SteamGridDbSearchResultData>(response);
+                string response = DownloadApiResponse(url, context);
+                if (!Serialization.TryFromJson(response, out SteamGridDbSearchResultData resultData, out Exception parseEx))
+                {
+                    Logger.Warn(string.Format(
+                        "{0} SearchGame JSON parse failed {1} responseLength={2}",
+                        LogPrefix,
+                        context,
+                        response?.Length ?? 0));
+                    if (parseEx != null)
+                    {
+                        Common.LogError(parseEx, false, LogPrefix + " SearchGame parse error", false, PluginDatabase.PluginName);
+                    }
+
+                    NotifyUser(
+                        NotificationIdParseError,
+                        "LOCBcSteamGridDbParseErrorNotification",
+                        NotificationType.Error,
+                        openSettingsOnActivate: true);
+                    return null;
+                }
+
+                int resultCount = resultData?.Data?.Count ?? 0;
+                Common.LogDebug(
+                    false,
+                    string.Format("{0} SearchGame success term='{1}' results={2}", LogPrefix, name, resultCount));
                 return resultData;
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                LogApiFailure(ex, url, context);
             }
 
             return null;
@@ -100,16 +146,224 @@ namespace BackgroundChanger.Services
         /// <returns>A <see cref="SteamGridDbResultData"/> object containing the results, or null if an error occurs.</returns>
         public SteamGridDbResultData SearchElement(int id, SteamGridDbType steamGridDbType, SteamGridFilters activeFilters, int page = 0)
         {
+            if (!EnsureApiKeyConfigured("SearchElement"))
+            {
+                return null;
+            }
+
+            string resource = SteamGridFilterHelper.ResolveApiResource(steamGridDbType);
+            string url = BuildSearchUrl(id, steamGridDbType, activeFilters, page);
+            string context = string.Format(
+                "operation=SearchElement endpoint={0}/game/{1} assetType={2} page={3}",
+                resource,
+                id,
+                steamGridDbType,
+                page);
+
             try
             {
-                string url = BuildSearchUrl(id, steamGridDbType, activeFilters, page);
-                string response = Web.DownloadStringData(url, ApiKey).GetAwaiter().GetResult();
-                _ = Serialization.TryFromJson(response, out SteamGridDbResultData resultData);
+                string response = DownloadApiResponse(url, context);
+                if (!Serialization.TryFromJson(response, out SteamGridDbResultData resultData, out Exception parseEx))
+                {
+                    Logger.Warn(string.Format(
+                        "{0} SearchElement JSON parse failed {1} responseLength={2}",
+                        LogPrefix,
+                        context,
+                        response?.Length ?? 0));
+                    if (parseEx != null)
+                    {
+                        Common.LogError(parseEx, false, LogPrefix + " SearchElement parse error", false, PluginDatabase.PluginName);
+                    }
+
+                    NotifyUser(
+                        NotificationIdParseError,
+                        "LOCBcSteamGridDbParseErrorNotification",
+                        NotificationType.Error,
+                        openSettingsOnActivate: true);
+                    return null;
+                }
+
+                int resultCount = resultData?.Data?.Count ?? 0;
+                Common.LogDebug(
+                    false,
+                    string.Format("{0} SearchElement success {1} results={2}", LogPrefix, context, resultCount));
                 return resultData;
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                LogApiFailure(ex, url, context);
+            }
+
+            return null;
+        }
+
+        private bool EnsureApiKeyConfigured(string operation)
+        {
+            if (!string.IsNullOrWhiteSpace(ApiKey))
+            {
+                Common.LogDebug(
+                    true,
+                    string.Format("{0} {1} apiKeyLength={2}", LogPrefix, operation, ApiKey.Length));
+                return true;
+            }
+
+            Logger.Warn(string.Format(
+                "{0} {1} skipped: SteamGridDB API key is not configured (plugin settings).",
+                LogPrefix,
+                operation));
+            NotifyUser(
+                NotificationIdMissingApiKey,
+                "LOCBcSteamGridDbApiKeyMissingNotification",
+                NotificationType.Error,
+                openSettingsOnActivate: true);
+            return false;
+        }
+
+        private string DownloadApiResponse(string url, string context)
+        {
+            Common.LogDebug(true, string.Format("{0} request {1} url={2}", LogPrefix, context, url));
+            return Web.DownloadStringData(url, ApiKey).GetAwaiter().GetResult();
+        }
+
+        private void LogApiFailure(Exception ex, string url, string context)
+        {
+            string statusCode = TryGetHttpStatusCode(ex);
+            if (statusCode == "401")
+            {
+                Logger.Warn(string.Format(
+                    "{0} HTTP 401 Unauthorized on {1}. Verify the SteamGridDB API key in plugin settings (missing, invalid, expired, or revoked). url={2}",
+                    LogPrefix,
+                    context,
+                    url));
+                Common.LogError(ex, true, LogPrefix + " HTTP 401", false, PluginDatabase.PluginName);
+                NotifyUser(
+                    NotificationIdUnauthorized,
+                    "LOCBcSteamGridDbUnauthorizedNotification",
+                    NotificationType.Error,
+                    openSettingsOnActivate: true);
+                return;
+            }
+
+            if (statusCode == "403")
+            {
+                Logger.Warn(string.Format(
+                    "{0} HTTP 403 Forbidden on {1}. The API key may lack permissions for this endpoint. url={2}",
+                    LogPrefix,
+                    context,
+                    url));
+                Common.LogError(ex, true, LogPrefix + " HTTP 403", false, PluginDatabase.PluginName);
+                NotifyUser(
+                    NotificationIdForbidden,
+                    "LOCBcSteamGridDbForbiddenNotification",
+                    NotificationType.Error,
+                    openSettingsOnActivate: true);
+                return;
+            }
+
+            if (statusCode == "429")
+            {
+                Logger.Warn(string.Format(
+                    "{0} HTTP 429 Too Many Requests on {1}. SteamGridDB rate limit reached; retry later. url={2}",
+                    LogPrefix,
+                    context,
+                    url));
+                Common.LogError(ex, true, LogPrefix + " HTTP 429", false, PluginDatabase.PluginName);
+                NotifyUser(
+                    NotificationIdRateLimit,
+                    "LOCBcSteamGridDbRateLimitNotification",
+                    NotificationType.Info,
+                    openSettingsOnActivate: false);
+                return;
+            }
+
+            if (statusCode == "404")
+            {
+                Logger.Warn(string.Format(
+                    "{0} HTTP 404 Not Found on {1}. url={2}",
+                    LogPrefix,
+                    context,
+                    url));
+                Common.LogError(ex, true, LogPrefix + " HTTP 404", false, PluginDatabase.PluginName);
+                return;
+            }
+
+            string statusLabel = string.IsNullOrEmpty(statusCode) ? "unknown" : "HTTP " + statusCode;
+            Common.LogError(
+                ex,
+                false,
+                string.Format("{0} request failed status={1} {2} url={3}", LogPrefix, statusLabel, context, url),
+                false,
+                PluginDatabase.PluginName);
+            NotifyUser(
+                NotificationIdGenericError,
+                "LOCBcSteamGridDbGenericErrorNotification",
+                NotificationType.Error,
+                openSettingsOnActivate: false);
+        }
+
+        private void NotifyUser(
+            string notificationId,
+            string resourceKey,
+            NotificationType notificationType,
+            bool openSettingsOnActivate)
+        {
+            string pluginName = PluginDatabase.PluginName;
+            string message = ResourceProvider.GetString(resourceKey);
+            string notificationText = pluginName + Environment.NewLine + message;
+
+            if (openSettingsOnActivate)
+            {
+                API.Instance.Notifications.Add(new NotificationMessage(
+                    notificationId,
+                    notificationText,
+                    notificationType,
+                    OpenPluginSettings));
+                return;
+            }
+
+            API.Instance.Notifications.Add(new NotificationMessage(
+                notificationId,
+                notificationText,
+                notificationType));
+        }
+
+        private static void OpenPluginSettings()
+        {
+            Plugin plugin = API.Instance.Addons.Plugins.FirstOrDefault(x => x.Id == PluginId);
+            if (plugin != null)
+            {
+                _ = plugin.OpenSettingsView();
+            }
+        }
+
+        private static string TryGetHttpStatusCode(Exception ex)
+        {
+            for (Exception current = ex; current != null; current = current.InnerException)
+            {
+                string message = current.Message ?? string.Empty;
+                if (message.IndexOf("(401)", StringComparison.OrdinalIgnoreCase) >= 0
+                    || message.IndexOf("401 (Unauthorized)", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return "401";
+                }
+
+                if (message.IndexOf("(403)", StringComparison.OrdinalIgnoreCase) >= 0
+                    || message.IndexOf("403 (Forbidden)", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return "403";
+                }
+
+                if (message.IndexOf("(404)", StringComparison.OrdinalIgnoreCase) >= 0
+                    || message.IndexOf("404 (Not Found)", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return "404";
+                }
+
+                if (message.IndexOf("(429)", StringComparison.OrdinalIgnoreCase) >= 0
+                    || message.IndexOf("429 (Too Many Requests)", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return "429";
+                }
             }
 
             return null;

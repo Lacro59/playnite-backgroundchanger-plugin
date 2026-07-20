@@ -258,11 +258,19 @@ namespace BackgroundChanger.Views
             {
                 if (PART_SearchList?.Items?.Count > 0)
                 {
-                    int id = ((SteamGridDbSearchResult)PART_SearchList.SelectedItem).Id;
-                    SearchDataElements(id);
+                    SteamGridDbSearchResult selected = PART_SearchList.SelectedItem as SteamGridDbSearchResult;
+                    if (selected == null)
+                    {
+                        return;
+                    }
+
+                    SearchDataElements(selected.Id);
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, "BackgroundChanger");
+            }
         }
 
 
