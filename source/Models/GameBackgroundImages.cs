@@ -8,6 +8,15 @@ namespace BackgroundChanger.Models
 {
     public class GameBackgroundImages : PluginGameCollection<ItemImage>
     {
+        /// <summary>
+        /// Invalidates cached <see cref="PluginGameEntry.HasData"/> after in-memory item list mutations
+        /// (e.g. ephemeral Playnite default mirrors from <see cref="BackgroundChangerDatabase.Get"/>).
+        /// </summary>
+        public void InvalidateItemCache()
+        {
+            RefreshCachedValues();
+        }
+
         [DontSerialize]
         public bool HasDataBackground => Items?.Where(x => x.IsBackgroundMedia && x.Exist)?.Count() > 0;
 

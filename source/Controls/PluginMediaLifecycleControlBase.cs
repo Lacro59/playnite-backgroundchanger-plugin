@@ -17,6 +17,27 @@ namespace BackgroundChangerPlugin.Controls
 
         protected bool WindowsIsActivated { get; private set; } = true;
 
+        /// <summary>
+        /// Theme mirror flags updated on every game switch via SetThemesResources.
+        /// They must not reset media controls or restart the settings debounce path.
+        /// </summary>
+        protected override bool ShouldApplySettingsProperty(string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                return true;
+            }
+
+            if (propertyName == "HasDataBackground"
+                || propertyName == "HasDataCover"
+                || propertyName == "HasDataIcon")
+            {
+                return false;
+            }
+
+            return base.ShouldApplySettingsProperty(propertyName);
+        }
+
         protected void InitializeMediaLifecycleHooks()
         {
             IsVisibleChanged += OnMediaLifecycleVisibilityChanged;

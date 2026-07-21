@@ -15,12 +15,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
-using System.Threading;
 
 namespace BackgroundChanger.Controls
 {
@@ -79,6 +80,8 @@ namespace BackgroundChanger.Controls
         {
             DisposeBcTimers();
             _stableCoverGameId = null;
+            Interlocked.Increment(ref _coverApplyRequestId);
+            ClearCoverDisplayState();
 
             ControlDataContext = new PluginCoverImageDataContext
             {
@@ -204,9 +207,7 @@ namespace BackgroundChanger.Controls
 
                     if (!GameBackgroundImages.HasDataCover)
                     {
-                        DisposeBcTimers();
-                        PauseVideos();
-                        MustDisplay = false;
+                        ApplyNoCoverDataState();
                         return;
                     }
 
@@ -217,6 +218,23 @@ namespace BackgroundChanger.Controls
                     Common.LogError(ex, false, true, PluginDatabase.PluginName);
                 }
             }
+        }
+
+
+        protected override Task OnNoPluginCacheEntryAsync(Game gameContext, CancellationToken cancellationToken)
+        {
+            Video1.LoadedBehavior = MediaState.Stop;
+            ApplyNoCoverDataState();
+            return Task.CompletedTask;
+        }
+
+
+        private void ApplyNoCoverDataState()
+        {
+            DisposeBcTimers();
+            ClearCoverDisplayState();
+            PauseVideos();
+            MustDisplay = false;
         }
 
 
@@ -529,13 +547,99 @@ namespace BackgroundChanger.Controls
             {
                 ControlDataContext.ImageSource = pathImage;
                 ControlDataContext.VideoSource = null;
+            long requestId = Interlocked.Increment(ref _coverApplyRequestId);
+            Guid gameIdAtSchedule = GameContext != null ? GameContext.Id : Guid.Empty;
+            ApplyCoverImageWhenReady(pathImage, requestId, gameIdAtSchedule);
+            }
+        }
+
+        private async void ApplyCoverImageWhenReady(string pathImage, long requestId, Guid gameIdAtSchedule)
+        {
+            bool decodeReady = await ImageAsync.WaitForDecodeAsync(Image1, pathImage).ConfigureAwait(true);
+            if (!decodeReady)
+            {
+                LogControlTrace(
+                    MediaControlDiagnostics.PhaseSourceSet,
+                    string.Format(
+                        "ApplyCoverImage aborted: decodeReady=false, file={0}",
+                        MediaControlDiagnostics.FormatFileName(pathImage)));
+                return;
             }
 
-            _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
+            if (requestId != _coverApplyRequestId)
             {
+                LogControlTrace(
+                    MediaControlDiagnostics.PhaseSourceSet,
+                    string.Format(
+                        "ApplyCoverImage skipped: superseded request, file={0}, request={1}, latest={2}",
+                        MediaControlDiagnostics.FormatFileName(pathImage),
+                        requestId,
+                        _coverApplyRequestId));
+                return;
+            }
+
+            if (gameIdAtSchedule != Guid.Empty
+                && (GameContext == null || GameContext.Id != gameIdAtSchedule))
+            {
+                LogControlTrace(
+                    MediaControlDiagnostics.PhaseSourceSet,
+                    string.Format(
+                        "ApplyCoverImage skipped: context superseded, file={0}, request={1}",
+                        MediaControlDiagnostics.FormatFileName(pathImage),
+                        requestId));
+                return;
+            }
+
+            Dispatcher dispatcher = API.Instance?.MainView?.UIDispatcher ?? Dispatcher;
+            if (dispatcher == null)
+            {
+                return;
+            }
+
+            await dispatcher.InvokeAsync(() =>
+            {
+                if (requestId != _coverApplyRequestId)
+                {
+                    LogControlTrace(
+                        MediaControlDiagnostics.PhaseSourceSet,
+                        string.Format(
+                            "ApplyCoverImage ui-sync skipped: superseded request, file={0}, request={1}, latest={2}",
+                            MediaControlDiagnostics.FormatFileName(pathImage),
+                            requestId,
+                            _coverApplyRequestId));
+                    return;
+                }
+
+                if (gameIdAtSchedule != Guid.Empty
+                    && (GameContext == null || GameContext.Id != gameIdAtSchedule))
+                {
+                    LogControlTrace(
+                        MediaControlDiagnostics.PhaseSourceSet,
+                        string.Format(
+                            "ApplyCoverImage ui-sync skipped: context superseded, file={0}, request={1}",
+                            MediaControlDiagnostics.FormatFileName(pathImage),
+                            requestId));
+                    return;
+                }
+
+                if (!string.Equals(ControlDataContext.ImageSource, pathImage, StringComparison.Ordinal))
+                {
+                    LogControlTrace(
+                        MediaControlDiagnostics.PhaseSourceSet,
+                        string.Format(
+                            "ApplyCoverImage ui-sync skipped: superseded, file={0}",
+                            MediaControlDiagnostics.FormatFileName(pathImage)));
+                    return;
+                }
+
                 Image1.Source = ControlDataContext.ImageSource;
-                Video1.Source = ControlDataContext.VideoSource.IsNullOrEmpty() ? null : new Uri(ControlDataContext.VideoSource);
-            }));
+                Video1.Source = null;
+                LogControlTrace(
+                    MediaControlDiagnostics.PhaseSourceSet,
+                    string.Format(
+                        "ApplyCoverImage ui-sync applied, file={0}",
+                        MediaControlDiagnostics.FormatFileName(pathImage)));
+            }, DispatcherPriority.Loaded);
         }
 
 
@@ -589,6 +693,7 @@ namespace BackgroundChanger.Controls
 
 
         private object currentSource = null;
+        private long _coverApplyRequestId = 0;
 
         private static void SourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
@@ -666,6 +771,19 @@ namespace BackgroundChanger.Controls
                     fadeBranch = "image";
                     Image1.Source = image;
                     Video1.Source = null;
+                    bool decodeReady = await ImageAsync.WaitForDecodeAsync(Image1, image).ConfigureAwait(true);
+                    if (!decodeReady
+                        || !string.Equals(currentSource as string, image, StringComparison.Ordinal))
+                    {
+                        LogControlTrace(
+                            MediaControlDiagnostics.PhaseLoadNewSource,
+                            string.Format(
+                                "LoadNewSource aborted: decodeReady={0}, currentSourceMatch={1}, file={2}",
+                                decodeReady,
+                                string.Equals(currentSource as string, image, StringComparison.Ordinal),
+                                MediaControlDiagnostics.FormatFileName(image)));
+                        return;
+                    }
                 }
             }
         }
@@ -916,6 +1034,32 @@ namespace BackgroundChanger.Controls
         private void PauseVideos()
         {
             Video1.LoadedBehavior = MediaState.Pause;
+        }
+
+        /// <summary>
+        /// Clears displayed cover layers when no plugin cover data is shown.
+        /// Prevents stale bitmaps from reappearing when <see cref="MustDisplay"/> becomes true again.
+        /// </summary>
+        private void ClearCoverDisplayState()
+        {
+            LogControlTrace(
+                MediaControlDiagnostics.PhaseSetData,
+                string.Format(
+                    "ClearDisplayState, hadSource={0}, hadImage={1}, hadVideo={2}",
+                    currentSource != null,
+                    !ControlDataContext.ImageSource.IsNullOrEmpty(),
+                    !ControlDataContext.VideoSource.IsNullOrEmpty()));
+
+            Image1.Source = null;
+            Video1.Source = null;
+            Video1.LoadedBehavior = MediaState.Stop;
+
+            ControlDataContext.ImageSource = null;
+            ControlDataContext.VideoSource = null;
+
+            _isCurrentMediaVideo = false;
+            currentSource = null;
+            Source = null;
         }
 
         private void ResumeVideosIfLifecycleActive()

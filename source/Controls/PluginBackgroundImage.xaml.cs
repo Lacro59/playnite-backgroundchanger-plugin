@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -75,10 +77,29 @@ namespace BackgroundChanger.Controls
         }
 
 
+        public override void GameContextChanged(Game oldContext, Game newContext)
+        {
+            base.GameContextChanged(oldContext, newContext);
+
+            // When background feature is enabled, stay visible so theme-native FadeImage
+            // (collapsed only while EnableBackgroundImage is on) cannot flash through.
+            EnsureActivatedVisibility("GameContextChanged");
+        }
+
+
+        /// <inheritdoc />
+        protected override bool ShouldCollapseOnContextSwitch()
+        {
+            // Keep the BC background surface mounted while the feature is enabled.
+            return !(AlwaysShow || PluginDatabase.PluginSettings.EnableBackgroundImage);
+        }
+
+
         public override void SetDefaultDataContext()
         {
             DisposeBcTimers();
             _stableBackgroundGameId = null;
+            Interlocked.Increment(ref _sourceSetRequestId);
 
             ControlDataContext = new PluginBackgroundImageDataContext
             {
@@ -280,9 +301,11 @@ namespace BackgroundChanger.Controls
             Video2.Volume = 0;
 
             string setDataDetail = string.Format(
-                "game={0}, hasData={1}",
+                "game={0}, hasDataBackground={1}, itemsBackground={2}, entryHasData={3}",
                 MediaControlDiagnostics.FormatGameRef(GameContext),
-                GameBackgroundImages.HasDataBackground);
+                GameBackgroundImages.HasDataBackground,
+                GameBackgroundImages.ItemsBackground.Count,
+                GameBackgroundImages.HasData);
 
             using (MediaControlDiagnostics.BeginScope(
                 MediaControlDiagnostics.PhaseSetData,
@@ -297,10 +320,7 @@ namespace BackgroundChanger.Controls
 
                     if (!GameBackgroundImages.HasDataBackground)
                     {
-                        DisposeBcTimers();
-                        PauseVideos();
-                        MustDisplay = false;
-                        DataContext = ControlDataContext;
+                        ApplyNoBackgroundDataState();
                         return;
                     }
 
@@ -311,6 +331,30 @@ namespace BackgroundChanger.Controls
                     Common.LogError(ex, false, true, PluginDatabase.PluginName);
                 }
             }
+        }
+
+
+        protected override Task OnNoPluginCacheEntryAsync(Game gameContext, CancellationToken cancellationToken)
+        {
+            Video1.LoadedBehavior = MediaState.Stop;
+            Video2.LoadedBehavior = MediaState.Stop;
+            Video1.Volume = 0;
+            Video2.Volume = 0;
+            ApplyNoBackgroundDataState();
+            return Task.CompletedTask;
+        }
+
+
+        private void ApplyNoBackgroundDataState()
+        {
+            DisposeBcTimers();
+            ClearBackgroundDisplayState("ApplyNoBackgroundDataState");
+            PauseVideos();
+            // Keep hosting the background surface while the feature is enabled; themes hide
+            // native FadeImage based on EnableBackgroundImage, so collapsing here would flash it.
+            MustDisplay = AlwaysShow || (ControlDataContext?.IsActivated ?? false);
+            EnsureActivatedVisibility("ApplyNoBackgroundDataState");
+            DataContext = ControlDataContext;
         }
 
 
@@ -592,6 +636,8 @@ namespace BackgroundChanger.Controls
         {
             bool exists = !string.IsNullOrEmpty(pathImage) && File.Exists(pathImage);
             bool isVideo = !string.IsNullOrEmpty(pathImage) && Path.GetExtension(pathImage).IsEqual(".mp4");
+            long requestId = Interlocked.Increment(ref _sourceSetRequestId);
+            Guid gameIdAtSchedule = GameContext?.Id ?? Guid.Empty;
 
             if (!string.IsNullOrEmpty(pathImage) && !exists)
             {
@@ -608,11 +654,44 @@ namespace BackgroundChanger.Controls
 
             _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Render, (Action)delegate
             {
+                if (requestId != _sourceSetRequestId)
+                {
+                    LogControlTrace(
+                        MediaControlDiagnostics.PhaseSourceSet,
+                        string.Format(
+                            "BeginInvoke skipped: superseded request, file={0}, request={1}, latest={2}",
+                            MediaControlDiagnostics.FormatFileName(pathImage),
+                            requestId,
+                            _sourceSetRequestId));
+                    return;
+                }
+
+                if (gameIdAtSchedule == Guid.Empty || GameContext?.Id != gameIdAtSchedule)
+                {
+                    LogControlTrace(
+                        MediaControlDiagnostics.PhaseSourceSet,
+                        string.Format(
+                            "BeginInvoke skipped: context superseded, file={0}, request={1}",
+                            MediaControlDiagnostics.FormatFileName(pathImage),
+                            requestId));
+                    return;
+                }
+
+                string appliedPath = pathImage;
                 if (!File.Exists(pathImage))
                 {
-                    pathImage = null;
+                    appliedPath = null;
                 }
-                Source = pathImage;
+
+                LogControlTrace(
+                    MediaControlDiagnostics.PhaseSourceSet,
+                    string.Format(
+                        "BeginInvoke applied, file={0}, exists={1}, request={2}",
+                        MediaControlDiagnostics.FormatFileName(appliedPath),
+                        appliedPath != null,
+                        requestId));
+
+                Source = appliedPath;
             });
         }
 
@@ -626,6 +705,7 @@ namespace BackgroundChanger.Controls
 
         private CurrentImage currentImage = CurrentImage.None;
         private object currentSource = null;
+        private long _sourceSetRequestId = 0;
 
         internal Storyboard Image1FadeIn;
         internal Storyboard Image2FadeIn;
@@ -815,6 +895,19 @@ namespace BackgroundChanger.Controls
             control.LoadNewSource(args.NewValue, args.OldValue);
         }
 
+        private void LogCrossfadeGateAborted(string imagePath, string slot, bool decodeReady)
+        {
+            bool currentSourceMatch = string.Equals(currentSource as string, imagePath, StringComparison.Ordinal);
+            LogControlTrace(
+                MediaControlDiagnostics.PhaseLoadNewSource,
+                string.Format(
+                    "crossfade aborted: decodeReady={0}, currentSourceMatch={1}, slot={2}, file={3}",
+                    decodeReady,
+                    currentSourceMatch,
+                    slot,
+                    MediaControlDiagnostics.FormatFileName(imagePath)));
+        }
+
         private async void LoadNewSource(object newSource, object oldSource)
         {
             string oldPath = oldSource as string;
@@ -885,23 +978,28 @@ namespace BackgroundChanger.Controls
                     {
                         if (image == null)
                         {
-                            fadeBranch = "fade-out";
-
                             if (currentImage == CurrentImage.None)
                             {
+                                fadeBranch = "immediate-clear-noop";
+                                LogLoadNewSourceBranch(fadeBranch, oldPath, newPath);
                                 return;
                             }
 
-                            if (currentImage == CurrentImage.Image1)
-                            {
-                                Image1FadeOut.Begin();
-                                BorderDarkenFadeOut.Begin();
-                            }
-                            else if (currentImage == CurrentImage.Image2)
-                            {
-                                Image2FadeOut.Begin();
-                                BorderDarkenFadeOut.Begin();
-                            }
+                            fadeBranch = "immediate-clear";
+                            LogLoadNewSourceBranch(fadeBranch, oldPath, newPath);
+
+                            StopCrossfadeStoryboards();
+
+                            Image1.Opacity = 0;
+                            Image2.Opacity = 0;
+                            Video1.Opacity = 0;
+                            Video2.Opacity = 0;
+                            BorderDarken.Opacity = 0;
+
+                            Image1.Source = null;
+                            Image2.Source = null;
+                            Video1.Source = null;
+                            Video2.Source = null;
 
                             currentImage = CurrentImage.None;
                         }
@@ -916,16 +1014,27 @@ namespace BackgroundChanger.Controls
                                 {
                                     Video1.Source = new Uri(image);
                                     Video1.LoadedBehavior = VideoStateForLifecycle();
+                                    Image1FadeIn.Begin();
+                                    BorderDarken.Opacity = 1;
+                                    BorderDarkenFadeOut.Stop();
+                                    currentImage = CurrentImage.Image1;
                                 }
                                 else
                                 {
                                     Image1.Source = image;
-                                }
+                                    bool decodeReady = await ImageAsync.WaitForDecodeAsync(Image1, image).ConfigureAwait(true);
+                                    if (!decodeReady
+                                        || !string.Equals(currentSource as string, image, StringComparison.Ordinal))
+                                    {
+                                        LogCrossfadeGateAborted(image, "Image1", decodeReady);
+                                        return;
+                                    }
 
-                                Image1FadeIn.Begin();
-                                BorderDarken.Opacity = 1;
-                                BorderDarkenFadeOut.Stop();
-                                currentImage = CurrentImage.Image1;
+                                    Image1FadeIn.Begin();
+                                    BorderDarken.Opacity = 1;
+                                    BorderDarkenFadeOut.Stop();
+                                    currentImage = CurrentImage.Image1;
+                                }
                             }
                             else if (currentImage == CurrentImage.Image1)
                             {
@@ -936,17 +1045,29 @@ namespace BackgroundChanger.Controls
                                 {
                                     Video2.Source = new Uri(image);
                                     Video2.LoadedBehavior = VideoStateForLifecycle();
+                                    Image2FadeIn.Begin();
+                                    Image1FadeOut.Begin();
+                                    BorderDarken.Opacity = 1;
+                                    BorderDarkenFadeOut.Stop();
+                                    currentImage = CurrentImage.Image2;
                                 }
                                 else
                                 {
                                     Image2.Source = image;
-                                }
+                                    Image1FadeOut.Begin();
+                                    bool decodeReady = await ImageAsync.WaitForDecodeAsync(Image2, image).ConfigureAwait(true);
+                                    if (!decodeReady
+                                        || !string.Equals(currentSource as string, image, StringComparison.Ordinal))
+                                    {
+                                        LogCrossfadeGateAborted(image, "Image2", decodeReady);
+                                        return;
+                                    }
 
-                                Image2FadeIn.Begin();
-                                Image1FadeOut.Begin();
-                                BorderDarken.Opacity = 1;
-                                BorderDarkenFadeOut.Stop();
-                                currentImage = CurrentImage.Image2;
+                                    Image2FadeIn.Begin();
+                                    BorderDarken.Opacity = 1;
+                                    BorderDarkenFadeOut.Stop();
+                                    currentImage = CurrentImage.Image2;
+                                }
                             }
                             else if (currentImage == CurrentImage.Image2)
                             {
@@ -957,17 +1078,29 @@ namespace BackgroundChanger.Controls
                                 {
                                     Video1.Source = new Uri(image);
                                     Video1.LoadedBehavior = VideoStateForLifecycle();
+                                    Image1FadeIn.Begin();
+                                    Image2FadeOut.Begin();
+                                    BorderDarken.Opacity = 1;
+                                    BorderDarkenFadeOut.Stop();
+                                    currentImage = CurrentImage.Image1;
                                 }
                                 else
                                 {
                                     Image1.Source = image;
-                                }
+                                    Image2FadeOut.Begin();
+                                    bool decodeReady = await ImageAsync.WaitForDecodeAsync(Image1, image).ConfigureAwait(true);
+                                    if (!decodeReady
+                                        || !string.Equals(currentSource as string, image, StringComparison.Ordinal))
+                                    {
+                                        LogCrossfadeGateAborted(image, "Image1", decodeReady);
+                                        return;
+                                    }
 
-                                Image1FadeIn.Begin();
-                                Image2FadeOut.Begin();
-                                BorderDarken.Opacity = 1;
-                                BorderDarkenFadeOut.Stop();
-                                currentImage = CurrentImage.Image1;
+                                    Image1FadeIn.Begin();
+                                    BorderDarken.Opacity = 1;
+                                    BorderDarkenFadeOut.Stop();
+                                    currentImage = CurrentImage.Image1;
+                                }
                             }
                         }
                     }
@@ -1340,6 +1473,121 @@ namespace BackgroundChanger.Controls
         {
             Video1.LoadedBehavior = MediaState.Pause;
             Video2.LoadedBehavior = MediaState.Pause;
+        }
+
+        /// <summary>
+        /// Stops crossfade storyboards and clears all display layers when no plugin background data is shown.
+        /// Prevents stale bitmaps from reappearing when <see cref="MustDisplay"/> becomes true again.
+        /// </summary>
+        private void LogLoadNewSourceBranch(string fadeBranch, string oldPath, string newPath)
+        {
+            LogControlTrace(
+                MediaControlDiagnostics.PhaseLoadNewSource,
+                string.Format(
+                    "branch={0}, old={1}, new={2}, {3}",
+                    fadeBranch,
+                    MediaControlDiagnostics.FormatFileName(oldPath),
+                    MediaControlDiagnostics.FormatFileName(newPath),
+                    FormatDisplayLayerState()));
+        }
+
+
+        private string FormatDisplayLayerState()
+        {
+            return string.Format(
+                "slot={0}, source={1}, opacities=(I1={2:0.##},I2={3:0.##},V1={4:0.##},V2={5:0.##}), visibility={6}, mustDisplay={7}",
+                currentImage,
+                MediaControlDiagnostics.FormatFileName(currentSource as string),
+                Image1?.Opacity ?? 0,
+                Image2?.Opacity ?? 0,
+                Video1?.Opacity ?? 0,
+                Video2?.Opacity ?? 0,
+                Visibility,
+                MustDisplay);
+        }
+
+
+        private void StopCrossfadeStoryboards()
+        {
+            Image1FadeIn?.Stop();
+            Image2FadeIn?.Stop();
+            Image1FadeOut?.Stop();
+            Image2FadeOut?.Stop();
+            BorderDarkenFadeOut?.Stop();
+        }
+
+
+        /// <summary>
+        /// Forces the control (and its theme <see cref="ContentControl"/> host) visible while
+        /// background image feature is activated, even when the current game has no BC media.
+        /// </summary>
+        private void EnsureActivatedVisibility(string trigger)
+        {
+            bool keepVisible = AlwaysShow || (ControlDataContext?.IsActivated ?? false) || MustDisplay;
+            if (!keepVisible)
+            {
+                LogControlTrace(
+                    MediaControlDiagnostics.PhaseSetData,
+                    string.Format(
+                        "EnsureActivatedVisibility skipped ({0}): inactive, {1}",
+                        trigger,
+                        FormatDisplayLayerState()));
+                return;
+            }
+
+            MustDisplay = true;
+            if (Parent is ContentControl contentControl && contentControl.Visibility != Visibility.Visible)
+            {
+                contentControl.Visibility = Visibility.Visible;
+            }
+
+            SetVisibility(Visibility.Visible);
+            LogControlTrace(
+                MediaControlDiagnostics.PhaseSetData,
+                string.Format(
+                    "EnsureActivatedVisibility ({0}): kept Visible, {1}",
+                    trigger,
+                    FormatDisplayLayerState()));
+        }
+
+
+        private void ClearBackgroundDisplayState(string trigger = null)
+        {
+            LogControlTrace(
+                MediaControlDiagnostics.PhaseSetData,
+                string.Format(
+                    "ClearDisplayState, trigger={0}, slot={1}, hadSource={2}, {3}",
+                    trigger ?? "?",
+                    currentImage,
+                    currentSource != null,
+                    FormatDisplayLayerState()));
+
+            StopCrossfadeStoryboards();
+
+            Image1.Opacity = 0;
+            Image2.Opacity = 0;
+            Video1.Opacity = 0;
+            Video2.Opacity = 0;
+            BorderDarken.Opacity = 0;
+
+            Image1.Source = null;
+            Image2.Source = null;
+            Video1.Source = null;
+            Video2.Source = null;
+
+            _isCurrentMediaVideo = false;
+            _lastBlurMediaSource = null;
+            _lastBlurRadius = -1;
+            _lastBlurBias = null;
+
+            if (ImageHolder?.Effect != null)
+            {
+                ImageHolder.Effect = null;
+            }
+
+            currentImage = CurrentImage.None;
+            currentSource = null;
+            Source = null;
         }
 
         private void ResumeVideosIfLifecycleActive()

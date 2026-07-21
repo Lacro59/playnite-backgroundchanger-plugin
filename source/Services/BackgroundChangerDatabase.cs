@@ -159,6 +159,8 @@ namespace BackgroundChanger.Services
                 favoriteReappliedCover,
                 favoriteReappliedIcon);
 
+            gameBackgroundImages.InvalidateItemCache();
+
             return new RefreshMediaResult
             {
                 PurgedCount = purgedCount,
