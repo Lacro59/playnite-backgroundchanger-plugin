@@ -50,6 +50,7 @@ namespace BackgroundChanger.Controls
         private GameBackgroundImages GameBackgroundImages { get; set; }
 
         private static readonly Random random = new Random();
+        private readonly MediaShuffleQueue _mediaShuffleQueue = new MediaShuffleQueue();
 
         private const double MinDecodePixelHeight = 100;
         private const string ImageDecodeParameterAuto = "0";
@@ -80,7 +81,6 @@ namespace BackgroundChanger.Controls
         {
             DisposeBcTimers();
             _stableCoverGameId = null;
-            Interlocked.Increment(ref _coverApplyRequestId);
             ClearCoverDisplayState();
 
             ControlDataContext = new PluginCoverImageDataContext
@@ -296,6 +296,10 @@ namespace BackgroundChanger.Controls
                         // Timer entry: favorite-first or one stable index; rotation only in OnTimedEvent.
                         ResolveStableCoverIndex(ItemFavorite);
                         Counter = _stableCoverIndex;
+                        if (ControlDataContext.EnableRandomSelect)
+                        {
+                            _mediaShuffleQueue.RememberDisplayedIndex(Counter);
+                        }
                         pathImage = GameBackgroundImages.ItemsCover[Counter].FullPath;
 
                         if (ItemFavorite != null)
@@ -547,99 +551,16 @@ namespace BackgroundChanger.Controls
             {
                 ControlDataContext.ImageSource = pathImage;
                 ControlDataContext.VideoSource = null;
-            long requestId = Interlocked.Increment(ref _coverApplyRequestId);
-            Guid gameIdAtSchedule = GameContext != null ? GameContext.Id : Guid.Empty;
-            ApplyCoverImageWhenReady(pathImage, requestId, gameIdAtSchedule);
-            }
-        }
-
-        private async void ApplyCoverImageWhenReady(string pathImage, long requestId, Guid gameIdAtSchedule)
-        {
-            bool decodeReady = await ImageAsync.WaitForDecodeAsync(Image1, pathImage).ConfigureAwait(true);
-            if (!decodeReady)
-            {
-                LogControlTrace(
-                    MediaControlDiagnostics.PhaseSourceSet,
-                    string.Format(
-                        "ApplyCoverImage aborted: decodeReady=false, file={0}",
-                        MediaControlDiagnostics.FormatFileName(pathImage)));
-                return;
             }
 
-            if (requestId != _coverApplyRequestId)
+            // DataContext has no INPC — assign visual sources directly (same as PluginIconImage).
+            _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
             {
-                LogControlTrace(
-                    MediaControlDiagnostics.PhaseSourceSet,
-                    string.Format(
-                        "ApplyCoverImage skipped: superseded request, file={0}, request={1}, latest={2}",
-                        MediaControlDiagnostics.FormatFileName(pathImage),
-                        requestId,
-                        _coverApplyRequestId));
-                return;
-            }
-
-            if (gameIdAtSchedule != Guid.Empty
-                && (GameContext == null || GameContext.Id != gameIdAtSchedule))
-            {
-                LogControlTrace(
-                    MediaControlDiagnostics.PhaseSourceSet,
-                    string.Format(
-                        "ApplyCoverImage skipped: context superseded, file={0}, request={1}",
-                        MediaControlDiagnostics.FormatFileName(pathImage),
-                        requestId));
-                return;
-            }
-
-            Dispatcher dispatcher = API.Instance?.MainView?.UIDispatcher ?? Dispatcher;
-            if (dispatcher == null)
-            {
-                return;
-            }
-
-            await dispatcher.InvokeAsync(() =>
-            {
-                if (requestId != _coverApplyRequestId)
-                {
-                    LogControlTrace(
-                        MediaControlDiagnostics.PhaseSourceSet,
-                        string.Format(
-                            "ApplyCoverImage ui-sync skipped: superseded request, file={0}, request={1}, latest={2}",
-                            MediaControlDiagnostics.FormatFileName(pathImage),
-                            requestId,
-                            _coverApplyRequestId));
-                    return;
-                }
-
-                if (gameIdAtSchedule != Guid.Empty
-                    && (GameContext == null || GameContext.Id != gameIdAtSchedule))
-                {
-                    LogControlTrace(
-                        MediaControlDiagnostics.PhaseSourceSet,
-                        string.Format(
-                            "ApplyCoverImage ui-sync skipped: context superseded, file={0}, request={1}",
-                            MediaControlDiagnostics.FormatFileName(pathImage),
-                            requestId));
-                    return;
-                }
-
-                if (!string.Equals(ControlDataContext.ImageSource, pathImage, StringComparison.Ordinal))
-                {
-                    LogControlTrace(
-                        MediaControlDiagnostics.PhaseSourceSet,
-                        string.Format(
-                            "ApplyCoverImage ui-sync skipped: superseded, file={0}",
-                            MediaControlDiagnostics.FormatFileName(pathImage)));
-                    return;
-                }
-
                 Image1.Source = ControlDataContext.ImageSource;
-                Video1.Source = null;
-                LogControlTrace(
-                    MediaControlDiagnostics.PhaseSourceSet,
-                    string.Format(
-                        "ApplyCoverImage ui-sync applied, file={0}",
-                        MediaControlDiagnostics.FormatFileName(pathImage)));
-            }, DispatcherPriority.Loaded);
+                Video1.Source = ControlDataContext.VideoSource.IsNullOrEmpty()
+                    ? null
+                    : new Uri(ControlDataContext.VideoSource);
+            }));
         }
 
 
@@ -693,7 +614,6 @@ namespace BackgroundChanger.Controls
 
 
         private object currentSource = null;
-        private long _coverApplyRequestId = 0;
 
         private static void SourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
@@ -804,28 +724,38 @@ namespace BackgroundChanger.Controls
                     {
                         if (GameBackgroundImages.ItemsCover.Count != 0)
                         {
-                            int imgSelected = random.Next(0, (GameBackgroundImages.ItemsCover.Count));
-                            while (imgSelected == Counter && GameBackgroundImages.ItemsCover.Count != 1)
+                            Guid gameId = GameContext != null ? GameContext.Id : Guid.Empty;
+                            List<ItemImage> items = GameBackgroundImages.ItemsCover;
+                            string fingerprint = MediaShuffleQueue.BuildFingerprint(items.Select(x => x.FullPath));
+                            int imgSelected = _mediaShuffleQueue.Next(gameId, items.Count, fingerprint);
+                            if (imgSelected < 0 || imgSelected >= items.Count)
                             {
-                                imgSelected = random.Next(0, (GameBackgroundImages.ItemsCover.Count));
+                                imgSelected = 0;
                             }
+
                             Counter = imgSelected;
                             _stableCoverIndex = imgSelected;
-
-                            pathImage = GameBackgroundImages.ItemsCover[imgSelected].FullPath;
+                            pathImage = items[imgSelected].FullPath;
                         }
 
                         Common.LogDebug(
                             true,
                             string.Format(
-                                "[PluginCoverImage][TimerChange] random=true, fromCounter={0} toCounter={1}, file={2}",
+                                "[PluginCoverImage][TimerChange] random=true (shuffle), fromCounter={0} toCounter={1}, cycle={2}/{3}, file={4}",
                                 fromCounter,
                                 Counter,
+                                _mediaShuffleQueue.CycleIndex,
+                                _mediaShuffleQueue.CycleTotal,
                                 MediaControlDiagnostics.FormatFileName(pathImage)));
                         MediaControlDiagnostics.Trace(
                             LogControlTrace,
                             MediaControlDiagnostics.PhaseTimerTick,
-                            MediaControlDiagnostics.FormatTimerTickDetail("auto-changer-random", pathImage, true));
+                            MediaControlDiagnostics.FormatTimerTickDetail(
+                                "auto-changer-random",
+                                pathImage,
+                                true,
+                                _mediaShuffleQueue.CycleIndex,
+                                _mediaShuffleQueue.CycleTotal));
 
                         SetCoverImage(pathImage);
                     }
@@ -1001,6 +931,7 @@ namespace BackgroundChanger.Controls
             DisposeBcTimer();
             DisposeBcTimerVideo();
             Counter = 0;
+            _mediaShuffleQueue.Reset();
             _pendingCoverVideoPath = null;
             _deferAutoChangerUntilVideoDelay = false;
         }

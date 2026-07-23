@@ -25,8 +25,8 @@
     <sys:String x:Key="LOCBcRandomOnStart">Random once on Playnite start</sys:String>
     <sys:String x:Key="LOCBcRandomOnSelect">Random each time a game is selected</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Change automatically on a timer</sys:String>
-    <sys:String x:Key="LOCBcTimerRandomOrder">Random order</sys:String>
-    <sys:String x:Key="LOCBcTimerRandomOrderToolTip">When enabled, each timer tick picks a random item. When disabled, items advance in list order.</sys:String>
+    <sys:String x:Key="LOCBcTimerRandomOrder">Shuffled order</sys:String>
+    <sys:String x:Key="LOCBcTimerRandomOrderToolTip">When enabled, items are shuffled once and shown without repeats until the full set is exhausted, then reshuffled. When disabled, items advance in list order.</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Time interval</sys:String>
     <sys:String x:Key="LOCBcSeconds">seconds</sys:String>
 

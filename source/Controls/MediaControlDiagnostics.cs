@@ -185,8 +185,29 @@ namespace BackgroundChanger.Controls
         }
 
         /// <summary>Detail line for <see cref="PhaseTimerTick"/>.</summary>
-        public static string FormatTimerTickDetail(string timerType, string filePath, bool lifecycleActive)
+        /// <param name="timerType">Timer kind (e.g. auto-changer-random).</param>
+        /// <param name="filePath">Selected media path.</param>
+        /// <param name="lifecycleActive">Whether media lifecycle is active.</param>
+        /// <param name="cycleIndex">1-based shuffle cycle position, or &lt;= 0 to omit.</param>
+        /// <param name="cycleTotal">Shuffle cycle size, or &lt;= 0 to omit.</param>
+        public static string FormatTimerTickDetail(
+            string timerType,
+            string filePath,
+            bool lifecycleActive,
+            int cycleIndex = 0,
+            int cycleTotal = 0)
         {
+            if (cycleIndex > 0 && cycleTotal > 0)
+            {
+                return string.Format(
+                    "timer={0}, path={1}, lifecycle={2}, cycle={3}/{4}",
+                    timerType ?? "?",
+                    FormatFileName(filePath),
+                    lifecycleActive ? "active" : "inactive",
+                    cycleIndex,
+                    cycleTotal);
+            }
+
             return string.Format(
                 "timer={0}, path={1}, lifecycle={2}",
                 timerType ?? "?",

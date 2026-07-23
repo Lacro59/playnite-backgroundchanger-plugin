@@ -114,6 +114,7 @@
     <Compile Include="BackgroundChanger.cs" />
     <Compile Include="BackgroundChangerSettings.cs" />
     <Compile Include="Controls\MediaControlDiagnostics.cs" />
+    <Compile Include="Controls\MediaShuffleQueue.cs" />
     <Compile Include="Controls\MediaThemeSyncWindowHandler.cs" />
     <Compile Include="Controls\PluginMediaLifecycleControlBase.cs" />
     <Compile Include="Controls\PluginIconImage.xaml.cs">

@@ -52,6 +52,7 @@ namespace BackgroundChanger.Controls
         private GameBackgroundImages GameBackgroundImages { get; set; }
 
         private static readonly Random random = new Random();
+        private readonly MediaShuffleQueue _mediaShuffleQueue = new MediaShuffleQueue();
 
         private object _lastBlurMediaSource;
         private int _lastBlurRadius = -1;
@@ -416,6 +417,10 @@ namespace BackgroundChanger.Controls
                         // Timer entry: favorite-first or one stable index; rotation only in OnTimedEvent.
                         ResolveStableBackgroundIndex(ItemFavorite);
                         Counter = _stableBackgroundIndex;
+                        if (ControlDataContext.EnableRandomSelect)
+                        {
+                            _mediaShuffleQueue.RememberDisplayedIndex(Counter);
+                        }
                         pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
 
                         if (ItemFavorite != null)
@@ -1192,28 +1197,38 @@ namespace BackgroundChanger.Controls
                     {
                         if (GameBackgroundImages.ItemsBackground.Count != 0)
                         {
-                            int imgSelected = random.Next(0, GameBackgroundImages.ItemsBackground.Count);
-                            while (imgSelected == Counter && GameBackgroundImages.ItemsBackground.Count != 1)
+                            Guid gameId = GameContext != null ? GameContext.Id : Guid.Empty;
+                            List<ItemImage> items = GameBackgroundImages.ItemsBackground;
+                            string fingerprint = MediaShuffleQueue.BuildFingerprint(items.Select(x => x.FullPath));
+                            int imgSelected = _mediaShuffleQueue.Next(gameId, items.Count, fingerprint);
+                            if (imgSelected < 0 || imgSelected >= items.Count)
                             {
-                                imgSelected = random.Next(0, GameBackgroundImages.ItemsBackground.Count);
+                                imgSelected = 0;
                             }
+
                             Counter = imgSelected;
                             _stableBackgroundIndex = imgSelected;
-
-                            pathImage = GameBackgroundImages.ItemsBackground[imgSelected].FullPath;
+                            pathImage = items[imgSelected].FullPath;
                         }
 
                         Common.LogDebug(
                             true,
                             string.Format(
-                                "[PluginBackgroundImage][TimerChange] random=true, fromCounter={0} toCounter={1}, file={2}",
+                                "[PluginBackgroundImage][TimerChange] random=true (shuffle), fromCounter={0} toCounter={1}, cycle={2}/{3}, file={4}",
                                 fromCounter,
                                 Counter,
+                                _mediaShuffleQueue.CycleIndex,
+                                _mediaShuffleQueue.CycleTotal,
                                 MediaControlDiagnostics.FormatFileName(pathImage)));
                         MediaControlDiagnostics.Trace(
                             LogControlTrace,
                             MediaControlDiagnostics.PhaseTimerTick,
-                            MediaControlDiagnostics.FormatTimerTickDetail("auto-changer-random", pathImage, true));
+                            MediaControlDiagnostics.FormatTimerTickDetail(
+                                "auto-changer-random",
+                                pathImage,
+                                true,
+                                _mediaShuffleQueue.CycleIndex,
+                                _mediaShuffleQueue.CycleTotal));
 
                         SetBackgroundImage(pathImage);
                     }
@@ -1439,6 +1454,7 @@ namespace BackgroundChanger.Controls
             DisposeBcTimer();
             DisposeBcTimerVideo();
             Counter = 0;
+            _mediaShuffleQueue.Reset();
             _pendingBackgroundVideoPath = null;
             _deferAutoChangerUntilVideoDelay = false;
         }
