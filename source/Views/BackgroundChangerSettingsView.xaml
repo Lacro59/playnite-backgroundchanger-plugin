@@ -275,6 +275,10 @@
                                         <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
                                     </StackPanel>
 
+                                    <CheckBox IsChecked="{Binding Settings.EnableRandomVideoStartPointBackground}" Margin="0,0,0,10"
+                                              ToolTip="{DynamicResource LOCBcRandomVideoStartPointToolTip}"
+                                              Content="{DynamicResource LOCBcEnableRandomVideoStartPoint}" />
+
                                 </StackPanel>
                             </Border>
                         </Expander.Content>
@@ -340,6 +344,10 @@
                                                                      LongValue="{Binding Settings.videoDelayCoverImage}" />
                                         <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
                                     </StackPanel>
+
+                                    <CheckBox IsChecked="{Binding Settings.EnableRandomVideoStartPointCover}" Margin="0,0,0,10"
+                                              ToolTip="{DynamicResource LOCBcRandomVideoStartPointToolTip}"
+                                              Content="{DynamicResource LOCBcEnableRandomVideoStartPoint}" />
 
                                 </StackPanel>
                             </Border>

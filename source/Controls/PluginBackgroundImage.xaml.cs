@@ -129,9 +129,48 @@ namespace BackgroundChanger.Controls
             Image2FadeOut.Completed += Image2FadeOut_Completed;
             BorderDarkenFadeOut.Completed += BorderDarkenOut_Completed;
 
+            Video1.MediaOpened += OnBackgroundVideoMediaOpened;
+            Video2.MediaOpened += OnBackgroundVideoMediaOpened;
+
             Loaded += OnLoaded;
             InitializeMediaLifecycleHooks();
             MediaThemeSyncWindowHandler.EnsureRegistered(this);
+        }
+
+        private void OnBackgroundVideoMediaOpened(object sender, RoutedEventArgs e)
+        {
+            const string kind = "background";
+            try
+            {
+                if (!PluginDatabase.PluginSettings.EnableRandomVideoStartPointBackground)
+                {
+                    MediaControlDiagnostics.Trace(
+                        LogControlTrace,
+                        "video-start",
+                        MediaRandomVideoStartPoint.FormatDetail(
+                            kind,
+                            MediaRandomVideoStartPoint.OutcomeSkippedSettingOff,
+                            0,
+                            0));
+                    return;
+                }
+
+                MediaElement video = sender as MediaElement;
+                MediaRandomVideoStartPoint.TrySeekRandom(
+                    video,
+                    random,
+                    out string outcome,
+                    out double positionSeconds,
+                    out double durationSeconds);
+                MediaControlDiagnostics.Trace(
+                    LogControlTrace,
+                    "video-start",
+                    MediaRandomVideoStartPoint.FormatDetail(kind, outcome, positionSeconds, durationSeconds));
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
         }
 
 

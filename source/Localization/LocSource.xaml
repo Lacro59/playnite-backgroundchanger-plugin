@@ -32,6 +32,8 @@
 
     <sys:String x:Key="LOCBcEnableVideoDelay">Delay video start</sys:String>
     <sys:String x:Key="LOCBcVideoDelayToolTip">Show the Playnite default image for this game first, then start the video after the interval.</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomVideoStartPoint">Randomize video start point</sys:String>
+    <sys:String x:Key="LOCBcRandomVideoStartPointToolTip">When enabled, videos seek to a random timestamp on first play only. Loop replays keep continuity (not re-randomized). Off by default.</sys:String>
 
     <!-- ImagesManagerView -->
 

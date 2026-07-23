@@ -98,6 +98,30 @@ namespace BackgroundChanger
         private int _videoDelayCoverImage = 5;
         public int videoDelayCoverImage { get => _videoDelayCoverImage; set => SetValue(ref _videoDelayCoverImage, value); }
 
+        private bool enableRandomVideoStartPointBackground = false;
+
+        /// <summary>
+        /// Gets or sets whether background MP4 playback starts at a random timestamp
+        /// on the first play of each source (opt-in; default off). Loop replays are not re-randomized.
+        /// </summary>
+        public bool EnableRandomVideoStartPointBackground
+        {
+            get => enableRandomVideoStartPointBackground;
+            set => SetValue(ref enableRandomVideoStartPointBackground, value);
+        }
+
+        private bool enableRandomVideoStartPointCover = false;
+
+        /// <summary>
+        /// Gets or sets whether cover MP4 playback starts at a random timestamp
+        /// on the first play of each source (opt-in; default off). Loop replays are not re-randomized.
+        /// </summary>
+        public bool EnableRandomVideoStartPointCover
+        {
+            get => enableRandomVideoStartPointCover;
+            set => SetValue(ref enableRandomVideoStartPointCover, value);
+        }
+
         #endregion
 
         /// <summary>

@@ -103,10 +103,49 @@ namespace BackgroundChanger.Controls
 
             Delay = 0;
             DataContext = ControlDataContext;
+
+            Video1.MediaOpened += OnCoverVideoMediaOpened;
+
             Loaded += OnLoaded;
             SizeChanged += OnCoverSizeChanged;
             InitializeMediaLifecycleHooks();
             MediaThemeSyncWindowHandler.EnsureRegistered(this);
+        }
+
+        private void OnCoverVideoMediaOpened(object sender, RoutedEventArgs e)
+        {
+            const string kind = "cover";
+            try
+            {
+                if (!PluginDatabase.PluginSettings.EnableRandomVideoStartPointCover)
+                {
+                    MediaControlDiagnostics.Trace(
+                        LogControlTrace,
+                        "video-start",
+                        MediaRandomVideoStartPoint.FormatDetail(
+                            kind,
+                            MediaRandomVideoStartPoint.OutcomeSkippedSettingOff,
+                            0,
+                            0));
+                    return;
+                }
+
+                MediaElement video = sender as MediaElement;
+                MediaRandomVideoStartPoint.TrySeekRandom(
+                    video,
+                    random,
+                    out string outcome,
+                    out double positionSeconds,
+                    out double durationSeconds);
+                MediaControlDiagnostics.Trace(
+                    LogControlTrace,
+                    "video-start",
+                    MediaRandomVideoStartPoint.FormatDetail(kind, outcome, positionSeconds, durationSeconds));
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
         }
 
 
