@@ -1,14 +1,17 @@
 using BackgroundChanger.Models;
 using CommonPlayniteShared.Common.Web;
 using CommonPluginsShared;
+using CommonPluginsShared.Extensions;
 using CommonPluginsShared.Images;
 using CommonPluginsStores.Steam;
+using FuzzySharp;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using SteamKit2;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using static CommonPluginsShared.PlayniteTools;
 
@@ -47,6 +50,8 @@ namespace BackgroundChanger.Services
 
         /// <summary>
         /// Resolves the Steam AppId for <paramref name="game"/> (native library, links, store search).
+        /// Prefer <see cref="ResolveAppIdViaStoreSearch"/> for bulk flows: this method may load the full Steam apps list
+        /// (auth / cache notifications) when falling through <see cref="SteamApi.ResolveAppId"/>.
         /// </summary>
         /// <param name="game">Playnite game.</param>
         /// <returns>Steam AppId, or <c>0</c> when not found.</returns>
@@ -66,6 +71,145 @@ namespace BackgroundChanger.Services
                 Common.LogError(ex, false, true, BackgroundChanger.PluginDatabase.PluginName);
                 return 0;
             }
+        }
+
+        /// <summary>
+        /// Resolves a Steam AppId without loading the Steam apps catalogue (avoids WebToken 403 / old-data notifications).
+        /// Order: native Steam library id → Steam link → store search (<see cref="GetSearchGame"/>) with FuzzySharp.
+        /// </summary>
+        /// <param name="game">Playnite game.</param>
+        /// <param name="fuzzyThreshold">Minimum <see cref="Fuzz.Ratio"/> (0–100) to accept a search hit.</param>
+        /// <returns>Steam AppId, or <c>0</c> when not found / below threshold.</returns>
+        public uint ResolveAppIdViaStoreSearch(Game game, int fuzzyThreshold = 90)
+        {
+            if (game == null)
+            {
+                return 0;
+            }
+
+            if (fuzzyThreshold < 0)
+            {
+                fuzzyThreshold = 0;
+            }
+            else if (fuzzyThreshold > 100)
+            {
+                fuzzyThreshold = 100;
+            }
+
+            try
+            {
+                if (game.PluginId == GetPluginId(ExternalPlugin.SteamLibrary)
+                    && uint.TryParse(game.GameId, out uint nativeAppId)
+                    && nativeAppId > 0)
+                {
+                    Common.LogDebug(
+                        false,
+                        string.Format("{0} AppId via native Steam library gameId={1}", LogPrefix, nativeAppId));
+                    return nativeAppId;
+                }
+
+                uint fromLink = TryGetAppIdFromSteamLink(game);
+                if (fromLink > 0)
+                {
+                    Common.LogDebug(
+                        false,
+                        string.Format("{0} AppId via Steam link appId={1} game='{2}'", LogPrefix, fromLink, game.Name));
+                    return fromLink;
+                }
+
+                if (game.Name.IsNullOrWhiteSpace())
+                {
+                    return 0;
+                }
+
+                IReadOnlyList<GenericItemOption> search = SearchGames(game.Name);
+                if (search == null || search.Count == 0)
+                {
+                    Common.LogDebug(
+                        false,
+                        string.Format("{0} Store search empty game='{1}'", LogPrefix, game.Name));
+                    return 0;
+                }
+
+                string gameName = game.Name.ToLowerInvariant();
+                GenericItemOption best = null;
+                int bestScore = -1;
+                foreach (GenericItemOption option in search)
+                {
+                    if (option == null || option.Name.IsNullOrEmpty())
+                    {
+                        continue;
+                    }
+
+                    int score = Fuzz.Ratio(gameName, option.Name.ToLowerInvariant());
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        best = option;
+                    }
+                }
+
+                if (best == null || bestScore < fuzzyThreshold)
+                {
+                    Common.LogDebug(
+                        false,
+                        string.Format(
+                            "{0} Store search below threshold game='{1}' best='{2}' score={3} threshold={4}",
+                            LogPrefix,
+                            game.Name,
+                            best?.Name,
+                            bestScore,
+                            fuzzyThreshold));
+                    return 0;
+                }
+
+                uint appId = ParseAppIdFromSearchOption(best);
+                Common.LogDebug(
+                    false,
+                    string.Format(
+                        "{0} AppId via store search game='{1}' match='{2}' score={3} appId={4}",
+                        LogPrefix,
+                        game.Name,
+                        best.Name,
+                        bestScore,
+                        appId));
+                return appId;
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, BackgroundChanger.PluginDatabase.PluginName);
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Reads a Steam AppId from a game link named "Steam" (<c>/app/{id}</c>), same rules as <c>SteamApi.GetAppIdFromLinks</c>.
+        /// </summary>
+        /// <param name="game">Playnite game.</param>
+        /// <returns>AppId, or <c>0</c> when absent.</returns>
+        private static uint TryGetAppIdFromSteamLink(Game game)
+        {
+            Link steamLink = game.Links?.FirstOrDefault(link =>
+                link != null
+                && !link.Name.IsNullOrEmpty()
+                && link.Name.Equals("steam", StringComparison.OrdinalIgnoreCase));
+
+            if (steamLink == null || steamLink.Url.IsNullOrEmpty())
+            {
+                return 0;
+            }
+
+            string[] linkSplit = steamLink.Url.Split(new[] { "/app/" }, StringSplitOptions.None);
+            string steamIdString = linkSplit.Length > 1
+                ? linkSplit[1].Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()
+                : null;
+
+            if (steamIdString.IsNullOrEmpty())
+            {
+                return 0;
+            }
+
+            return uint.TryParse(steamIdString, out uint steamId) ? steamId : 0;
         }
 
         /// <summary>

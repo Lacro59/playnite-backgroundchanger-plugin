@@ -118,7 +118,17 @@ namespace BackgroundChanger.Services
 
         public override IEnumerable<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
         {
-            return null;
+            List<MainMenuItem> mainMenuItems = new List<MainMenuItem>
+            {
+                new MainMenuItem
+                {
+                    MenuSection = "@" + ResourceProvider.GetString("LOCBc"),
+                    Description = ResourceProvider.GetString("LOCBcBulkDownloadMenu"),
+                    Action = (mainMenuItem) => _windows.StartBulkMediaDownloadFlow(_plugin)
+                }
+            };
+
+            return mainMenuItems;
         }
     }
 }

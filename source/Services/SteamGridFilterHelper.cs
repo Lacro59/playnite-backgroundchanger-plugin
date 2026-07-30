@@ -227,6 +227,18 @@ namespace BackgroundChanger.Services
         /// <param name="page">Pagination index.</param>
         public static string BuildSearchQueryString(SteamGridDbType assetType, SteamGridFilters filters, int page)
         {
+            return BuildSearchQueryString(assetType, filters, page, limit: null);
+        }
+
+        /// <summary>
+        /// Builds the query string for a SteamGridDB asset search, optionally capping page size with <c>limit</c>.
+        /// </summary>
+        /// <param name="assetType">Grids, heroes, or icons.</param>
+        /// <param name="filters">Active filter lists (checked items are serialized).</param>
+        /// <param name="page">Pagination index.</param>
+        /// <param name="limit">Optional API <c>limit</c> (clamped 1–50). Null keeps the API default.</param>
+        public static string BuildSearchQueryString(SteamGridDbType assetType, SteamGridFilters filters, int page, int? limit)
+        {
             if (filters == null)
             {
                 filters = CreateDefaultFilters(assetType);
@@ -251,7 +263,63 @@ namespace BackgroundChanger.Services
             AppendQueryParam(query, "epilepsy", "any");
             AppendQueryParam(query, "page", page.ToString());
 
+            if (limit.HasValue)
+            {
+                int clamped = Math.Max(1, Math.Min(limit.Value, BulkMediaDownloadOptions.MaxSteamGridApiPageLimit));
+                AppendQueryParam(query, "limit", clamped.ToString());
+            }
+
             return query.ToString();
+        }
+
+        /// <summary>
+        /// Applies client-side tag OR-filter and static/animated edge cases (same rules as <c>SteamGridDbView</c>).
+        /// </summary>
+        /// <param name="results">Raw API results; may be null.</param>
+        /// <param name="filters">Active filters; null returns an empty list.</param>
+        /// <returns>Filtered list (never null).</returns>
+        public static List<SteamGridDbResult> ApplyClientSideFilters(IEnumerable<SteamGridDbResult> results, SteamGridFilters filters)
+        {
+            List<SteamGridDbResult> filtered = results?.Where(x => x != null).ToList() ?? new List<SteamGridDbResult>();
+            if (filters == null || filtered.Count == 0)
+            {
+                return filtered;
+            }
+
+            List<CheckData> listTags = filters.CheckTags;
+            bool humor = IsFilterChecked(listTags, "Humor");
+            bool nsfw = IsFilterChecked(listTags, "Adult Content");
+            bool epilepsy = IsFilterChecked(listTags, "Epilepsy");
+            bool untagged = IsFilterChecked(listTags, "Untagged");
+            filtered = filtered
+                .Where(x => (humor && x.Humor) || (nsfw && x.Nsfw) || (epilepsy && x.Epilepsy) || (untagged && x.Untagged))
+                .ToList();
+
+            List<CheckData> listTypes = filters.CheckTypes;
+            bool staticChecked = IsFilterChecked(listTypes, "static");
+            bool animatedChecked = IsFilterChecked(listTypes, "animated");
+            if (staticChecked && !animatedChecked)
+            {
+                filtered = filtered.Where(x => !x.IsAnimated).ToList();
+            }
+            else if (!staticChecked && animatedChecked)
+            {
+                filtered = filtered.Where(x => x.IsAnimated).ToList();
+            }
+
+            return filtered;
+        }
+
+        private static bool IsFilterChecked(List<CheckData> items, string dataValue)
+        {
+            if (items == null || string.IsNullOrEmpty(dataValue))
+            {
+                return false;
+            }
+
+            CheckData match = items.FirstOrDefault(x =>
+                x != null && string.Equals(x.Data, dataValue, StringComparison.OrdinalIgnoreCase));
+            return match != null && match.IsChecked;
         }
 
         /// <summary>

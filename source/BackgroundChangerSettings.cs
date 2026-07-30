@@ -85,6 +85,14 @@ namespace BackgroundChanger
         /// </summary>
         public MediaConversionSettings MediaConversion { get; set; } = new MediaConversionSettings();
 
+        /// <summary>
+        /// Gets or sets persisted options for bulk Steam / SteamGridDB media download (issue #25).
+        /// Null until load/ensure; dialog sessions clone this object and write it back on save or download confirm.
+        /// Default is null (not <see cref="BulkMediaDownloadOptions.CreateDefaults"/>) so Playnite deserialization
+        /// replaces the property from JSON instead of merging into a pre-built defaults instance.
+        /// </summary>
+        public BulkMediaDownloadOptions BulkMediaDownload { get; set; }
+
 
         private bool _useVideoDelayBackgroundImage = false;
         public bool useVideoDelayBackgroundImage { get => _useVideoDelayBackgroundImage; set => SetValue(ref _useVideoDelayBackgroundImage, value); }
@@ -336,6 +344,15 @@ namespace BackgroundChanger
                 settings.MediaConversion = new MediaConversionSettings();
             }
 
+            if (settings.BulkMediaDownload == null)
+            {
+                settings.BulkMediaDownload = BulkMediaDownloadOptions.CreateDefaults();
+            }
+            else
+            {
+                settings.BulkMediaDownload.EnsureInitialized();
+            }
+
             settings.CoerceExclusiveMediaSelectionModes();
             SteamGridFilterHelper.EnsureFilterSlots(settings);
         }
@@ -360,6 +377,21 @@ namespace BackgroundChanger
             BackgroundChangerSettingsView.ApplyActiveSelectionModes(Settings);
             Settings.CoerceExclusiveMediaSelectionModes();
             Plugin.SavePluginSettings(Settings);
+        }
+
+        /// <summary>
+        /// Refreshes the <see cref="BeginEdit"/> snapshot for <see cref="BackgroundChangerSettings.BulkMediaDownload"/>
+        /// after an external persist (bulk dialog Save / Download). Prevents <see cref="CancelEdit"/> from restoring
+        /// a stale bulk options tree and later <see cref="EndEdit"/> from overwriting the file.
+        /// </summary>
+        public void SyncEditingCloneBulkMediaDownload()
+        {
+            if (EditingClone == null || Settings?.BulkMediaDownload == null)
+            {
+                return;
+            }
+
+            EditingClone.BulkMediaDownload = Serialization.GetClone(Settings.BulkMediaDownload);
         }
 
         // Code execute when user decides to confirm changes made since BeginEdit was called.

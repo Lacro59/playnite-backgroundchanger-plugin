@@ -83,4 +83,33 @@
     <sys:String x:Key="LOCBcFfmpegConversionFailed">Conversion to MP4 failed. Detected toolchain: {0}. Animated WebP requires FFmpeg {1} or newer with libwebp animated decode support.</sys:String>
     <sys:String x:Key="LOCBcInvalidUrlFormat">Invalid Url Format!</sys:String>
 
+    <!-- Bulk media download (#25) -->
+
+    <sys:String x:Key="LOCBcBulkDownloadTitle">Bulk media download</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadMenu">Bulk media download...</sys:String>
+    <sys:String x:Key="LOCBcBulkNoGamesSelected">No games matched the selected filters.</sys:String>
+    <sys:String x:Key="LOCBcBulkSources">Sources</sys:String>
+    <sys:String x:Key="LOCBcBulkSourceSteam">Steam official</sys:String>
+    <sys:String x:Key="LOCBcBulkSourceSteamGridDb">SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcBulkMediaKinds">Media types</sys:String>
+    <sys:String x:Key="LOCBcBulkOnlyMissing">Skip existing plugin media per type (Background/Cover/Icon)</sys:String>
+    <sys:String x:Key="LOCBcBulkOnlyGamesWithoutData">Only games with no plugin images</sys:String>
+    <sys:String x:Key="LOCBcBulkQuantity">Quantity (total per media type)</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadAll">Download all</sys:String>
+    <sys:String x:Key="LOCBcBulkFuzzyThreshold">Name match threshold</sys:String>
+    <sys:String x:Key="LOCBcBulkPromptLowFuzzy">Prompt when match is below threshold</sys:String>
+    <sys:String x:Key="LOCBcBulkAllowAnimated">Allow animated SteamGridDB assets</sys:String>
+    <sys:String x:Key="LOCBcBulkPickMode">SteamGridDB selection</sys:String>
+    <sys:String x:Key="LOCBcBulkPickRandom">Random</sys:String>
+    <sys:String x:Key="LOCBcBulkPickBestScore">Best score</sys:String>
+    <sys:String x:Key="LOCBcBulkPickBestVotes">Best upvotes</sys:String>
+    <sys:String x:Key="LOCBcBulkPickNewest">Newest (by id)</sys:String>
+    <sys:String x:Key="LOCBcBulkSteamGridFilters">SteamGridDB filters</sys:String>
+    <sys:String x:Key="LOCBcBulkSaveOptions">Save options</sys:String>
+    <sys:String x:Key="LOCBcBulkOptionsSaved">Bulk download options were saved.</sys:String>
+    <sys:String x:Key="LOCBcBulkOptionsInvalid">Select at least one source and one media type.</sys:String>
+    <sys:String x:Key="LOCBcBulkFuzzyPrompt">Select the matching SteamGridDB game</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadSummary">Imported: {0} — Skipped: {1} — Errors: {2}</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadCancelled">Download was cancelled.</sys:String>
+
 </ResourceDictionary>

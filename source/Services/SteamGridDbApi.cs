@@ -59,6 +59,7 @@ namespace BackgroundChanger.Services
 
         private static string UrlBase => @"https://www.steamgriddb.com";
         private static string UrlSearch => UrlBase + "/api/v2/search/autocomplete/{0}";
+        private static string UrlGameBySteam => UrlBase + "/api/v2/games/steam/{0}";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SteamGridDbApi"/> class using the API key from plugin settings.
@@ -66,6 +67,65 @@ namespace BackgroundChanger.Services
         public SteamGridDbApi()
         {
             ApiKey = PluginDatabase.PluginSettings.SteamGridDbApiKey;
+        }
+
+        /// <summary>
+        /// Resolves a SteamGridDB game by Steam AppId (<c>/games/steam/{appId}</c>).
+        /// </summary>
+        /// <param name="steamAppId">Steam application id.</param>
+        /// <returns>Game payload when found; otherwise <c>null</c>.</returns>
+        public SteamGridDbGame GetGameBySteamAppId(uint steamAppId)
+        {
+            if (steamAppId == 0 || !EnsureApiKeyConfigured("GetGameBySteamAppId"))
+            {
+                return null;
+            }
+
+            string url = string.Format(UrlGameBySteam, steamAppId);
+            string context = string.Format(
+                "operation=GetGameBySteamAppId endpoint=games/steam/{0}",
+                steamAppId);
+
+            try
+            {
+                string response = DownloadApiResponse(url, context);
+                if (!Serialization.TryFromJson(response, out SteamGridDbGameResponse resultData, out Exception parseEx))
+                {
+                    Logger.Warn(string.Format(
+                        "{0} GetGameBySteamAppId JSON parse failed {1} responseLength={2}",
+                        LogPrefix,
+                        context,
+                        response?.Length ?? 0));
+                    if (parseEx != null)
+                    {
+                        Common.LogError(parseEx, false, LogPrefix + " GetGameBySteamAppId parse error", false, PluginDatabase.PluginName);
+                    }
+
+                    return null;
+                }
+
+                if (resultData == null || !resultData.Success || resultData.Data == null || resultData.Data.Id <= 0)
+                {
+                    Common.LogDebug(false, string.Format("{0} GetGameBySteamAppId no game steamAppId={1}", LogPrefix, steamAppId));
+                    return null;
+                }
+
+                Common.LogDebug(
+                    false,
+                    string.Format(
+                        "{0} GetGameBySteamAppId success steamAppId={1} sgdbId={2} name='{3}'",
+                        LogPrefix,
+                        steamAppId,
+                        resultData.Data.Id,
+                        resultData.Data.Name));
+                return resultData.Data;
+            }
+            catch (Exception ex)
+            {
+                LogApiFailure(ex, url, context);
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -131,8 +191,26 @@ namespace BackgroundChanger.Services
         /// <param name="page">Pagination index.</param>
         public static string BuildSearchUrl(int gameId, SteamGridDbType assetType, SteamGridFilters activeFilters, int page)
         {
+            return BuildSearchUrl(gameId, assetType, activeFilters, page, limit: null);
+        }
+
+        /// <summary>
+        /// Builds the full search URL for a game asset list, optionally including API <c>limit</c>.
+        /// </summary>
+        /// <param name="gameId">SteamGridDB game ID.</param>
+        /// <param name="assetType">Grid, hero, or icon asset type.</param>
+        /// <param name="activeFilters">Checked filter values to serialize as query parameters.</param>
+        /// <param name="page">Pagination index.</param>
+        /// <param name="limit">Optional page size (1–50).</param>
+        public static string BuildSearchUrl(
+            int gameId,
+            SteamGridDbType assetType,
+            SteamGridFilters activeFilters,
+            int page,
+            int? limit)
+        {
             string resource = SteamGridFilterHelper.ResolveApiResource(assetType);
-            string query = SteamGridFilterHelper.BuildSearchQueryString(assetType, activeFilters, page);
+            string query = SteamGridFilterHelper.BuildSearchQueryString(assetType, activeFilters, page, limit);
             return string.Format("{0}/api/v2/{1}/game/{2}?{3}", UrlBase, resource, gameId, query);
         }
 
@@ -146,19 +224,39 @@ namespace BackgroundChanger.Services
         /// <returns>A <see cref="SteamGridDbResultData"/> object containing the results, or null if an error occurs.</returns>
         public SteamGridDbResultData SearchElement(int id, SteamGridDbType steamGridDbType, SteamGridFilters activeFilters, int page = 0)
         {
+            return SearchElement(id, steamGridDbType, activeFilters, page, limit: null);
+        }
+
+        /// <summary>
+        /// Searches for images for the specified game ID using active filter selections and an optional page <c>limit</c>.
+        /// </summary>
+        /// <param name="id">The SteamGridDB game ID.</param>
+        /// <param name="steamGridDbType">The type of image to search (grid, hero, or icon).</param>
+        /// <param name="activeFilters">Active filter lists from the UI or persisted settings.</param>
+        /// <param name="page">The page number for paginated results.</param>
+        /// <param name="limit">Optional API page size (1–50).</param>
+        /// <returns>A <see cref="SteamGridDbResultData"/> object containing the results, or null if an error occurs.</returns>
+        public SteamGridDbResultData SearchElement(
+            int id,
+            SteamGridDbType steamGridDbType,
+            SteamGridFilters activeFilters,
+            int page,
+            int? limit)
+        {
             if (!EnsureApiKeyConfigured("SearchElement"))
             {
                 return null;
             }
 
             string resource = SteamGridFilterHelper.ResolveApiResource(steamGridDbType);
-            string url = BuildSearchUrl(id, steamGridDbType, activeFilters, page);
+            string url = BuildSearchUrl(id, steamGridDbType, activeFilters, page, limit);
             string context = string.Format(
-                "operation=SearchElement endpoint={0}/game/{1} assetType={2} page={3}",
+                "operation=SearchElement endpoint={0}/game/{1} assetType={2} page={3} limit={4}",
                 resource,
                 id,
                 steamGridDbType,
-                page);
+                page,
+                limit.HasValue ? limit.Value.ToString() : "default");
 
             try
             {
