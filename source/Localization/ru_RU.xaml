@@ -37,13 +37,13 @@
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamSelect">Select from Steam</sys:String>
-    <sys:String x:Key="LOCBcSteamGet">Get from Steam</sys:String>
+    <sys:String x:Key="LOCBcSteamSelect">Выбрать из Steam</sys:String>
+    <sys:String x:Key="LOCBcSteamGet">Получить из Steam</sys:String>
     <sys:String x:Key="LOCBcSteamNoAppId">Could not find a Steam App ID for this game.</sys:String>
     <sys:String x:Key="LOCBcSteamNoAssets">No official Steam media found for this game.</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbSelect">Выбрать из SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbAnimated">Animated</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbMimes">MIME types</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbAnimated">Анимированный</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbMimes">MIME типы</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbApiKeyMissingNotification">Configure a SteamGridDB API key in plugin settings to search and download artwork.</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbUnauthorizedNotification">SteamGridDB rejected the API key (401 Unauthorized). Verify the key in plugin settings (invalid, expired, or revoked).</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbForbiddenNotification">SteamGridDB denied access to this resource (403 Forbidden). Your API key may lack the required permissions.</sys:String>
@@ -54,7 +54,7 @@
     <sys:String x:Key="LOCBcAddFromUrl">Добавить из URL</sys:String>
     <sys:String x:Key="LOCBcAddFromUrlDescription">Введите URL к изображению</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg файл</sys:String>
-    <sys:String x:Key="LOCBcFfprobeFile">ffprobe file</sys:String>
+    <sys:String x:Key="LOCBcFfprobeFile">ffprobe файл</sys:String>
     <sys:String x:Key="LOCBcFfmpegFileDescription">Required to import animated media (WebP, WebM, APNG, GIF). Configure FFmpeg and ffprobe (usually in the same folder). Files are automatically converted to MP4 at import and on startup.</sys:String>
 
     <sys:String x:Key="LOCBcMediaConversionSection">Media conversion</sys:String>
@@ -63,20 +63,20 @@
     <sys:String x:Key="LOCBcMediaConversionCrfToolTip">H.264 constant rate factor (0–51). Lower values yield higher quality and larger files. Set 0 to use the default CRF above.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionCrfDescription">The CRF sets the trade-off between MP4 quality and file size: a lower value improves image quality (larger file), a higher value reduces file size (lower quality). 23 is a good starting point for most users.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionAlphaNote">Output uses H.264 yuv420p, which does not preserve transparency. This is acceptable for most animated backgrounds and covers, which rarely rely on alpha.</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionAnimatedWebp">Animated WebP</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionAnimatedWebp">Анимированный WebP</sys:String>
     <sys:String x:Key="LOCBcMediaConversionWebm">WebM</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionApng">Animated PNG (APNG)</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionGif">Animated GIF</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionApng">Анимированный PNG (APNG)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionGif">Анимированный GIF</sys:String>
     <sys:String x:Key="LOCBcMediaConversionUseAutoFramerate">Use source frame timing</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionFixedFramerate">Fixed frame rate (fps)</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionForceReencode">Always re-encode to H.264</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionFixedFramerate">Фиксированная частота кадров (fps)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionForceReencode">Всегда перекодировать в H.264</sys:String>
     <sys:String x:Key="LOCBcMediaConversionForceReencodeToolTip">When disabled, FFmpeg attempts to copy the video stream when the WebM is already H.264 compatible.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionCrfInvalid">Media conversion CRF must be 0 (inherit default) or between 0 and 51. Default CRF must be between 0 and 51.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">Media conversion frame rate must be between 1 and 120 fps.</sys:String>
 
     <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
     <sys:String x:Key="LOCBcFfmpegOutdated">FFmpeg or ffprobe version is too old</sys:String>
-    <sys:String x:Key="LOCBcFfmpegPathNotConfigured">not configured</sys:String>
+    <sys:String x:Key="LOCBcFfmpegPathNotConfigured">не настроено</sys:String>
     <sys:String x:Key="LOCBcFfmpegStartupNotification">FFmpeg is not configured or the executable was not found at &quot;{0}&quot;. Animated media cannot be imported or converted until FFmpeg is set in plugin settings.</sys:String>
     <sys:String x:Key="LOCBcMediaToolkitStartupNotification">FFmpeg and ffprobe must be configured for animated media import and conversion. FFmpeg: {0}. ffprobe: {1}.</sys:String>
     <sys:String x:Key="LOCBcMediaToolkitOutdatedNotification">Animated media import and conversion require FFmpeg {0} or newer (detected: {1}). Update your FFmpeg and ffprobe install in plugin settings.</sys:String>
@@ -85,10 +85,10 @@
 
     <!-- Bulk media download (#25) -->
 
-    <sys:String x:Key="LOCBcBulkDownloadTitle">Bulk media download</sys:String>
-    <sys:String x:Key="LOCBcBulkDownloadMenu">Bulk media download...</sys:String>
-    <sys:String x:Key="LOCBcBulkNoGamesSelected">No games matched the selected filters.</sys:String>
-    <sys:String x:Key="LOCBcBulkSources">Sources</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadTitle">Массовая загрузка медиа</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadMenu">Массовая загрузка медиа...</sys:String>
+    <sys:String x:Key="LOCBcBulkNoGamesSelected">Нет игр, соответствующих выбранным фильтрам.</sys:String>
+    <sys:String x:Key="LOCBcBulkSources">Источники</sys:String>
     <sys:String x:Key="LOCBcBulkSourceSteam">Steam official</sys:String>
     <sys:String x:Key="LOCBcBulkSourceSteamGridDb">SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcBulkMediaKinds">Media types</sys:String>
