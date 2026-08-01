@@ -21,7 +21,7 @@
 
     <sys:String x:Key="LOCBcEnableRandomSelect">Véletlenszerű kiválasztás engedélyezése</sys:String>
     <sys:String x:Key="LOCBcSelectionMode">Selection mode</sys:String>
-    <sys:String x:Key="LOCBcModeDefault">Favorite if set, otherwise Playnite default</sys:String>
+    <sys:String x:Key="LOCBcModeDefault">A kedvenc, ha be van állítva, különben a Playnite alapértelmezett</sys:String>
     <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
     <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Automatikus változtatás engedélyezése</sys:String>
@@ -45,17 +45,17 @@
     <sys:String x:Key="LOCBcSteamGridDbAnimated">Animált</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbMimes">MIME típusok</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbApiKeyMissingNotification">Configure a SteamGridDB API key in plugin settings to search and download artwork.</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbUnauthorizedNotification">SteamGridDB rejected the API key (401 Unauthorized). Verify the key in plugin settings (invalid, expired, or revoked).</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbForbiddenNotification">SteamGridDB denied access to this resource (403 Forbidden). Your API key may lack the required permissions.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbUnauthorizedNotification">A SteamGridDB elutasította az API kulcsot (401 Unauthorized). Ellenőrizd a kulcsot a bővítmény beállításaiban (érvénytelen, lejárt vagy visszavont).</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbForbiddenNotification">A SteamGridDB megtagadta a hozzáférést ehhez az erőforráshoz (403 Forbidden). Lehet, hogy az API-kulcsod nem rendelkezik a szükséges jogosultságokkal.</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbRateLimitNotification">SteamGridDB rate limit reached (429). Wait a moment and try again.</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbParseErrorNotification">SteamGridDB returned an unexpected response. Try again or verify your API key in plugin settings.</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbGenericErrorNotification">SteamGridDB request failed. See extensions.log for details.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbParseErrorNotification">A SteamGridDB váratlan választ adott. Próbáld meg újra, vagy ellenőrizd az API kulcsodat a bővítmény beállításaiban.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbGenericErrorNotification">A SteamGridDB lekérdezés sikertelen volt. A részleteket az extensions.log fájlban találod.</sys:String>
     <sys:String x:Key="LOCBcGoogleImageSelect">Választás a Google Képekből</sys:String>
     <sys:String x:Key="LOCBcAddFromUrl">Hozzáadás URL-ből</sys:String>
     <sys:String x:Key="LOCBcAddFromUrlDescription">Írja be a kép URL-jét</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg fájl</sys:String>
     <sys:String x:Key="LOCBcFfprobeFile">ffprobe fájl</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFileDescription">Required to import animated media (WebP, WebM, APNG, GIF). Configure FFmpeg and ffprobe (usually in the same folder). Files are automatically converted to MP4 at import and on startup.</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFileDescription">Az animált médiafájlok (WebP, WebM, APNG, GIF) importálásához szükséges. Konfigurálja az FFmpeg-et és az ffprobe-ot (általában ugyanabban a mappában találhatók). A fájlok importáláskor és az indításkor automatikusan MP4 formátumra konvertálódnak.</sys:String>
 
     <sys:String x:Key="LOCBcMediaConversionSection">Média átalakítás</sys:String>
     <sys:String x:Key="LOCBcMediaConversionDefaultsCrf">Default CRF (quality)</sys:String>
@@ -69,7 +69,7 @@
     <sys:String x:Key="LOCBcMediaConversionGif">Animált GIF</sys:String>
     <sys:String x:Key="LOCBcMediaConversionUseAutoFramerate">Use source frame timing</sys:String>
     <sys:String x:Key="LOCBcMediaConversionFixedFramerate">Rögzített képfrissítési sebesség (fps)</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionForceReencode">Mindig újrakódolja H.246-ra</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionForceReencode">Mindig újrakódolja H.264-ra</sys:String>
     <sys:String x:Key="LOCBcMediaConversionForceReencodeToolTip">When disabled, FFmpeg attempts to copy the video stream when the WebM is already H.264 compatible.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionCrfInvalid">Media conversion CRF must be 0 (inherit default) or between 0 and 51. Default CRF must be between 0 and 51.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">Media conversion frame rate must be between 1 and 120 fps.</sys:String>
@@ -87,7 +87,7 @@
 
     <sys:String x:Key="LOCBcBulkDownloadTitle">Bulk media download</sys:String>
     <sys:String x:Key="LOCBcBulkDownloadMenu">Bulk media download...</sys:String>
-    <sys:String x:Key="LOCBcBulkNoGamesSelected">No games matched the selected filters.</sys:String>
+    <sys:String x:Key="LOCBcBulkNoGamesSelected">A kiválasztott szűrőknek megfelelő játék nem található.</sys:String>
     <sys:String x:Key="LOCBcBulkSources">Források</sys:String>
     <sys:String x:Key="LOCBcBulkSourceSteam">Steam official</sys:String>
     <sys:String x:Key="LOCBcBulkSourceSteamGridDb">SteamGridDB</sys:String>
@@ -107,7 +107,7 @@
     <sys:String x:Key="LOCBcBulkSteamGridFilters">SteamGridDB szűrők</sys:String>
     <sys:String x:Key="LOCBcBulkSaveOptions">Save options</sys:String>
     <sys:String x:Key="LOCBcBulkOptionsSaved">Bulk download options were saved.</sys:String>
-    <sys:String x:Key="LOCBcBulkOptionsInvalid">Select at least one source and one media type.</sys:String>
+    <sys:String x:Key="LOCBcBulkOptionsInvalid">Válasszon ki legalább egy forrást és egy médiatípust.</sys:String>
     <sys:String x:Key="LOCBcBulkFuzzyPrompt">Select the matching SteamGridDB game</sys:String>
     <sys:String x:Key="LOCBcBulkDownloadSummary">Importálva: {0} —  Átugorva: {1} — Hibák: {2}</sys:String>
     <sys:String x:Key="LOCBcBulkDownloadCancelled">A letöltés leállítva.</sys:String>
