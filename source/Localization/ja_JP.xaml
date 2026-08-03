@@ -18,32 +18,100 @@
     <sys:String x:Key="LOCBcEnableIconImage">プラグインのアイコンを表示</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">プラグインのゲーム背景をテーマ背景と同じ設定にした *。</sys:String>
-    
+
     <sys:String x:Key="LOCBcEnableRandomSelect">ダム選択を有効にする</sys:String>
+    <sys:String x:Key="LOCBcSelectionMode">選択モード</sys:String>
+    <sys:String x:Key="LOCBcModeDefault">お気に入りが設定されている場合はそれを使用し、それ以外は Playnite の既定を使用</sys:String>
     <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
     <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">自動変更を有効にする</sys:String>
+    <sys:String x:Key="LOCBcTimerRandomOrder">シャッフル順</sys:String>
+    <sys:String x:Key="LOCBcTimerRandomOrderToolTip">有効にすると、項目は一度シャッフルされ、全体を一巡するまで重複なしで表示されます。その後、再度シャッフルされます。無効にすると、項目はリスト順に進みます。</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">時間間隔</sys:String>
     <sys:String x:Key="LOCBcSeconds">秒</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">ニメーション背景を有効にする</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">ニメーションカバーを有効にする</sys:String>
-    
     <sys:String x:Key="LOCBcEnableVideoDelay">デオの遅延を有効にする</sys:String>
     <sys:String x:Key="LOCBcVideoDelayToolTip">デオの前に既定の画像を表示する場合は、このオプションを使用します</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomVideoStartPoint">動画の開始位置をランダム化</sys:String>
+    <sys:String x:Key="LOCBcRandomVideoStartPointToolTip">有効にすると、動画の初回再生時のみランダムな時点から再生されます。ループ再生では連続性が維持されます（再ランダム化されません）。既定ではオフです。</sys:String>
 
     <!-- ImagesManagerView -->
 
+    <sys:String x:Key="LOCBcSteamSelect">Steam から選択</sys:String>
+    <sys:String x:Key="LOCBcSteamGet">Steam から取得</sys:String>
+    <sys:String x:Key="LOCBcSteamNoAppId">このゲームの Steam App ID が見つかりませんでした。</sys:String>
+    <sys:String x:Key="LOCBcSteamNoAssets">このゲームの公式 Steam メディアが見つかりませんでした。</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbSelect">SteamGridDBから選択</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbAnimated">アニメーション</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbMimes">MIME タイプ</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKeyMissingNotification">アートワークを検索してダウンロードするには、プラグイン設定で SteamGridDB API キーを設定してください。</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbUnauthorizedNotification">SteamGridDB が API キーを拒否しました（401 Unauthorized）。プラグイン設定でキーを確認してください（無効、期限切れ、または取り消されている可能性があります）。</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbForbiddenNotification">SteamGridDB により、このリソースへのアクセスが拒否されました（403 Forbidden）。API キーに必要な権限がない可能性があります。</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbRateLimitNotification">SteamGridDB のレート制限に達しました（429）。しばらく待ってからもう一度お試しください。</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbParseErrorNotification">SteamGridDB から予期しない応答が返されました。もう一度試すか、プラグイン設定で API キーを確認してください。</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbGenericErrorNotification">SteamGridDB へのリクエストに失敗しました。詳細は extensions.log を確認してください。</sys:String>
     <sys:String x:Key="LOCBcGoogleImageSelect">グーグル画像から選択</sys:String>
-    <sys:String x:Key="LOCBcAddFromUrl">Add from url</sys:String>
-    <sys:String x:Key="LOCBcAddFromUrlDescription">Enter the url to the image</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrl">URL から追加</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrlDescription">画像の URL を入力してください</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg ファイル</sys:String>
-    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo ファイル</sys:String>
+    <sys:String x:Key="LOCBcFfprobeFile">ffprobe ファイル</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFileDescription">アニメーションメディア（WebP、WebM、APNG、GIF）のインポートに必要です。
+FFmpeg と ffprobe を設定してください（通常は同じフォルダーにあります）。
+ファイルはインポート時および起動時に自動的に MP4 に変換されます。</sys:String>
+
+    <sys:String x:Key="LOCBcMediaConversionSection">メディア変換</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionDefaultsCrf">既定の CRF（品質）</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrf">CRF（0 = 既定値を使用）</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfToolTip">H.264 の品質係数（0～51）。値が小さいほど高品質になり、ファイルサイズが大きくなります。上記の既定の CRF を使用するには 0 に設定してください。</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfDescription">CRF は MP4 の品質とファイルサイズのバランスを決めます。値を小さくすると画質が向上します (ファイルサイズは大きくなります)。値を大きくするとファイルサイズは小さくなります (画質は低下します)。ほとんどのユーザーには、23 が適切な初期値です。</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionAlphaNote">出力には透明度を保持しない H.264 yuv420p が使用されます。アルファチャンネルを使用することが少ないアニメーション背景やカバーのほとんどでは問題ありません。</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionAnimatedWebp">アニメーション WebP</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionWebm">WebM</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionApng">アニメーション PNG (APNG)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionGif">アニメーション GIF</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionUseAutoFramerate">ソースのフレームタイミングを使用</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionFixedFramerate">固定フレームレート (fps)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionForceReencode">常に H.264 に再エンコード</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionForceReencodeToolTip">無効にすると、WebM がすでに H.264 互換の場合、FFmpeg は動画ストリームのコピーを試みます。</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfInvalid">メディア変換の CRF は 0 (既定値を継承) または 0～51 の範囲で指定する必要があります。既定の CRF は 0～51 の範囲で指定する必要があります。</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">メディア変換のフレームレートは 1～120 fps の範囲で指定する必要があります。</sys:String>
 
     <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
-    <sys:String x:Key="LOCBcFTooltTipConvert">mp4 に変換 (パフォーマンスが向上)</sys:String>
+    <sys:String x:Key="LOCBcFfmpegOutdated">FFmpeg または ffprobe のバージョンが古すぎます</sys:String>
+    <sys:String x:Key="LOCBcFfmpegPathNotConfigured">未設定</sys:String>
+    <sys:String x:Key="LOCBcFfmpegStartupNotification">FFmpeg が設定されていないか、&quot;{0}&quot; に実行ファイルが見つかりません。プラグイン設定で FFmpeg を設定するまで、アニメーションメディアをインポートまたは変換できません。</sys:String>
+    <sys:String x:Key="LOCBcMediaToolkitStartupNotification">アニメーションメディアのインポートと変換には、FFmpeg と ffprobe の設定が必要です。FFmpeg: {0}、ffprobe: {1}。</sys:String>
+    <sys:String x:Key="LOCBcMediaToolkitOutdatedNotification">アニメーションメディアのインポートと変換には、FFmpeg {0} 以降が必要です (検出されたバージョン: {1})。プラグイン設定で FFmpeg と ffprobe のインストールを更新してください。</sys:String>
+    <sys:String x:Key="LOCBcFfmpegConversionFailed">MP4 への変換に失敗しました。検出されたツールチェーン: {0}。アニメーション WebP には、libwebp のアニメーションデコードに対応した FFmpeg {1} 以降が必要です。</sys:String>
+    <sys:String x:Key="LOCBcInvalidUrlFormat">URL の形式が正しくありません！</sys:String>
 
-    <sys:String x:Key="LOCBcInvalidUrlFormat">Invalid Url Format!</sys:String>
+    <!-- Bulk media download (#25) -->
+
+    <sys:String x:Key="LOCBcBulkDownloadTitle">一括メディアダウンロード</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadMenu">メディアを一括ダウンロード…</sys:String>
+    <sys:String x:Key="LOCBcBulkNoGamesSelected">選択したフィルターに一致するゲームがありません。</sys:String>
+    <sys:String x:Key="LOCBcBulkSources">ソース</sys:String>
+    <sys:String x:Key="LOCBcBulkSourceSteam">Steam 公式</sys:String>
+    <sys:String x:Key="LOCBcBulkSourceSteamGridDb">SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcBulkMediaKinds">メディアタイプ</sys:String>
+    <sys:String x:Key="LOCBcBulkOnlyMissing">種類ごとに既存のプラグインメディアをスキップ（背景/カバー/アイコン）</sys:String>
+    <sys:String x:Key="LOCBcBulkOnlyGamesWithoutData">プラグイン画像がないゲームのみ</sys:String>
+    <sys:String x:Key="LOCBcBulkQuantity">数量（メディアタイプごとの合計）</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadAll">すべてダウンロード</sys:String>
+    <sys:String x:Key="LOCBcBulkFuzzyThreshold">名前の一致しきい値</sys:String>
+    <sys:String x:Key="LOCBcBulkPromptLowFuzzy">一致度がしきい値を下回る場合に確認</sys:String>
+    <sys:String x:Key="LOCBcBulkAllowAnimated">SteamGridDB のアニメーションアセットを許可</sys:String>
+    <sys:String x:Key="LOCBcBulkPickMode">SteamGridDB の選択方法</sys:String>
+    <sys:String x:Key="LOCBcBulkPickRandom">ランダム</sys:String>
+    <sys:String x:Key="LOCBcBulkPickBestScore">最高スコア</sys:String>
+    <sys:String x:Key="LOCBcBulkPickBestVotes">最多賛成票</sys:String>
+    <sys:String x:Key="LOCBcBulkPickNewest">新しい順（ID 基準）</sys:String>
+    <sys:String x:Key="LOCBcBulkSteamGridFilters">SteamGridDB フィルター</sys:String>
+    <sys:String x:Key="LOCBcBulkSaveOptions">オプションを保存</sys:String>
+    <sys:String x:Key="LOCBcBulkOptionsSaved">一括ダウンロードオプションを保存しました。</sys:String>
+    <sys:String x:Key="LOCBcBulkOptionsInvalid">ソースとメディアタイプをそれぞれ 1 つ以上選択してください。</sys:String>
+    <sys:String x:Key="LOCBcBulkFuzzyPrompt">一致する SteamGridDB のゲームを選択</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadSummary">インポート済み：{0} — スキップ：{1} — エラー：{2}</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadCancelled">ダウンロードがキャンセルされました。</sys:String>
 
 </ResourceDictionary>
