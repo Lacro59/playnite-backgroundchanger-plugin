@@ -1,4 +1,5 @@
 ﻿using BackgroundChanger.Models;
+using BackgroundChangerPlugin.Controls;
 using BackgroundChanger.Services;
 using CommonPlayniteShared;
 using CommonPluginsShared;
@@ -6,6 +7,7 @@ using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
 using CommonPluginsShared.Extensions;
 using CommonPluginsShared.Interfaces;
+using CommonPluginsShared.UI;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
@@ -17,7 +19,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
-using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -29,7 +30,7 @@ namespace BackgroundChanger.Controls
     /// <summary>
     /// Logique d'interaction pour PluginBackgroundImage.xaml
     /// </summary>
-    public partial class PluginBackgroundImage : PluginUserControlExtend
+    public partial class PluginBackgroundImage : PluginMediaLifecycleControlBase, IMediaThemeSyncTarget
     {
         private static BackgroundChangerDatabase PluginDatabase => BackgroundChanger.PluginDatabase;
         protected override IPluginDatabase pluginDatabase => PluginDatabase;
@@ -44,38 +45,70 @@ namespace BackgroundChanger.Controls
         private System.Timers.Timer BcTimer { get; set; }
         private System.Timers.Timer BcTimerVideo { get; set; }
         private int Counter { get; set; } = 0;
+        private Guid? _stableBackgroundGameId;
+        private int _stableBackgroundIndex;
+        private string _pendingBackgroundVideoPath;
+        private bool _deferAutoChangerUntilVideoDelay;
         private GameBackgroundImages GameBackgroundImages { get; set; }
 
-        private static readonly Random _random = new Random();
+        private static readonly Random random = new Random();
+        private readonly MediaShuffleQueue _mediaShuffleQueue = new MediaShuffleQueue();
 
-        private bool WindowsIsActivated { get; set; } = true;
-        private bool IsFirst { get; set; } = true;
+        private object _lastBlurMediaSource;
+        private int _lastBlurRadius = -1;
+        private RenderingBias? _lastBlurBias;
+        private bool _isCurrentMediaVideo;
+
+        protected override void AttachStaticEvents()
+        {
+            base.AttachStaticEvents();
+
+            // Attach once per plugin to avoid subscribing multiple times across theme control instances.
+            if (PluginDatabase == null || PluginDatabase.PluginSettings == null)
+            {
+                return;
+            }
+
+            AttachPluginEvents(PluginDatabase.PluginName, () =>
+            {
+                PluginDatabase.PluginSettings.PropertyChanged += CreatePluginSettingsHandler();
+                PluginDatabase.DatabaseItemUpdated += CreateDatabaseItemUpdatedHandler<GameBackgroundImages>();
+                PluginDatabase.DatabaseItemCollectionChanged += CreateDatabaseCollectionChangedHandler<GameBackgroundImages>();
+            });
+        }
+
+
+        public override void GameContextChanged(Game oldContext, Game newContext)
+        {
+            base.GameContextChanged(oldContext, newContext);
+
+            // When background feature is enabled, stay visible so theme-native FadeImage
+            // (collapsed only while EnableBackgroundImage is on) cannot flash through.
+            EnsureActivatedVisibility("GameContextChanged");
+        }
+
+
+        /// <inheritdoc />
+        protected override bool ShouldCollapseOnContextSwitch()
+        {
+            // Keep the BC background surface mounted while the feature is enabled.
+            return !(AlwaysShow || PluginDatabase.PluginSettings.EnableBackgroundImage);
+        }
 
 
         public override void SetDefaultDataContext()
         {
-            if (BcTimer != null)
-            {
-                Counter = 0;
-                BcTimer.Stop();
-                BcTimer.Dispose();
-                BcTimer = null;
-            }
-            if (BcTimerVideo != null)
-            {
-                BcTimerVideo.Stop();
-                BcTimerVideo.Dispose();
-                BcTimerVideo = null;
-            }
+            DisposeBcTimers();
+            _stableBackgroundGameId = null;
+            Interlocked.Increment(ref _sourceSetRequestId);
 
             ControlDataContext = new PluginBackgroundImageDataContext
             {
-                IsActivated = PluginDatabase.PluginSettings.Settings.EnableBackgroundImage,
-                UseAnimated = PluginDatabase.PluginSettings.Settings.EnableImageAnimatedBackground,
-                EnableRandomSelect = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomSelect,
-                EnableRandomOnSelect = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomOnSelect,
-                EnableRandomOnStart = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageRandomOnStart,
-                EnableAutoChanger = PluginDatabase.PluginSettings.Settings.EnableBackgroundImageAutoChanger
+                IsActivated = PluginDatabase.PluginSettings.EnableBackgroundImage,
+                EnableRandomSelect = PluginDatabase.PluginSettings.EnableBackgroundImageRandomSelect,
+                EnableRandomOnSelect = PluginDatabase.PluginSettings.EnableBackgroundImageRandomOnSelect,
+                EnableRandomOnStart = PluginDatabase.PluginSettings.EnableBackgroundImageRandomOnStart,
+                EnableAutoChanger = PluginDatabase.PluginSettings.EnableBackgroundImageAutoChanger
             };
         }
 
@@ -96,142 +129,43 @@ namespace BackgroundChanger.Controls
             Image2FadeOut.Completed += Image2FadeOut_Completed;
             BorderDarkenFadeOut.Completed += BorderDarkenOut_Completed;
 
+            Video1.MediaOpened += OnBackgroundVideoMediaOpened;
+            Video2.MediaOpened += OnBackgroundVideoMediaOpened;
 
-            PluginDatabase.PluginSettings.PropertyChanged += PluginSettings_PropertyChanged;
-            PluginDatabase.Database.ItemUpdated += Database_ItemUpdated;
-            PluginDatabase.Database.ItemCollectionChanged += Database_ItemCollectionChanged;
-            API.Instance.Database.Games.ItemUpdated += Games_ItemUpdated;
-
-            // Apply settings
-            PluginSettings_PropertyChanged(null, null);
-
-            if (API.Instance.ApplicationInfo.Mode == ApplicationMode.Desktop)
-            {
-                EventManager.RegisterClassHandler(typeof(Window), Window.UnloadedEvent, new RoutedEventHandler(WindowBase_UnloadedEvent));
-            }
+            Loaded += OnLoaded;
+            InitializeMediaLifecycleHooks();
+            MediaThemeSyncWindowHandler.EnsureRegistered(this);
         }
 
-
-        private void WindowBase_UnloadedEvent(object sender, System.EventArgs e)
+        private void OnBackgroundVideoMediaOpened(object sender, RoutedEventArgs e)
         {
-            string winIdProperty = string.Empty;
-            string winName = string.Empty;
-
+            const string kind = "background";
             try
             {
-                winIdProperty = ((Window)sender).GetValue(AutomationProperties.AutomationIdProperty).ToString();
-                winName = ((Window)sender).Name;
-
-                if (winIdProperty == "WindowSettings")
+                if (!PluginDatabase.PluginSettings.EnableRandomVideoStartPointBackground)
                 {
-                    GetFadeImageProperties();
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, $"Error on WindowBase_LoadedEvent for {winName} - {winIdProperty}", true, PluginDatabase.PluginName);
-            }
-        }
-
-        private void GetFadeImageProperties()
-        {
-            if (!PluginDatabase.PluginSettings.Settings.BackgroundImageSameSettings)
-            {
-                return;
-            }
-
-            FrameworkElement PART_ImageBackground_4 = null;
-            try
-            {
-                PART_ImageBackground_4 = UI.SearchElementByName("ControlRoot", false, false, 4);
-            }
-            catch
-            {
-            }
-
-            FrameworkElement PART_ImageBackground_3 = null;
-            try
-            {
-                PART_ImageBackground_3 = UI.SearchElementByName("ControlRoot", false, false, 3);
-            }
-            catch
-            {
-            }
-
-            FrameworkElement PART_ImageBackground_2 = null;
-            try
-            {
-                PART_ImageBackground_2 = UI.SearchElementByName("ControlRoot", false, false, 2);
-            }
-            catch
-            {
-            }
-
-            FrameworkElement PART_ImageBackground = PART_ImageBackground_4 ?? PART_ImageBackground_3 ?? PART_ImageBackground_2 ?? null;
-
-            if (PART_ImageBackground != null)
-            {
-                PropertyInfo[] ImageBackgroundProperties = PART_ImageBackground.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                PropertyInfo[] backChangerImageProperties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-                List<string> UsedProperties = new List<string>
-                {
-                    "AnimationEnabled", "ImageOpacityMask", "ImageDarkeningBrush", "Stretch", "StretchDirection",
-                    "IsBlurEnabled", "BlurAmount", "HighQualityBlur", "OpacityMask"
-                };
-
-                foreach (PropertyInfo propImageBackground in ImageBackgroundProperties)
-                {
-                    if (propImageBackground.CanWrite)
-                    {
-                        if (UsedProperties.Contains(propImageBackground.Name))
-                        {
-                            PropertyInfo propBackChangerImage = backChangerImageProperties.Where(x => x.Name == propImageBackground.Name).FirstOrDefault();
-                            try
-                            {
-                                if (propBackChangerImage != null)
-                                {
-                                    object value = propImageBackground.GetValue(PART_ImageBackground, null);
-                                    propBackChangerImage.SetValue(this, value, null);
-                                }
-                                else
-                                {
-                                    Logger.Warn($"No property for {propImageBackground.Name}");
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Common.LogError(ex, false, true, PluginDatabase.PluginName);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-
-        public override void SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
-        {
-            GameBackgroundImages = (GameBackgroundImages)PluginGameData;
-
-            Video1.Volume = PluginDatabase.PluginSettings.Settings.Volume / 10;
-            Video2.Volume = PluginDatabase.PluginSettings.Settings.Volume / 10;
-
-            try
-            {
-                Video1.LoadedBehavior = MediaState.Stop;
-                Video2.LoadedBehavior = MediaState.Stop;
-
-                if (!GameBackgroundImages.HasDataBackground)
-                {
-                    MustDisplay = false;
-                    DataContext = ControlDataContext;
+                    MediaControlDiagnostics.Trace(
+                        LogControlTrace,
+                        "video-start",
+                        MediaRandomVideoStartPoint.FormatDetail(
+                            kind,
+                            MediaRandomVideoStartPoint.OutcomeSkippedSettingOff,
+                            0,
+                            0));
                     return;
                 }
 
-                IsFirst = true;
-                SetBackground();
-                IsFirst = false;
+                MediaElement video = sender as MediaElement;
+                MediaRandomVideoStartPoint.TrySeekRandom(
+                    video,
+                    random,
+                    out string outcome,
+                    out double positionSeconds,
+                    out double durationSeconds);
+                MediaControlDiagnostics.Trace(
+                    LogControlTrace,
+                    "video-start",
+                    MediaRandomVideoStartPoint.FormatDetail(kind, outcome, positionSeconds, durationSeconds));
             }
             catch (Exception ex)
             {
@@ -240,99 +174,428 @@ namespace BackgroundChanger.Controls
         }
 
 
+        void IMediaThemeSyncTarget.SyncThemePropertiesOnSettingsClose()
+        {
+            GetFadeImageProperties();
+        }
+
+        private void GetFadeImageProperties()
+        {
+            if (!PluginDatabase.PluginSettings.BackgroundImageSameSettings)
+            {
+                MediaControlDiagnostics.Trace(
+                    LogControlTrace,
+                    MediaControlDiagnostics.PhaseThemeSync,
+                    "skipped, sameSettings=false");
+                return;
+            }
+
+            int propsCopied = 0;
+            bool partFound = false;
+            int partDepth = 0;
+
+            using (MediaControlDiagnostics.BeginScope(
+                MediaControlDiagnostics.PhaseThemeSync,
+                LogControlTrace,
+                LogControlIssue,
+                slowThresholdMs: MediaControlDiagnostics.ThemeSyncSlowThresholdMs))
+            {
+                FrameworkElement partControlRoot = TryFindThemeControlRoot(out partDepth);
+                partFound = partControlRoot != null;
+
+                if (partControlRoot == null)
+                {
+                    string detail = "ControlRoot not found (search depths 2–4); theme display settings were not copied (no config.json fallback)";
+                    Logger.Warn(string.Format(
+                        "[{0}] BackgroundImageSameSettings: {1}",
+                        PluginDatabase.PluginName,
+                        detail));
+                    MediaControlDiagnostics.Issue(
+                        LogControlIssue,
+                        MediaControlDiagnostics.PhaseThemeSync,
+                        detail);
+                }
+                else
+                {
+                    PropertyInfo[] ImageBackgroundProperties = partControlRoot.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                    PropertyInfo[] backChangerImageProperties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                    List<string> UsedProperties = new List<string>
+                    {
+                        "AnimationEnabled", "ImageOpacityMask", "ImageDarkeningBrush", "Stretch", "StretchDirection",
+                        "IsBlurEnabled", "BlurAmount", "HighQualityBlur", "OpacityMask"
+                    };
+
+                    foreach (PropertyInfo propImageBackground in ImageBackgroundProperties)
+                    {
+                        if (propImageBackground.CanWrite)
+                        {
+                            if (UsedProperties.Contains(propImageBackground.Name))
+                            {
+                                PropertyInfo propBackChangerImage = backChangerImageProperties.Where(x => x.Name == propImageBackground.Name).FirstOrDefault();
+                                try
+                                {
+                                    if (propBackChangerImage != null)
+                                    {
+                                        object value = propImageBackground.GetValue(partControlRoot, null);
+                                        propBackChangerImage.SetValue(this, value, null);
+                                        propsCopied++;
+                                    }
+                                    else
+                                    {
+                                        Logger.Warn(string.Format(
+                                            "[{0}] BackgroundImageSameSettings: no matching property '{1}' on PluginBackgroundImage",
+                                            PluginDatabase.PluginName,
+                                            propImageBackground.Name));
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logger.Warn(string.Format(
+                                        "[{0}] BackgroundImageSameSettings: failed to copy '{1}' from ControlRoot — {2}",
+                                        PluginDatabase.PluginName,
+                                        propImageBackground.Name,
+                                        ex.Message));
+                                    Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                                }
+                            }
+                        }
+                    }
+
+                    if (propsCopied == 0)
+                    {
+                        string detail = string.Format(
+                            "ControlRoot found (depth={0}) but no display properties were copied",
+                            partDepth);
+                        Logger.Warn(string.Format(
+                            "[{0}] BackgroundImageSameSettings: {1}",
+                            PluginDatabase.PluginName,
+                            detail));
+                        MediaControlDiagnostics.Issue(
+                            LogControlIssue,
+                            MediaControlDiagnostics.PhaseThemeSync,
+                            detail);
+                    }
+                }
+
+                MediaControlDiagnostics.Trace(
+                    LogControlTrace,
+                    MediaControlDiagnostics.PhaseThemeSync,
+                    string.Format("props={0}, partFound={1}, partDepth={2}", propsCopied, partFound, partDepth));
+            }
+        }
+
+        /// <summary>
+        /// Locates the theme <c>ControlRoot</c> used by FadeImage (depths 4 → 2). No <c>config.json</c> fallback.
+        /// </summary>
+        private static FrameworkElement TryFindThemeControlRoot(out int partDepth)
+        {
+            partDepth = 0;
+
+            FrameworkElement partDepth4 = TrySearchControlRoot(4);
+            if (partDepth4 != null)
+            {
+                partDepth = 4;
+                return partDepth4;
+            }
+
+            FrameworkElement partDepth3 = TrySearchControlRoot(3);
+            if (partDepth3 != null)
+            {
+                partDepth = 3;
+                return partDepth3;
+            }
+
+            FrameworkElement partDepth2 = TrySearchControlRoot(2);
+            if (partDepth2 != null)
+            {
+                partDepth = 2;
+                return partDepth2;
+            }
+
+            return null;
+        }
+
+        private static FrameworkElement TrySearchControlRoot(int maxDepth)
+        {
+            try
+            {
+                return UIHelper.SearchElementByName("ControlRoot", false, false, maxDepth);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(string.Format(
+                    "BackgroundImageSameSettings: ControlRoot search failed at depth {0} — {1}",
+                    maxDepth,
+                    ex.Message));
+                return null;
+            }
+        }
+
+
+        public override void SetData(Game newContext, PluginGameEntry PluginGameData)
+        {
+            GameBackgroundImages = (GameBackgroundImages)PluginGameData;
+
+            Video1.Volume = 0;
+            Video2.Volume = 0;
+
+            string setDataDetail = string.Format(
+                "game={0}, hasDataBackground={1}, itemsBackground={2}, entryHasData={3}",
+                MediaControlDiagnostics.FormatGameRef(GameContext),
+                GameBackgroundImages.HasDataBackground,
+                GameBackgroundImages.ItemsBackground.Count,
+                GameBackgroundImages.HasData);
+
+            using (MediaControlDiagnostics.BeginScope(
+                MediaControlDiagnostics.PhaseSetData,
+                LogControlTrace,
+                LogControlIssue,
+                setDataDetail))
+            {
+                try
+                {
+                    Video1.LoadedBehavior = MediaState.Stop;
+                    Video2.LoadedBehavior = MediaState.Stop;
+
+                    if (!GameBackgroundImages.HasDataBackground)
+                    {
+                        ApplyNoBackgroundDataState();
+                        return;
+                    }
+
+                    SetBackground();
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                }
+            }
+        }
+
+
+        protected override Task OnNoPluginCacheEntryAsync(Game gameContext, CancellationToken cancellationToken)
+        {
+            Video1.LoadedBehavior = MediaState.Stop;
+            Video2.LoadedBehavior = MediaState.Stop;
+            Video1.Volume = 0;
+            Video2.Volume = 0;
+            ApplyNoBackgroundDataState();
+            return Task.CompletedTask;
+        }
+
+
+        private void ApplyNoBackgroundDataState()
+        {
+            DisposeBcTimers();
+            ClearBackgroundDisplayState("ApplyNoBackgroundDataState");
+            PauseVideos();
+            // Keep hosting the background surface while the feature is enabled; themes hide
+            // native FadeImage based on EnableBackgroundImage, so collapsing here would flash it.
+            MustDisplay = AlwaysShow || (ControlDataContext?.IsActivated ?? false);
+            EnsureActivatedVisibility("ApplyNoBackgroundDataState");
+            DataContext = ControlDataContext;
+        }
+
+
         public void SetBackground()
         {
             string pathImage = string.Empty;
 
-            if (GameBackgroundImages.HasDataBackground)
+            using (MediaControlDiagnostics.BeginScope(
+                MediaControlDiagnostics.PhaseMediaSelect,
+                LogControlTrace,
+                LogControlIssue))
             {
-                ItemImage ItemFavorite = GameBackgroundImages.ItemsBackground.FirstOrDefault(x => x.IsFavorite);
-
-                if (ControlDataContext.EnableAutoChanger)
+                if (GameBackgroundImages.HasDataBackground)
                 {
-                    if (ControlDataContext.EnableRandomSelect)
+                    ItemImage ItemFavorite = GameBackgroundImages.ItemsBackground.FirstOrDefault(x => x.IsFavorite);
+
+                    int itemsCount = GameBackgroundImages.ItemsBackground.Count;
+                    int favIndex = ItemFavorite != null
+                        ? GameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite)
+                        : -1;
+
+                    bool timerMode = ControlDataContext.EnableAutoChanger;
+                    string modeName;
+                    if (timerMode)
                     {
-                        if (IsFirst && ItemFavorite != null)
-                        {
-                            pathImage = ItemFavorite.FullPath;
-                            Counter = GameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
-                        }
-                        else
-                        {
-                            Counter = _random.Next(0, GameBackgroundImages.ItemsBackground.Count);
-                            pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
-                        }
+                        modeName = ControlDataContext.EnableRandomSelect ? "Timer+Random" : "Timer+Sequential";
+                    }
+                    else if (ControlDataContext.EnableRandomSelect && ControlDataContext.EnableRandomOnStart)
+                    {
+                        modeName = "OnStart+Random";
+                    }
+                    else if (ControlDataContext.EnableRandomSelect)
+                    {
+                        modeName = "OnSelect+Random";
+                    }
+                    else if (ItemFavorite != null)
+                    {
+                        modeName = "Favorite";
                     }
                     else
                     {
-                        if (IsFirst && ItemFavorite != null)
+                        modeName = "Default";
+                    }
+
+                    Common.LogDebug(
+                        true,
+                        string.Format(
+                            "[PluginBackgroundImage][Mode] game={0}, mode={1}, autoChanger={2}, randomSelect={3}, randomOnStart={4}, items={5}, favIndex={6}",
+                            MediaControlDiagnostics.FormatGameRef(GameContext),
+                            modeName,
+                            ControlDataContext.EnableAutoChanger,
+                            ControlDataContext.EnableRandomSelect,
+                            ControlDataContext.EnableRandomOnStart,
+                            itemsCount,
+                            favIndex));
+
+                    if (ControlDataContext.EnableAutoChanger)
+                    {
+                        // Timer entry: favorite-first or one stable index; rotation only in OnTimedEvent.
+                        ResolveStableBackgroundIndex(ItemFavorite);
+                        Counter = _stableBackgroundIndex;
+                        if (ControlDataContext.EnableRandomSelect)
                         {
-                            pathImage = ItemFavorite.FullPath;
-                            Counter = GameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
+                            _mediaShuffleQueue.RememberDisplayedIndex(Counter);
+                        }
+                        pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
+
+                        if (ItemFavorite != null)
+                        {
+                            LogMediaSelect("auto-changer-favorite-first", pathImage);
+                            Common.LogDebug(
+                                true,
+                                string.Format(
+                                    "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                    "auto-changer-favorite-first",
+                                    Counter,
+                                    itemsCount,
+                                    MediaControlDiagnostics.FormatFileName(pathImage)));
                         }
                         else
                         {
-                            pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
+                            LogMediaSelect("auto-changer-stable-entry", pathImage, Counter);
+                            Common.LogDebug(
+                                true,
+                                string.Format(
+                                    "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                    "auto-changer-stable-entry",
+                                    Counter,
+                                    itemsCount,
+                                    MediaControlDiagnostics.FormatFileName(pathImage)));
+                        }
+
+                        SetBackgroundImageWithOptionalVideoDelay(pathImage);
+
+                        DisposeBcTimer();
+                        BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.BackgroundImageAutoChangerTimer * 1000)
+                        {
+                            AutoReset = true
+                        };
+                        BcTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+                        if (!_deferAutoChangerUntilVideoDelay && IsMediaLifecycleActive())
+                        {
+                            BcTimer.Start();
                         }
                     }
-
-                    SetBackgroundImage(pathImage);
-
-                    BcTimer = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.BackgroundImageAutoChangerTimer * 1000)
+                    else if (ControlDataContext.EnableRandomSelect)
                     {
-                        AutoReset = true
-                    };
-                    BcTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-                    BcTimer.Start();
-                }
-                else if (ControlDataContext.EnableRandomSelect)
-                {
-                    if (ControlDataContext.EnableRandomOnStart)
-                    {
-                        pathImage = GameBackgroundImages.BackgroundImageOnStart.FullPath;
-                    }
-                    else
-                    {
-                        if (IsFirst && ItemFavorite != null)
+                        if (ControlDataContext.EnableRandomOnStart)
                         {
-                            pathImage = ItemFavorite.FullPath;
+                            pathImage = GameBackgroundImages.BackgroundImageOnStart.FullPath;
+                            LogMediaSelect("random-on-start", pathImage);
+                            int onStartIndex = GameBackgroundImages.ItemsBackground.FindIndex(x => x.FullPath == pathImage);
+                            Common.LogDebug(
+                                true,
+                                string.Format(
+                                    "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                    "random-on-start",
+                                    onStartIndex,
+                                    itemsCount,
+                                    MediaControlDiagnostics.FormatFileName(pathImage)));
                         }
                         else
                         {
-                            Random rnd = new Random();
-                            int imgSelected = rnd.Next(0, GameBackgroundImages.ItemsBackground.Count);
+                            // OnSelect: always re-roll; favorite applies only in Timer entry / default mode.
+                            int imgSelected = random.Next(0, GameBackgroundImages.ItemsBackground.Count);
                             pathImage = GameBackgroundImages.ItemsBackground[imgSelected].FullPath;
+                            LogMediaSelect("random-on-select", pathImage, imgSelected);
+                            Common.LogDebug(
+                                true,
+                                string.Format(
+                                    "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                    "random-on-select",
+                                    imgSelected,
+                                    itemsCount,
+                                    MediaControlDiagnostics.FormatFileName(pathImage)));
+                        }
+
+                        SetBackgroundImageWithOptionalVideoDelay(pathImage);
+                    }
+                    else
+                    {
+                        if (ItemFavorite != null)
+                        {
+                            pathImage = ItemFavorite.FullPath;
+                            LogMediaSelect("favorite", pathImage);
+                            Common.LogDebug(
+                                true,
+                                string.Format(
+                                    "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                                    "favorite",
+                                    favIndex,
+                                    itemsCount,
+                                    MediaControlDiagnostics.FormatFileName(pathImage)));
+                            SetBackgroundImageWithOptionalVideoDelay(pathImage);
+                        }
+                        else
+                        {
+                            DisposeBcTimerVideo();
+                            SetDefaultBackgroundImage();
                         }
                     }
-
-                    SetBackgroundImage(pathImage);
                 }
                 else
                 {
-                    if (ItemFavorite != null)
-                    {
-                        pathImage = ItemFavorite.FullPath;
-                        SetBackgroundImage(pathImage);
-                    }
-                    else
-                    {
-                        SetDefaultBackgroundImage();
-                    }
+                    DisposeBcTimerVideo();
+                    SetDefaultBackgroundImage();
                 }
             }
-            else
+        }
+
+        /// <summary>
+        /// Picks a stable background index for the current game (favorite, one random draw, or zero).
+        /// Reused across re-selections until the game context changes or the timer advances the index.
+        /// </summary>
+        private void ResolveStableBackgroundIndex(ItemImage itemFavorite)
+        {
+            if (GameContext == null
+                || GameBackgroundImages?.ItemsBackground == null
+                || GameBackgroundImages.ItemsBackground.Count == 0)
             {
-                SetDefaultBackgroundImage();
+                _stableBackgroundIndex = 0;
+                return;
             }
 
-            if (PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
+            if (_stableBackgroundGameId != GameContext.Id)
             {
-                BcTimerVideo = new System.Timers.Timer(PluginDatabase.PluginSettings.Settings.videoDelayBackgroundImage * 1000)
+                _stableBackgroundGameId = GameContext.Id;
+
+                if (itemFavorite != null)
                 {
-                    AutoReset = true
-                };
-                BcTimerVideo.Elapsed += new ElapsedEventHandler(OnTimedVideoEvent);
-                BcTimerVideo.Start();
+                    int favIndex = GameBackgroundImages.ItemsBackground.FindIndex(x => x.IsFavorite);
+                    _stableBackgroundIndex = favIndex >= 0 ? favIndex : 0;
+                }
+                else if (ControlDataContext.EnableRandomSelect)
+                {
+                    _stableBackgroundIndex = random.Next(0, GameBackgroundImages.ItemsBackground.Count);
+                }
+                else
+                {
+                    _stableBackgroundIndex = 0;
+                }
             }
         }
 
@@ -340,25 +603,139 @@ namespace BackgroundChanger.Controls
         {
             if (GameContext.BackgroundImage.IsNullOrEmpty())
             {
+                LogMediaSelect("default-playnite", null);
                 SetBackgroundImage();
+                Common.LogDebug(
+                    true,
+                    string.Format(
+                        "[PluginBackgroundImage][Change] branch={0}, file={1}",
+                        "default-playnite",
+                        "(null)"));
             }
             else
             {
                 string pathImage = ImageSourceManager.GetImagePath(GameContext.BackgroundImage)
                     ?? API.Instance.Database.GetFullFilePath(GameContext.BackgroundImage);
+                LogMediaSelect("default-playnite", pathImage);
                 SetBackgroundImage(pathImage);
+                Common.LogDebug(
+                    true,
+                    string.Format(
+                        "[PluginBackgroundImage][Change] branch={0}, index={1}/{2}, file={3}",
+                        "default-playnite",
+                        -1,
+                        -1,
+                        MediaControlDiagnostics.FormatFileName(pathImage)));
             }
+        }
+
+        /// <summary>
+        /// Shows <paramref name="pathImage"/> immediately, or Playnite default then the video after the configured delay.
+        /// </summary>
+        /// <returns><c>true</c> when a one-shot video delay was armed.</returns>
+        private bool SetBackgroundImageWithOptionalVideoDelay(string pathImage)
+        {
+            DisposeBcTimerVideo();
+            _pendingBackgroundVideoPath = null;
+            _deferAutoChangerUntilVideoDelay = false;
+
+            if (PluginDatabase.PluginSettings.useVideoDelayBackgroundImage && IsExistingVideoPath(pathImage))
+            {
+                _pendingBackgroundVideoPath = pathImage;
+                _deferAutoChangerUntilVideoDelay = ControlDataContext.EnableAutoChanger;
+                SetDefaultBackgroundImage();
+                Common.LogDebug(
+                    true,
+                    string.Format(
+                        "[PluginBackgroundImage][Change] branch={0}, delaySec={1}, pending={2}",
+                        "video-delay-pending",
+                        PluginDatabase.PluginSettings.videoDelayBackgroundImage,
+                        MediaControlDiagnostics.FormatFileName(pathImage)));
+
+                BcTimerVideo = new System.Timers.Timer(PluginDatabase.PluginSettings.videoDelayBackgroundImage * 1000)
+                {
+                    AutoReset = false
+                };
+                BcTimerVideo.Elapsed += new ElapsedEventHandler(OnTimedVideoEvent);
+                if (IsMediaLifecycleActive())
+                {
+                    BcTimerVideo.Start();
+                }
+
+                return true;
+            }
+
+            SetBackgroundImage(pathImage);
+            return false;
+        }
+
+        private static bool IsExistingVideoPath(string pathImage)
+        {
+            return !pathImage.IsNullOrEmpty()
+                && File.Exists(pathImage)
+                && Path.GetExtension(pathImage).IsEqual(".mp4");
         }
 
         public void SetBackgroundImage(string pathImage = null)
         {
+            bool exists = !string.IsNullOrEmpty(pathImage) && File.Exists(pathImage);
+            bool isVideo = !string.IsNullOrEmpty(pathImage) && Path.GetExtension(pathImage).IsEqual(".mp4");
+            long requestId = Interlocked.Increment(ref _sourceSetRequestId);
+            Guid gameIdAtSchedule = GameContext?.Id ?? Guid.Empty;
+
+            if (!string.IsNullOrEmpty(pathImage) && !exists)
+            {
+                MediaControlDiagnostics.Issue(
+                    LogControlIssue,
+                    MediaControlDiagnostics.PhaseSourceSet,
+                    string.Format("file missing: {0}", MediaControlDiagnostics.FormatFileName(pathImage)));
+            }
+
+            MediaControlDiagnostics.Trace(
+                LogControlTrace,
+                MediaControlDiagnostics.PhaseSourceSet,
+                MediaControlDiagnostics.FormatSourceSetDetail(pathImage, exists, isVideo, "Render"));
+
             _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Render, (Action)delegate
             {
+                if (requestId != _sourceSetRequestId)
+                {
+                    LogControlTrace(
+                        MediaControlDiagnostics.PhaseSourceSet,
+                        string.Format(
+                            "BeginInvoke skipped: superseded request, file={0}, request={1}, latest={2}",
+                            MediaControlDiagnostics.FormatFileName(pathImage),
+                            requestId,
+                            _sourceSetRequestId));
+                    return;
+                }
+
+                if (gameIdAtSchedule == Guid.Empty || GameContext?.Id != gameIdAtSchedule)
+                {
+                    LogControlTrace(
+                        MediaControlDiagnostics.PhaseSourceSet,
+                        string.Format(
+                            "BeginInvoke skipped: context superseded, file={0}, request={1}",
+                            MediaControlDiagnostics.FormatFileName(pathImage),
+                            requestId));
+                    return;
+                }
+
+                string appliedPath = pathImage;
                 if (!File.Exists(pathImage))
                 {
-                    pathImage = null;
+                    appliedPath = null;
                 }
-                Source = pathImage;
+
+                LogControlTrace(
+                    MediaControlDiagnostics.PhaseSourceSet,
+                    string.Format(
+                        "BeginInvoke applied, file={0}, exists={1}, request={2}",
+                        MediaControlDiagnostics.FormatFileName(appliedPath),
+                        appliedPath != null,
+                        requestId));
+
+                Source = appliedPath;
             });
         }
 
@@ -372,6 +749,7 @@ namespace BackgroundChanger.Controls
 
         private CurrentImage currentImage = CurrentImage.None;
         private object currentSource = null;
+        private long _sourceSetRequestId = 0;
 
         internal Storyboard Image1FadeIn;
         internal Storyboard Image2FadeIn;
@@ -380,6 +758,7 @@ namespace BackgroundChanger.Controls
         internal Storyboard BorderDarkenFadeOut;
 
         #region AnimationEnabled
+
         public static readonly DependencyProperty AnimationEnabledProperty = DependencyProperty.Register(
             nameof(AnimationEnabled),
             typeof(bool),
@@ -391,9 +770,11 @@ namespace BackgroundChanger.Controls
             get => (bool)GetValue(AnimationEnabledProperty);
             set => SetValue(AnimationEnabledProperty, value);
         }
+
         #endregion
 
         #region Source
+
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(
             nameof(Source),
             typeof(object),
@@ -405,9 +786,11 @@ namespace BackgroundChanger.Controls
             get => GetValue(SourceProperty);
             set => SetValue(SourceProperty, value);
         }
+
         #endregion
 
         #region ImageOpacityMask
+
         public static readonly DependencyProperty ImageOpacityMaskProperty = DependencyProperty.Register(
             nameof(ImageOpacityMask),
             typeof(Brush),
@@ -419,9 +802,11 @@ namespace BackgroundChanger.Controls
             get => (Brush)GetValue(ImageOpacityMaskProperty);
             set => SetValue(ImageOpacityMaskProperty, value);
         }
+
         #endregion
 
         #region ImageDarkeningBrush
+
         public static readonly DependencyProperty ImageDarkeningBrushProperty = DependencyProperty.Register(
             nameof(ImageDarkeningBrush),
             typeof(Brush),
@@ -433,9 +818,11 @@ namespace BackgroundChanger.Controls
             get => (Brush)GetValue(ImageDarkeningBrushProperty);
             set => SetValue(ImageDarkeningBrushProperty, value);
         }
+
         #endregion
 
         #region Stretch
+
         public static readonly DependencyProperty StretchProperty = DependencyProperty.Register(
             nameof(Stretch),
             typeof(Stretch),
@@ -447,9 +834,11 @@ namespace BackgroundChanger.Controls
             get => (Stretch)GetValue(StretchProperty);
             set => SetValue(StretchProperty, value);
         }
+
         #endregion
 
         #region StretchDirection
+
         public static readonly DependencyProperty StretchDirectionProperty = DependencyProperty.Register(
             nameof(StretchDirection),
             typeof(StretchDirection),
@@ -461,9 +850,11 @@ namespace BackgroundChanger.Controls
             get => (StretchDirection)GetValue(StretchProperty);
             set => SetValue(StretchProperty, value);
         }
+
         #endregion
 
         #region IsBlurEnabled
+
         public static readonly DependencyProperty IsBlurEnabledProperty = DependencyProperty.Register(
             nameof(IsBlurEnabled),
             typeof(bool),
@@ -475,9 +866,11 @@ namespace BackgroundChanger.Controls
             get => (bool)GetValue(IsBlurEnabledProperty);
             set => SetValue(IsBlurEnabledProperty, value);
         }
+
         #endregion
 
         #region BlurAmount
+
         public static readonly DependencyProperty BlurAmountProperty = DependencyProperty.Register(
             nameof(BlurAmount),
             typeof(int),
@@ -489,9 +882,11 @@ namespace BackgroundChanger.Controls
             get => (int)GetValue(BlurAmountProperty);
             set => SetValue(BlurAmountProperty, value);
         }
+
         #endregion
 
         #region HighQualityBlur
+
         public static readonly DependencyProperty HighQualityBlurProperty = DependencyProperty.Register(
             nameof(HighQualityBlurProperty),
             typeof(bool),
@@ -503,20 +898,21 @@ namespace BackgroundChanger.Controls
             get => (bool)GetValue(HighQualityBlurProperty);
             set => SetValue(HighQualityBlurProperty, value);
         }
+
         #endregion
 
         private void Image1FadeOut_Completed(object sender, EventArgs e)
         {
-            AnimatedImage1.Source = null;
-            AnimatedImage1.UpdateLayout();
+            Image1.Source = null;
+            Image1.UpdateLayout();
             Video1.Source = null;
             Video1.UpdateLayout();
         }
 
         private void Image2FadeOut_Completed(object sender, EventArgs e)
         {
-            AnimatedImage2.Source = null;
-            AnimatedImage2.UpdateLayout();
+            Image2.Source = null;
+            Image2.UpdateLayout();
             Video2.Source = null;
             Video2.UpdateLayout();
         }
@@ -534,17 +930,7 @@ namespace BackgroundChanger.Controls
                 return;
             }
 
-            int blurAmount = control.BlurAmount;
-            bool blurEnabled = control.IsBlurEnabled;
-            bool highQuality = control.HighQualityBlur;
-            control.ImageHolder.Effect = blurEnabled
-                ? new BlurEffect()
-                {
-                    KernelType = KernelType.Gaussian,
-                    Radius = blurAmount,
-                    RenderingBias = highQuality ? RenderingBias.Quality : RenderingBias.Performance
-                }
-                : null;
+            control.ApplyAdaptiveBlurEffect();
         }
 
         private static void SourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
@@ -553,232 +939,278 @@ namespace BackgroundChanger.Controls
             control.LoadNewSource(args.NewValue, args.OldValue);
         }
 
+        private void LogCrossfadeGateAborted(string imagePath, string slot, bool decodeReady)
+        {
+            bool currentSourceMatch = string.Equals(currentSource as string, imagePath, StringComparison.Ordinal);
+            LogControlTrace(
+                MediaControlDiagnostics.PhaseLoadNewSource,
+                string.Format(
+                    "crossfade aborted: decodeReady={0}, currentSourceMatch={1}, slot={2}, file={3}",
+                    decodeReady,
+                    currentSourceMatch,
+                    slot,
+                    MediaControlDiagnostics.FormatFileName(imagePath)));
+        }
+
         private async void LoadNewSource(object newSource, object oldSource)
         {
+            string oldPath = oldSource as string;
+            string newPath = newSource as string;
+
             try
             {
-                int blurAmount = BlurAmount;
-                bool blurEnabled = IsBlurEnabled;
-                bool highQuality = HighQualityBlur;
-
-                string image = null;
-
                 if (newSource?.Equals(currentSource) == true)
                 {
+                    MediaControlDiagnostics.Trace(
+                        LogControlTrace,
+                        MediaControlDiagnostics.PhaseLoadNewSource,
+                        MediaControlDiagnostics.FormatLoadNewSourceDetail(
+                            oldPath,
+                            newPath,
+                            true,
+                            "duplicate",
+                            currentImage.ToString()));
+
                     if (Video1.Source != null)
                     {
-                        Video1.LoadedBehavior = MediaState.Play;
+                        Video1.LoadedBehavior = VideoStateForLifecycle();
                     }
                     if (Video2.Source != null)
                     {
-                        Video2.LoadedBehavior = MediaState.Play;
+                        Video2.LoadedBehavior = VideoStateForLifecycle();
                     }
 
                     return;
                 }
 
-                currentSource = newSource;
+                string fadeBranch = AnimationEnabled ? "crossfade" : "direct-swap";
 
-                if (newSource is string)
+                using (MediaControlDiagnostics.BeginScope(
+                    MediaControlDiagnostics.PhaseLoadNewSource,
+                    LogControlTrace,
+                    LogControlIssue,
+                    MediaControlDiagnostics.FormatLoadNewSourceDetail(
+                        oldPath,
+                        newPath,
+                        false,
+                        fadeBranch,
+                        currentImage.ToString())))
                 {
-                    if (!File.Exists(newSource.ToString()))
+                    string image = null;
+
+                    currentSource = newSource;
+
+                    if (newSource is string)
                     {
-                        Logger.Warn($"File not founs {newSource}");
+                        if (!File.Exists(newSource.ToString()))
+                        {
+                            MediaControlDiagnostics.Issue(
+                                LogControlIssue,
+                                MediaControlDiagnostics.PhaseLoadNewSource,
+                                string.Format("file missing: {0}", MediaControlDiagnostics.FormatFileName(newPath)));
+                        }
+                        else
+                        {
+                            image = (string)currentSource;
+                        }
+                    }
+
+                    _isCurrentMediaVideo = !string.IsNullOrEmpty(image) && Path.GetExtension(image).IsEqual(".mp4");
+                    ApplyAdaptiveBlurEffect();
+
+                    if (AnimationEnabled)
+                    {
+                        if (image == null)
+                        {
+                            if (currentImage == CurrentImage.None)
+                            {
+                                fadeBranch = "immediate-clear-noop";
+                                LogLoadNewSourceBranch(fadeBranch, oldPath, newPath);
+                                return;
+                            }
+
+                            fadeBranch = "immediate-clear";
+                            LogLoadNewSourceBranch(fadeBranch, oldPath, newPath);
+
+                            StopCrossfadeStoryboards();
+
+                            Image1.Opacity = 0;
+                            Image2.Opacity = 0;
+                            Video1.Opacity = 0;
+                            Video2.Opacity = 0;
+                            BorderDarken.Opacity = 0;
+
+                            Image1.Source = null;
+                            Image2.Source = null;
+                            Video1.Source = null;
+                            Video2.Source = null;
+
+                            currentImage = CurrentImage.None;
+                        }
+                        else
+                        {
+                            if (currentImage == CurrentImage.None)
+                            {
+                                fadeBranch = "crossfade-to-Image1";
+                                Image1FadeOut.Stop();
+
+                                if (Path.GetExtension(image).IsEqual(".mp4"))
+                                {
+                                    Video1.Source = new Uri(image);
+                                    Video1.LoadedBehavior = VideoStateForLifecycle();
+                                    Image1FadeIn.Begin();
+                                    BorderDarken.Opacity = 1;
+                                    BorderDarkenFadeOut.Stop();
+                                    currentImage = CurrentImage.Image1;
+                                }
+                                else
+                                {
+                                    Image1.Source = image;
+                                    bool decodeReady = await ImageAsync.WaitForDecodeAsync(Image1, image).ConfigureAwait(true);
+                                    if (!decodeReady
+                                        || !string.Equals(currentSource as string, image, StringComparison.Ordinal))
+                                    {
+                                        LogCrossfadeGateAborted(image, "Image1", decodeReady);
+                                        return;
+                                    }
+
+                                    Image1FadeIn.Begin();
+                                    BorderDarken.Opacity = 1;
+                                    BorderDarkenFadeOut.Stop();
+                                    currentImage = CurrentImage.Image1;
+                                }
+                            }
+                            else if (currentImage == CurrentImage.Image1)
+                            {
+                                fadeBranch = "crossfade-to-Image2";
+                                Image2FadeOut.Stop();
+
+                                if (Path.GetExtension(image).IsEqual(".mp4"))
+                                {
+                                    Video2.Source = new Uri(image);
+                                    Video2.LoadedBehavior = VideoStateForLifecycle();
+                                    Image2FadeIn.Begin();
+                                    Image1FadeOut.Begin();
+                                    BorderDarken.Opacity = 1;
+                                    BorderDarkenFadeOut.Stop();
+                                    currentImage = CurrentImage.Image2;
+                                }
+                                else
+                                {
+                                    Image2.Source = image;
+                                    Image1FadeOut.Begin();
+                                    bool decodeReady = await ImageAsync.WaitForDecodeAsync(Image2, image).ConfigureAwait(true);
+                                    if (!decodeReady
+                                        || !string.Equals(currentSource as string, image, StringComparison.Ordinal))
+                                    {
+                                        LogCrossfadeGateAborted(image, "Image2", decodeReady);
+                                        return;
+                                    }
+
+                                    Image2FadeIn.Begin();
+                                    BorderDarken.Opacity = 1;
+                                    BorderDarkenFadeOut.Stop();
+                                    currentImage = CurrentImage.Image2;
+                                }
+                            }
+                            else if (currentImage == CurrentImage.Image2)
+                            {
+                                fadeBranch = "crossfade-to-Image1";
+                                Image1FadeOut.Stop();
+
+                                if (Path.GetExtension(image).IsEqual(".mp4"))
+                                {
+                                    Video1.Source = new Uri(image);
+                                    Video1.LoadedBehavior = VideoStateForLifecycle();
+                                    Image1FadeIn.Begin();
+                                    Image2FadeOut.Begin();
+                                    BorderDarken.Opacity = 1;
+                                    BorderDarkenFadeOut.Stop();
+                                    currentImage = CurrentImage.Image1;
+                                }
+                                else
+                                {
+                                    Image1.Source = image;
+                                    Image2FadeOut.Begin();
+                                    bool decodeReady = await ImageAsync.WaitForDecodeAsync(Image1, image).ConfigureAwait(true);
+                                    if (!decodeReady
+                                        || !string.Equals(currentSource as string, image, StringComparison.Ordinal))
+                                    {
+                                        LogCrossfadeGateAborted(image, "Image1", decodeReady);
+                                        return;
+                                    }
+
+                                    Image1FadeIn.Begin();
+                                    BorderDarken.Opacity = 1;
+                                    BorderDarkenFadeOut.Stop();
+                                    currentImage = CurrentImage.Image1;
+                                }
+                            }
+                        }
                     }
                     else
                     {
-                        image = (string)currentSource;
-                    }
-                }
-
-                if (blurEnabled)
-                {
-                    if (ImageHolder.Effect == null)
-                    {
-                        ImageHolder.Effect = new BlurEffect()
-                        {
-                            KernelType = KernelType.Gaussian,
-                            Radius = blurAmount,
-                            RenderingBias = highQuality ? RenderingBias.Quality : RenderingBias.Performance
-                        };
-                    }
-                }
-                else
-                {
-                    if (ImageHolder.Effect != null)
-                    {
-                        ImageHolder.Effect = null;
-                    }
-                }
-
-                if (AnimationEnabled)
-                {
-                    if (image == null)
-                    {
-                        if (currentImage == CurrentImage.None)
-                        {
-                            return;
-                        }
+                        fadeBranch = "direct-swap";
 
                         if (currentImage == CurrentImage.Image1)
                         {
-                            Image1FadeOut.Begin();
-                            BorderDarkenFadeOut.Begin();
-                        }
-                        else if (currentImage == CurrentImage.Image2)
-                        {
-                            Image2FadeOut.Begin();
-                            BorderDarkenFadeOut.Begin();
-                        }
-
-                        currentImage = CurrentImage.None;
-                    }
-                    else
-                    {
-                        PluginDatabase.PluginSettings.Settings.BackgroundIsVideo = Path.GetExtension(image).IsEqual(".mp4");
-
-                        if (currentImage == CurrentImage.None)
-                        {
-                            Image1FadeOut.Stop();
-
-                            if (Path.GetExtension(image).IsEqual(".mp4"))
+                            if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
                             {
-                                //AnimatedImage1.Source = null;
-                                //AnimatedImage2.Source = null;
+                                Image1.Source = null;
+                                Image2.Source = null;
                                 Video1.Source = new Uri(image);
-                                //Video2.Source = null;
+                                Video2.Source = null;
 
-                                Video1.LoadedBehavior = MediaState.Play;
+                                Video1.LoadedBehavior = VideoStateForLifecycle();
                             }
                             else
                             {
-                                //Video1.Source = null;
-                                //Video2.Source = null;
-                                AnimatedImage1.Source = image;
-                                //AnimatedImage2.Source = null;
+                                Video1.Source = null;
+                                Video2.Source = null;
+                                Image1.Source = image;
+                                Image2.Source = null;
                             }
-
-                            Image1FadeIn.Begin();
-                            BorderDarken.Opacity = 1;
-                            BorderDarkenFadeOut.Stop();
-                            currentImage = CurrentImage.Image1;
                         }
-                        else if (currentImage == CurrentImage.Image1)
+                        else if (currentImage == CurrentImage.Image2)
                         {
-                            Image2FadeOut.Stop();
-
-                            if (Path.GetExtension(image).IsEqual(".mp4"))
+                            if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
                             {
-                                //AnimatedImage1.Source = null;
-                                //AnimatedImage2.Source = null;
-                                //Video1.Source = null;
+                                Image1.Source = null;
+                                Image2.Source = null;
+                                Video1.Source = null;
                                 Video2.Source = new Uri(image);
 
-                                Video2.LoadedBehavior = MediaState.Play;
+                                Video2.LoadedBehavior = VideoStateForLifecycle();
                             }
                             else
                             {
-                                //Video1.Source = null;
-                                //Video2.Source = null;
-                                //AnimatedImage1.Source = null;
-                                AnimatedImage2.Source = image;
+                                Video1.Source = null;
+                                Video2.Source = null;
+                                Image1.Source = null;
+                                Image2.Source = image;
                             }
-
-                            Image2FadeIn.Begin();
-                            Image1FadeOut.Begin();
-                            BorderDarken.Opacity = 1;
-                            BorderDarkenFadeOut.Stop();
-                            currentImage = CurrentImage.Image2;
                         }
-                        else if (currentImage == CurrentImage.Image2)
+                        else
                         {
-                            Image1FadeOut.Stop();
-
-                            if (Path.GetExtension(image).IsEqual(".mp4"))
+                            if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
                             {
-                                //AnimatedImage1.Source = null;
-                                //AnimatedImage2.Source = null;
+                                Image1.Source = null;
+                                Image2.Source = null;
                                 Video1.Source = new Uri(image);
-                                //Video2.Source = null;
+                                Video2.Source = null;
 
-                                Video1.LoadedBehavior = MediaState.Play;
+                                Video1.LoadedBehavior = VideoStateForLifecycle();
                             }
                             else
                             {
-                                //Video1.Source = null;
-                                //Video2.Source = null;
-                                AnimatedImage1.Source = image;
-                                //AnimatedImage2.Source = null;
+                                Video1.Source = null;
+                                Video2.Source = null;
+                                Image1.Source = image;
+                                Image2.Source = null;
                             }
 
-                            Image1FadeIn.Begin();
-                            Image2FadeOut.Begin();
-                            BorderDarken.Opacity = 1;
-                            BorderDarkenFadeOut.Stop();
                             currentImage = CurrentImage.Image1;
                         }
-                    }
-                }
-                else
-                {
-                    if (currentImage == CurrentImage.Image1)
-                    {
-                        if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
-                        {
-                            AnimatedImage1.Source = null;
-                            AnimatedImage2.Source = null;
-                            Video1.Source = new Uri(image);
-                            Video2.Source = null;
-
-                            Video1.LoadedBehavior = MediaState.Play;
-                        }
-                        else
-                        {
-                            Video1.Source = null;
-                            Video2.Source = null;
-                            AnimatedImage1.Source = image;
-                            AnimatedImage2.Source = null;
-                        }
-                    }
-                    else if (currentImage == CurrentImage.Image2)
-                    {
-                        if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
-                        {
-                            AnimatedImage1.Source = null;
-                            AnimatedImage2.Source = null;
-                            Video1.Source = null;
-                            Video2.Source = new Uri(image);
-
-                            Video2.LoadedBehavior = MediaState.Play;
-                        }
-                        else
-                        {
-                            Video1.Source = null;
-                            Video2.Source = null;
-                            AnimatedImage1.Source = null;
-                            AnimatedImage2.Source = image;
-                        }
-                    }
-                    else
-                    {
-                        if (image != null && Path.GetExtension(image).IsEqual(".mp4"))
-                        {
-                            AnimatedImage1.Source = null;
-                            AnimatedImage2.Source = null;
-                            Video1.Source = new Uri(image);
-                            Video2.Source = null;
-
-                            Video1.LoadedBehavior = MediaState.Play;
-                        }
-                        else
-                        {
-                            Video1.Source = null;
-                            Video2.Source = null;
-                            AnimatedImage1.Source = image;
-                            AnimatedImage2.Source = null;
-                        }
-
-                        currentImage = CurrentImage.Image1;
                     }
                 }
             }
@@ -791,31 +1223,51 @@ namespace BackgroundChanger.Controls
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-            if (!WindowsIsActivated)
-            {
-                return;
-            }
-
             try
             {
-                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                LogTimerTickLifecycleIfInactive("auto-changer");
+
+                InvokeOnUiIfLifecycleActive(() =>
                 {
                     string pathImage = string.Empty;
+                    int fromCounter = Counter;
 
                     if (ControlDataContext.EnableRandomSelect)
                     {
                         if (GameBackgroundImages.ItemsBackground.Count != 0)
                         {
-                            Random rnd = new Random();
-                            int imgSelected = rnd.Next(0, GameBackgroundImages.ItemsBackground.Count);
-                            while (imgSelected == Counter && GameBackgroundImages.ItemsBackground.Count != 1)
+                            Guid gameId = GameContext != null ? GameContext.Id : Guid.Empty;
+                            List<ItemImage> items = GameBackgroundImages.ItemsBackground;
+                            string fingerprint = MediaShuffleQueue.BuildFingerprint(items.Select(x => x.FullPath));
+                            int imgSelected = _mediaShuffleQueue.Next(gameId, items.Count, fingerprint);
+                            if (imgSelected < 0 || imgSelected >= items.Count)
                             {
-                                imgSelected = rnd.Next(0, GameBackgroundImages.ItemsBackground.Count);
+                                imgSelected = 0;
                             }
-                            Counter = imgSelected;
 
-                            pathImage = GameBackgroundImages.ItemsBackground[imgSelected].FullPath;
+                            Counter = imgSelected;
+                            _stableBackgroundIndex = imgSelected;
+                            pathImage = items[imgSelected].FullPath;
                         }
+
+                        Common.LogDebug(
+                            true,
+                            string.Format(
+                                "[PluginBackgroundImage][TimerChange] random=true (shuffle), fromCounter={0} toCounter={1}, cycle={2}/{3}, file={4}",
+                                fromCounter,
+                                Counter,
+                                _mediaShuffleQueue.CycleIndex,
+                                _mediaShuffleQueue.CycleTotal,
+                                MediaControlDiagnostics.FormatFileName(pathImage)));
+                        MediaControlDiagnostics.Trace(
+                            LogControlTrace,
+                            MediaControlDiagnostics.PhaseTimerTick,
+                            MediaControlDiagnostics.FormatTimerTickDetail(
+                                "auto-changer-random",
+                                pathImage,
+                                true,
+                                _mediaShuffleQueue.CycleIndex,
+                                _mediaShuffleQueue.CycleTotal));
 
                         SetBackgroundImage(pathImage);
                     }
@@ -830,12 +1282,25 @@ namespace BackgroundChanger.Controls
                                 Counter = 0;
                             }
 
+                            _stableBackgroundIndex = Counter;
                             pathImage = GameBackgroundImages.ItemsBackground[Counter].FullPath;
                         }
 
+                        Common.LogDebug(
+                            true,
+                            string.Format(
+                                "[PluginBackgroundImage][TimerChange] random=false, fromCounter={0} toCounter={1}, file={2}",
+                                fromCounter,
+                                Counter,
+                                MediaControlDiagnostics.FormatFileName(pathImage)));
+                        MediaControlDiagnostics.Trace(
+                            LogControlTrace,
+                            MediaControlDiagnostics.PhaseTimerTick,
+                            MediaControlDiagnostics.FormatTimerTickDetail("auto-changer-sequential", pathImage, true));
+
                         SetBackgroundImage(pathImage);
                     }
-                }));
+                });
             }
             catch (Exception ex)
             {
@@ -845,21 +1310,35 @@ namespace BackgroundChanger.Controls
 
         private void OnTimedVideoEvent(object source, ElapsedEventArgs e)
         {
-            if (!WindowsIsActivated)
-            {
-                return;
-            }
-
             try
             {
-                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                LogTimerTickLifecycleIfInactive("video-delay");
+
+                InvokeOnUiIfLifecycleActive(() =>
                 {
-                    string pathVideo = GameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo && x.Exist)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
+                    string pathVideo = _pendingBackgroundVideoPath;
+                    _pendingBackgroundVideoPath = null;
+                    BcTimerVideo?.Stop();
+
+                    MediaControlDiagnostics.Trace(
+                        LogControlTrace,
+                        MediaControlDiagnostics.PhaseTimerTick,
+                        MediaControlDiagnostics.FormatTimerTickDetail("video-delay", pathVideo, true));
+
                     if (!pathVideo.IsNullOrEmpty())
                     {
                         SetBackgroundImage(pathVideo);
                     }
-                }));
+
+                    if (_deferAutoChangerUntilVideoDelay)
+                    {
+                        _deferAutoChangerUntilVideoDelay = false;
+                        if (ControlDataContext.EnableAutoChanger && BcTimer != null && IsMediaLifecycleActive())
+                        {
+                            BcTimer.Start();
+                        }
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -873,77 +1352,396 @@ namespace BackgroundChanger.Controls
             // Copy FadeImage properties
             GetFadeImageProperties();
 
-            // Activate/Deactivated animation
-            Application.Current.Activated += Application_Activated;
-            Application.Current.Deactivated += Application_Deactivated;
-            Application.Current.MainWindow.StateChanged += MainWindow_StateChanged;
+            AttachApplicationFocusEvents();
         }
 
 
-        #region Activate/Deactivated animation
+        #region Media lifecycle
 
-        private void Application_Deactivated(object sender, EventArgs e)
+        /// <summary>
+        /// Whether auto-change timers and video playback are allowed for this control instance.
+        /// </summary>
+        private bool IsMediaLifecycleActive()
         {
-            _ = Task.Run(() =>
+            return IsLifecycleDisplayActive();
+        }
+
+        private MediaState VideoStateForLifecycle()
+        {
+            return IsMediaLifecycleActive() ? MediaState.Play : MediaState.Pause;
+        }
+
+        /// <summary>
+        /// Applies blur with an adaptive quality profile.
+        /// Auto-changer prefers a balanced quality/performance profile and falls back to performance.
+        /// </summary>
+        private void ApplyAdaptiveBlurEffect()
+        {
+            if (!IsBlurEnabled)
             {
-                Thread.Sleep(1000);
-                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                _lastBlurMediaSource = null;
+                _lastBlurRadius = -1;
+                _lastBlurBias = null;
+
+                if (ImageHolder.Effect != null)
                 {
-                    WindowsIsActivated = false;
-                    Video1.LoadedBehavior = MediaState.Pause;
-                    Video2.LoadedBehavior = MediaState.Pause;
+                    ImageHolder.Effect = null;
+                }
+                return;
+            }
 
-                    if (BcTimer != null)
-                    {
-                        BcTimer.Stop();
-                    }
-                }));
-            });
-        }
+            bool isAutoChangerEnabled = ControlDataContext != null && ControlDataContext.EnableAutoChanger;
+            bool hasVideoSource = _isCurrentMediaVideo || (Video1?.Source != null) || (Video2?.Source != null);
+            int blurRadius = Math.Max(0, BlurAmount);
+            RenderingBias renderingBias = ResolveAdaptiveBlurBias(isAutoChangerEnabled, hasVideoSource, blurRadius);
+            string sourceKey = currentSource as string ?? Source as string;
 
-        private void Application_Activated(object sender, EventArgs e)
-        {
-            _ = Task.Run(() =>
+            if (sourceKey != null
+                && sourceKey.Equals(_lastBlurMediaSource)
+                && blurRadius == _lastBlurRadius
+                && _lastBlurBias == renderingBias
+                && ImageHolder.Effect is BlurEffect existingBlur
+                && existingBlur.Radius == blurRadius
+                && existingBlur.RenderingBias == renderingBias)
             {
-                Thread.Sleep(1000);
-                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                MediaControlDiagnostics.Trace(
+                    LogControlTrace,
+                    MediaControlDiagnostics.PhaseBlur,
+                    "skipped unchanged source");
+                return;
+            }
+
+            try
+            {
+                ImageHolder.Effect = new BlurEffect
                 {
-                    WindowsIsActivated = true;
-                    Video1.LoadedBehavior = MediaState.Play;
-                    Video2.LoadedBehavior = MediaState.Play;
+                    KernelType = KernelType.Gaussian,
+                    Radius = blurRadius,
+                    RenderingBias = renderingBias
+                };
 
-                    if (BcTimer != null)
-                    {
-                        BcTimer.Start();
-                    }
-                }));
-            });
+                _lastBlurMediaSource = sourceKey;
+                _lastBlurRadius = blurRadius;
+                _lastBlurBias = renderingBias;
+
+                MediaControlDiagnostics.Trace(
+                    LogControlTrace,
+                    MediaControlDiagnostics.PhaseBlur,
+                    string.Format(
+                        "autoChanger={0}, hasVideo={1}, radius={2}, bias={3}",
+                        isAutoChangerEnabled,
+                        hasVideoSource,
+                        blurRadius,
+                        renderingBias));
+            }
+            catch (Exception ex)
+            {
+                // Runtime fallback: if quality profile fails, force performance profile.
+                Common.LogError(ex, true, "Adaptive blur fallback to performance mode", true, PluginDatabase.PluginName);
+                ImageHolder.Effect = new BlurEffect
+                {
+                    KernelType = KernelType.Gaussian,
+                    Radius = blurRadius,
+                    RenderingBias = RenderingBias.Performance
+                };
+
+                _lastBlurMediaSource = sourceKey;
+                _lastBlurRadius = blurRadius;
+                _lastBlurBias = RenderingBias.Performance;
+            }
         }
 
-        private void MainWindow_StateChanged(object sender, EventArgs e)
+        private RenderingBias ResolveAdaptiveBlurBias(bool isAutoChangerEnabled, bool hasVideoSource, int blurRadius)
         {
-            switch (((Window)sender).WindowState)
+            if (!isAutoChangerEnabled)
             {
-                case WindowState.Normal:
-                case WindowState.Maximized:
-                    Application_Activated(sender, e);
-                    break;
-                case WindowState.Minimized:
-                    Application_Deactivated(sender, e);
-                    break;
-                default:
-                    break;
+                return HighQualityBlur ? RenderingBias.Quality : RenderingBias.Performance;
+            }
+
+            const int intermediateRadiusThreshold = 12;
+            bool canUseIntermediateQuality = !hasVideoSource
+                && blurRadius <= intermediateRadiusThreshold
+                && !AnimationEnabled;
+
+            return canUseIntermediateQuality
+                ? RenderingBias.Quality
+                : RenderingBias.Performance;
+        }
+
+        private void DisposeBcTimer()
+        {
+            if (BcTimer != null)
+            {
+                BcTimer.Stop();
+                BcTimer.Dispose();
+                BcTimer = null;
+            }
+        }
+
+        private void DisposeBcTimerVideo()
+        {
+            if (BcTimerVideo != null)
+            {
+                BcTimerVideo.Stop();
+                BcTimerVideo.Dispose();
+                BcTimerVideo = null;
+            }
+        }
+
+        private void DisposeBcTimers()
+        {
+            DisposeBcTimer();
+            DisposeBcTimerVideo();
+            Counter = 0;
+            _mediaShuffleQueue.Reset();
+            _pendingBackgroundVideoPath = null;
+            _deferAutoChangerUntilVideoDelay = false;
+        }
+
+        private void StopBcTimers()
+        {
+            BcTimer?.Stop();
+            BcTimerVideo?.Stop();
+        }
+
+        private void StartBcTimersIfConfigured()
+        {
+            if (!IsMediaLifecycleActive())
+            {
+                return;
+            }
+
+            if (ControlDataContext.EnableAutoChanger && BcTimer != null && !_deferAutoChangerUntilVideoDelay)
+            {
+                BcTimer.Start();
+            }
+
+            if (PluginDatabase.PluginSettings.useVideoDelayBackgroundImage
+                && BcTimerVideo != null
+                && !_pendingBackgroundVideoPath.IsNullOrEmpty())
+            {
+                BcTimerVideo.Start();
+            }
+        }
+
+        private void PauseVideos()
+        {
+            Video1.LoadedBehavior = MediaState.Pause;
+            Video2.LoadedBehavior = MediaState.Pause;
+        }
+
+        /// <summary>
+        /// Stops crossfade storyboards and clears all display layers when no plugin background data is shown.
+        /// Prevents stale bitmaps from reappearing when <see cref="MustDisplay"/> becomes true again.
+        /// </summary>
+        private void LogLoadNewSourceBranch(string fadeBranch, string oldPath, string newPath)
+        {
+            LogControlTrace(
+                MediaControlDiagnostics.PhaseLoadNewSource,
+                string.Format(
+                    "branch={0}, old={1}, new={2}, {3}",
+                    fadeBranch,
+                    MediaControlDiagnostics.FormatFileName(oldPath),
+                    MediaControlDiagnostics.FormatFileName(newPath),
+                    FormatDisplayLayerState()));
+        }
+
+
+        private string FormatDisplayLayerState()
+        {
+            return string.Format(
+                "slot={0}, source={1}, opacities=(I1={2:0.##},I2={3:0.##},V1={4:0.##},V2={5:0.##}), visibility={6}, mustDisplay={7}",
+                currentImage,
+                MediaControlDiagnostics.FormatFileName(currentSource as string),
+                Image1?.Opacity ?? 0,
+                Image2?.Opacity ?? 0,
+                Video1?.Opacity ?? 0,
+                Video2?.Opacity ?? 0,
+                Visibility,
+                MustDisplay);
+        }
+
+
+        private void StopCrossfadeStoryboards()
+        {
+            Image1FadeIn?.Stop();
+            Image2FadeIn?.Stop();
+            Image1FadeOut?.Stop();
+            Image2FadeOut?.Stop();
+            BorderDarkenFadeOut?.Stop();
+        }
+
+
+        /// <summary>
+        /// Forces the control (and its theme <see cref="ContentControl"/> host) visible while
+        /// background image feature is activated, even when the current game has no BC media.
+        /// </summary>
+        private void EnsureActivatedVisibility(string trigger)
+        {
+            bool keepVisible = AlwaysShow || (ControlDataContext?.IsActivated ?? false) || MustDisplay;
+            if (!keepVisible)
+            {
+                LogControlTrace(
+                    MediaControlDiagnostics.PhaseSetData,
+                    string.Format(
+                        "EnsureActivatedVisibility skipped ({0}): inactive, {1}",
+                        trigger,
+                        FormatDisplayLayerState()));
+                return;
+            }
+
+            MustDisplay = true;
+            if (Parent is ContentControl contentControl && contentControl.Visibility != Visibility.Visible)
+            {
+                contentControl.Visibility = Visibility.Visible;
+            }
+
+            SetVisibility(Visibility.Visible);
+            LogControlTrace(
+                MediaControlDiagnostics.PhaseSetData,
+                string.Format(
+                    "EnsureActivatedVisibility ({0}): kept Visible, {1}",
+                    trigger,
+                    FormatDisplayLayerState()));
+        }
+
+
+        private void ClearBackgroundDisplayState(string trigger = null)
+        {
+            LogControlTrace(
+                MediaControlDiagnostics.PhaseSetData,
+                string.Format(
+                    "ClearDisplayState, trigger={0}, slot={1}, hadSource={2}, {3}",
+                    trigger ?? "?",
+                    currentImage,
+                    currentSource != null,
+                    FormatDisplayLayerState()));
+
+            StopCrossfadeStoryboards();
+
+            Image1.Opacity = 0;
+            Image2.Opacity = 0;
+            Video1.Opacity = 0;
+            Video2.Opacity = 0;
+            BorderDarken.Opacity = 0;
+
+            Image1.Source = null;
+            Image2.Source = null;
+            Video1.Source = null;
+            Video2.Source = null;
+
+            _isCurrentMediaVideo = false;
+            _lastBlurMediaSource = null;
+            _lastBlurRadius = -1;
+            _lastBlurBias = null;
+
+            if (ImageHolder?.Effect != null)
+            {
+                ImageHolder.Effect = null;
+            }
+
+            currentImage = CurrentImage.None;
+            currentSource = null;
+            Source = null;
+        }
+
+        private void ResumeVideosIfLifecycleActive()
+        {
+            if (!IsMediaLifecycleActive())
+            {
+                return;
+            }
+
+            if (Video1.Source != null)
+            {
+                Video1.LoadedBehavior = MediaState.Play;
+            }
+
+            if (Video2.Source != null)
+            {
+                Video2.LoadedBehavior = MediaState.Play;
+            }
+        }
+
+        private void PauseMediaActivity()
+        {
+            StopBcTimers();
+            PauseVideos();
+        }
+
+        private void ResumeMediaActivityIfAllowed()
+        {
+            if (!IsMediaLifecycleActive())
+            {
+                return;
+            }
+
+            ResumeVideosIfLifecycleActive();
+            StartBcTimersIfConfigured();
+        }
+
+        protected override void OnMediaLifecycleStateChanged()
+        {
+            if (IsMediaLifecycleActive())
+            {
+                LogControlTrace("Media activity", "resume timers/video");
+                ResumeMediaActivityIfAllowed();
+            }
+            else
+            {
+                LogControlTrace("Media activity", "pause timers/video");
+                PauseMediaActivity();
             }
         }
 
         #endregion
+
+        #region Media diagnostics
+
+        private void LogMediaSelect(string branch, string pathImage, int index = -1, int total = -1)
+        {
+            int itemIndex = index >= 0 ? index : Counter;
+            int itemTotal = total >= 0 ? total : (GameBackgroundImages?.ItemsBackground?.Count ?? 0);
+
+            MediaControlDiagnostics.Trace(
+                LogControlTrace,
+                MediaControlDiagnostics.PhaseMediaSelect,
+                MediaControlDiagnostics.FormatMediaSelectDetail(GameContext, branch, itemIndex, itemTotal, pathImage));
+        }
+
+        private void LogTimerTickLifecycleIfInactive(string timerType)
+        {
+            Dispatcher dispatcher = API.Instance?.MainView?.UIDispatcher ?? Dispatcher;
+            if (dispatcher == null)
+            {
+                return;
+            }
+
+            _ = dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+            {
+                if (!IsLifecycleDisplayActive())
+                {
+                    MediaControlDiagnostics.Issue(
+                        LogControlIssue,
+                        MediaControlDiagnostics.PhaseTimerTick,
+                        string.Format("timer={0}, lifecycle=inactive", timerType));
+                }
+            }));
+        }
+
+        #endregion
+
+        protected override void OnMediaLifecycleUnloadedCore()
+        {
+            MediaThemeSyncWindowHandler.Unregister(this);
+            DisposeBcTimers();
+        }
     }
 
 
     public class PluginBackgroundImageDataContext : IDataContext
     {
         public bool IsActivated { get; set; }
-        public bool UseAnimated { get; set; }
         public bool EnableRandomSelect { get; set; }
         public bool EnableRandomOnSelect { get; set; }
         public bool EnableRandomOnStart { get; set; }

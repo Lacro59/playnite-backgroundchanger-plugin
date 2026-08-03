@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:BackgroundChanger.Views"
              xmlns:converters="clr-namespace:CommonPlayniteShared.Converters"
              xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
-             xmlns:controlsAnimated="clr-namespace:wpf_animatedimage.Controls"
              xmlns:commonpluginsshared="clr-namespace:CommonPluginsShared.Converters"
              xmlns:converters1="clr-namespace:CommonPlayniteShared.Converters" 
              xmlns:controls="clr-namespace:CommonPluginsShared.Controls"
@@ -16,11 +15,10 @@
     <UserControl.Resources>
         <converters:InvertedBoolenConverter x:Key="InvertedBoolenConverter" />
         <commonpluginsshared:IndexConverter x:Key="IndexConverter" />
-        <commonpluginsshared:ImageConverter x:Key="ImageConverter" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" />
         <converters1:TwoBooleanToBooleanConverter x:Key="TwoBooleanToBooleanConverter" />
-        <local:GetMediaTypeConverter x:Key="GetMediaTypeConverter" />
+        <commonpluginsshared:GetMediaTypeConverter x:Key="GetMediaTypeConverter" />
     </UserControl.Resources>
 
     <Grid Margin="10">
@@ -60,20 +58,6 @@
                                         ToolTip="{DynamicResource LOCRemoveTitle}" FontFamily="{DynamicResource CommonFont}"
                                         Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}" />
 
-
-                                <Button Name="PART_BtConvert" Content="&#xe97b;" Click="PART_BtConvert_Click" 
-                                        DockPanel.Dock="Bottom"
-                                        ToolTip="{DynamicResource LOCBcFTooltTipConvert}" FontFamily="{DynamicResource CommonFont}"
-                                        Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Mode=OneWay, Converter={StaticResource IndexConverter}}">
-                                    <Button.IsEnabled>
-                                        <MultiBinding Converter="{StaticResource TwoBooleanToBooleanConverter}">
-                                            <Binding Path="IsConvertable"/>
-                                            <Binding Path="IsDefault" />
-                                            <MultiBinding.ConverterParameter>firsttrue</MultiBinding.ConverterParameter>
-                                        </MultiBinding>
-                                    </Button.IsEnabled>
-                                </Button>
-
                                 <Grid>
                                     <Button Name="PART_BtDefault" Content="&#xE807;" Click="PART_BtDefault_Click" 
                                             VerticalAlignment="Center"
@@ -112,14 +96,10 @@
 
                                 <Grid Name="PART_ListContener">
                                     <controls:ImageAsync Height="150" Width="170"
-                                                     Stretch="Uniform" RenderOptions.BitmapScalingMode="Linear"
-                                                     Visibility="{Binding IsVideo, Converter={StaticResource InvertedBooleanToVisibilityConverter}}">
-                                        <Image.Source>
-                                            <MultiBinding Converter="{StaticResource ImageConverter}" ConverterParameter="2">
-                                                <Binding Path="FullPath" IsAsync="True" />
-                                            </MultiBinding>
-                                        </Image.Source>
-                                    </controls:ImageAsync>
+                                                     Stretch="Uniform" RenderOptions.BitmapScalingMode="Fant"
+                                                     Source="{Binding FullPath}"
+                                                     Parameter="2"
+                                                     Visibility="{Binding IsVideo, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" />
                                     <MediaElement Height="150" Width="170"
                                               ScrubbingEnabled="True" MediaOpened="Video_MediaOpened" 
                                               Source="{Binding FullPath}" LoadedBehavior="Stop" Name="Video"
@@ -183,8 +163,8 @@
         </Grid>
 
         <Grid Grid.Column="2" Grid.Row="0">
-            <!--Image Name="PART_BackgroundImage" Stretch="Uniform" Grid.Row="0" /-->
-            <controlsAnimated:AnimatedImage x:Name="PART_BackgroundImage" Stretch="Uniform" Grid.Row="0" UseBitmapImage="True" />
+            <controls:ImageAsync x:Name="PART_BackgroundImage" Stretch="Uniform" Grid.Row="0"
+                                 Parameter="0" RenderOptions.BitmapScalingMode="Fant" />
             <MediaElement Stretch="Uniform" Grid.Row="0" Name="PART_Video" pbeh:MediaElementBehaviors.Repeat="True" />
         </Grid>
 
@@ -192,16 +172,18 @@
             <DockPanel KeyboardNavigation.TabNavigation="Local" LastChildFill="False" Margin="0,5">
                 <Button TabIndex="1" Name="PART_BtAdd" Content="{DynamicResource LOCSelectFileTitle}" DockPanel.Dock="Left"
                         Style="{StaticResource BottomButton}" Click="PART_BtAdd_Click" />
-                <Button TabIndex="2" Name="PART_BtAddSteamGridDb" Content="{DynamicResource LOCBcSteamGridDbSelect}" DockPanel.Dock="Left"
+                <Button TabIndex="2" Name="PART_BtAddSteamOfficial" DockPanel.Dock="Left"
+                        Style="{StaticResource BottomButton}" Click="PART_BtAddSteamOfficial_Click" />
+                <Button TabIndex="3" Name="PART_BtAddSteamGridDb" Content="{DynamicResource LOCBcSteamGridDbSelect}" DockPanel.Dock="Left"
                         Style="{StaticResource BottomButton}" Click="PART_BtAddSteamGridDb_Click" />
-                <Button TabIndex="3" Name="PART_BtAddGoogleImage" Content="{DynamicResource LOCBcGoogleImageSelect}" DockPanel.Dock="Left"
+                <Button TabIndex="4" Name="PART_BtAddGoogleImage" Content="{DynamicResource LOCBcGoogleImageSelect}" DockPanel.Dock="Left"
                         Style="{StaticResource BottomButton}" Click="PART_BtAddGoogleImage_Click" />
-                <Button TabIndex="4" Name="PART_BtAddFromUrl" Content="{DynamicResource LOCBcAddFromUrl}" DockPanel.Dock="Left"
+                <Button TabIndex="5" Name="PART_BtAddFromUrl" Content="{DynamicResource LOCBcAddFromUrl}" DockPanel.Dock="Left"
                         Style="{StaticResource BottomButton}" Click="PART_BtAddFromUrl_Click" />
 
-                <Button TabIndex="5" Name="PART_BtCancel" Content="{DynamicResource LOCCancelLabel}" DockPanel.Dock="Right" IsCancel="True"
+                <Button TabIndex="6" Name="PART_BtCancel" Content="{DynamicResource LOCCancelLabel}" DockPanel.Dock="Right" IsCancel="True"
                         Style="{StaticResource BottomButton}" Click="PART_BtCancel_Click" />
-                <Button TabIndex="6" Name="PART_BtOK" Content="{DynamicResource LOCSaveLabel}" DockPanel.Dock="Right" IsDefault="True"
+                <Button TabIndex="7" Name="PART_BtOK" Content="{DynamicResource LOCSaveLabel}" DockPanel.Dock="Right" IsDefault="True"
                         Style="{StaticResource BottomButton}" Click="PART_BtOK_Click" />
             </DockPanel>
         </Border>

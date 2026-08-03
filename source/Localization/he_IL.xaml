@@ -1,25 +1,25 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">משנהרקע</sys:String>
+    <sys:String x:Key="LOCBc">???????</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">ניהול תמונות רקע</sys:String>
-    <sys:String x:Key="LOCBcManageCover">ניהול תמונות כיסוי</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">????? ?????? ???</sys:String>
+    <sys:String x:Key="LOCBcManageCover">????? ?????? ?????</sys:String>
     <sys:String x:Key="LOCBcManageIcon">Manage icon images</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbApiKey">מפתח api של SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKey">???? api ?? SteamGridDB</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">הצגת תמונת הרקע של ה-Plugin</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">הצגת תמונת הכיסוי של ה-Plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">???? ????? ???? ?? ?-Plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">???? ????? ?????? ?? ?-Plugin</sys:String>
     <sys:String x:Key="LOCBcEnableIconImage">Display the plugin icon image</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
 
-    <sys:String x:Key="LOCBcEnableRandomSelect">איפשר בחירה אקראית</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">????? ????? ??????</sys:String>
     <sys:String x:Key="LOCBcSelectionMode">Selection mode</sys:String>
     <sys:String x:Key="LOCBcModeDefault">Favorite if set, otherwise Playnite default</sys:String>
     <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
@@ -27,8 +27,8 @@
     <sys:String x:Key="LOCBcEnableAutoChanger">Enable automatic change</sys:String>
     <sys:String x:Key="LOCBcTimerRandomOrder">Shuffled order</sys:String>
     <sys:String x:Key="LOCBcTimerRandomOrderToolTip">When enabled, items are shuffled once and shown without repeats until the full set is exhausted, then reshuffled. When disabled, items advance in list order.</sys:String>
-    <sys:String x:Key="LOCBcTimeInterval">מרווח זמן</sys:String>
-    <sys:String x:Key="LOCBcSeconds">שניות</sys:String>
+    <sys:String x:Key="LOCBcTimeInterval">????? ???</sys:String>
+    <sys:String x:Key="LOCBcSeconds">?????</sys:String>
 
     <sys:String x:Key="LOCBcEnableVideoDelay">Enable video delay</sys:String>
     <sys:String x:Key="LOCBcVideoDelayToolTip">Use this option if you want to display the default image before a video.</sys:String>
@@ -41,7 +41,7 @@
     <sys:String x:Key="LOCBcSteamGet">Get from Steam</sys:String>
     <sys:String x:Key="LOCBcSteamNoAppId">Could not find a Steam App ID for this game.</sys:String>
     <sys:String x:Key="LOCBcSteamNoAssets">No official Steam media found for this game.</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbSelect">בחירה מתוך SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">????? ???? SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbAnimated">Animated</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbMimes">MIME types</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbApiKeyMissingNotification">Configure a SteamGridDB API key in plugin settings to search and download artwork.</sys:String>
@@ -50,17 +50,17 @@
     <sys:String x:Key="LOCBcSteamGridDbRateLimitNotification">SteamGridDB rate limit reached (429). Wait a moment and try again.</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbParseErrorNotification">SteamGridDB returned an unexpected response. Try again or verify your API key in plugin settings.</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbGenericErrorNotification">SteamGridDB request failed. See extensions.log for details.</sys:String>
-    <sys:String x:Key="LOCBcGoogleImageSelect">בחירה מתוך Google Image</sys:String>
-    <sys:String x:Key="LOCBcAddFromUrl">הוספה מ-url</sys:String>
-    <sys:String x:Key="LOCBcAddFromUrlDescription">הכניסו את ה-url לתמונה</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFile">קובץ ffmpeg</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">????? ???? Google Image</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrl">????? ?-url</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrlDescription">?????? ?? ?-url ??????</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFile">???? ffmpeg</sys:String>
     <sys:String x:Key="LOCBcFfprobeFile">ffprobe file</sys:String>
     <sys:String x:Key="LOCBcFfmpegFileDescription">Required to import animated media (WebP, WebM, APNG, GIF). Configure FFmpeg and ffprobe (usually in the same folder). Files are automatically converted to MP4 at import and on startup.</sys:String>
 
     <sys:String x:Key="LOCBcMediaConversionSection">Media conversion</sys:String>
     <sys:String x:Key="LOCBcMediaConversionDefaultsCrf">Default CRF (quality)</sys:String>
     <sys:String x:Key="LOCBcMediaConversionCrf">CRF (0 = use default)</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionCrfToolTip">H.264 constant rate factor (0–51). Lower values yield higher quality and larger files. Set 0 to use the default CRF above.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfToolTip">H.264 constant rate factor (0�51). Lower values yield higher quality and larger files. Set 0 to use the default CRF above.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionCrfDescription">The CRF sets the trade-off between MP4 quality and file size: a lower value improves image quality (larger file), a higher value reduces file size (lower quality). 23 is a good starting point for most users.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionAlphaNote">Output uses H.264 yuv420p, which does not preserve transparency. This is acceptable for most animated backgrounds and covers, which rarely rely on alpha.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionAnimatedWebp">Animated WebP</sys:String>
@@ -81,7 +81,7 @@
     <sys:String x:Key="LOCBcMediaToolkitStartupNotification">FFmpeg and ffprobe must be configured for animated media import and conversion. FFmpeg: {0}. ffprobe: {1}.</sys:String>
     <sys:String x:Key="LOCBcMediaToolkitOutdatedNotification">Animated media import and conversion require FFmpeg {0} or newer (detected: {1}). Update your FFmpeg and ffprobe install in plugin settings.</sys:String>
     <sys:String x:Key="LOCBcFfmpegConversionFailed">Conversion to MP4 failed. Detected toolchain: {0}. Animated WebP requires FFmpeg {1} or newer with libwebp animated decode support.</sys:String>
-    <sys:String x:Key="LOCBcInvalidUrlFormat">פורמט Url בלתי תקין!</sys:String>
+    <sys:String x:Key="LOCBcInvalidUrlFormat">????? Url ???? ????!</sys:String>
 
     <!-- Bulk media download (#25) -->
 
@@ -109,7 +109,8 @@
     <sys:String x:Key="LOCBcBulkOptionsSaved">Bulk download options were saved.</sys:String>
     <sys:String x:Key="LOCBcBulkOptionsInvalid">Select at least one source and one media type.</sys:String>
     <sys:String x:Key="LOCBcBulkFuzzyPrompt">Select the matching SteamGridDB game</sys:String>
-    <sys:String x:Key="LOCBcBulkDownloadSummary">Imported: {0} — Skipped: {1} — Errors: {2}</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadSummary">Imported: {0} � Skipped: {1} � Errors: {2}</sys:String>
     <sys:String x:Key="LOCBcBulkDownloadCancelled">Download was cancelled.</sys:String>
 
 </ResourceDictionary>
+

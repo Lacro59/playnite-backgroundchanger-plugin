@@ -62,8 +62,24 @@
       <HintPath>packages\AngleSharp.0.9.9\lib\net45\AngleSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Playnite.SDK, Version=6.11.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\PlayniteSDK.6.11.0\lib\net462\Playnite.SDK.dll</HintPath>
+    <Reference Include="Ardalis.GuardClauses, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Ardalis.GuardClauses.5.0.0\lib\netstandard2.0\Ardalis.GuardClauses.dll</HintPath>
+    </Reference>
+    <Reference Include="FuzzySharp, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\FuzzySharp.2.0.2\lib\net461\FuzzySharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Playnite.SDK, Version=6.16.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\PlayniteSDK.6.16.0\lib\net462\Playnite.SDK.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <HintPath>packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="SteamKit2, Version=1.8.3.0, Culture=neutral, PublicKeyToken=ed3ce47ed5aad940, processorArchitecture=MSIL">
+      <HintPath>packages\SteamKit2.1.8.3\lib\net45\SteamKit2.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -80,6 +96,7 @@
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Management" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -96,21 +113,38 @@
   <ItemGroup>
     <Compile Include="BackgroundChanger.cs" />
     <Compile Include="BackgroundChangerSettings.cs" />
+    <Compile Include="Controls\MediaControlDiagnostics.cs" />
+    <Compile Include="Controls\MediaShuffleQueue.cs" />
+    <Compile Include="Controls\MediaRandomVideoStartPoint.cs" />
+    <Compile Include="Controls\MediaThemeSyncWindowHandler.cs" />
+    <Compile Include="Controls\PluginMediaLifecycleControlBase.cs" />
+    <Compile Include="Controls\PluginIconImage.xaml.cs">
+      <DependentUpon>PluginIconImage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\PluginCoverImage.xaml.cs">
       <DependentUpon>PluginCoverImage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\PluginBackgroundImage.xaml.cs">
       <DependentUpon>PluginBackgroundImage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\CheckListFilterBox.xaml.cs">
+      <DependentUpon>CheckListFilterBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Models\CheckData.cs" />
+    <Compile Include="Models\BulkMediaDownloadOptions.cs" />
     <Compile Include="Models\ItemImage.cs" />
     <Compile Include="Models\BackgroundImagesCollection.cs" />
     <Compile Include="Models\GameBackgroundImages.cs" />
+    <Compile Include="Models\MediaConversionSettings.cs" />
     <Compile Include="Models\GoogleImage.cs" />
     <Compile Include="Models\SteamGridDbResult.cs" />
     <Compile Include="Models\SteamGridDbSearchResult.cs" />
+    <Compile Include="Models\SteamOfficialMediaCandidate.cs" />
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Controls\TextBlockTrimmed.xaml.cs">
       <DependentUpon>TextBlockTrimmed.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="playnite-plugincommon\CommonPluginsControls\PlayniteControls\DdItemListSelectionBox.xaml.cs">
+      <DependentUpon>DdItemListSelectionBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="playnite-plugincommon\CommonPluginsControls\PlayniteControls\NullableIntBox.xaml.cs">
       <DependentUpon>NullableIntBox.xaml</DependentUpon>
@@ -121,11 +155,37 @@
     <Compile Include="playnite-plugincommon\CommonPluginsControls\PlayniteControls\SearchBox.xaml.cs">
       <DependentUpon>SearchBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="playnite-plugincommon\CommonPluginsControls\ViewsModels\DatabaseMaintenanceViewModel.cs" />
+    <Compile Include="playnite-plugincommon\CommonPluginsControls\ViewsModels\ExportCsvViewModel.cs" />
+    <Compile Include="playnite-plugincommon\CommonPluginsControls\ViewsModels\TransfertDataViewModel.cs" />
+    <Compile Include="playnite-plugincommon\CommonPluginsControls\Views\DatabaseMaintenanceView.xaml.cs">
+      <DependentUpon>DatabaseMaintenanceView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="playnite-plugincommon\CommonPluginsControls\Views\ExportCsvView.xaml.cs">
+      <DependentUpon>ExportCsvView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="playnite-plugincommon\CommonPluginsControls\Views\ListWithNoData.xaml.cs">
+      <DependentUpon>ListWithNoData.xaml</DependentUpon>
+    </Compile>
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Views\OptionsDownloadData.xaml.cs">
       <DependentUpon>OptionsDownloadData.xaml</DependentUpon>
     </Compile>
+    <Compile Include="playnite-plugincommon\CommonPluginsControls\Views\TransfertData.xaml.cs">
+      <DependentUpon>TransfertData.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Services\BackgroundChangerDatabase.cs" />
+    <Compile Include="Services\MediaConversionService.cs" />
+    <Compile Include="Services\MediaImportService.cs" />
+    <Compile Include="Services\MediaToolkitVersion.cs" />
+    <Compile Include="Services\MediaConversionStartupService.cs" />
+    <Compile Include="Services\BackgroundChangerMenus.cs" />
+    <Compile Include="Services\BackgroundChangerWindows.cs" />
+    <Compile Include="Services\BulkMediaDownloadService.cs" />
+    <Compile Include="Services\BulkGameSelectionHelper.cs" />
     <Compile Include="Services\SteamGridDbApi.cs" />
+    <Compile Include="Services\SteamGridFilterHelper.cs" />
+    <Compile Include="Services\SteamAnonymousProductInfoClient.cs" />
+    <Compile Include="Services\SteamOfficialMediaService.cs" />
     <Compile Include="Views\GoogleImageView.xaml.cs">
       <DependentUpon>GoogleImageView.xaml</DependentUpon>
     </Compile>
@@ -139,11 +199,12 @@
     <Compile Include="Views\SteamGridDbView.xaml.cs">
       <DependentUpon>SteamGridDbView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="wpf-animatedimage\Controls\AnimatedImage.xaml.cs">
-      <DependentUpon>AnimatedImage.xaml</DependentUpon>
+    <Compile Include="Views\SteamSelectView.xaml.cs">
+      <DependentUpon>SteamSelectView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="wpf-animatedimage\WebP\WebpAnim.cs" />
-    <Compile Include="wpf-animatedimage\WebP\WebPWrapper.cs" />
+    <Compile Include="Views\BulkMediaDownloadView.xaml.cs">
+      <DependentUpon>BulkMediaDownloadView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="extension.yaml">
@@ -161,7 +222,15 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Include="Controls\PluginIconImage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Controls\PluginCoverImage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\CheckListFilterBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -358,6 +427,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="playnite-plugincommon\CommonPluginsControls\PlayniteControls\DdItemListSelectionBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="playnite-plugincommon\CommonPluginsControls\PlayniteControls\NullableIntBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -370,7 +443,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="playnite-plugincommon\CommonPluginsControls\Views\DatabaseMaintenanceView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="playnite-plugincommon\CommonPluginsControls\Views\ExportCsvView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="playnite-plugincommon\CommonPluginsControls\Views\ListWithNoData.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="playnite-plugincommon\CommonPluginsControls\Views\OptionsDownloadData.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="playnite-plugincommon\CommonPluginsControls\Views\TransfertData.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -390,9 +479,13 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="wpf-animatedimage\Controls\AnimatedImage.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="Views\SteamSelectView.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BulkMediaDownloadView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -401,10 +494,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="APNG\QSoft.Apng\QSoft.Apng.csproj">
-      <Project>{9B5C14B0-AAD8-47BB-9C8D-9F6C8D975897}</Project>
-      <Name>QSoft.Apng</Name>
-    </ProjectReference>
     <ProjectReference Include="playnite-plugincommon\CommonPluginsResources\CommonPluginsResources.csproj">
       <Project>{4effe926-9c64-4750-a399-f344710edc09}</Project>
       <Name>CommonPluginsResources</Name>
@@ -413,7 +502,7 @@
   <ItemGroup />
   <Import Project="playnite-plugincommon\CommonPlayniteShared\CommonPlayniteShared.projitems" Label="Shared" />
   <Import Project="playnite-plugincommon\CommonPluginsShared\CommonPluginsShared.projitems" Label="Shared" />
-  <Import Project="SharedDLL\SharedDLL.projitems" Label="Shared" />
+  <Import Project="playnite-plugincommon\CommonPluginsStores\CommonPluginsStores.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>powershell -ExecutionPolicy Unrestricted $(SolutionDir)..\build\build.ps1 -ConfigurationName $(ConfigurationName) -OutDir $(SolutionDir)$(OutDir) -SolutionDir $(SolutionDir)</PostBuildEvent>

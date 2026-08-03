@@ -1,6 +1,6 @@
-﻿<lifecycle:PluginMediaLifecycleControlBase
+<lifecycle:PluginMediaLifecycleControlBase
         xmlns:controls="clr-namespace:CommonPluginsShared.Controls"
-        x:Class="BackgroundChanger.Controls.PluginCoverImage"
+        x:Class="BackgroundChanger.Controls.PluginIconImage"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:BackgroundChanger.Controls"
         xmlns:lifecycle="clr-namespace:BackgroundChangerPlugin.Controls"
         xmlns:pbeh="clr-namespace:CommonPlayniteShared.Behaviors"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:PluginCoverImageDataContext, IsDesignTimeCreatable=True}"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:PluginIconImageDataContext, IsDesignTimeCreatable=True}"
         MinHeight="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MinHeight}"
         Height="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=Height}"
         MaxHeight="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MaxHeight}"
@@ -17,10 +17,6 @@
         MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=MaxWidth}"
         HorizontalAlignment="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=HorizontalAlignment}"
         VerticalAlignment="{Binding RelativeSource={RelativeSource AncestorType=ContentControl}, Path=VerticalAlignment}">
-
-    <!--UserControl.CacheMode>
-        <BitmapCache EnableClearType="False" RenderAtScale="1" SnapsToDevicePixels="False" />
-    </UserControl.CacheMode-->
 
     <Grid Name="ImageHolder" Loaded="ImageHolder_Loaded">
         <controls:ImageAsync x:Name="Image1"

@@ -3,7 +3,7 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCBc">Modificateur d'arrière-plan</sys:String>
+    <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
     
     <sys:String x:Key="LOCBcManageBackground">Gérer les images de fond</sys:String>
     <sys:String x:Key="LOCBcManageCover">Gérer les pochettes</sys:String>
@@ -13,49 +13,49 @@
 
     <sys:String x:Key="LOCBcSteamGridDbApiKey">Clé API SteamGridDB</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">Affiche l'image de fond du plugin</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">Affiche la pochette du plugin</sys:String>
-    <sys:String x:Key="LOCBcEnableIconImage">Affiche l'icône du plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">Afficher l'image de fond du plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">Afficher la pochette du plugin</sys:String>
+    <sys:String x:Key="LOCBcEnableIconImage">Afficher l'icône du plugin</sys:String>
 
-    <sys:String x:Key="LOCBcBackgroundSameSettings">Utiliser le même paramètre pour l'arrière-plan du jeu de plugin que l'arrière-plan du thème *</sys:String>
+    <sys:String x:Key="LOCBcBackgroundSameSettings">Utiliser les mêmes paramètres d'affichage que l'arrière-plan du thème Playnite *</sys:String>
 
     <sys:String x:Key="LOCBcEnableRandomSelect">Activer la sélection aléatoire</sys:String>
-    <sys:String x:Key="LOCBcSelectionMode">Selection mode</sys:String>
-    <sys:String x:Key="LOCBcModeDefault">Favorite if set, otherwise Playnite default</sys:String>
-    <sys:String x:Key="LOCBcRandomOnStart">Seulement au démarrage de Playnite</sys:String>
-    <sys:String x:Key="LOCBcRandomOnSelect">À la sélection du jeu</sys:String>
-    <sys:String x:Key="LOCBcEnableAutoChanger">Activer le changement automatique</sys:String>
-    <sys:String x:Key="LOCBcTimerRandomOrder">Shuffled order</sys:String>
-    <sys:String x:Key="LOCBcTimerRandomOrderToolTip">When enabled, items are shuffled once and shown without repeats until the full set is exhausted, then reshuffled. When disabled, items advance in list order.</sys:String>
+    <sys:String x:Key="LOCBcSelectionMode">Mode de sélection</sys:String>
+    <sys:String x:Key="LOCBcModeDefault">Favori si défini, sinon défaut Playnite</sys:String>
+    <sys:String x:Key="LOCBcRandomOnStart">Aléatoire une fois au démarrage de Playnite</sys:String>
+    <sys:String x:Key="LOCBcRandomOnSelect">Aléatoire à chaque sélection de jeu</sys:String>
+    <sys:String x:Key="LOCBcEnableAutoChanger">Changer automatiquement selon un minuteur</sys:String>
+    <sys:String x:Key="LOCBcTimerRandomOrder">Ordre mélangé</sys:String>
+    <sys:String x:Key="LOCBcTimerRandomOrderToolTip">Si activé, les éléments sont mélangés une fois et affichés sans répétition jusqu'à épuisement du jeu, puis remélangés. Si désactivé, les éléments défilent dans l'ordre de la liste.</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Intervalle de temps</sys:String>
     <sys:String x:Key="LOCBcSeconds">secondes</sys:String>
 
-    <sys:String x:Key="LOCBcEnableVideoDelay">Activer le retard vidéo</sys:String>
-    <sys:String x:Key="LOCBcVideoDelayToolTip">Utilisez cette option si vous voulez afficher l'image par défaut avant une vidéo.</sys:String>
-    <sys:String x:Key="LOCBcEnableRandomVideoStartPoint">Randomize video start point</sys:String>
-    <sys:String x:Key="LOCBcRandomVideoStartPointToolTip">When enabled, videos seek to a random timestamp on first play only. Loop replays keep continuity (not re-randomized). Off by default.</sys:String>
+    <sys:String x:Key="LOCBcEnableVideoDelay">Retarder le démarrage de la vidéo</sys:String>
+    <sys:String x:Key="LOCBcVideoDelayToolTip">Afficher d'abord l'image par défaut Playnite pour ce jeu, puis démarrer la vidéo après l'intervalle.</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomVideoStartPoint">Démarrage vidéo aléatoire</sys:String>
+    <sys:String x:Key="LOCBcRandomVideoStartPointToolTip">Si activé, les vidéos démarrent à un instant aléatoire uniquement à la première lecture. Les boucles suivantes conservent la continuité (pas de nouveau tirage). Désactivé par défaut.</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamSelect">Select from Steam</sys:String>
-    <sys:String x:Key="LOCBcSteamGet">Get from Steam</sys:String>
-    <sys:String x:Key="LOCBcSteamNoAppId">Could not find a Steam App ID for this game.</sys:String>
-    <sys:String x:Key="LOCBcSteamNoAssets">No official Steam media found for this game.</sys:String>
+    <sys:String x:Key="LOCBcSteamSelect">Sélectionner depuis Steam</sys:String>
+    <sys:String x:Key="LOCBcSteamGet">Récupérer depuis Steam</sys:String>
+    <sys:String x:Key="LOCBcSteamNoAppId">Impossible de trouver un App ID Steam pour ce jeu.</sys:String>
+    <sys:String x:Key="LOCBcSteamNoAssets">Aucun média officiel Steam trouvé pour ce jeu.</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbSelect">Sélectionner depuis SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbAnimated">Animated</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbMimes">MIME types</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbApiKeyMissingNotification">Configure a SteamGridDB API key in plugin settings to search and download artwork.</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbUnauthorizedNotification">SteamGridDB rejected the API key (401 Unauthorized). Verify the key in plugin settings (invalid, expired, or revoked).</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbForbiddenNotification">SteamGridDB denied access to this resource (403 Forbidden). Your API key may lack the required permissions.</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbRateLimitNotification">SteamGridDB rate limit reached (429). Wait a moment and try again.</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbParseErrorNotification">SteamGridDB returned an unexpected response. Try again or verify your API key in plugin settings.</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbGenericErrorNotification">SteamGridDB request failed. See extensions.log for details.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbAnimated">Animé</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbMimes">Types MIME</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKeyMissingNotification">Configurez une clé API SteamGridDB dans les paramètres du plugin pour rechercher et télécharger des illustrations.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbUnauthorizedNotification">SteamGridDB a rejeté la clé API (401 Unauthorized). Vérifiez la clé dans les paramètres du plugin (invalide, expirée ou révoquée).</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbForbiddenNotification">SteamGridDB a refusé l'accès à cette ressource (403 Forbidden). Votre clé API n'a peut-être pas les permissions requises.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbRateLimitNotification">Limite de débit SteamGridDB atteinte (429). Attendez un moment et réessayez.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbParseErrorNotification">SteamGridDB a renvoyé une réponse inattendue. Réessayez ou vérifiez votre clé API dans les paramètres du plugin.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbGenericErrorNotification">La requête SteamGridDB a échoué. Consultez extensions.log pour plus de détails.</sys:String>
     <sys:String x:Key="LOCBcGoogleImageSelect">Sélectionner depuis Google Image</sys:String>
-    <sys:String x:Key="LOCBcAddFromUrl">Ajouter depuis une url</sys:String>
-    <sys:String x:Key="LOCBcAddFromUrlDescription">Saisir l'url de l'image</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrl">Ajouter depuis une URL</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrlDescription">Saisir l'URL de l'image</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">fichier ffmpeg</sys:String>
-    <sys:String x:Key="LOCBcFfprobeFile">ffprobe file</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFileDescription">Nécessaire pour importer des médias animés (WebP, WebM, APNG, GIF). Les fichiers sont automatiquement convertis en MP4 à l'import et au démarrage.</sys:String>
+    <sys:String x:Key="LOCBcFfprobeFile">fichier ffprobe</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFileDescription">Nécessaire pour importer des médias animés (WebP, WebM, APNG, GIF). Configurez FFmpeg et ffprobe (généralement dans le même dossier). Les fichiers sont automatiquement convertis en MP4 à l'import et au démarrage.</sys:String>
 
     <sys:String x:Key="LOCBcMediaConversionSection">Conversion des médias</sys:String>
     <sys:String x:Key="LOCBcMediaConversionDefaultsCrf">CRF par défaut (qualité)</sys:String>
@@ -71,45 +71,45 @@
     <sys:String x:Key="LOCBcMediaConversionFixedFramerate">Images par seconde (fps) fixe</sys:String>
     <sys:String x:Key="LOCBcMediaConversionForceReencode">Toujours réencoder en H.264</sys:String>
     <sys:String x:Key="LOCBcMediaConversionForceReencodeToolTip">Si désactivé, FFmpeg tente de copier le flux vidéo lorsque le WebM est déjà compatible H.264.</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionCrfInvalid">Le CRF doit être 0 (hériter du défaut) ou compris entre 0 et 51. Le CRF par défaut doit être entre 0 et 51.</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">Le nombre d'images par seconde doit être compris entre 1 et 120.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfInvalid">Le CRF de conversion doit être 0 (hériter du défaut) ou compris entre 0 et 51. Le CRF par défaut doit être entre 0 et 51.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">Le nombre d'images par seconde de conversion doit être compris entre 1 et 120.</sys:String>
 
-    <sys:String x:Key="LOCBcFfmpegNotFound">FFmpeg non trouvé</sys:String>
-    <sys:String x:Key="LOCBcFfmpegOutdated">FFmpeg or ffprobe version is too old</sys:String>
-    <sys:String x:Key="LOCBcFfmpegPathNotConfigured">not configured</sys:String>
-    <sys:String x:Key="LOCBcFfmpegStartupNotification">FFmpeg is not configured or the executable was not found at &quot;{0}&quot;. Animated media cannot be imported or converted until FFmpeg is set in plugin settings.</sys:String>
-    <sys:String x:Key="LOCBcMediaToolkitStartupNotification">FFmpeg and ffprobe must be configured for animated media import and conversion. FFmpeg: {0}. ffprobe: {1}.</sys:String>
-    <sys:String x:Key="LOCBcMediaToolkitOutdatedNotification">Animated media import and conversion require FFmpeg {0} or newer (detected: {1}). Update your FFmpeg and ffprobe install in plugin settings.</sys:String>
-    <sys:String x:Key="LOCBcFfmpegConversionFailed">Conversion to MP4 failed. Detected toolchain: {0}. Animated WebP requires FFmpeg {1} or newer with libwebp animated decode support.</sys:String>
-    <sys:String x:Key="LOCBcInvalidUrlFormat">Format d'url invalide !</sys:String>
+    <sys:String x:Key="LOCBcFfmpegNotFound">FFmpeg ou ffprobe introuvable</sys:String>
+    <sys:String x:Key="LOCBcFfmpegOutdated">La version de FFmpeg ou ffprobe est trop ancienne</sys:String>
+    <sys:String x:Key="LOCBcFfmpegPathNotConfigured">non configuré</sys:String>
+    <sys:String x:Key="LOCBcFfmpegStartupNotification">FFmpeg n'est pas configuré ou l'exécutable est introuvable à « {0} ». Les médias animés ne peuvent pas être importés ni convertis tant que FFmpeg n'est pas défini dans les paramètres du plugin.</sys:String>
+    <sys:String x:Key="LOCBcMediaToolkitStartupNotification">FFmpeg et ffprobe doivent être configurés pour l'import et la conversion des médias animés. FFmpeg : {0}. ffprobe : {1}.</sys:String>
+    <sys:String x:Key="LOCBcMediaToolkitOutdatedNotification">L'import et la conversion des médias animés nécessitent FFmpeg {0} ou plus récent (détecté : {1}). Mettez à jour FFmpeg et ffprobe dans les paramètres du plugin.</sys:String>
+    <sys:String x:Key="LOCBcFfmpegConversionFailed">La conversion en MP4 a échoué. Chaîne d'outils détectée : {0}. Le WebP animé nécessite FFmpeg {1} ou plus récent avec le décodage animé libwebp.</sys:String>
+    <sys:String x:Key="LOCBcInvalidUrlFormat">Format d'URL invalide !</sys:String>
 
     <!-- Bulk media download (#25) -->
 
-    <sys:String x:Key="LOCBcBulkDownloadTitle">Bulk media download</sys:String>
-    <sys:String x:Key="LOCBcBulkDownloadMenu">Bulk media download...</sys:String>
-    <sys:String x:Key="LOCBcBulkNoGamesSelected">No games matched the selected filters.</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadTitle">Téléchargement groupé de médias</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadMenu">Téléchargement groupé de médias...</sys:String>
+    <sys:String x:Key="LOCBcBulkNoGamesSelected">Aucun jeu ne correspond aux filtres sélectionnés.</sys:String>
     <sys:String x:Key="LOCBcBulkSources">Sources</sys:String>
-    <sys:String x:Key="LOCBcBulkSourceSteam">Steam official</sys:String>
+    <sys:String x:Key="LOCBcBulkSourceSteam">Steam officiel</sys:String>
     <sys:String x:Key="LOCBcBulkSourceSteamGridDb">SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcBulkMediaKinds">Media types</sys:String>
-    <sys:String x:Key="LOCBcBulkOnlyMissing">Skip existing plugin media per type (Background/Cover/Icon)</sys:String>
-    <sys:String x:Key="LOCBcBulkOnlyGamesWithoutData">Only games with no plugin images</sys:String>
-    <sys:String x:Key="LOCBcBulkQuantity">Quantity (total per media type)</sys:String>
-    <sys:String x:Key="LOCBcBulkDownloadAll">Download all</sys:String>
-    <sys:String x:Key="LOCBcBulkFuzzyThreshold">Name match threshold</sys:String>
-    <sys:String x:Key="LOCBcBulkPromptLowFuzzy">Prompt when match is below threshold</sys:String>
-    <sys:String x:Key="LOCBcBulkAllowAnimated">Allow animated SteamGridDB assets</sys:String>
-    <sys:String x:Key="LOCBcBulkPickMode">SteamGridDB selection</sys:String>
-    <sys:String x:Key="LOCBcBulkPickRandom">Random</sys:String>
-    <sys:String x:Key="LOCBcBulkPickBestScore">Best score</sys:String>
-    <sys:String x:Key="LOCBcBulkPickBestVotes">Best upvotes</sys:String>
-    <sys:String x:Key="LOCBcBulkPickNewest">Newest (by id)</sys:String>
-    <sys:String x:Key="LOCBcBulkSteamGridFilters">SteamGridDB filters</sys:String>
-    <sys:String x:Key="LOCBcBulkSaveOptions">Save options</sys:String>
-    <sys:String x:Key="LOCBcBulkOptionsSaved">Bulk download options were saved.</sys:String>
-    <sys:String x:Key="LOCBcBulkOptionsInvalid">Select at least one source and one media type.</sys:String>
-    <sys:String x:Key="LOCBcBulkFuzzyPrompt">Select the matching SteamGridDB game</sys:String>
-    <sys:String x:Key="LOCBcBulkDownloadSummary">Imported: {0} — Skipped: {1} — Errors: {2}</sys:String>
-    <sys:String x:Key="LOCBcBulkDownloadCancelled">Download was cancelled.</sys:String>
+    <sys:String x:Key="LOCBcBulkMediaKinds">Types de média</sys:String>
+    <sys:String x:Key="LOCBcBulkOnlyMissing">Ignorer les médias plugin déjà présents par type (Fond/Pochette/Icône)</sys:String>
+    <sys:String x:Key="LOCBcBulkOnlyGamesWithoutData">Uniquement les jeux sans images plugin</sys:String>
+    <sys:String x:Key="LOCBcBulkQuantity">Quantité (total par type de média)</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadAll">Tout télécharger</sys:String>
+    <sys:String x:Key="LOCBcBulkFuzzyThreshold">Seuil de correspondance du nom</sys:String>
+    <sys:String x:Key="LOCBcBulkPromptLowFuzzy">Demander confirmation si la correspondance est sous le seuil</sys:String>
+    <sys:String x:Key="LOCBcBulkAllowAnimated">Autoriser les assets animés SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcBulkPickMode">Sélection SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcBulkPickRandom">Aléatoire</sys:String>
+    <sys:String x:Key="LOCBcBulkPickBestScore">Meilleur score</sys:String>
+    <sys:String x:Key="LOCBcBulkPickBestVotes">Meilleurs votes positifs</sys:String>
+    <sys:String x:Key="LOCBcBulkPickNewest">Plus récent (par id)</sys:String>
+    <sys:String x:Key="LOCBcBulkSteamGridFilters">Filtres SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcBulkSaveOptions">Options d'enregistrement</sys:String>
+    <sys:String x:Key="LOCBcBulkOptionsSaved">Les options de téléchargement groupé ont été enregistrées.</sys:String>
+    <sys:String x:Key="LOCBcBulkOptionsInvalid">Sélectionnez au moins une source et un type de média.</sys:String>
+    <sys:String x:Key="LOCBcBulkFuzzyPrompt">Sélectionnez le jeu SteamGridDB correspondant</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadSummary">Importés : {0} — Ignorés : {1} — Erreurs : {2}</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadCancelled">Le téléchargement a été annulé.</sys:String>
 
 </ResourceDictionary>
