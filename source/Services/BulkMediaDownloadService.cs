@@ -84,12 +84,11 @@ namespace BackgroundChanger.Services
             options.EnsureInitialized();
             if (!options.HasAnySource || !options.HasAnyMediaKind)
             {
-                Common.LogDebug(false, LogPrefix + " Aborted: no source or media kind enabled.");
+                Common.LogDebug(true, LogPrefix + " Aborted: no source or media kind enabled.");
                 return result;
             }
 
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format(
                     "{0} Run games={1} OnlyMissing={2} Steam={3} SGDB={4} BG={5} Cover={6} Icon={7} Qty={8} DownloadAll={9} Pick={10}",
                     LogPrefix,
@@ -132,8 +131,7 @@ namespace BackgroundChanger.Services
                 }
             }
 
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format(
                     "{0} Done games={1} imported={2} skipped={3} errors={4} cancelled={5}",
                     LogPrefix,
@@ -156,7 +154,7 @@ namespace BackgroundChanger.Services
             if (gameData == null)
             {
                 result.SkippedCount++;
-                Common.LogDebug(false, string.Format("{0} Skip game (no DB entry) id={1}", LogPrefix, game.Id));
+                Common.LogDebug(true, string.Format("{0} Skip game (no DB entry) id={1}", LogPrefix, game.Id));
                 return;
             }
 
@@ -186,8 +184,7 @@ namespace BackgroundChanger.Services
                 if (options.OnlyMissing && countBeforeKind > 0)
                 {
                     result.SkippedCount++;
-                    Common.LogDebug(
-                        false,
+                    Common.LogDebug(true,
                         string.Format(
                             "{0} Skip kind (bulk OnlyMissing=true) game='{1}' kind={2} count={3}",
                             LogPrefix,
@@ -248,8 +245,7 @@ namespace BackgroundChanger.Services
 
                 int countAfterKind = CountPluginOwnedMedia(gameData, mediaKind);
                 int sgdbImported = Math.Max(0, result.ImportedCount - importedAfterSteam);
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "{0} Kind counts game='{1}' kind={2} before={3} after={4} delta={5} steam+={6} sgdb+={7} remainAfterSteam={8}",
                         LogPrefix,
@@ -277,8 +273,7 @@ namespace BackgroundChanger.Services
             int bg = CountPluginOwnedMedia(gameData, BackgroundChangerDatabase.PluginMediaKind.Background);
             int cover = CountPluginOwnedMedia(gameData, BackgroundChangerDatabase.PluginMediaKind.Cover);
             int icon = CountPluginOwnedMedia(gameData, BackgroundChangerDatabase.PluginMediaKind.Icon);
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format(
                     "{0} Counts {1} game='{2}' bg={3} cover={4} icon={5} total={6}",
                     LogPrefix,
@@ -302,7 +297,7 @@ namespace BackgroundChanger.Services
         {
             if (steamAppId == 0)
             {
-                Common.LogDebug(false, string.Format("{0} Steam skip (no AppId) game='{1}'", LogPrefix, game.Name));
+                Common.LogDebug(true, string.Format("{0} Steam skip (no AppId) game='{1}'", LogPrefix, game.Name));
                 return 0;
             }
 
@@ -383,8 +378,7 @@ namespace BackgroundChanger.Services
                 urls = SelectOrderedSteamGridUrls(pool, options.PickMode, remaining, usedUrls);
             }
 
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format(
                     "{0} SGDB pool game='{1}' kind={2} filtered={3} selected={4} pick={5} remain={6}",
                     LogPrefix,
@@ -566,7 +560,7 @@ namespace BackgroundChanger.Services
             if (matches.Count == 0)
             {
                 result.SkippedCount++;
-                Common.LogDebug(false, string.Format("{0} SGDB match: no results game='{1}'", LogPrefix, game.Name));
+                Common.LogDebug(true, string.Format("{0} SGDB match: no results game='{1}'", LogPrefix, game.Name));
                 return null;
             }
 
@@ -584,8 +578,7 @@ namespace BackgroundChanger.Services
             var best = scored[0];
             if (best.Score >= options.FuzzyMatchThreshold)
             {
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "{0} SGDB fuzzy auto game='{1}' match='{2}' score={3}",
                         LogPrefix,
@@ -598,8 +591,7 @@ namespace BackgroundChanger.Services
             if (!options.PromptOnLowFuzzyMatch)
             {
                 result.SkippedCount++;
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "{0} SGDB fuzzy skip game='{1}' best='{2}' score={3} threshold={4}",
                         LogPrefix,
@@ -690,8 +682,7 @@ namespace BackgroundChanger.Services
                     downloadError = ex;
                     if (attempt < DownloadMaxAttempts && IsTransientDownloadFailure(ex))
                     {
-                        Common.LogDebug(
-                            false,
+                        Common.LogDebug(true,
                             string.Format(
                                 "{0} Download retry {1}/{2} url={3} reason={4}",
                                 LogPrefix,
@@ -727,7 +718,7 @@ namespace BackgroundChanger.Services
                 if (cachedFile.IsNullOrEmpty() || !File.Exists(cachedFile))
                 {
                     result.ErrorCount++;
-                    Common.LogDebug(false, string.Format("{0} Download miss url={1}", LogPrefix, url));
+                    Common.LogDebug(true, string.Format("{0} Download miss url={1}", LogPrefix, url));
                     return false;
                 }
 
@@ -736,8 +727,7 @@ namespace BackgroundChanger.Services
                     || prepare.PreparedPath.IsNullOrEmpty())
                 {
                     result.ErrorCount++;
-                    Common.LogDebug(
-                        false,
+                    Common.LogDebug(true,
                         string.Format("{0} Import prepare failed status={1} url={2}", LogPrefix, prepare.Status, url));
                     return false;
                 }
@@ -765,8 +755,7 @@ namespace BackgroundChanger.Services
                 PluginDatabase.Update(gameData);
                 result.ImportedCount++;
 
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "{0} Imported game='{1}' kind={2} file={3}",
                         LogPrefix,

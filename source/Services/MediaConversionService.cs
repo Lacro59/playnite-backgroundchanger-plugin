@@ -729,7 +729,7 @@ namespace BackgroundChanger.Services
 
         private static void LogDebugMessage(string message)
         {
-            Common.LogDebug(false, LogPrefix + " " + message);
+            Common.LogDebug(true, LogPrefix + " " + message);
         }
 
         private static void LogDetectionFailure(string formatLabel, string filePath, Exception ex)

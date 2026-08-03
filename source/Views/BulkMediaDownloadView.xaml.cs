@@ -60,7 +60,7 @@ namespace BackgroundChanger.Views
 
             BackgroundChangerSettings live = ResolveLiveSettings(plugin);
             BulkMediaDownloadOptions working = live.BulkMediaDownload.Clone();
-            Common.LogDebug(false, string.Format(
+            Common.LogDebug(true, string.Format(
                 "{0} Open dialog from persisted options OnlyMissing={1} PickMode={2} Cover={3} Icon={4} Qty={5} BG dims checked={6}",
                 LogPrefix,
                 working.OnlyMissing,
@@ -321,7 +321,7 @@ namespace BackgroundChanger.Views
             BackgroundChangerSettingsViewModel viewModel = _plugin.GetSettings(false) as BackgroundChangerSettingsViewModel;
             viewModel?.SyncEditingCloneBulkMediaDownload();
 
-            Common.LogDebug(false, string.Format(
+            Common.LogDebug(true, string.Format(
                 "{0} Persisted options OnlyMissing={1} PickMode={2} Cover={3} Icon={4} Qty={5}",
                 LogPrefix,
                 settings.BulkMediaDownload.OnlyMissing,

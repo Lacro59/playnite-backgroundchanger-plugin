@@ -1,4 +1,4 @@
-﻿using BackgroundChanger.Controls;
+using BackgroundChanger.Controls;
 using BackgroundChanger.Models;
 using BackgroundChanger.Services;
 using BackgroundChanger.Views;
@@ -164,8 +164,7 @@ namespace BackgroundChanger
 
                     if (!PluginDatabase.IsDatabaseReady())
                     {
-                        Common.LogDebug(
-                            false,
+                        Common.LogDebug(true,
                             "[MediaConversionStartup] Database not ready after timeout, startup batch skipped.");
                         return;
                     }

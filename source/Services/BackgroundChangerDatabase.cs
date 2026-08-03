@@ -1,4 +1,4 @@
-﻿using BackgroundChanger.Models;
+using BackgroundChanger.Models;
 using CommonPlayniteShared;
 using CommonPluginsShared;
 using CommonPluginsShared.Collections;
@@ -241,8 +241,7 @@ namespace BackgroundChanger.Services
                 return true;
             }
 
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format(
                     "{0} Favorite not reapplied — no default item (mediaKind={1}, game='{2}')",
                     LogPrefix,
@@ -329,8 +328,7 @@ namespace BackgroundChanger.Services
                 return;
             }
 
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format(
                     "{0} RefreshMedia game='{1}', trigger={2}, items {3}->{4}, purged={5}, favCaptured cover={6} bg={7} icon={8}, favReapplied cover={9} bg={10} icon={11}",
                     LogPrefix,
@@ -363,8 +361,7 @@ namespace BackgroundChanger.Services
                 return;
             }
 
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format(
                     "{0} Games_ItemUpdated game='{1}', coverChanged={2}, backgroundChanged={3}, iconChanged={4}",
                     LogPrefix,
@@ -376,8 +373,7 @@ namespace BackgroundChanger.Services
             GameBackgroundImages gameBackgroundImages = GetOnlyCache(gameNew.Id);
             if (gameBackgroundImages == null)
             {
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "{0} Games_ItemUpdated skip — no plugin cache for game='{1}'",
                         LogPrefix,
@@ -389,8 +385,7 @@ namespace BackgroundChanger.Services
 
             if (SuppressGamesItemUpdatedPersist)
             {
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "{0} Games_ItemUpdated memory refresh only (persist suppressed) for game='{1}'",
                         LogPrefix,
@@ -407,8 +402,7 @@ namespace BackgroundChanger.Services
             if (shouldPersist)
             {
                 Update(gameBackgroundImages);
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "{0} Games_ItemUpdated persisted refresh for game='{1}' (purged={2}, favReapplied={3}, coverChanged={4}, bgChanged={5}, iconChanged={6})",
                         LogPrefix,
@@ -421,8 +415,7 @@ namespace BackgroundChanger.Services
             }
             else
             {
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "{0} Games_ItemUpdated memory refresh only (no persist) for game='{1}'",
                         LogPrefix,

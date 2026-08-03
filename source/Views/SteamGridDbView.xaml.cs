@@ -1,4 +1,4 @@
-﻿using BackgroundChanger.Models;
+using BackgroundChanger.Models;
 using BackgroundChanger.Services;
 using CommonPluginsControls.PlayniteControls;
 using CommonPluginsShared;
@@ -72,7 +72,7 @@ namespace BackgroundChanger.Views
             ApplyContextualFilterPanels();
             RefreshFilterSummaries();
 
-            Common.LogDebug(false, string.Format(
+            Common.LogDebug(true, string.Format(
                 "[SteamGridDbView] LoadFilters mediaKind={0} slot={1} apiType={2} active={3}",
                 MediaKind,
                 FilterSlot,
@@ -140,7 +140,7 @@ namespace BackgroundChanger.Views
             DataSearch = null;
             SteamGridFilters activeFilters = CollectActiveFiltersFromUi();
 
-            Common.LogDebug(false, string.Format(
+            Common.LogDebug(true, string.Format(
                 "[SteamGridDbView] Refetch reason={0} gameId={1} mediaKind={2} slot={3} apiType={4} active={5} url={6}",
                 reason,
                 id,
@@ -177,7 +177,7 @@ namespace BackgroundChanger.Views
             }, new GlobalProgressOptions("LOCDownloadingLabel")).Result == true)
             {
                 int fetchedCount = DataSearch?.Data?.Count ?? 0;
-                Common.LogDebug(false, string.Format(
+                Common.LogDebug(true, string.Format(
                     "[SteamGridDbView] Refetch done reason={0} gameId={1} pages={2} fetched={3}",
                     reason,
                     id,
@@ -340,7 +340,7 @@ namespace BackgroundChanger.Views
             if (DataSearchFiltered != null)
             {
                 PART_TotalFound.Content = DataSearchFiltered.Count;
-                Common.LogDebug(false, string.Format(
+                Common.LogDebug(true, string.Format(
                     "[SteamGridDbView] DisplayFilter fetched={0} displayed={1}",
                     DataSearch?.Data?.Count ?? 0,
                     DataSearchFiltered.Count));
@@ -361,7 +361,7 @@ namespace BackgroundChanger.Views
             int videoItems = items.Count(x => x.IsVideo);
             int displayableThumbs = items.Count(x => x.HasDisplayableThumbnail);
 
-            Common.LogDebug(false, string.Format(
+            Common.LogDebug(true, string.Format(
                 "[SteamGridDbView] PART_ElementList: {0} items, {1} missing thumb, {2} video, {3} displayable previews",
                 items.Count,
                 missingThumb,
@@ -456,7 +456,7 @@ namespace BackgroundChanger.Views
             Plugin.SavePluginSettings(PluginDatabase.PluginSettings);
             RefreshFilterSummaries();
 
-            Common.LogDebug(false, string.Format(
+            Common.LogDebug(true, string.Format(
                 "[SteamGridDbView] SavedFilter slot={0} mediaKind={1} active={2}",
                 FilterSlot,
                 MediaKind,

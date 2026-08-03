@@ -106,8 +106,7 @@ namespace BackgroundChanger.Views
             if (searchResults != null)
             {
                 PART_SearchList.ItemsSource = searchResults;
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "[SteamSelectView] Search term={0} mediaKind={1} games={2}",
                         searchTerm,
@@ -129,8 +128,7 @@ namespace BackgroundChanger.Views
             uint appId = SteamOfficialMediaService.ParseAppIdFromSearchOption(selectedGame);
             if (appId == 0)
             {
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "[SteamSelectView] Invalid AppId from search game={0}",
                         selectedGame.Name));
@@ -166,8 +164,7 @@ namespace BackgroundChanger.Views
             }
 
             int count = candidates?.Count ?? 0;
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format(
                     "[SteamSelectView] Media probe appId={0} game={1} mediaKind={2} available={3}",
                     appId,
@@ -251,8 +248,7 @@ namespace BackgroundChanger.Views
             SelectedResults = PART_ElementList.SelectedItems
                 .Cast<SteamOfficialMediaCandidate>()
                 .ToList();
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format(
                     "[SteamSelectView] Select confirmed appId={0} count={1}",
                     _selectedAppId,
@@ -266,8 +262,7 @@ namespace BackgroundChanger.Views
             SelectedResults = PART_ElementList.SelectedItems
                 .Cast<SteamOfficialMediaCandidate>()
                 .ToList();
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format(
                     "[SteamSelectView] Select all confirmed appId={0} count={1}",
                     _selectedAppId,
@@ -278,7 +273,7 @@ namespace BackgroundChanger.Views
         private void ButtonCancel_Click(object sender, RoutedEventArgs e)
         {
             SelectedResults = null;
-            Common.LogDebug(false, "[SteamSelectView] Select cancelled");
+            Common.LogDebug(true, "[SteamSelectView] Select cancelled");
             CloseParentWindow();
         }
 

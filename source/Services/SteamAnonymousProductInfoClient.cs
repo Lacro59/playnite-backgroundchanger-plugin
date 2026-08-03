@@ -63,14 +63,14 @@ namespace BackgroundChanger.Services
                 steamClient.Connect();
                 if (!connectedEvent.WaitOne(TimeoutMs) || connectedResult != EResult.OK)
                 {
-                    Common.LogDebug(false, LogPrefix + " Connect failed or timed out appId=" + appId);
+                    Common.LogDebug(true, LogPrefix + " Connect failed or timed out appId=" + appId);
                     return null;
                 }
 
                 steamUser.LogOnAnonymous(new SteamUser.AnonymousLogOnDetails());
                 if (!loggedOnEvent.WaitOne(TimeoutMs) || loggedOnResult != EResult.OK)
                 {
-                    Common.LogDebug(false, LogPrefix + " Anonymous logon failed appId=" + appId);
+                    Common.LogDebug(true, LogPrefix + " Anonymous logon failed appId=" + appId);
                     return null;
                 }
 
@@ -78,7 +78,7 @@ namespace BackgroundChanger.Services
                 Task<AsyncJobMultiple<SteamApps.PICSProductInfoCallback>.ResultSet> productTask = productJob.ToTask();
                 if (!productTask.Wait(TimeoutMs))
                 {
-                    Common.LogDebug(false, LogPrefix + " PICS timeout appId=" + appId);
+                    Common.LogDebug(true, LogPrefix + " PICS timeout appId=" + appId);
                     return null;
                 }
 
@@ -96,11 +96,11 @@ namespace BackgroundChanger.Services
 
                 if (productInfo == null || !productInfo.Apps.ContainsKey(appId))
                 {
-                    Common.LogDebug(false, LogPrefix + " PICS missing app entry appId=" + appId);
+                    Common.LogDebug(true, LogPrefix + " PICS missing app entry appId=" + appId);
                     return null;
                 }
 
-                Common.LogDebug(false, LogPrefix + " PICS success appId=" + appId);
+                Common.LogDebug(true, LogPrefix + " PICS success appId=" + appId);
                 return productInfo.Apps[appId].KeyValues;
             }
             catch (Exception ex)

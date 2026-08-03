@@ -1,4 +1,4 @@
-﻿using BackgroundChanger.Models;
+using BackgroundChanger.Models;
 using BackgroundChanger.Services;
 using CommonPlayniteShared;
 using CommonPlayniteShared.Common;
@@ -156,21 +156,21 @@ namespace BackgroundChanger.Views
             switch (result.Status)
             {
                 case MediaImportService.ImportPrepareStatus.BlockedMissingToolkit:
-                    Common.LogDebug(false, string.Format("[ImagesManager] Import blocked, media toolkit not configured: {0}", sourcePath));
+                    Common.LogDebug(true, string.Format("[ImagesManager] Import blocked, media toolkit not configured: {0}", sourcePath));
                     ShowFfmpegNotFoundIfNeeded(ref ffmpegErrorShown);
                     return;
 
                 case MediaImportService.ImportPrepareStatus.BlockedOutdatedToolkit:
-                    Common.LogDebug(false, string.Format("[ImagesManager] Import blocked, media toolkit version outdated: {0}", sourcePath));
+                    Common.LogDebug(true, string.Format("[ImagesManager] Import blocked, media toolkit version outdated: {0}", sourcePath));
                     ShowFfmpegOutdatedIfNeeded(ref ffmpegOutdatedShown);
                     return;
 
                 case MediaImportService.ImportPrepareStatus.MissingSource:
-                    Common.LogDebug(false, string.Format("[ImagesManager] Import skipped, file missing: {0}", sourcePath));
+                    Common.LogDebug(true, string.Format("[ImagesManager] Import skipped, file missing: {0}", sourcePath));
                     return;
 
                 case MediaImportService.ImportPrepareStatus.ConversionFailed:
-                    Common.LogDebug(false, string.Format("[ImagesManager] Import item skipped, no output produced: {0}", sourcePath));
+                    Common.LogDebug(true, string.Format("[ImagesManager] Import item skipped, no output produced: {0}", sourcePath));
                     ShowFfmpegConversionFailedIfNeeded(ref conversionFailedShown);
                     return;
 
@@ -184,7 +184,7 @@ namespace BackgroundChanger.Views
 
                         if (Path.GetExtension(sourcePath).IsEqual(".webp") && result.PreparedPath.IsEqual(sourcePath))
                         {
-                            Common.LogDebug(false, string.Format("[ImagesManager] Import added as static WebP (no conversion): {0}", sourcePath));
+                            Common.LogDebug(true, string.Format("[ImagesManager] Import added as static WebP (no conversion): {0}", sourcePath));
                         }
                     }
                     break;
@@ -256,8 +256,7 @@ namespace BackgroundChanger.Views
         private static void LogSaveItemsSnapshot(string phase, string gameName, BackgroundChangerDatabase.PluginMediaKind mediaKind, IList<ItemImage> items)
         {
             int count = items?.Count ?? 0;
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format("[ImagesManager] Save {0} — game='{1}', mediaKind={2}, count={3}", phase, gameName, mediaKind, count));
 
             if (items == null || count == 0)
@@ -267,7 +266,7 @@ namespace BackgroundChanger.Views
 
             for (int i = 0; i < items.Count; i++)
             {
-                Common.LogDebug(false, string.Format("[ImagesManager] Save {0} {1}", phase, FormatSaveItemLine(items[i], i)));
+                Common.LogDebug(true, string.Format("[ImagesManager] Save {0} {1}", phase, FormatSaveItemLine(items[i], i)));
             }
         }
 
@@ -294,8 +293,7 @@ namespace BackgroundChanger.Views
 
                     if (!EditedImagesContains(EditedImages, y))
                     {
-                        Common.LogDebug(
-                            false,
+                        Common.LogDebug(true,
                             string.Format("[ImagesManager] Save delete removed file: {0}", y.FullPath ?? string.Empty));
                         FileSystem.DeleteFileSafe(y.FullPath);
                     }
@@ -314,8 +312,7 @@ namespace BackgroundChanger.Views
                         if (BackgroundChangerDatabase.IsUnderPlayniteLibraryFiles(itemImage.Name))
                         {
                             skippedMirrorCount++;
-                            Common.LogDebug(
-                                false,
+                            Common.LogDebug(true,
                                 string.Format(
                                     "[ImagesManager] Save import skipped (Playnite library file): {0}",
                                     itemImage.Name ?? string.Empty));
@@ -377,8 +374,7 @@ namespace BackgroundChanger.Views
                         FileSystem.CreateDirectory(dir);
                         File.Copy(originalPath, itemImage.FullPath);
                         importedCount++;
-                        Common.LogDebug(
-                            false,
+                        Common.LogDebug(true,
                             string.Format(
                                 "[ImagesManager] Save import copied: {0} -> {1}",
                                 originalPath,
@@ -433,8 +429,7 @@ namespace BackgroundChanger.Views
                             EditedImages.Add(archivedItem);
                         }
 
-                        Common.LogDebug(
-                            false,
+                        Common.LogDebug(true,
                             string.Format(
                                 "[ImagesManager] Save default swap — archived former default: {0} -> {1} (playniteOwned={2})",
                                 sourcePath,
@@ -462,8 +457,7 @@ namespace BackgroundChanger.Views
 
                 int savedMediaCount = EditedImages.Count;
                 int otherMediaCount = otherMediaItems.Count;
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "[ImagesManager] Save merge — game='{1}', mediaKind={2}, edited={0}, otherKinds={3}, total={4}, imported={5}, skippedMirror={6}, defaultSwap={7}",
                         savedMediaCount,
@@ -479,8 +473,7 @@ namespace BackgroundChanger.Views
 
                 BackgroundChanger.PluginDatabase.Update(GameBackgroundImages);
 
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "[ImagesManager] Save persisted — game='{0}', mediaKind={1}, totalItems={2}, playniteRef={3}",
                         gameName,
@@ -641,7 +634,7 @@ namespace BackgroundChanger.Views
                 return;
             }
 
-            Common.LogDebug(false, string.Format(
+            Common.LogDebug(true, string.Format(
                 "[ImagesManager] Steam official import start game={0} mediaKind={1} count={2}",
                 GameBackgroundImages?.Name,
                 MediaKind,
@@ -662,7 +655,7 @@ namespace BackgroundChanger.Views
                 {
                     try
                     {
-                        Common.LogDebug(false, string.Format(
+                        Common.LogDebug(true, string.Format(
                             "[ImagesManager] Steam official import item kind={0} url={1}",
                             candidate.AssetKind,
                             candidate.Url));
@@ -674,7 +667,7 @@ namespace BackgroundChanger.Views
                             ref ffmpegOutdatedShown,
                             ref conversionFailedShown);
 
-                        Common.LogDebug(false, string.Format(
+                        Common.LogDebug(true, string.Format(
                             "[ImagesManager] Steam official import cached kind={0} file={1}",
                             candidate.AssetKind,
                             cachedFile));
@@ -702,7 +695,7 @@ namespace BackgroundChanger.Views
                     return;
                 }
 
-                Common.LogDebug(false, string.Format(
+                Common.LogDebug(true, string.Format(
                     "[ImagesManager] Steam official open search game={0} mediaKind={1}",
                     GameBackgroundImages.Name,
                     MediaKind));
@@ -719,14 +712,14 @@ namespace BackgroundChanger.Views
 
                 if (viewExtension.SelectedResults == null || viewExtension.SelectedResults.Count == 0)
                 {
-                    Common.LogDebug(false, string.Format(
+                    Common.LogDebug(true, string.Format(
                         "[ImagesManager] Steam official cancelled game={0} mediaKind={1}",
                         GameBackgroundImages.Name,
                         MediaKind));
                     return;
                 }
 
-                Common.LogDebug(false, string.Format(
+                Common.LogDebug(true, string.Format(
                     "[ImagesManager] Steam official confirmed game={0} mediaKind={1} count={2}",
                     GameBackgroundImages.Name,
                     MediaKind,
@@ -744,7 +737,7 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                Common.LogDebug(false, string.Format(
+                Common.LogDebug(true, string.Format(
                     "[ImagesManager] Open SteamGridDB game={0} mediaKind={1}",
                     GameBackgroundImages.Name,
                     MediaKind));

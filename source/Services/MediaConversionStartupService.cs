@@ -331,7 +331,7 @@ namespace BackgroundChanger.Services
 
         private static void LogDebugMessage(string message)
         {
-            Common.LogDebug(false, LogPrefix + " " + message);
+            Common.LogDebug(true, LogPrefix + " " + message);
         }
 
         private sealed class PendingMediaConversion

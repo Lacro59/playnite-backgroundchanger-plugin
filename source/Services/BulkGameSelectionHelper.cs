@@ -99,8 +99,7 @@ namespace BackgroundChanger.Services
                 }
             }
 
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format(
                     "{0} Game selection Source={1} Install={2} Time={3} Months={4} OnlyGamesWithoutData={5} Games={6}",
                     LogPrefix,

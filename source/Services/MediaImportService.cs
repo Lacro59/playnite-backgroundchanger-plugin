@@ -157,7 +157,7 @@ namespace BackgroundChanger.Services
 
         private static void LogDebug(string message)
         {
-            Common.LogDebug(false, LogPrefix + " " + message);
+            Common.LogDebug(true, LogPrefix + " " + message);
         }
 
         /// <summary>

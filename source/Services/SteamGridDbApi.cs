@@ -1,4 +1,4 @@
-﻿using BackgroundChanger.Models;
+using BackgroundChanger.Models;
 using CommonPluginsShared;
 using Playnite.SDK;
 using Playnite.SDK.Data;
@@ -106,12 +106,11 @@ namespace BackgroundChanger.Services
 
                 if (resultData == null || !resultData.Success || resultData.Data == null || resultData.Data.Id <= 0)
                 {
-                    Common.LogDebug(false, string.Format("{0} GetGameBySteamAppId no game steamAppId={1}", LogPrefix, steamAppId));
+                    Common.LogDebug(true, string.Format("{0} GetGameBySteamAppId no game steamAppId={1}", LogPrefix, steamAppId));
                     return null;
                 }
 
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "{0} GetGameBySteamAppId success steamAppId={1} sgdbId={2} name='{3}'",
                         LogPrefix,
@@ -169,8 +168,7 @@ namespace BackgroundChanger.Services
                 }
 
                 int resultCount = resultData?.Data?.Count ?? 0;
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format("{0} SearchGame success term='{1}' results={2}", LogPrefix, name, resultCount));
                 return resultData;
             }
@@ -282,8 +280,7 @@ namespace BackgroundChanger.Services
                 }
 
                 int resultCount = resultData?.Data?.Count ?? 0;
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format("{0} SearchElement success {1} results={2}", LogPrefix, context, resultCount));
                 return resultData;
             }

@@ -102,8 +102,7 @@ namespace BackgroundChanger.Services
                     && uint.TryParse(game.GameId, out uint nativeAppId)
                     && nativeAppId > 0)
                 {
-                    Common.LogDebug(
-                        false,
+                    Common.LogDebug(true,
                         string.Format("{0} AppId via native Steam library gameId={1}", LogPrefix, nativeAppId));
                     return nativeAppId;
                 }
@@ -111,8 +110,7 @@ namespace BackgroundChanger.Services
                 uint fromLink = TryGetAppIdFromSteamLink(game);
                 if (fromLink > 0)
                 {
-                    Common.LogDebug(
-                        false,
+                    Common.LogDebug(true,
                         string.Format("{0} AppId via Steam link appId={1} game='{2}'", LogPrefix, fromLink, game.Name));
                     return fromLink;
                 }
@@ -125,8 +123,7 @@ namespace BackgroundChanger.Services
                 IReadOnlyList<GenericItemOption> search = SearchGames(game.Name);
                 if (search == null || search.Count == 0)
                 {
-                    Common.LogDebug(
-                        false,
+                    Common.LogDebug(true,
                         string.Format("{0} Store search empty game='{1}'", LogPrefix, game.Name));
                     return 0;
                 }
@@ -151,8 +148,7 @@ namespace BackgroundChanger.Services
 
                 if (best == null || bestScore < fuzzyThreshold)
                 {
-                    Common.LogDebug(
-                        false,
+                    Common.LogDebug(true,
                         string.Format(
                             "{0} Store search below threshold game='{1}' best='{2}' score={3} threshold={4}",
                             LogPrefix,
@@ -164,8 +160,7 @@ namespace BackgroundChanger.Services
                 }
 
                 uint appId = ParseAppIdFromSearchOption(best);
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "{0} AppId via store search game='{1}' match='{2}' score={3} appId={4}",
                         LogPrefix,
@@ -334,7 +329,7 @@ namespace BackgroundChanger.Services
                     break;
 
                 case BackgroundChangerDatabase.PluginMediaKind.Icon:
-                    Common.LogDebug(false, LogPrefix + " CDN catalog has no Icon candidates; use product-info resolution.");
+                    Common.LogDebug(true, LogPrefix + " CDN catalog has no Icon candidates; use product-info resolution.");
                     break;
 
                 default:
@@ -367,8 +362,7 @@ namespace BackgroundChanger.Services
             {
                 if (!TryProbeAsset(candidate.Url, out int width, out int height, out string mime))
                 {
-                    Common.LogDebug(
-                        false,
+                    Common.LogDebug(true,
                         string.Format(
                             "{0} Probe miss appId={1} kind={2} url={3}",
                             LogPrefix,
@@ -389,8 +383,7 @@ namespace BackgroundChanger.Services
 
                 if (candidate.AssetKind == SteamOfficialAssetKind.Library600x900 && hasLibraryCover2x)
                 {
-                    Common.LogDebug(
-                        false,
+                    Common.LogDebug(true,
                         string.Format(
                             "{0} Skip 1x cover; 2x available appId={1}",
                             LogPrefix,
@@ -399,8 +392,7 @@ namespace BackgroundChanger.Services
                 }
 
                 available.Add(candidate);
-                Common.LogDebug(
-                    false,
+                Common.LogDebug(true,
                     string.Format(
                         "{0} Probe hit appId={1} kind={2} media={3} size={4}x{5} mime={6} url={7}",
                         LogPrefix,
@@ -429,7 +421,7 @@ namespace BackgroundChanger.Services
             uint appId = ResolveAppId(game);
             if (appId == 0)
             {
-                Common.LogDebug(false, LogPrefix + " No AppId; CDN probe skipped.");
+                Common.LogDebug(true, LogPrefix + " No AppId; CDN probe skipped.");
                 return new List<SteamOfficialMediaCandidate>();
             }
 
@@ -451,7 +443,7 @@ namespace BackgroundChanger.Services
             KeyValue productInfo = new SteamAnonymousProductInfoClient().GetProductInfo(appId);
             if (productInfo == null)
             {
-                Common.LogDebug(false, LogPrefix + " No product info for Icon appId=" + appId);
+                Common.LogDebug(true, LogPrefix + " No product info for Icon appId=" + appId);
                 return null;
             }
 
@@ -495,14 +487,13 @@ namespace BackgroundChanger.Services
                 }
             }
 
-            Common.LogDebug(false, LogPrefix + " No icon hash in product info appId=" + appId);
+            Common.LogDebug(true, LogPrefix + " No icon hash in product info appId=" + appId);
             return null;
         }
 
         private static void LogIconCandidateResolved(uint appId, SteamOfficialMediaCandidate candidate)
         {
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format(
                     "{0} Icon resolved appId={1} kind={2} size={3}x{4} mime={5} url={6}",
                     LogPrefix,
@@ -686,8 +677,7 @@ namespace BackgroundChanger.Services
                 AssetKind = assetKind
             });
 
-            Common.LogDebug(
-                false,
+            Common.LogDebug(true,
                 string.Format(
                     "{0} Candidate appId={1} kind={2} media={3} url={4}",
                     LogPrefix,

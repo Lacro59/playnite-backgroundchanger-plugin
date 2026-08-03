@@ -123,7 +123,7 @@ namespace BackgroundChanger.Services
             if (settings.SgIconsFilters == null)
             {
                 settings.SgIconsFilters = CreateDefaultFilters(SteamGridDbType.icons);
-                Common.LogDebug(false, "[SteamGridFilterHelper] Migrated SgIconsFilters to icon defaults (legacy two-slot settings JSON)");
+                Common.LogDebug(true, "[SteamGridFilterHelper] Migrated SgIconsFilters to icon defaults (legacy two-slot settings JSON)");
             }
         }
 
