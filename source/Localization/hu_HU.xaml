@@ -7,6 +7,7 @@
     
     <sys:String x:Key="LOCBcManageBackground">Háttérképek kezelése</sys:String>
     <sys:String x:Key="LOCBcManageCover">Borítóképek kezelése</sys:String>
+    <sys:String x:Key="LOCBcManageIcon">Ikonképek kezelése</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
@@ -14,34 +15,101 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">A bővítmény háttérképének megjelenítése</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">A bővítmény borítóképének megjelenítése</sys:String>
+    <sys:String x:Key="LOCBcEnableIconImage">A bővítmény ikonjának megjelenítése</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">Used same setting for plugin game background than theme background *</sys:String>
-    
+
     <sys:String x:Key="LOCBcEnableRandomSelect">Véletlenszerű kiválasztás engedélyezése</sys:String>
+    <sys:String x:Key="LOCBcSelectionMode">Selection mode</sys:String>
+    <sys:String x:Key="LOCBcModeDefault">A kedvenc, ha be van állítva, különben a Playnite alapértelmezett</sys:String>
     <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
     <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Automatikus változtatás engedélyezése</sys:String>
+    <sys:String x:Key="LOCBcTimerRandomOrder">Shuffled order</sys:String>
+    <sys:String x:Key="LOCBcTimerRandomOrderToolTip">When enabled, items are shuffled once and shown without repeats until the full set is exhausted, then reshuffled. When disabled, items advance in list order.</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Időintervallum</sys:String>
     <sys:String x:Key="LOCBcSeconds">másodperc</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Animált háttér engedélyezése</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Animált borítókép engedélyezése</sys:String>
-    
     <sys:String x:Key="LOCBcEnableVideoDelay">Videó késleltetés engedélyezése</sys:String>
     <sys:String x:Key="LOCBcVideoDelayToolTip">Használja ezt a beállítást, ha egy videó előtt az alapértelmezett képet szeretné megjeleníteni.</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomVideoStartPoint">Randomize video start point</sys:String>
+    <sys:String x:Key="LOCBcRandomVideoStartPointToolTip">When enabled, videos seek to a random timestamp on first play only. Loop replays keep continuity (not re-randomized). Off by default.</sys:String>
 
     <!-- ImagesManagerView -->
 
-    <sys:String x:Key="LOCBcSteamGridDbSelect">Select from SteamGridDB</sys:String>
-    <sys:String x:Key="LOCBcGoogleImageSelect">Select from Google Image</sys:String>
-    <sys:String x:Key="LOCBcAddFromUrl">Add from url</sys:String>
-    <sys:String x:Key="LOCBcAddFromUrlDescription">Enter the url to the image</sys:String>
+    <sys:String x:Key="LOCBcSteamSelect">Választás a Steamről</sys:String>
+    <sys:String x:Key="LOCBcSteamGet">Get from Steam</sys:String>
+    <sys:String x:Key="LOCBcSteamNoAppId">Nem található Steam App ID ehhez a játékhoz.</sys:String>
+    <sys:String x:Key="LOCBcSteamNoAssets">Nincs hivatalos Steam média ehhez a játékhoz.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">Választás a SteamGridDB-ből</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbAnimated">Animált</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbMimes">MIME típusok</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKeyMissingNotification">Configure a SteamGridDB API key in plugin settings to search and download artwork.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbUnauthorizedNotification">A SteamGridDB elutasította az API kulcsot (401 Unauthorized). Ellenőrizd a kulcsot a bővítmény beállításaiban (érvénytelen, lejárt vagy visszavont).</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbForbiddenNotification">A SteamGridDB megtagadta a hozzáférést ehhez az erőforráshoz (403 Forbidden). Lehet, hogy az API-kulcsod nem rendelkezik a szükséges jogosultságokkal.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbRateLimitNotification">SteamGridDB rate limit reached (429). Wait a moment and try again.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbParseErrorNotification">A SteamGridDB váratlan választ adott. Próbáld meg újra, vagy ellenőrizd az API kulcsodat a bővítmény beállításaiban.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbGenericErrorNotification">A SteamGridDB lekérdezés sikertelen volt. A részleteket az extensions.log fájlban találod.</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">Választás a Google Képekből</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrl">Hozzáadás URL-ből</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrlDescription">Írja be a kép URL-jét</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg fájl</sys:String>
-    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo fájl</sys:String>
+    <sys:String x:Key="LOCBcFfprobeFile">ffprobe fájl</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFileDescription">Az animált médiafájlok (WebP, WebM, APNG, GIF) importálásához szükséges. Konfigurálja az FFmpeg-et és az ffprobe-ot (általában ugyanabban a mappában találhatók). A fájlok importáláskor és az indításkor automatikusan MP4 formátumra konvertálódnak.</sys:String>
+
+    <sys:String x:Key="LOCBcMediaConversionSection">Média átalakítás</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionDefaultsCrf">Default CRF (quality)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrf">CRF (0 = alapértelmezett használata)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfToolTip">H.264 constant rate factor (0–51). Lower values yield higher quality and larger files. Set 0 to use the default CRF above.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfDescription">The CRF sets the trade-off between MP4 quality and file size: a lower value improves image quality (larger file), a higher value reduces file size (lower quality). 23 is a good starting point for most users.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionAlphaNote">Output uses H.264 yuv420p, which does not preserve transparency. This is acceptable for most animated backgrounds and covers, which rarely rely on alpha.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionAnimatedWebp">Animált WebP</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionWebm">WebM</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionApng">Animált PNG (APNG)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionGif">Animált GIF</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionUseAutoFramerate">Use source frame timing</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionFixedFramerate">Rögzített képfrissítési sebesség (fps)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionForceReencode">Mindig újrakódolja H.264-ra</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionForceReencodeToolTip">When disabled, FFmpeg attempts to copy the video stream when the WebM is already H.264 compatible.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfInvalid">Media conversion CRF must be 0 (inherit default) or between 0 and 51. Default CRF must be between 0 and 51.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">Media conversion frame rate must be between 1 and 120 fps.</sys:String>
 
     <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
-    <sys:String x:Key="LOCBcFTooltTipConvert">Konvertálás mp4-be (javult a teljesítmény)</sys:String>
+    <sys:String x:Key="LOCBcFfmpegOutdated">FFmpeg vagy ffprobe verzió túl régi</sys:String>
+    <sys:String x:Key="LOCBcFfmpegPathNotConfigured">nincs beállítva</sys:String>
+    <sys:String x:Key="LOCBcFfmpegStartupNotification">FFmpeg is not configured or the executable was not found at &quot;{0}&quot;. Animated media cannot be imported or converted until FFmpeg is set in plugin settings.</sys:String>
+    <sys:String x:Key="LOCBcMediaToolkitStartupNotification">FFmpeg and ffprobe must be configured for animated media import and conversion. FFmpeg: {0}. ffprobe: {1}.</sys:String>
+    <sys:String x:Key="LOCBcMediaToolkitOutdatedNotification">Animated media import and conversion require FFmpeg {0} or newer (detected: {1}). Update your FFmpeg and ffprobe install in plugin settings.</sys:String>
+    <sys:String x:Key="LOCBcFfmpegConversionFailed">Conversion to MP4 failed. Detected toolchain: {0}. Animated WebP requires FFmpeg {1} or newer with libwebp animated decode support.</sys:String>
+    <sys:String x:Key="LOCBcInvalidUrlFormat">Hibás Url Formátum!</sys:String>
 
-    <sys:String x:Key="LOCBcInvalidUrlFormat">Invalid Url Format!</sys:String>
+    <!-- Bulk media download (#25) -->
+
+    <sys:String x:Key="LOCBcBulkDownloadTitle">Bulk media download</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadMenu">Bulk media download...</sys:String>
+    <sys:String x:Key="LOCBcBulkNoGamesSelected">A kiválasztott szűrőknek megfelelő játék nem található.</sys:String>
+    <sys:String x:Key="LOCBcBulkSources">Források</sys:String>
+    <sys:String x:Key="LOCBcBulkSourceSteam">Steam official</sys:String>
+    <sys:String x:Key="LOCBcBulkSourceSteamGridDb">SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcBulkMediaKinds">Média típusok</sys:String>
+    <sys:String x:Key="LOCBcBulkOnlyMissing">Skip existing plugin media per type (Background/Cover/Icon)</sys:String>
+    <sys:String x:Key="LOCBcBulkOnlyGamesWithoutData">Only games with no plugin images</sys:String>
+    <sys:String x:Key="LOCBcBulkQuantity">Quantity (total per media type)</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadAll">Az összes letöltése</sys:String>
+    <sys:String x:Key="LOCBcBulkFuzzyThreshold">Name match threshold</sys:String>
+    <sys:String x:Key="LOCBcBulkPromptLowFuzzy">Prompt when match is below threshold</sys:String>
+    <sys:String x:Key="LOCBcBulkAllowAnimated">Allow animated SteamGridDB assets</sys:String>
+    <sys:String x:Key="LOCBcBulkPickMode">SteamGridDB selection</sys:String>
+    <sys:String x:Key="LOCBcBulkPickRandom">Véletlenszerű</sys:String>
+    <sys:String x:Key="LOCBcBulkPickBestScore">Best score</sys:String>
+    <sys:String x:Key="LOCBcBulkPickBestVotes">Best upvotes</sys:String>
+    <sys:String x:Key="LOCBcBulkPickNewest">Legújabb (id alapján)</sys:String>
+    <sys:String x:Key="LOCBcBulkSteamGridFilters">SteamGridDB szűrők</sys:String>
+    <sys:String x:Key="LOCBcBulkSaveOptions">Save options</sys:String>
+    <sys:String x:Key="LOCBcBulkOptionsSaved">Bulk download options were saved.</sys:String>
+    <sys:String x:Key="LOCBcBulkOptionsInvalid">Válasszon ki legalább egy forrást és egy médiatípust.</sys:String>
+    <sys:String x:Key="LOCBcBulkFuzzyPrompt">Select the matching SteamGridDB game</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadSummary">Importálva: {0} —  Átugorva: {1} — Hibák: {2}</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadCancelled">A letöltés leállítva.</sys:String>
 
 </ResourceDictionary>

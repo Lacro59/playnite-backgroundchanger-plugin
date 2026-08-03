@@ -7,6 +7,7 @@
     
     <sys:String x:Key="LOCBcManageBackground">Управление фоновыми изображениями</sys:String>
     <sys:String x:Key="LOCBcManageCover">Управление обложками</sys:String>
+    <sys:String x:Key="LOCBcManageIcon">Управление иконками</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
@@ -14,34 +15,101 @@
     
     <sys:String x:Key="LOCBcEnableBackgroundImage">Отображать фоновое изображение плагина</sys:String>
     <sys:String x:Key="LOCBcEnableCoverImage">Отображать изображение обложки плагина</sys:String>
+    <sys:String x:Key="LOCBcEnableIconImage">Отображать иконку плагина</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">Используется тот же параметр для фона игры плагина, чем фон темы *</sys:String>
-    
+
     <sys:String x:Key="LOCBcEnableRandomSelect">Включить случайный выбор</sys:String>
+    <sys:String x:Key="LOCBcSelectionMode">Selection mode</sys:String>
+    <sys:String x:Key="LOCBcModeDefault">Favorite if set, otherwise Playnite default</sys:String>
     <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
     <sys:String x:Key="LOCBcRandomOnSelect">On game selection</sys:String>
     <sys:String x:Key="LOCBcEnableAutoChanger">Включить автоматическое изменение</sys:String>
+    <sys:String x:Key="LOCBcTimerRandomOrder">Shuffled order</sys:String>
+    <sys:String x:Key="LOCBcTimerRandomOrderToolTip">When enabled, items are shuffled once and shown without repeats until the full set is exhausted, then reshuffled. When disabled, items advance in list order.</sys:String>
     <sys:String x:Key="LOCBcTimeInterval">Временной интервал</sys:String>
     <sys:String x:Key="LOCBcSeconds">секунд(ы)</sys:String>
 
-    <sys:String x:Key="LOCBcEnableImageAnimatedBackground">Включить анимированный фон</sys:String>
-    <sys:String x:Key="LOCBcEnableImageAnimatedCover">Включить анимированную обложку</sys:String>
-    
     <sys:String x:Key="LOCBcEnableVideoDelay">Включить задержку видео</sys:String>
     <sys:String x:Key="LOCBcVideoDelayToolTip">Используйте этот параметр, если вы хотите перед видео отобразить дефолтное изображение.</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomVideoStartPoint">Randomize video start point</sys:String>
+    <sys:String x:Key="LOCBcRandomVideoStartPointToolTip">When enabled, videos seek to a random timestamp on first play only. Loop replays keep continuity (not re-randomized). Off by default.</sys:String>
 
     <!-- ImagesManagerView -->
 
+    <sys:String x:Key="LOCBcSteamSelect">Выбрать из Steam</sys:String>
+    <sys:String x:Key="LOCBcSteamGet">Получить из Steam</sys:String>
+    <sys:String x:Key="LOCBcSteamNoAppId">Could not find a Steam App ID for this game.</sys:String>
+    <sys:String x:Key="LOCBcSteamNoAssets">No official Steam media found for this game.</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbSelect">Выбрать из SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbAnimated">Анимированный</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbMimes">MIME типы</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbApiKeyMissingNotification">Configure a SteamGridDB API key in plugin settings to search and download artwork.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbUnauthorizedNotification">SteamGridDB rejected the API key (401 Unauthorized). Verify the key in plugin settings (invalid, expired, or revoked).</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbForbiddenNotification">SteamGridDB denied access to this resource (403 Forbidden). Your API key may lack the required permissions.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbRateLimitNotification">SteamGridDB rate limit reached (429). Wait a moment and try again.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbParseErrorNotification">SteamGridDB returned an unexpected response. Try again or verify your API key in plugin settings.</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbGenericErrorNotification">SteamGridDB request failed. See extensions.log for details.</sys:String>
     <sys:String x:Key="LOCBcGoogleImageSelect">Выбрать из Google Image</sys:String>
-    <sys:String x:Key="LOCBcAddFromUrl">Add from url</sys:String>
-    <sys:String x:Key="LOCBcAddFromUrlDescription">Enter the url to the image</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrl">Добавить из URL</sys:String>
+    <sys:String x:Key="LOCBcAddFromUrlDescription">Введите URL к изображению</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg файл</sys:String>
-    <sys:String x:Key="LOCBcWebpinfoFile">webpinfo файл</sys:String>
+    <sys:String x:Key="LOCBcFfprobeFile">ffprobe файл</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFileDescription">Required to import animated media (WebP, WebM, APNG, GIF). Configure FFmpeg and ffprobe (usually in the same folder). Files are automatically converted to MP4 at import and on startup.</sys:String>
+
+    <sys:String x:Key="LOCBcMediaConversionSection">Media conversion</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionDefaultsCrf">Default CRF (quality)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrf">CRF (0 = use default)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfToolTip">H.264 constant rate factor (0–51). Lower values yield higher quality and larger files. Set 0 to use the default CRF above.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfDescription">The CRF sets the trade-off between MP4 quality and file size: a lower value improves image quality (larger file), a higher value reduces file size (lower quality). 23 is a good starting point for most users.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionAlphaNote">Output uses H.264 yuv420p, which does not preserve transparency. This is acceptable for most animated backgrounds and covers, which rarely rely on alpha.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionAnimatedWebp">Анимированный WebP</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionWebm">WebM</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionApng">Анимированный PNG (APNG)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionGif">Анимированный GIF</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionUseAutoFramerate">Use source frame timing</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionFixedFramerate">Фиксированная частота кадров (fps)</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionForceReencode">Всегда перекодировать в H.264</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionForceReencodeToolTip">When disabled, FFmpeg attempts to copy the video stream when the WebM is already H.264 compatible.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfInvalid">Media conversion CRF must be 0 (inherit default) or between 0 and 51. Default CRF must be between 0 and 51.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">Media conversion frame rate must be between 1 and 120 fps.</sys:String>
 
     <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
-    <sys:String x:Key="LOCBcFTooltTipConvert">Преобразовать в mp4 (улучшена производительность)</sys:String>
+    <sys:String x:Key="LOCBcFfmpegOutdated">FFmpeg or ffprobe version is too old</sys:String>
+    <sys:String x:Key="LOCBcFfmpegPathNotConfigured">не настроено</sys:String>
+    <sys:String x:Key="LOCBcFfmpegStartupNotification">FFmpeg is not configured or the executable was not found at &quot;{0}&quot;. Animated media cannot be imported or converted until FFmpeg is set in plugin settings.</sys:String>
+    <sys:String x:Key="LOCBcMediaToolkitStartupNotification">FFmpeg and ffprobe must be configured for animated media import and conversion. FFmpeg: {0}. ffprobe: {1}.</sys:String>
+    <sys:String x:Key="LOCBcMediaToolkitOutdatedNotification">Animated media import and conversion require FFmpeg {0} or newer (detected: {1}). Update your FFmpeg and ffprobe install in plugin settings.</sys:String>
+    <sys:String x:Key="LOCBcFfmpegConversionFailed">Conversion to MP4 failed. Detected toolchain: {0}. Animated WebP requires FFmpeg {1} or newer with libwebp animated decode support.</sys:String>
+    <sys:String x:Key="LOCBcInvalidUrlFormat">Неверный формат URL!</sys:String>
 
-    <sys:String x:Key="LOCBcInvalidUrlFormat">Invalid Url Format!</sys:String>
+    <!-- Bulk media download (#25) -->
+
+    <sys:String x:Key="LOCBcBulkDownloadTitle">Массовая загрузка медиа</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadMenu">Массовая загрузка медиа...</sys:String>
+    <sys:String x:Key="LOCBcBulkNoGamesSelected">Нет игр, соответствующих выбранным фильтрам.</sys:String>
+    <sys:String x:Key="LOCBcBulkSources">Источники</sys:String>
+    <sys:String x:Key="LOCBcBulkSourceSteam">Steam official</sys:String>
+    <sys:String x:Key="LOCBcBulkSourceSteamGridDb">SteamGridDB</sys:String>
+    <sys:String x:Key="LOCBcBulkMediaKinds">Media types</sys:String>
+    <sys:String x:Key="LOCBcBulkOnlyMissing">Skip existing plugin media per type (Background/Cover/Icon)</sys:String>
+    <sys:String x:Key="LOCBcBulkOnlyGamesWithoutData">Only games with no plugin images</sys:String>
+    <sys:String x:Key="LOCBcBulkQuantity">Quantity (total per media type)</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadAll">Download all</sys:String>
+    <sys:String x:Key="LOCBcBulkFuzzyThreshold">Name match threshold</sys:String>
+    <sys:String x:Key="LOCBcBulkPromptLowFuzzy">Prompt when match is below threshold</sys:String>
+    <sys:String x:Key="LOCBcBulkAllowAnimated">Allow animated SteamGridDB assets</sys:String>
+    <sys:String x:Key="LOCBcBulkPickMode">SteamGridDB selection</sys:String>
+    <sys:String x:Key="LOCBcBulkPickRandom">Random</sys:String>
+    <sys:String x:Key="LOCBcBulkPickBestScore">Best score</sys:String>
+    <sys:String x:Key="LOCBcBulkPickBestVotes">Best upvotes</sys:String>
+    <sys:String x:Key="LOCBcBulkPickNewest">Newest (by id)</sys:String>
+    <sys:String x:Key="LOCBcBulkSteamGridFilters">SteamGridDB filters</sys:String>
+    <sys:String x:Key="LOCBcBulkSaveOptions">Save options</sys:String>
+    <sys:String x:Key="LOCBcBulkOptionsSaved">Bulk download options were saved.</sys:String>
+    <sys:String x:Key="LOCBcBulkOptionsInvalid">Select at least one source and one media type.</sys:String>
+    <sys:String x:Key="LOCBcBulkFuzzyPrompt">Select the matching SteamGridDB game</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadSummary">Imported: {0} — Skipped: {1} — Errors: {2}</sys:String>
+    <sys:String x:Key="LOCBcBulkDownloadCancelled">Download was cancelled.</sys:String>
 
 </ResourceDictionary>

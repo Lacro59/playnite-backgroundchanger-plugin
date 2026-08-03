@@ -1,18 +1,18 @@
-﻿using BackgroundChanger.Controls;
+using BackgroundChanger.Controls;
 using BackgroundChanger.Models;
 using BackgroundChanger.Services;
 using BackgroundChanger.Views;
-using CommonPlayniteShared.Commands;
 using CommonPluginsShared;
 using CommonPluginsShared.PlayniteExtended;
+using CommonPluginsShared.Plugins;
 using Playnite.SDK;
 using Playnite.SDK.Events;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -23,13 +23,15 @@ namespace BackgroundChanger
         public override Guid Id => Guid.Parse("3afdd02b-db6c-4b60-8faa-2971d6dfad2a");
 
         public static FrameworkElement PART_ImageBackground = null;
+        private readonly BackgroundChangerMenus menus;
+        private readonly MediaConversionStartupService _mediaConversionStartupService = new MediaConversionStartupService();
 
-        public BackgroundChanger(IPlayniteAPI api) : base(api)
+        public BackgroundChanger(IPlayniteAPI api) : base(api, nameof(BackgroundChanger))
         {
             // Custom elements integration
             AddCustomElementSupport(new AddCustomElementSupportArgs
             {
-                ElementList = new List<string> { "PluginBackgroundImage", "PluginCoverImage" },
+                ElementList = new List<string> { "PluginBackgroundImage", "PluginCoverImage", "PluginIconImage" },
                 SourceName = "BackgroundChanger"
             });
 
@@ -37,7 +39,7 @@ namespace BackgroundChanger
             AddSettingsSupport(new AddSettingsSupportArgs
             {
                 SourceName = "BackgroundChanger",
-                SettingsRoot = $"{nameof(PluginSettings)}.{nameof(PluginSettings.Settings)}"
+                SettingsRoot = $"{nameof(PluginSettingsViewModel)}.{nameof(BackgroundChangerSettingsViewModel.Settings)}"
             });
 
             var iconResourcesToAdd = new Dictionary<string, string>
@@ -45,6 +47,10 @@ namespace BackgroundChanger
                 { "openFolderIcon", "\xEC5B" }
             };
             Common.AddTextIcoFontResource(iconResourcesToAdd);
+
+            BackgroundChangerWindows pluginWindows = new BackgroundChangerWindows(nameof(BackgroundChanger), PluginDatabase);
+            PluginDatabase.PluginWindows = pluginWindows;
+            menus = new BackgroundChangerMenus(PluginSettingsViewModel.Settings, PluginDatabase, pluginWindows, this);
         }
 
         #region Custom event
@@ -66,6 +72,11 @@ namespace BackgroundChanger
                 return new PluginCoverImage();
             }
 
+            if (args.Name == "PluginIconImage")
+            {
+                return new PluginIconImage();
+            }
+
             return null;
         }
 
@@ -76,90 +87,13 @@ namespace BackgroundChanger
         // To add new game menu items override GetGameMenuItems
         public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
-            Game gameMenu = args.Games.First();
-            List<GameMenuItem> gameMenuItems = new List<GameMenuItem>();
-
-            GameBackgroundImages data = PluginDatabase.Get(gameMenu, true);
-
-            if (PluginSettings.Settings.EnableBackgroundImage)
-            {
-                gameMenuItems.Add(new GameMenuItem
-                {
-                    // Manage game background
-                    MenuSection = ResourceProvider.GetString("LOCBc"),
-                    Description = ResourceProvider.GetString("LOCBcManageBackground"),
-                    Action = (gameMenuItem) =>
-                    {
-                        ImagesManager viewExtension = new ImagesManager(PluginDatabase.Get(gameMenu), false, this);
-                        Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(ResourceProvider.GetString("LOCBc") + " - " + ResourceProvider.GetString("LOCGameBackgroundTitle"), viewExtension);
-                        _ = windowExtension.ShowDialog();
-                    }
-                });
-            }
-
-            if (PluginSettings.Settings.EnableCoverImage)
-            {
-                gameMenuItems.Add(new GameMenuItem
-                {
-                    // Manage game cover
-                    MenuSection = ResourceProvider.GetString("LOCBc"),
-                    Description = ResourceProvider.GetString("LOCBcManageCover"),
-                    Action = (gameMenuItem) =>
-                    {
-                        ImagesManager viewExtension = new ImagesManager(PluginDatabase.Get(gameMenu), true, this);
-                        Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(ResourceProvider.GetString("LOCBc") + " - " + ResourceProvider.GetString("LOCGameCoverImageTitle"), viewExtension);
-                        _ = windowExtension.ShowDialog();
-                    }
-                });
-            }
-
-            if (data.HasDataBackground || data.HasDataCover)
-            {
-                if (gameMenuItems.Count > 0)
-                {
-                    gameMenuItems.Add(new GameMenuItem
-                    {
-                        MenuSection = ResourceProvider.GetString("LOCBc"),
-                        Description = "-"
-                    });
-                }
-
-                gameMenuItems.Add(new GameMenuItem
-                {
-                    MenuSection = ResourceProvider.GetString("LOCBc"),
-                    Icon = "openFolderIcon",
-                    Description = ResourceProvider.GetString("LOCOpenMetadataFolder"),
-                    Action = (gameMenuItem) =>
-                    {
-                        string path = Path.Combine(PluginDatabase.Paths.PluginUserDataPath, "Images", gameMenu.Id.ToString());
-                        GlobalCommands.NavigateDirectoryCommand.Execute(path);
-                    }
-                });
-            }
-
-#if DEBUG
-            gameMenuItems.Add(new GameMenuItem
-            {
-                MenuSection = ResourceProvider.GetString("LOCBc"),
-                Description = "-"
-            });
-            gameMenuItems.Add(new GameMenuItem
-            {
-                MenuSection = ResourceProvider.GetString("LOCBc"),
-                Description = "Test",
-                Action = (mainMenuItem) =>
-                {
-                }
-            });
-#endif
-
-            return gameMenuItems;
+            return menus.GetGameMenuItems(args);
         }
 
         // To add new main menu items override GetMainMenuItems
         public override IEnumerable<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
         {
-            return null;
+            return menus.GetMainMenuItems(args);
         }
 
         #endregion
@@ -211,9 +145,37 @@ namespace BackgroundChanger
 
         #region Application event
 
+        private const int StartupBatchDatabaseWaitMs = 120000;
+        private const int StartupBatchDatabasePollMs = 200;
+
         // Add code to be executed when Playnite is initialized.
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
+            Task.Run(() =>
+            {
+                try
+                {
+                    int elapsed = 0;
+                    while (!PluginDatabase.IsDatabaseReady() && elapsed < StartupBatchDatabaseWaitMs)
+                    {
+                        Thread.Sleep(StartupBatchDatabasePollMs);
+                        elapsed += StartupBatchDatabasePollMs;
+                    }
+
+                    if (!PluginDatabase.IsDatabaseReady())
+                    {
+                        Common.LogDebug(true,
+                            "[MediaConversionStartup] Database not ready after timeout, startup batch skipped.");
+                        return;
+                    }
+
+                    _mediaConversionStartupService.RunStartupBatch(PluginDatabase, Id);
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                }
+            });
         }
 
         // Add code to be executed when Playnite is shutting down.
@@ -233,7 +195,7 @@ namespace BackgroundChanger
 
         public override ISettings GetSettings(bool firstRunSettings)
         {
-            return PluginSettings;
+            return PluginSettingsViewModel;
         }
 
         public override UserControl GetSettingsView(bool firstRunSettings)

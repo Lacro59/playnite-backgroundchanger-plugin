@@ -1,9 +1,3 @@
 [submodule "source/playnite-plugincommon"]
 	path = source/playnite-plugincommon
 	url = https://github.com/Lacro59/playnite-plugincommon.git
-[submodule "source/wpf-animatedimage"]
-	path = source/wpf-animatedimage
-	url = https://github.com/Lacro59/wpf-animatedimage.git
-[submodule "source/APNG"]
-	path = source/APNG
-	url = https://github.com/Lacro59/QSoft.APNG.git

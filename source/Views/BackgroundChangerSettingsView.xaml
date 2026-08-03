@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:commonPlugin="clr-namespace:CommonPluginsShared"
+             xmlns:commonPlugin="clr-namespace:CommonPluginsShared.Commands"
              xmlns:AttachedProperties="clr-namespace:CommonPluginsShared.Controls" 
              xmlns:backgroundchanger="clr-namespace:BackgroundChanger" 
-             xmlns:pcmd="clr-namespace:CommonPluginsShared" 
+             xmlns:pcmd="clr-namespace:CommonPluginsShared.Commands" 
              xmlns:playnitecontrols="clr-namespace:CommonPluginsControls.PlayniteControls" 
              xmlns:converters="clr-namespace:CommonPlayniteShared.Converters"
              mc:Ignorable="d" d:DesignWidth="800"
@@ -32,14 +32,18 @@
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="20" />
                         <RowDefinition Height="auto" />
-                        <!--RowDefinition Height="20" />
-                        <RowDefinition Height="auto" /-->
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="20" />
+                        <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
 
                     <Label Grid.Column="0" Grid.Row="0" Content="{DynamicResource LOCBcSteamGridDbApiKey}" />
                     <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Settings.SteamGridDbApiKey}" />
                     <Button Grid.Column="5" Grid.Row="0" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}"
-                            Command="{x:Static commonPlugin:Commands.NavigateUrl}"
+                            Command="{x:Static commonPlugin:CommandsNavigation.NavigateUrl}"
                             CommandParameter="https://www.steamgriddb.com/profile/preferences/api" />
 
                     <Label Grid.Column="0" Grid.Row="2" Content="{DynamicResource LOCBcFfmpegFile}" />
@@ -47,16 +51,154 @@
                     <Button Grid.Column="3" Grid.Row="2" Content="&#xeb12;" FontFamily="{DynamicResource FontIcoFont}" HorizontalAlignment="Right"
                             Click="ButtonFfmpeg_Click" />
                     <Button Grid.Column="5" Grid.Row="2" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}"
-                            Command="{x:Static commonPlugin:Commands.NavigateUrl}"
+                            Command="{x:Static commonPlugin:CommandsNavigation.NavigateUrl}"
                             CommandParameter="https://www.ffmpeg.org/" />
 
-                    <!--Label Grid.Column="0" Grid.Row="4" Content="{DynamicResource LOCBcWebpinfoFile}" />
-                    <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Settings.webpinfoFile, Mode=TwoWay}" Name="PART_WebpinfoFile" />
+                    <Label Grid.Column="0" Grid.Row="4" Content="{DynamicResource LOCBcFfprobeFile}" />
+                    <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Settings.ffprobeFile, Mode=TwoWay}" Name="PART_FfprobeFile" />
                     <Button Grid.Column="3" Grid.Row="4" Content="&#xeb12;" FontFamily="{DynamicResource FontIcoFont}" HorizontalAlignment="Right"
-                            Click="ButtonWebpinfo_Click" />
+                            Click="ButtonFfprobe_Click" />
                     <Button Grid.Column="5" Grid.Row="4" Content="&#xefca;" FontFamily="{DynamicResource FontIcoFont}"
-                            Command="{x:Static commonPlugin:Commands.NavigateUrl}"
-                            CommandParameter="https://developers.google.com/speed/webp/download" /-->
+                            Command="{x:Static commonPlugin:CommandsNavigation.NavigateUrl}"
+                            CommandParameter="https://ffmpeg.org/ffprobe.html" />
+
+                    <TextBlock Grid.Column="1" Grid.ColumnSpan="4" Grid.Row="6"
+                               Style="{DynamicResource BaseTextBlockStyle}"
+                               Text="{DynamicResource LOCBcFfmpegFileDescription}"
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource GlyphBrush}" />
+
+                    <StackPanel Grid.Column="0" Grid.ColumnSpan="6" Grid.Row="8" Margin="0,10,0,0">
+                        <TextBlock Text="{DynamicResource LOCBcMediaConversionSection}" Style="{DynamicResource SectionHeaderText}" Margin="0,0,0,8" />
+
+                        <TextBlock Margin="0,0,0,10"
+                                   Style="{DynamicResource BaseTextBlockStyle}"
+                                   Text="{DynamicResource LOCBcMediaConversionAlphaNote}"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource GlyphBrush}" />
+
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="2*" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="{DynamicResource LOCBcMediaConversionDefaultsCrf}" />
+                            <playnitecontrols:NumericBox Grid.Column="1" MinLongValue="0" MaxLongValue="51" Width="60" HorizontalAlignment="Left"
+                                                         LongValue="{Binding Settings.MediaConversion.Defaults.Crf, Mode=TwoWay}"
+                                                         ToolTip="{DynamicResource LOCBcMediaConversionCrfToolTip}" />
+                        </Grid>
+
+                        <TextBlock Margin="0,0,0,10"
+                                   Style="{DynamicResource BaseTextBlockStyle}"
+                                   Text="{DynamicResource LOCBcMediaConversionCrfDescription}"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource GlyphBrush}" />
+
+                        <Expander Margin="0,0,0,8" IsExpanded="False">
+                            <Expander.Header>
+                                <TextBlock Text="{DynamicResource LOCBcMediaConversionAnimatedWebp}" Style="{DynamicResource BaseTextBlockStyle}" />
+                            </Expander.Header>
+                            <Expander.Content>
+                                <StackPanel Margin="10,5,0,5">
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="2*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0" Content="{DynamicResource LOCBcMediaConversionCrf}" />
+                                        <playnitecontrols:NumericBox Grid.Column="1" MinLongValue="0" MaxLongValue="51" Width="60" HorizontalAlignment="Left"
+                                                                     LongValue="{Binding Settings.MediaConversion.AnimatedWebp.Crf, Mode=TwoWay}"
+                                                                     ToolTip="{DynamicResource LOCBcMediaConversionCrfToolTip}" />
+                                    </Grid>
+                                    <CheckBox IsChecked="{Binding Settings.MediaConversion.AnimatedWebp.UseAutoFramerate, Mode=TwoWay}"
+                                              Content="{DynamicResource LOCBcMediaConversionUseAutoFramerate}" Margin="0,0,0,8" />
+                                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.MediaConversion.AnimatedWebp.UseAutoFramerate, Converter={StaticResource InvertedBoolenConverter}}">
+                                        <Label Content="{DynamicResource LOCBcMediaConversionFixedFramerate}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                        <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="120" Width="60"
+                                                                     LongValue="{Binding Settings.MediaConversion.AnimatedWebp.FixedFramerate, Mode=TwoWay}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander.Content>
+                        </Expander>
+
+                        <Expander Margin="0,0,0,8" IsExpanded="False">
+                            <Expander.Header>
+                                <TextBlock Text="{DynamicResource LOCBcMediaConversionWebm}" Style="{DynamicResource BaseTextBlockStyle}" />
+                            </Expander.Header>
+                            <Expander.Content>
+                                <StackPanel Margin="10,5,0,5">
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="2*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0" Content="{DynamicResource LOCBcMediaConversionCrf}" />
+                                        <playnitecontrols:NumericBox Grid.Column="1" MinLongValue="0" MaxLongValue="51" Width="60" HorizontalAlignment="Left"
+                                                                     LongValue="{Binding Settings.MediaConversion.Webm.Crf, Mode=TwoWay}"
+                                                                     ToolTip="{DynamicResource LOCBcMediaConversionCrfToolTip}" />
+                                    </Grid>
+                                    <CheckBox IsChecked="{Binding Settings.MediaConversion.Webm.ForceReencode, Mode=TwoWay}"
+                                              Content="{DynamicResource LOCBcMediaConversionForceReencode}"
+                                              ToolTip="{DynamicResource LOCBcMediaConversionForceReencodeToolTip}" />
+                                </StackPanel>
+                            </Expander.Content>
+                        </Expander>
+
+                        <Expander Margin="0,0,0,8" IsExpanded="False">
+                            <Expander.Header>
+                                <TextBlock Text="{DynamicResource LOCBcMediaConversionApng}" Style="{DynamicResource BaseTextBlockStyle}" />
+                            </Expander.Header>
+                            <Expander.Content>
+                                <StackPanel Margin="10,5,0,5">
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="2*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0" Content="{DynamicResource LOCBcMediaConversionCrf}" />
+                                        <playnitecontrols:NumericBox Grid.Column="1" MinLongValue="0" MaxLongValue="51" Width="60" HorizontalAlignment="Left"
+                                                                     LongValue="{Binding Settings.MediaConversion.Apng.Crf, Mode=TwoWay}"
+                                                                     ToolTip="{DynamicResource LOCBcMediaConversionCrfToolTip}" />
+                                    </Grid>
+                                    <CheckBox IsChecked="{Binding Settings.MediaConversion.Apng.UseAutoFramerate, Mode=TwoWay}"
+                                              Content="{DynamicResource LOCBcMediaConversionUseAutoFramerate}" Margin="0,0,0,8" />
+                                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.MediaConversion.Apng.UseAutoFramerate, Converter={StaticResource InvertedBoolenConverter}}">
+                                        <Label Content="{DynamicResource LOCBcMediaConversionFixedFramerate}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                        <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="120" Width="60"
+                                                                     LongValue="{Binding Settings.MediaConversion.Apng.FixedFramerate, Mode=TwoWay}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander.Content>
+                        </Expander>
+
+                        <Expander IsExpanded="False">
+                            <Expander.Header>
+                                <TextBlock Text="{DynamicResource LOCBcMediaConversionGif}" Style="{DynamicResource BaseTextBlockStyle}" />
+                            </Expander.Header>
+                            <Expander.Content>
+                                <StackPanel Margin="10,5,0,5">
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="2*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0" Content="{DynamicResource LOCBcMediaConversionCrf}" />
+                                        <playnitecontrols:NumericBox Grid.Column="1" MinLongValue="0" MaxLongValue="51" Width="60" HorizontalAlignment="Left"
+                                                                     LongValue="{Binding Settings.MediaConversion.Gif.Crf, Mode=TwoWay}"
+                                                                     ToolTip="{DynamicResource LOCBcMediaConversionCrfToolTip}" />
+                                    </Grid>
+                                    <CheckBox IsChecked="{Binding Settings.MediaConversion.Gif.UseAutoFramerate, Mode=TwoWay}"
+                                              Content="{DynamicResource LOCBcMediaConversionUseAutoFramerate}" Margin="0,0,0,8" />
+                                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.MediaConversion.Gif.UseAutoFramerate, Converter={StaticResource InvertedBoolenConverter}}">
+                                        <Label Content="{DynamicResource LOCBcMediaConversionFixedFramerate}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                        <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="120" Width="60"
+                                                                     LongValue="{Binding Settings.MediaConversion.Gif.FixedFramerate, Mode=TwoWay}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander.Content>
+                        </Expander>
+                    </StackPanel>
+
                 </Grid>
             </ScrollViewer>
         </TabItem>
@@ -86,76 +228,46 @@
 				                    BorderThickness="{DynamicResource PopupBorderThickness}">
                                 <StackPanel>
                                     <CheckBox IsChecked="{Binding Settings.BackgroundImageSameSettings}" Margin="0,0,0,10"
-                                              Command="{x:Static pcmd:Commands.RestartRequired}" 
+                                              Command="{x:Static pcmd:CommandsPlugin.CmdRestartRequired}"
                                               CommandParameter="{Binding RelativeSource={RelativeSource Self}}"
                                               Content="{DynamicResource LOCBcBackgroundSameSettings}" />
 
-                                    <DockPanel Margin="0,0,0,10">
-                                        <CheckBox IsChecked="{Binding Settings.EnableBackgroundImageRandomSelect}" 
-                                                  DockPanel.Dock="Left" Name="cbBackgroundRandom"
-                                                  Content="{DynamicResource LOCBcEnableRandomSelect}" />
-                                        
-                                        <RadioButton DockPanel.Dock="Right" GroupName="BcRandom"
-                                                     Name="rbBackgroundOnSelect" Click="Rb_Click"
-                                                     Content="{DynamicResource LOCBcRandomOnSelect}">
-                                            <RadioButton.Style>
-                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
-                                                    <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=CbBcAutoChanger}" Value="True" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=cbBackgroundRandom}" Value="False" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </RadioButton.Style>
-                                        </RadioButton>
+                                    <TextBlock Text="{DynamicResource LOCBcSelectionMode}"
+                                               Style="{DynamicResource BaseTextBlockStyle}"
+                                               Margin="0,0,0,6" />
 
-                                        <RadioButton HorizontalAlignment="Right" Margin="0,0,20,0" GroupName="BcRandom"
-                                                     Name="rbBackgroundOnStart" Click="Rb_Click"
-                                                     Content="{DynamicResource LOCBcRandomOnStart}">
-                                            <RadioButton.Style>
-                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
-                                                    <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=CbBcAutoChanger}" Value="True" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=cbBackgroundRandom}" Value="False" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </RadioButton.Style>
-                                        </RadioButton>
-                                    </DockPanel>
+                                    <RadioButton GroupName="BcSelectionMode" Name="rbBackgroundDefault"
+                                                 Margin="0,0,0,4" Checked="OnBackgroundSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcModeDefault}" />
+                                    <RadioButton GroupName="BcSelectionMode" Name="rbBackgroundOnStart"
+                                                 Margin="0,0,0,4" Checked="OnBackgroundSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcRandomOnStart}" />
+                                    <RadioButton GroupName="BcSelectionMode" Name="rbBackgroundOnSelect"
+                                                 Margin="0,0,0,4" Checked="OnBackgroundSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcRandomOnSelect}" />
+                                    <RadioButton GroupName="BcSelectionMode" Name="rbBackgroundTimer"
+                                                 Margin="0,0,0,4" Checked="OnBackgroundSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcEnableAutoChanger}" />
 
-                                    <CheckBox Name="CbBcAutoChanger" IsChecked="{Binding Settings.EnableBackgroundImageAutoChanger}" Margin="0,0,0,10"
-                                              Content="{DynamicResource LOCBcEnableAutoChanger}" />
-                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal" 
-                                                IsEnabled="{Binding ElementName=CbBcAutoChanger, Path=IsChecked, TargetNullValue=false}">
-                                        <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
-                                        <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
-                                                                     LongValue="{Binding Settings.BackgroundImageAutoChangerTimer}" />
-                                        <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
+                                    <StackPanel Name="panelBackgroundTimer" Margin="24,0,0,10"
+                                                IsEnabled="{Binding ElementName=rbBackgroundTimer, Path=IsChecked, TargetNullValue=false}">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                            <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
+                                            <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
+                                                                         LongValue="{Binding Settings.BackgroundImageAutoChangerTimer}" />
+                                            <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
+                                        </StackPanel>
+                                        <CheckBox Name="cbBackgroundTimerRandom"
+                                                  Content="{DynamicResource LOCBcTimerRandomOrder}"
+                                                  ToolTip="{DynamicResource LOCBcTimerRandomOrderToolTip}"
+                                                  Checked="OnBackgroundTimerRandomChanged"
+                                                  Unchecked="OnBackgroundTimerRandomChanged" />
                                     </StackPanel>
 
                                     <CheckBox Name="CbBcVideoDelay" IsChecked="{Binding Settings.useVideoDelayBackgroundImage}" Margin="0,0,0,10"
                                               ToolTip="{DynamicResource LOCBcVideoDelayToolTip}"
                                               Content="{DynamicResource LOCBcEnableVideoDelay}" />
-                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal" 
+                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal"
                                                 IsEnabled="{Binding ElementName=CbBcVideoDelay, Path=IsChecked, TargetNullValue=false}">
                                         <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
                                         <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
@@ -163,16 +275,10 @@
                                         <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
                                     </StackPanel>
 
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                        <Label Content="{DynamicResource LOCSettingsMusiVolume}" VerticalAlignment="Center" Margin="0,0,20,0" />
-                                        <playnitecontrols:NumericBox MinLongValue="0" MaxLongValue="100" Width="40"
-                                                                     LongValue="{Binding Settings.Volume}" />
-                                        <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
-                                    </StackPanel>
+                                    <CheckBox IsChecked="{Binding Settings.EnableRandomVideoStartPointBackground}" Margin="0,0,0,10"
+                                              ToolTip="{DynamicResource LOCBcRandomVideoStartPointToolTip}"
+                                              Content="{DynamicResource LOCBcEnableRandomVideoStartPoint}" />
 
-                                    <Label Margin="0,0,0,10" Content="EXPERIMENTAL" Foreground="DarkRed" />
-                                    <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedBackground}" Grid.Column="0" Grid.Row="16"
-                                              Content="{DynamicResource LOCBcEnableImageAnimatedBackground}" />
                                 </StackPanel>
                             </Border>
                         </Expander.Content>
@@ -196,72 +302,42 @@
 				                    BorderBrush="{DynamicResource PopupBorderBrush}"
 				                    BorderThickness="{DynamicResource PopupBorderThickness}">
                                 <StackPanel>
-                                    <DockPanel Margin="0,0,0,10">
-                                        <CheckBox IsChecked="{Binding Settings.EnableCoverImageRandomSelect}"
-                                                  DockPanel.Dock="Left" Name="cbCoverRandom"
-                                                  Content="{DynamicResource LOCBcEnableRandomSelect}" />
+                                    <TextBlock Text="{DynamicResource LOCBcSelectionMode}"
+                                               Style="{DynamicResource BaseTextBlockStyle}"
+                                               Margin="0,0,0,6" />
 
-                                        <RadioButton DockPanel.Dock="Right" GroupName="CoverRandom"
-                                                     Name="rbCoverOnSelect" Click="Rb_Click"
-                                                     Content="{DynamicResource LOCBcRandomOnSelect}">
-                                            <RadioButton.Style>
-                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
-                                                    <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=CbAutoChanger}" Value="True" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=cbCoverRandom}" Value="False" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </RadioButton.Style>
-                                        </RadioButton>
+                                    <RadioButton GroupName="CoverSelectionMode" Name="rbCoverDefault"
+                                                 Margin="0,0,0,4" Checked="OnCoverSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcModeDefault}" />
+                                    <RadioButton GroupName="CoverSelectionMode" Name="rbCoverOnStart"
+                                                 Margin="0,0,0,4" Checked="OnCoverSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcRandomOnStart}" />
+                                    <RadioButton GroupName="CoverSelectionMode" Name="rbCoverOnSelect"
+                                                 Margin="0,0,0,4" Checked="OnCoverSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcRandomOnSelect}" />
+                                    <RadioButton GroupName="CoverSelectionMode" Name="rbCoverTimer"
+                                                 Margin="0,0,0,4" Checked="OnCoverSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcEnableAutoChanger}" />
 
-                                        <RadioButton HorizontalAlignment="Right" Margin="0,0,20,0" GroupName="CoverRandom"
-                                                     Name="rbCoverOnStart" Click="Rb_Click"
-                                                     Content="{DynamicResource LOCBcRandomOnStart}">
-                                            <RadioButton.Style>
-                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
-                                                    <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=CbAutoChanger}" Value="True" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsChecked, ElementName=cbCoverRandom}" Value="False" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </RadioButton.Style>
-                                        </RadioButton>
-                                    </DockPanel>
-
-                                    <CheckBox Name="CbAutoChanger" IsChecked="{Binding Settings.EnableCoverImageAutoChanger}" Margin="0,0,0,10"
-                                              Content="{DynamicResource LOCBcEnableAutoChanger}" />
-                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal" 
-                                                IsEnabled="{Binding ElementName=CbAutoChanger, Path=IsChecked, TargetNullValue=false}">
-                                        <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
-                                        <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
-                                                                     LongValue="{Binding Settings.CoverImageAutoChangerTimer}" />
-                                        <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
+                                    <StackPanel Name="panelCoverTimer" Margin="24,0,0,10"
+                                                IsEnabled="{Binding ElementName=rbCoverTimer, Path=IsChecked, TargetNullValue=false}">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                            <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
+                                            <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
+                                                                         LongValue="{Binding Settings.CoverImageAutoChangerTimer}" />
+                                            <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
+                                        </StackPanel>
+                                        <CheckBox Name="cbCoverTimerRandom"
+                                                  Content="{DynamicResource LOCBcTimerRandomOrder}"
+                                                  ToolTip="{DynamicResource LOCBcTimerRandomOrderToolTip}"
+                                                  Checked="OnCoverTimerRandomChanged"
+                                                  Unchecked="OnCoverTimerRandomChanged" />
                                     </StackPanel>
 
-                                    <CheckBox Name="CbVideoDelay" IsChecked="{Binding Settings.useVideoDelayCoverImage}"  Margin="0,0,0,10"
+                                    <CheckBox Name="CbVideoDelay" IsChecked="{Binding Settings.useVideoDelayCoverImage}" Margin="0,0,0,10"
                                               ToolTip="{DynamicResource LOCBcVideoDelayToolTip}"
                                               Content="{DynamicResource LOCBcEnableVideoDelay}" />
-                                    <StackPanel Grid.Row="8" Margin="50,0,0,10" Orientation="Horizontal" 
+                                    <StackPanel Margin="50,0,0,10" Orientation="Horizontal"
                                                 IsEnabled="{Binding ElementName=CbVideoDelay, Path=IsChecked, TargetNullValue=false}">
                                         <Label Content="{DynamicResource LOCBcTimeInterval}" Margin="0,0,20,0" VerticalAlignment="Center" />
                                         <playnitecontrols:NumericBox MinLongValue="1" MaxLongValue="600" Width="40"
@@ -269,9 +345,44 @@
                                         <Label VerticalAlignment="Center" Content="{DynamicResource LOCBcSeconds}" Width="150" Margin="10,0,0,0" />
                                     </StackPanel>
 
-                                    <Label  Margin="0,0,0,10" Content="EXPERIMENTAL" Foreground="DarkRed" />
-                                    <CheckBox IsChecked="{Binding Settings.EnableImageAnimatedCover}"
-                                              Content="{DynamicResource LOCBcEnableImageAnimatedCover}" />
+                                    <CheckBox IsChecked="{Binding Settings.EnableRandomVideoStartPointCover}" Margin="0,0,0,10"
+                                              ToolTip="{DynamicResource LOCBcRandomVideoStartPointToolTip}"
+                                              Content="{DynamicResource LOCBcEnableRandomVideoStartPoint}" />
+
+                                </StackPanel>
+                            </Border>
+                        </Expander.Content>
+                    </Expander>
+
+                    <Expander Margin="0,10,0,0">
+                        <Expander.Style>
+                            <Style TargetType="{x:Type Expander}" BasedOn="{StaticResource {x:Type Expander}}">
+                                <Setter Property="Background" Value="Transparent" />
+                            </Style>
+                        </Expander.Style>
+
+                        <Expander.Header>
+                            <CheckBox IsChecked="{Binding Settings.EnableIconImage}" Name="PART_IntegrationIconImage"
+                                      Content="{DynamicResource LOCBcEnableIconImage}" />
+                        </Expander.Header>
+
+                        <Expander.Content>
+                            <Border IsEnabled="{Binding ElementName=PART_IntegrationIconImage, Path=IsChecked}"
+				                    Margin="5" Padding="10"
+				                    BorderBrush="{DynamicResource PopupBorderBrush}"
+				                    BorderThickness="{DynamicResource PopupBorderThickness}">
+                                <StackPanel>
+                                    <!-- Icon: Default + OnStart only (no Timer/OnSelect). Timer breaks Details list (N instances). -->
+                                    <TextBlock Text="{DynamicResource LOCBcSelectionMode}"
+                                               Style="{DynamicResource BaseTextBlockStyle}"
+                                               Margin="0,0,0,6" />
+
+                                    <RadioButton GroupName="IconSelectionMode" Name="rbIconDefault"
+                                                 Margin="0,0,0,4" Checked="OnIconSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcModeDefault}" />
+                                    <RadioButton GroupName="IconSelectionMode" Name="rbIconOnStart"
+                                                 Margin="0,0,0,4" Checked="OnIconSelectionModeChanged"
+                                                 Content="{DynamicResource LOCBcRandomOnStart}" />
                                 </StackPanel>
                             </Border>
                         </Expander.Content>

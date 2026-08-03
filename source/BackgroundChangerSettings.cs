@@ -1,5 +1,7 @@
 ﻿using BackgroundChanger.Models;
+using BackgroundChanger.Services;
 using BackgroundChanger.Views;
+using CommonPluginsShared.Interfaces;
 using CommonPluginsShared.Plugins;
 using Playnite.SDK;
 using Playnite.SDK.Data;
@@ -12,50 +14,213 @@ namespace BackgroundChanger
     {
         #region Settings variables
 
-        private bool _enableBackgroundImage = true;
-        public bool EnableBackgroundImage { get => _enableBackgroundImage; set => SetValue(ref _enableBackgroundImage, value); }
+        private bool enableBackgroundImage = true;
+        public bool EnableBackgroundImage { get => enableBackgroundImage; set => SetValue(ref enableBackgroundImage, value); }
 
-        public bool BackgroundImageSameSettings { get; set; } = true;
+        private bool backgroundImageSameSettings = true;
+        public bool BackgroundImageSameSettings { get => backgroundImageSameSettings; set => SetValue(ref backgroundImageSameSettings, value); }
 
-        public bool EnableBackgroundImageRandomSelect { get; set; } = false;
-        public bool EnableBackgroundImageRandomOnStart { get; set; } = true;
-        public bool EnableBackgroundImageRandomOnSelect { get; set; } = false;
-        public bool EnableBackgroundImageAutoChanger { get; set; } = false;
-        public int BackgroundImageAutoChangerTimer { get; set; } = 10;
+        private bool enableBackgroundImageRandomSelect = false;
+        public bool EnableBackgroundImageRandomSelect { get => enableBackgroundImageRandomSelect; set => SetValue(ref enableBackgroundImageRandomSelect, value); }
 
-        private bool _enableImageAnimatedBackground = false;
-        public bool EnableImageAnimatedBackground { get => _enableImageAnimatedBackground; set => SetValue(ref _enableImageAnimatedBackground, value); }
+        private bool enableBackgroundImageRandomOnStart = true;
+        public bool EnableBackgroundImageRandomOnStart { get => enableBackgroundImageRandomOnStart; set => SetValue(ref enableBackgroundImageRandomOnStart, value); }
 
-        public double Volume { get; set; } = 0;
+        private bool enableBackgroundImageRandomOnSelect = false;
+        public bool EnableBackgroundImageRandomOnSelect { get => enableBackgroundImageRandomOnSelect; set => SetValue(ref enableBackgroundImageRandomOnSelect, value); }
+
+        private bool enableBackgroundImageAutoChanger = false;
+        public bool EnableBackgroundImageAutoChanger { get => enableBackgroundImageAutoChanger; set => SetValue(ref enableBackgroundImageAutoChanger, value); }
+
+        private int backgroundImageAutoChangerTimer = 10;
+        public int BackgroundImageAutoChangerTimer { get => backgroundImageAutoChangerTimer; set => SetValue(ref backgroundImageAutoChangerTimer, value); }
 
 
-        private bool _enableCoverImage = true;
-        public bool EnableCoverImage { get => _enableCoverImage; set => SetValue(ref _enableCoverImage, value); }
+        private bool enableCoverImage = true;
+        public bool EnableCoverImage { get => enableCoverImage; set => SetValue(ref enableCoverImage, value); }
 
-        public bool EnableCoverImageRandomSelect { get; set; } = false;
-        public bool EnableCoverImageRandomOnStart { get; set; } = true;
-        public bool EnableCoverImageRandomOnSelect { get; set; } = false;
-        public bool EnableCoverImageAutoChanger { get; set; } = false;
-        public int CoverImageAutoChangerTimer { get; set; } = 10;
+        private bool enableCoverImageRandomSelect = false;
+        public bool EnableCoverImageRandomSelect { get => enableCoverImageRandomSelect; set => SetValue(ref enableCoverImageRandomSelect, value); }
 
-        private bool _enableImageAnimatedCover = false;
-        public bool EnableImageAnimatedCover { get => _enableImageAnimatedCover; set => SetValue(ref _enableImageAnimatedCover, value); }
+        private bool enableCoverImageRandomOnStart = true;
+        public bool EnableCoverImageRandomOnStart { get => enableCoverImageRandomOnStart; set => SetValue(ref enableCoverImageRandomOnStart, value); }
+
+        private bool enableCoverImageRandomOnSelect = false;
+        public bool EnableCoverImageRandomOnSelect { get => enableCoverImageRandomOnSelect; set => SetValue(ref enableCoverImageRandomOnSelect, value); }
+
+        private bool enableCoverImageAutoChanger = false;
+        public bool EnableCoverImageAutoChanger { get => enableCoverImageAutoChanger; set => SetValue(ref enableCoverImageAutoChanger, value); }
+
+        private int coverImageAutoChangerTimer = 10;
+        public int CoverImageAutoChangerTimer { get => coverImageAutoChangerTimer; set => SetValue(ref coverImageAutoChangerTimer, value); }
+
+
+        private bool enableIconImage = false;
+        public bool EnableIconImage { get => enableIconImage; set => SetValue(ref enableIconImage, value); }
+
+        private bool enableIconImageRandomSelect = false;
+        public bool EnableIconImageRandomSelect { get => enableIconImageRandomSelect; set => SetValue(ref enableIconImageRandomSelect, value); }
+
+        private bool enableIconImageRandomOnStart = true;
+        public bool EnableIconImageRandomOnStart { get => enableIconImageRandomOnStart; set => SetValue(ref enableIconImageRandomOnStart, value); }
+
+        private bool enableIconImageRandomOnSelect = false;
+        public bool EnableIconImageRandomOnSelect { get => enableIconImageRandomOnSelect; set => SetValue(ref enableIconImageRandomOnSelect, value); }
+
+        private bool enableIconImageAutoChanger = false;
+        public bool EnableIconImageAutoChanger { get => enableIconImageAutoChanger; set => SetValue(ref enableIconImageAutoChanger, value); }
+
+        private int iconImageAutoChangerTimer = 10;
+        public int IconImageAutoChangerTimer { get => iconImageAutoChangerTimer; set => SetValue(ref iconImageAutoChangerTimer, value); }
 
 
         public string SteamGridDbApiKey { get; set; } = string.Empty;
 
 
         public string ffmpegFile { get; set; } = string.Empty;
-        public string webpinfoFile { get; set; } = string.Empty;
+        public string ffprobeFile { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets per-format animated media conversion parameters.
+        /// </summary>
+        public MediaConversionSettings MediaConversion { get; set; } = new MediaConversionSettings();
+
+        /// <summary>
+        /// Gets or sets persisted options for bulk Steam / SteamGridDB media download (issue #25).
+        /// Null until load/ensure; dialog sessions clone this object and write it back on save or download confirm.
+        /// Default is null (not <see cref="BulkMediaDownloadOptions.CreateDefaults"/>) so Playnite deserialization
+        /// replaces the property from JSON instead of merging into a pre-built defaults instance.
+        /// </summary>
+        public BulkMediaDownloadOptions BulkMediaDownload { get; set; }
 
 
-        public bool useVideoDelayBackgroundImage { get; set; } = false;
-        public int videoDelayBackgroundImage { get; set; } = 5;
-        public bool useVideoDelayCoverImage { get; set; } = false;
-        public int videoDelayCoverImage { get; set; } = 5;
+        private bool _useVideoDelayBackgroundImage = false;
+        public bool useVideoDelayBackgroundImage { get => _useVideoDelayBackgroundImage; set => SetValue(ref _useVideoDelayBackgroundImage, value); }
+
+        private int _videoDelayBackgroundImage = 5;
+        public int videoDelayBackgroundImage { get => _videoDelayBackgroundImage; set => SetValue(ref _videoDelayBackgroundImage, value); }
+
+        private bool _useVideoDelayCoverImage = false;
+        public bool useVideoDelayCoverImage { get => _useVideoDelayCoverImage; set => SetValue(ref _useVideoDelayCoverImage, value); }
+
+        private int _videoDelayCoverImage = 5;
+        public int videoDelayCoverImage { get => _videoDelayCoverImage; set => SetValue(ref _videoDelayCoverImage, value); }
+
+        private bool enableRandomVideoStartPointBackground = false;
+
+        /// <summary>
+        /// Gets or sets whether background MP4 playback starts at a random timestamp
+        /// on the first play of each source (opt-in; default off). Loop replays are not re-randomized.
+        /// </summary>
+        public bool EnableRandomVideoStartPointBackground
+        {
+            get => enableRandomVideoStartPointBackground;
+            set => SetValue(ref enableRandomVideoStartPointBackground, value);
+        }
+
+        private bool enableRandomVideoStartPointCover = false;
+
+        /// <summary>
+        /// Gets or sets whether cover MP4 playback starts at a random timestamp
+        /// on the first play of each source (opt-in; default off). Loop replays are not re-randomized.
+        /// </summary>
+        public bool EnableRandomVideoStartPointCover
+        {
+            get => enableRandomVideoStartPointCover;
+            set => SetValue(ref enableRandomVideoStartPointCover, value);
+        }
 
         #endregion
 
+        /// <summary>
+        /// Coerces exclusive selection-mode flags for background, cover, and icon
+        /// (Timer xor OnStart xor OnSelect xor default).
+        /// Icons: Default or OnStart only — no Timer (see <see cref="Controls.PluginIconImage"/> remarks).
+        /// Safe to call on load and before save.
+        /// </summary>
+        public void CoerceExclusiveMediaSelectionModes()
+        {
+            CoerceMediaFlags(
+                ref enableBackgroundImageAutoChanger,
+                ref enableBackgroundImageRandomSelect,
+                ref enableBackgroundImageRandomOnStart,
+                ref enableBackgroundImageRandomOnSelect,
+                allowOnSelect: true);
+
+            CoerceMediaFlags(
+                ref enableCoverImageAutoChanger,
+                ref enableCoverImageRandomSelect,
+                ref enableCoverImageRandomOnStart,
+                ref enableCoverImageRandomOnSelect,
+                allowOnSelect: true);
+
+            // Icon: no Timer mode. Legacy EnableIconImageAutoChanger (saved JSON) maps to OnStart so list + overview stay safe.
+            if (enableIconImageAutoChanger)
+            {
+                enableIconImageAutoChanger = false;
+                enableIconImageRandomSelect = true;
+                enableIconImageRandomOnStart = true;
+                enableIconImageRandomOnSelect = false;
+            }
+
+            CoerceMediaFlags(
+                ref enableIconImageAutoChanger,
+                ref enableIconImageRandomSelect,
+                ref enableIconImageRandomOnStart,
+                ref enableIconImageRandomOnSelect,
+                allowOnSelect: false);
+
+            OnPropertyChanged(nameof(EnableBackgroundImageAutoChanger));
+            OnPropertyChanged(nameof(EnableBackgroundImageRandomSelect));
+            OnPropertyChanged(nameof(EnableBackgroundImageRandomOnStart));
+            OnPropertyChanged(nameof(EnableBackgroundImageRandomOnSelect));
+            OnPropertyChanged(nameof(EnableCoverImageAutoChanger));
+            OnPropertyChanged(nameof(EnableCoverImageRandomSelect));
+            OnPropertyChanged(nameof(EnableCoverImageRandomOnStart));
+            OnPropertyChanged(nameof(EnableCoverImageRandomOnSelect));
+            OnPropertyChanged(nameof(EnableIconImageAutoChanger));
+            OnPropertyChanged(nameof(EnableIconImageRandomSelect));
+            OnPropertyChanged(nameof(EnableIconImageRandomOnStart));
+            OnPropertyChanged(nameof(EnableIconImageRandomOnSelect));
+        }
+
+        private static void CoerceMediaFlags(
+            ref bool autoChanger,
+            ref bool randomSelect,
+            ref bool onStart,
+            ref bool onSelect,
+            bool allowOnSelect)
+        {
+            if (!allowOnSelect)
+            {
+                onSelect = false;
+            }
+
+            if (autoChanger)
+            {
+                onStart = false;
+                onSelect = false;
+                // randomSelect remains the Timer tick strategy (random vs sequential).
+                return;
+            }
+
+            if (!randomSelect)
+            {
+                onStart = false;
+                onSelect = false;
+                return;
+            }
+
+            // Random without Timer: exactly one of OnStart / OnSelect.
+            if (onStart && onSelect)
+            {
+                onStart = false;
+            }
+            else if (!onStart && !onSelect)
+            {
+                onStart = true;
+            }
+        }
 
         public SteamGridFilters SgGridsFilters = new SteamGridFilters
         {
@@ -119,38 +284,48 @@ namespace BackgroundChanger
             }
         };
 
+        /// <summary>
+        /// Persisted SteamGridDB filter preferences for icon browse (API icons). Null after upgrade until <see cref="SteamGridFilterHelper.EnsureFilterSlots"/> runs.
+        /// </summary>
+        public SteamGridFilters SgIconsFilters;
 
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
         #region Variables exposed
 
-        private bool _hasDataBackground = false;
+        private bool hasDataBackground = false;
         [DontSerialize]
-        public bool HasDataBackground { get => _hasDataBackground; set => SetValue(ref _hasDataBackground, value); }
+        public bool HasDataBackground { get => hasDataBackground; set => SetValue(ref hasDataBackground, value); }
 
-        private bool _hasDataCover = false;
+        private bool hasDataCover = false;
         [DontSerialize]
-        public bool HasDataCover { get => _hasDataCover; set => SetValue(ref _hasDataCover, value); }
+        public bool HasDataCover { get => hasDataCover; set => SetValue(ref hasDataCover, value); }
 
-        private bool _backgroundIsVideo = false;
+        private bool hasDataIcon = false;
         [DontSerialize]
-        public bool BackgroundIsVideo { get => _backgroundIsVideo; set => SetValue(ref _backgroundIsVideo, value); }
+        public bool HasDataIcon { get => hasDataIcon; set => SetValue(ref hasDataIcon, value); }
 
-        private bool _coverIsVideo = false;
+        private bool backgroundIsVideo = false;
         [DontSerialize]
-        public bool CoverIsVideo { get => _coverIsVideo; set => SetValue(ref _coverIsVideo, value); }
+        public bool BackgroundIsVideo { get => backgroundIsVideo; set => SetValue(ref backgroundIsVideo, value); }
+
+        private bool coverIsVideo = false;
+        [DontSerialize]
+        public bool CoverIsVideo { get => coverIsVideo; set => SetValue(ref coverIsVideo, value); }
 
         #endregion
     }
 
 
-    public class BackgroundChangerSettingsViewModel : ObservableObject, ISettings
+    public class BackgroundChangerSettingsViewModel : PluginSettingsViewModel, IPluginSettingsViewModel
     {
         private readonly BackgroundChanger Plugin;
         private BackgroundChangerSettings EditingClone { get; set; }
 
-        private BackgroundChangerSettings _settings;
-        public BackgroundChangerSettings Settings { get => _settings; set => SetValue(ref _settings, value); }
+        private BackgroundChangerSettings settings;
+        public BackgroundChangerSettings Settings { get => settings; }
+
+        IPluginSettings IPluginSettingsViewModel.Settings => Settings;
 
 
         public BackgroundChangerSettingsViewModel(BackgroundChanger plugin)
@@ -162,7 +337,24 @@ namespace BackgroundChanger
             BackgroundChangerSettings savedSettings = plugin.LoadPluginSettings<BackgroundChangerSettings>();
 
             // LoadPluginSettings returns null if not saved data is available.
-            Settings = savedSettings ?? new BackgroundChangerSettings();
+            settings = savedSettings ?? new BackgroundChangerSettings();
+
+            if (settings.MediaConversion == null)
+            {
+                settings.MediaConversion = new MediaConversionSettings();
+            }
+
+            if (settings.BulkMediaDownload == null)
+            {
+                settings.BulkMediaDownload = BulkMediaDownloadOptions.CreateDefaults();
+            }
+            else
+            {
+                settings.BulkMediaDownload.EnsureInitialized();
+            }
+
+            settings.CoerceExclusiveMediaSelectionModes();
+            SteamGridFilterHelper.EnsureFilterSlots(settings);
         }
 
         // Code executed when settings view is opened and user starts editing values.
@@ -175,22 +367,31 @@ namespace BackgroundChanger
         // This method should revert any changes made to Option1 and Option2.
         public void CancelEdit()
         {
-            Settings = EditingClone;
+            CopySettingsValues(EditingClone, Settings);
         }
 
         // Code executed when user decides to confirm changes made since BeginEdit was called.
         // This method should save settings made to Option1 and Option2.
         public void EndEdit()
         {
-            Settings.EnableBackgroundImageRandomOnSelect = BackgroundChangerSettingsView.BackgroundOnSelect;
-            Settings.EnableBackgroundImageRandomOnStart = BackgroundChangerSettingsView.BackgroundOnStart;
-
-            Settings.EnableCoverImageRandomOnSelect = BackgroundChangerSettingsView.CoverOnSelect;
-            Settings.EnableCoverImageRandomOnStart = BackgroundChangerSettingsView.CoverOnStart;
-
+            BackgroundChangerSettingsView.ApplyActiveSelectionModes(Settings);
+            Settings.CoerceExclusiveMediaSelectionModes();
             Plugin.SavePluginSettings(Settings);
-            BackgroundChanger.PluginDatabase.PluginSettings = this;
-            this.OnPropertyChanged();
+        }
+
+        /// <summary>
+        /// Refreshes the <see cref="BeginEdit"/> snapshot for <see cref="BackgroundChangerSettings.BulkMediaDownload"/>
+        /// after an external persist (bulk dialog Save / Download). Prevents <see cref="CancelEdit"/> from restoring
+        /// a stale bulk options tree and later <see cref="EndEdit"/> from overwriting the file.
+        /// </summary>
+        public void SyncEditingCloneBulkMediaDownload()
+        {
+            if (EditingClone == null || Settings?.BulkMediaDownload == null)
+            {
+                return;
+            }
+
+            EditingClone.BulkMediaDownload = Serialization.GetClone(Settings.BulkMediaDownload);
         }
 
         // Code execute when user decides to confirm changes made since BeginEdit was called.
@@ -199,7 +400,47 @@ namespace BackgroundChanger
         public bool VerifySettings(out List<string> errors)
         {
             errors = new List<string>();
-            return true;
+
+            if (Settings?.MediaConversion == null)
+            {
+                return true;
+            }
+
+            MediaConversionSettings conversion = Settings.MediaConversion;
+
+            if (!MediaConversionSettings.IsValidDefaultCrf(conversion.Defaults?.Crf ?? MediaConversionDefaults.DefaultCrf))
+            {
+                errors.Add(ResourceProvider.GetString("LOCBcMediaConversionCrfInvalid"));
+            }
+
+            ValidateFormatCrf(conversion.AnimatedWebp, errors);
+            ValidateFormatCrf(conversion.Webm, errors);
+            ValidateFormatCrf(conversion.Apng, errors);
+            ValidateFormatCrf(conversion.Gif, errors);
+
+            ValidateFormatFramerate(conversion.AnimatedWebp, errors);
+            ValidateFormatFramerate(conversion.Apng, errors);
+            ValidateFormatFramerate(conversion.Gif, errors);
+
+            return errors.Count == 0;
+        }
+
+        private static void ValidateFormatCrf(MediaConversionFormatSettings formatSettings, List<string> errors)
+        {
+            if (formatSettings != null && !MediaConversionSettings.IsValidCrf(formatSettings.Crf))
+            {
+                errors.Add(ResourceProvider.GetString("LOCBcMediaConversionCrfInvalid"));
+            }
+        }
+
+        private static void ValidateFormatFramerate(MediaConversionFormatSettings formatSettings, List<string> errors)
+        {
+            if (formatSettings != null
+                && !formatSettings.UseAutoFramerate
+                && !MediaConversionSettings.IsValidFramerate(formatSettings.FixedFramerate))
+            {
+                errors.Add(ResourceProvider.GetString("LOCBcMediaConversionFramerateInvalid"));
+            }
         }
     }
 
@@ -210,6 +451,11 @@ namespace BackgroundChanger
         public List<CheckData> CheckStyles { get; set; }
         public List<CheckData> CheckTypes { get; set; }
         public List<CheckData> CheckTags { get; set; }
+
+        /// <summary>
+        /// MIME type filters for SteamGridDB icons (<c>image/png</c>, <c>image/vnd.microsoft.icon</c>). Unused for grids/heroes.
+        /// </summary>
+        public List<CheckData> CheckMimes { get; set; }
 
         public bool SortByDateAsc { get; set; }
     }

@@ -80,3 +80,22 @@ Packages:
       - 'Updated: Settings and image manager UI with simplified layouts and numeric inputs'
       - 'Fixed: Detection and handling of image and video files with better extension checks'
       - 'Fixed: UI errors and crashes during image loading and updates'
+  - Version: 3.4
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-08-03
+    PackageUrl: https://github.com/Lacro59/playnite-backgroundchanger-plugin/releases/download/v3.4/playnite-backgroundchanger-plugin_3_4.pext
+    Changelog:
+      - 'Updated: Localizations'
+      - 'Added: Bulk media download for multiple games (Steam and SteamGridDB)'
+      - 'Added: Official Steam media import with game search'
+      - 'Added: Multi-icon support with shuffle and selection modes'
+      - 'Added: Automatic conversion of animated media (WebP, WebM, GIF, APNG) to MP4 via FFmpeg'
+      - 'Added: Random video start point option'
+      - 'Added: Shuffled playback order for timed media changes'
+      - 'Updated: SteamGridDB browser with per-media-kind filters, icons API, thumbnails and layout'
+      - 'Updated: Exclusive media selection modes in settings'
+      - 'Improved: Theme media controls with stabler transitions and theme sync'
+      - 'Fixed: Set-as-default save for backgrounds'
+      - 'Fixed: Icon display in the image manager'
+      - 'Fixed: Favorites preserved after Playnite metadata updates'
+      - 'Fixed: SteamGridDB API authentication errors shown to the user'

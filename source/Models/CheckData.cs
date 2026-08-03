@@ -4,26 +4,26 @@ namespace BackgroundChanger.Models
 {
     public class CheckData : ObservableObject
     {
-        private string _name;
-        private string _data;
-        private bool _isChecked = true;
+        private string name;
+        private string data;
+        private bool isChecked = true;
 
         public string Name
         {
-            get => _name;
-            set => SetValue(ref _name, value);
+            get => name;
+            set => SetValue(ref name, value);
         }
 
         public string Data
         {
-            get => _data;
-            set => SetValue(ref _data, value);
+            get => data;
+            set => SetValue(ref data, value);
         }
 
         public bool IsChecked
         {
-            get => _isChecked;
-            set => SetValue(ref _isChecked, value);
+            get => isChecked;
+            set => SetValue(ref isChecked, value);
         }
     }
 

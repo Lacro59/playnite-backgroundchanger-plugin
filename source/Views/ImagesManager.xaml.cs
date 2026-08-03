@@ -1,4 +1,4 @@
-﻿using BackgroundChanger.Models;
+using BackgroundChanger.Models;
 using BackgroundChanger.Services;
 using CommonPlayniteShared;
 using CommonPlayniteShared.Common;
@@ -7,20 +7,14 @@ using CommonPluginsShared.Extensions;
 using Playnite.SDK;
 using Playnite.SDK.Data;
 using Playnite.SDK.Models;
-using QSoft.Apng;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing.Imaging;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
-using wpf_animatedimage;
 using Path = System.IO.Path;
 
 namespace BackgroundChanger.Views
@@ -38,24 +32,166 @@ namespace BackgroundChanger.Views
         private GameBackgroundImages GameBackgroundImages { get; set; }
         private List<ItemImage> CurrentImages { get; set; }
         private List<ItemImage> EditedImages { get; set; }
-        private bool IsCover { get; set; }
+        private ItemImage OpeningDefaultSnapshot { get; set; }
+        private BackgroundChangerDatabase.PluginMediaKind MediaKind { get; set; }
+
+        private readonly MediaImportService _mediaImportService = new MediaImportService();
 
 
-        public ImagesManager(GameBackgroundImages gameBackgroundImages, bool isCover, BackgroundChanger plugin)
+        public ImagesManager(GameBackgroundImages gameBackgroundImages, BackgroundChangerDatabase.PluginMediaKind mediaKind, BackgroundChanger plugin)
         {
             GameBackgroundImages = gameBackgroundImages;
-            CurrentImages = Serialization.GetClone(gameBackgroundImages.Items.Where(x => x.IsCover == isCover && x.Exist).ToList());
+            CurrentImages = Serialization.GetClone(
+                gameBackgroundImages.Items.Where(x => BackgroundChangerDatabase.ItemMatchesMediaKind(x, mediaKind) && x.Exist).ToList());
             EditedImages = Serialization.GetClone(CurrentImages);
-            IsCover = isCover;
+            OpeningDefaultSnapshot = Serialization.GetClone(EditedImages.FirstOrDefault(x => x.IsDefault));
+            MediaKind = mediaKind;
             Plugin = plugin;
 
             InitializeComponent();
 
+            PART_BackgroundImage.SizeChanged += PART_BackgroundImage_SizeChanged;
+            ConfigureSteamOfficialButton(mediaKind);
+
             PART_LbBackgroundImages.ItemsSource = null;
             PART_LbBackgroundImages.ItemsSource = EditedImages;
-
-            PART_BackgroundImage.UseAnimated = true;
         }
+
+        private void ConfigureSteamOfficialButton(BackgroundChangerDatabase.PluginMediaKind mediaKind)
+        {
+            if (mediaKind == BackgroundChangerDatabase.PluginMediaKind.Icon)
+            {
+                PART_BtAddSteamOfficial.Content = ResourceProvider.GetString("LOCBcSteamGet");
+            }
+            else
+            {
+                PART_BtAddSteamOfficial.Content = ResourceProvider.GetString("LOCBcSteamSelect");
+            }
+        }
+
+        private void PART_BackgroundImage_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(PART_BackgroundImage?.Source))
+            {
+                return;
+            }
+
+            UpdatePreviewDecodePixelHeight();
+        }
+
+
+        #region Media import
+
+        private void RefreshEditedImagesList()
+        {
+            PART_LbBackgroundImages.ItemsSource = null;
+            PART_LbBackgroundImages.ItemsSource = EditedImages;
+        }
+
+        private void WaitProgressAndRefreshList(GlobalProgressResult progressDownload)
+        {
+            _ = Task.Run(() =>
+            {
+                while (!(bool)progressDownload.Result)
+                {
+                }
+            }).ContinueWith(antecedent =>
+            {
+                _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
+                {
+                    RefreshEditedImagesList();
+                });
+            });
+        }
+
+        private void ShowFfmpegNotFoundIfNeeded(ref bool ffmpegErrorShown)
+        {
+            if (ffmpegErrorShown)
+            {
+                return;
+            }
+
+            API.Instance.Dialogs.ShowErrorMessage(
+                ResourceProvider.GetString("LOCBcFfmpegNotFound"),
+                PluginDatabase.PluginName);
+            ffmpegErrorShown = true;
+        }
+
+        private void ShowFfmpegOutdatedIfNeeded(ref bool ffmpegOutdatedShown)
+        {
+            if (ffmpegOutdatedShown)
+            {
+                return;
+            }
+
+            string message = string.Format(
+                ResourceProvider.GetString("LOCBcMediaToolkitOutdatedNotification"),
+                _mediaImportService.GetMinimumMediaToolkitVersionDisplay(),
+                _mediaImportService.GetMediaToolkitVersionSummary());
+
+            API.Instance.Dialogs.ShowErrorMessage(message, PluginDatabase.PluginName);
+            ffmpegOutdatedShown = true;
+        }
+
+        private void ShowFfmpegConversionFailedIfNeeded(ref bool conversionFailedShown)
+        {
+            if (conversionFailedShown)
+            {
+                return;
+            }
+
+            string message = string.Format(
+                ResourceProvider.GetString("LOCBcFfmpegConversionFailed"),
+                _mediaImportService.GetMediaToolkitVersionSummary(),
+                _mediaImportService.GetMinimumMediaToolkitVersionDisplay());
+
+            API.Instance.Dialogs.ShowErrorMessage(message, PluginDatabase.PluginName);
+            conversionFailedShown = true;
+        }
+
+        private void TryAddImportedItem(string sourcePath, ref bool ffmpegErrorShown, ref bool ffmpegOutdatedShown, ref bool conversionFailedShown)
+        {
+            MediaImportService.ImportPrepareResult result = _mediaImportService.TryPrepareImportPath(sourcePath);
+
+            switch (result.Status)
+            {
+                case MediaImportService.ImportPrepareStatus.BlockedMissingToolkit:
+                    Common.LogDebug(true, string.Format("[ImagesManager] Import blocked, media toolkit not configured: {0}", sourcePath));
+                    ShowFfmpegNotFoundIfNeeded(ref ffmpegErrorShown);
+                    return;
+
+                case MediaImportService.ImportPrepareStatus.BlockedOutdatedToolkit:
+                    Common.LogDebug(true, string.Format("[ImagesManager] Import blocked, media toolkit version outdated: {0}", sourcePath));
+                    ShowFfmpegOutdatedIfNeeded(ref ffmpegOutdatedShown);
+                    return;
+
+                case MediaImportService.ImportPrepareStatus.MissingSource:
+                    Common.LogDebug(true, string.Format("[ImagesManager] Import skipped, file missing: {0}", sourcePath));
+                    return;
+
+                case MediaImportService.ImportPrepareStatus.ConversionFailed:
+                    Common.LogDebug(true, string.Format("[ImagesManager] Import item skipped, no output produced: {0}", sourcePath));
+                    ShowFfmpegConversionFailedIfNeeded(ref conversionFailedShown);
+                    return;
+
+                case MediaImportService.ImportPrepareStatus.Success:
+                    if (!result.PreparedPath.IsNullOrEmpty())
+                    {
+                        EditedImages.Add(new ItemImage
+                        {
+                            Name = result.PreparedPath
+                        });
+
+                        if (Path.GetExtension(sourcePath).IsEqual(".webp") && result.PreparedPath.IsEqual(sourcePath))
+                        {
+                            Common.LogDebug(true, string.Format("[ImagesManager] Import added as static WebP (no conversion): {0}", sourcePath));
+                        }
+                    }
+                    break;
+            }
+        }
+
+        #endregion
 
 
         private void PART_BtCancel_Click(object sender, RoutedEventArgs e)
@@ -63,17 +199,102 @@ namespace BackgroundChanger.Views
             ((Window)Parent).Close();
         }
 
+        private static bool ItemImageIdentityMatches(ItemImage left, ItemImage right)
+        {
+            if (left == null || right == null)
+            {
+                return false;
+            }
+
+            if (!left.Name.IsEqual(right.Name))
+            {
+                return false;
+            }
+
+            // IsEqual("", "") is false — treat both missing folder names as the same identity
+            // (Playnite mirrors and pending imports use an empty FolderName).
+            string leftFolder = left.FolderName ?? string.Empty;
+            string rightFolder = right.FolderName ?? string.Empty;
+            if (leftFolder.Length == 0 && rightFolder.Length == 0)
+            {
+                return true;
+            }
+
+            return leftFolder.IsEqual(rightFolder);
+        }
+
+        private static bool EditedImagesContains(List<ItemImage> editedImages, ItemImage candidate)
+        {
+            return editedImages.Exists(x => ItemImageIdentityMatches(x, candidate));
+        }
+
+        private static bool IsPlayniteLibraryMirror(ItemImage itemImage)
+        {
+            return BackgroundChangerDatabase.IsPlayniteLibraryMirror(itemImage);
+        }
+
+        private static string FormatSaveItemLine(ItemImage item, int index)
+        {
+            if (item == null)
+            {
+                return string.Format("  [{0}] null", index);
+            }
+
+            return string.Format(
+                "  [{0}] name={1}, folder={2}, cover={3}, icon={4}, default={5}, fav={6}, exist={7}, mirror={8}",
+                index,
+                item.Name ?? string.Empty,
+                item.FolderName ?? string.Empty,
+                item.IsCover,
+                item.IsIcon,
+                item.IsDefault,
+                item.IsFavorite,
+                item.Exist,
+                IsPlayniteLibraryMirror(item));
+        }
+
+        private static void LogSaveItemsSnapshot(string phase, string gameName, BackgroundChangerDatabase.PluginMediaKind mediaKind, IList<ItemImage> items)
+        {
+            int count = items?.Count ?? 0;
+            Common.LogDebug(true,
+                string.Format("[ImagesManager] Save {0} — game='{1}', mediaKind={2}, count={3}", phase, gameName, mediaKind, count));
+
+            if (items == null || count == 0)
+            {
+                return;
+            }
+
+            for (int i = 0; i < items.Count; i++)
+            {
+                Common.LogDebug(true, string.Format("[ImagesManager] Save {0} {1}", phase, FormatSaveItemLine(items[i], i)));
+            }
+        }
+
         private void PART_BtOK_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                ItemImage originalDefault = CurrentImages.FirstOrDefault(x => x.IsDefault);
+                string gameName = GameBackgroundImages?.Name ?? GameBackgroundImages?.Id.ToString() ?? "?";
+                LogSaveItemsSnapshot("before-current", gameName, MediaKind, CurrentImages);
+                LogSaveItemsSnapshot("before-edited", gameName, MediaKind, EditedImages);
 
-                // Delete removed
-                CurrentImages.Where(x => !x.Name.IsEqual(originalDefault?.Name) && x.IsCover == IsCover)?.ForEach(y =>
+                ItemImage originalDefault = OpeningDefaultSnapshot;
+                string playniteMediaReference = null;
+                int importedCount = 0;
+                int skippedMirrorCount = 0;
+
+                // Delete removed — never delete Playnite library files (owned by Playnite metadata)
+                CurrentImages.Where(x => !ItemImageIdentityMatches(x, originalDefault) && BackgroundChangerDatabase.ItemMatchesMediaKind(x, MediaKind))?.ForEach(y =>
                 {
-                    if (EditedImages.FirstOrDefault(x => x.FullPath == y.FullPath) == null)
+                    if (IsPlayniteLibraryMirror(y))
                     {
+                        return;
+                    }
+
+                    if (!EditedImagesContains(EditedImages, y))
+                    {
+                        Common.LogDebug(true,
+                            string.Format("[ImagesManager] Save delete removed file: {0}", y.FullPath ?? string.Empty));
                         FileSystem.DeleteFileSafe(y.FullPath);
                     }
                 });
@@ -83,66 +304,209 @@ namespace BackgroundChanger.Views
                 {
                     ItemImage itemImage = EditedImages[index];
 
-                    if (itemImage.FolderName.IsNullOrEmpty() && !itemImage.Name.IsEqual(originalDefault?.Name))
+                    if (itemImage.FolderName.IsNullOrEmpty() && !ItemImageIdentityMatches(itemImage, originalDefault))
                     {
+                        // Playnite library\files paths are never materialized into plugin Images/.
+                        // Do not skip merely because IsDefault is set — file-picker imports often
+                        // mark default before FolderName is assigned (that used to look like a mirror).
+                        if (BackgroundChangerDatabase.IsUnderPlayniteLibraryFiles(itemImage.Name))
+                        {
+                            skippedMirrorCount++;
+                            Common.LogDebug(true,
+                                string.Format(
+                                    "[ImagesManager] Save import skipped (Playnite library file): {0}",
+                                    itemImage.Name ?? string.Empty));
+                            continue;
+                        }
+
+                        if (_mediaImportService.RequiresConversion(itemImage.Name))
+                        {
+                            if (_mediaImportService.IsBlockedByMissingToolkit(itemImage.Name))
+                            {
+                                API.Instance.Dialogs.ShowErrorMessage(
+                                    ResourceProvider.GetString("LOCBcFfmpegNotFound"),
+                                    PluginDatabase.PluginName);
+                                return;
+                            }
+
+                            if (_mediaImportService.IsBlockedByOutdatedToolkit(itemImage.Name))
+                            {
+                                API.Instance.Dialogs.ShowErrorMessage(
+                                    string.Format(
+                                        ResourceProvider.GetString("LOCBcMediaToolkitOutdatedNotification"),
+                                        _mediaImportService.GetMinimumMediaToolkitVersionDisplay(),
+                                        _mediaImportService.GetMediaToolkitVersionSummary()),
+                                    PluginDatabase.PluginName);
+                                return;
+                            }
+
+                            MediaImportService.ImportPrepareResult prepareResult =
+                                _mediaImportService.TryPrepareImportPath(itemImage.Name);
+                            if (prepareResult.Status == MediaImportService.ImportPrepareStatus.ConversionFailed)
+                            {
+                                API.Instance.Dialogs.ShowErrorMessage(
+                                    string.Format(
+                                        ResourceProvider.GetString("LOCBcFfmpegConversionFailed"),
+                                        _mediaImportService.GetMediaToolkitVersionSummary(),
+                                        _mediaImportService.GetMinimumMediaToolkitVersionDisplay()),
+                                    PluginDatabase.PluginName);
+                                return;
+                            }
+
+                            if (prepareResult.Status != MediaImportService.ImportPrepareStatus.Success
+                                || prepareResult.PreparedPath.IsNullOrEmpty())
+                            {
+                                return;
+                            }
+
+                            itemImage.Name = prepareResult.PreparedPath;
+                        }
+
                         Guid imageGuid = Guid.NewGuid();
                         string originalPath = itemImage.Name;
                         string ext = Path.GetExtension(originalPath);
 
                         itemImage.Name = imageGuid.ToString() + ext;
                         itemImage.FolderName = GameBackgroundImages.Id.ToString();
-                        itemImage.IsCover = IsCover;
+                        BackgroundChangerDatabase.SetItemMediaKind(itemImage, MediaKind);
 
                         string dir = Path.GetDirectoryName(itemImage.FullPath);
                         FileSystem.CreateDirectory(dir);
                         File.Copy(originalPath, itemImage.FullPath);
+                        importedCount++;
+                        Common.LogDebug(true,
+                            string.Format(
+                                "[ImagesManager] Save import copied: {0} -> {1}",
+                                originalPath,
+                                itemImage.FullPath));
                     }
                 }
 
-                // Default
+                // Default — originalDefault is the snapshot at open; newDefault is the user selection
                 ItemImage newDefault = EditedImages.FirstOrDefault(x => x.IsDefault);
-                if (!originalDefault?.Name.IsEqual(newDefault?.Name) ?? false)
+                if (newDefault != null && !ItemImageIdentityMatches(originalDefault, newDefault))
                 {
-                    // Copy old in exention data
                     string folderName = GameBackgroundImages.Id.ToString();
-                    string newPath = Path.Combine(
-                        PluginDatabase.Paths.PluginUserDataPath,
-                        "Images",
-                        folderName,
-                        Path.GetFileName(originalDefault.Name)
-                    );
-                    File.Copy(originalDefault.Name, newPath);
-                    FileSystem.DeleteFileSafe(originalDefault.Name);
 
-                    // Copy new in game data
-                    Game game = GameBackgroundImages.Game;
-                    string filePath = API.Instance.Database.AddFile(newDefault.FullPath, game.Id);
-                    FileSystem.DeleteFileSafe(newDefault.FullPath);
-
-                    ItemImage originalNew = CurrentImages.FirstOrDefault(x => x.Name.IsEqual(newDefault.Name));
-                    ItemImage newOld = EditedImages.FirstOrDefault(x => x.Name.IsEqual(originalDefault.Name));
-
-                    newOld.Name = Path.GetFileName(originalDefault.Name);
-                    newOld.FolderName = folderName;
-
-                    if (IsCover)
+                    if (originalDefault != null && originalDefault.Exist)
                     {
-                        game.CoverImage = filePath;
+                        bool playniteOwnedMirror = IsPlayniteLibraryMirror(originalDefault);
+                        string sourcePath = originalDefault.FullPath;
+                        string archivedFileName = playniteOwnedMirror
+                            ? Guid.NewGuid().ToString() + Path.GetExtension(sourcePath)
+                            : Path.GetFileName(sourcePath);
+                        string archivePath = Path.Combine(
+                            PluginDatabase.Paths.PluginUserDataPath,
+                            "Images",
+                            folderName,
+                            archivedFileName);
+                        FileSystem.CreateDirectory(Path.GetDirectoryName(archivePath));
+                        File.Copy(sourcePath, archivePath, overwrite: true);
+
+                        // Playnite owns library\files — never delete those. Plugin-owned former
+                        // defaults are moved (copy then delete) into the Images folder.
+                        if (!playniteOwnedMirror)
+                        {
+                            FileSystem.DeleteFileSafe(sourcePath);
+                        }
+
+                        ItemImage archivedDefault = EditedImages.FirstOrDefault(x => ItemImageIdentityMatches(x, originalDefault));
+                        if (archivedDefault != null)
+                        {
+                            archivedDefault.Name = archivedFileName;
+                            archivedDefault.FolderName = folderName;
+                            archivedDefault.IsDefault = false;
+                            BackgroundChangerDatabase.SetItemMediaKind(archivedDefault, MediaKind);
+                        }
+                        else
+                        {
+                            ItemImage archivedItem = new ItemImage
+                            {
+                                Name = archivedFileName,
+                                FolderName = folderName
+                            };
+                            BackgroundChangerDatabase.SetItemMediaKind(archivedItem, MediaKind);
+                            EditedImages.Add(archivedItem);
+                        }
+
+                        Common.LogDebug(true,
+                            string.Format(
+                                "[ImagesManager] Save default swap — archived former default: {0} -> {1} (playniteOwned={2})",
+                                sourcePath,
+                                archivePath,
+                                playniteOwnedMirror));
                     }
-                    else
+
+                    if (!newDefault.FolderName.IsNullOrEmpty() && newDefault.Exist)
                     {
-                        game.BackgroundImage = filePath;
+                        playniteMediaReference = API.Instance.Database.AddFile(newDefault.FullPath, GameBackgroundImages.Game.Id);
+                        FileSystem.DeleteFileSafe(newDefault.FullPath);
+                        EditedImages.Remove(newDefault);
                     }
-                    API.Instance.Database.Games.Update(game);
-                    newDefault.Name = API.Instance.Database.GetFullFilePath(filePath);
-                    newDefault.FolderName = null;
                 }
+
+                LogSaveItemsSnapshot("after-edited", gameName, MediaKind, EditedImages);
 
                 // Saved
-                List<ItemImage> tmpList = Serialization.GetClone(GameBackgroundImages.Items.Where(x => x.IsCover != IsCover).ToList());
+                List<ItemImage> otherMediaItems = GameBackgroundImages.Items
+                    .Where(x => !BackgroundChangerDatabase.ItemMatchesMediaKind(x, MediaKind))
+                    .ToList();
+                List<ItemImage> tmpList = Serialization.GetClone(otherMediaItems);
                 tmpList.AddRange(EditedImages);
                 GameBackgroundImages.Items = tmpList;
+
+                int savedMediaCount = EditedImages.Count;
+                int otherMediaCount = otherMediaItems.Count;
+                Common.LogDebug(true,
+                    string.Format(
+                        "[ImagesManager] Save merge — game='{1}', mediaKind={2}, edited={0}, otherKinds={3}, total={4}, imported={5}, skippedMirror={6}, defaultSwap={7}",
+                        savedMediaCount,
+                        gameName,
+                        MediaKind,
+                        otherMediaCount,
+                        tmpList.Count,
+                        importedCount,
+                        skippedMirrorCount,
+                        !playniteMediaReference.IsNullOrEmpty()));
+
+                LogSaveItemsSnapshot("after-merged", gameName, MediaKind, EditedImages);
+
                 BackgroundChanger.PluginDatabase.Update(GameBackgroundImages);
+
+                Common.LogDebug(true,
+                    string.Format(
+                        "[ImagesManager] Save persisted — game='{0}', mediaKind={1}, totalItems={2}, playniteRef={3}",
+                        gameName,
+                        MediaKind,
+                        GameBackgroundImages.Items?.Count ?? 0,
+                        playniteMediaReference ?? "(none)"));
+
+                if (!playniteMediaReference.IsNullOrEmpty())
+                {
+                    Game game = GameBackgroundImages.Game;
+                    switch (MediaKind)
+                    {
+                        case BackgroundChangerDatabase.PluginMediaKind.Cover:
+                            game.CoverImage = playniteMediaReference;
+                            break;
+                        case BackgroundChangerDatabase.PluginMediaKind.Icon:
+                            game.Icon = playniteMediaReference;
+                            break;
+                        default:
+                            game.BackgroundImage = playniteMediaReference;
+                            break;
+                    }
+
+                    BackgroundChangerDatabase.SuppressGamesItemUpdatedPersist = true;
+                    try
+                    {
+                        API.Instance.Database.Games.Update(game);
+                    }
+                    finally
+                    {
+                        BackgroundChangerDatabase.SuppressGamesItemUpdatedPersist = false;
+                    }
+                }
 
                 ((Window)Parent).Close();
             }
@@ -177,21 +541,191 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                List<string> selectedFiles = API.Instance.Dialogs.SelectFiles("(*.jpg, *.jpeg, *.png)|*.jpg; *.jpeg; *.png|(*.webp)|*.webp|(*.mp4)|*.mp4");
+                List<string> selectedFiles = API.Instance.Dialogs.SelectFiles("(*.jpg, *.jpeg, *.png)|*.jpg; *.jpeg; *.png|(*.webp)|*.webp|(*.gif)|*.gif|(*.webm)|*.webm|(*.mp4)|*.mp4");
 
-                if (selectedFiles != null && selectedFiles.Count > 0)
+                if (selectedFiles == null || selectedFiles.Count == 0)
                 {
-                    foreach (string filePath in selectedFiles)
+                    return;
+                }
+
+                bool ffmpegErrorShown = false;
+                bool ffmpegOutdatedShown = false;
+                List<string> pendingFiles = new List<string>();
+                foreach (string filePath in selectedFiles)
+                {
+                    if (_mediaImportService.IsBlockedByMissingToolkit(filePath))
+                    {
+                        ShowFfmpegNotFoundIfNeeded(ref ffmpegErrorShown);
+                        continue;
+                    }
+
+                    if (_mediaImportService.IsBlockedByOutdatedToolkit(filePath))
+                    {
+                        ShowFfmpegOutdatedIfNeeded(ref ffmpegOutdatedShown);
+                        continue;
+                    }
+
+                    pendingFiles.Add(filePath);
+                }
+
+                if (pendingFiles.Count == 0)
+                {
+                    return;
+                }
+
+                bool needsConversion = false;
+                foreach (string filePath in pendingFiles)
+                {
+                    if (_mediaImportService.RequiresConversion(filePath))
+                    {
+                        needsConversion = true;
+                        break;
+                    }
+                }
+
+                if (needsConversion)
+                {
+                    GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(ResourceProvider.GetString("LOCCommonConverting"))
+                    {
+                        Cancelable = false,
+                        IsIndeterminate = true
+                    };
+
+                    GlobalProgressResult progressDownload = API.Instance.Dialogs.ActivateGlobalProgress(activateGlobalProgress =>
+                    {
+                        bool unusedFfmpegErrorShown = false;
+                        bool unusedFfmpegOutdatedShown = false;
+                        bool unusedConversionFailedShown = false;
+                        foreach (string filePath in pendingFiles)
+                        {
+                            TryAddImportedItem(
+                                filePath,
+                                ref unusedFfmpegErrorShown,
+                                ref unusedFfmpegOutdatedShown,
+                                ref unusedConversionFailedShown);
+                        }
+                    }, globalProgressOptions);
+
+                    WaitProgressAndRefreshList(progressDownload);
+                }
+                else
+                {
+                    foreach (string filePath in pendingFiles)
                     {
                         EditedImages.Add(new ItemImage
                         {
                             Name = filePath
                         });
                     }
+
+                    RefreshEditedImagesList();
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
+        }
+
+        private void ImportSteamOfficialCandidates(IList<SteamOfficialMediaCandidate> candidates)
+        {
+            if (candidates == null || candidates.Count == 0)
+            {
+                return;
+            }
+
+            Common.LogDebug(true, string.Format(
+                "[ImagesManager] Steam official import start game={0} mediaKind={1} count={2}",
+                GameBackgroundImages?.Name,
+                MediaKind,
+                candidates.Count));
+
+            GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(ResourceProvider.GetString("LOCCommonGettingData"))
+            {
+                Cancelable = false,
+                IsIndeterminate = true
+            };
+
+            GlobalProgressResult progressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+            {
+                bool ffmpegErrorShown = false;
+                bool ffmpegOutdatedShown = false;
+                bool conversionFailedShown = false;
+                foreach (SteamOfficialMediaCandidate candidate in candidates)
+                {
+                    try
+                    {
+                        Common.LogDebug(true, string.Format(
+                            "[ImagesManager] Steam official import item kind={0} url={1}",
+                            candidate.AssetKind,
+                            candidate.Url));
+
+                        string cachedFile = HttpFileCache.GetWebFile(candidate.Url);
+                        TryAddImportedItem(
+                            cachedFile,
+                            ref ffmpegErrorShown,
+                            ref ffmpegOutdatedShown,
+                            ref conversionFailedShown);
+
+                        Common.LogDebug(true, string.Format(
+                            "[ImagesManager] Steam official import cached kind={0} file={1}",
+                            candidate.AssetKind,
+                            cachedFile));
+                    }
+                    catch (Exception ex)
+                    {
+                        Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                    }
+                }
+            }, globalProgressOptions);
+
+            WaitProgressAndRefreshList(progressDownload);
+        }
+
+        private void PART_BtAddSteamOfficial_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Game game = GameBackgroundImages?.Game;
+                if (game == null)
+                {
+                    API.Instance.Dialogs.ShowErrorMessage(
+                        ResourceProvider.GetString("LOCBcSteamNoAppId"),
+                        PluginDatabase.PluginName);
+                    return;
                 }
 
-                PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = EditedImages;
+                Common.LogDebug(true, string.Format(
+                    "[ImagesManager] Steam official open search game={0} mediaKind={1}",
+                    GameBackgroundImages.Name,
+                    MediaKind));
+
+                SteamOfficialMediaService steamMediaService = new SteamOfficialMediaService();
+                SteamSelectView viewExtension = new SteamSelectView(
+                    GameBackgroundImages.Name,
+                    MediaKind,
+                    steamMediaService);
+                Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(
+                    ResourceProvider.GetString("LOCCommonStoreSteam"),
+                    viewExtension);
+                _ = windowExtension.ShowDialog();
+
+                if (viewExtension.SelectedResults == null || viewExtension.SelectedResults.Count == 0)
+                {
+                    Common.LogDebug(true, string.Format(
+                        "[ImagesManager] Steam official cancelled game={0} mediaKind={1}",
+                        GameBackgroundImages.Name,
+                        MediaKind));
+                    return;
+                }
+
+                Common.LogDebug(true, string.Format(
+                    "[ImagesManager] Steam official confirmed game={0} mediaKind={1} count={2}",
+                    GameBackgroundImages.Name,
+                    MediaKind,
+                    viewExtension.SelectedResults.Count));
+
+                ImportSteamOfficialCandidates(viewExtension.SelectedResults);
             }
             catch (Exception ex)
             {
@@ -203,13 +737,12 @@ namespace BackgroundChanger.Views
         {
             try
             {
-                SteamGridDbType steamGridDbType = SteamGridDbType.heroes;
-                if (IsCover)
-                {
-                    steamGridDbType = SteamGridDbType.grids;
-                }
+                Common.LogDebug(true, string.Format(
+                    "[ImagesManager] Open SteamGridDB game={0} mediaKind={1}",
+                    GameBackgroundImages.Name,
+                    MediaKind));
 
-                SteamGridDbView viewExtension = new SteamGridDbView(GameBackgroundImages.Name, steamGridDbType, Plugin);
+                SteamGridDbView viewExtension = new SteamGridDbView(GameBackgroundImages.Name, MediaKind, Plugin);
                 Window windowExtension = PlayniteUiHelper.CreateExtensionWindow("SteamGridDB", viewExtension);
                 _ = windowExtension.ShowDialog();
 
@@ -223,15 +756,19 @@ namespace BackgroundChanger.Views
 
                     GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
                     {
+                        bool ffmpegErrorShown = false;
+                        bool ffmpegOutdatedShown = false;
+                        bool conversionFailedShown = false;
                         viewExtension.SteamGridDbResults.ForEach(x =>
                         {
                             try
                             {
                                 string cachedFile = HttpFileCache.GetWebFile(x.Url);
-                                EditedImages.Add(new ItemImage
-                                {
-                                    Name = cachedFile
-                                });
+                                TryAddImportedItem(
+                                    cachedFile,
+                                    ref ffmpegErrorShown,
+                                    ref ffmpegOutdatedShown,
+                                    ref conversionFailedShown);
                             }
                             catch (Exception ex)
                             {
@@ -241,20 +778,7 @@ namespace BackgroundChanger.Views
                     }, globalProgressOptions);
 
 
-                    _ = Task.Run(() =>
-                    {
-                        while (!(bool)ProgressDownload.Result)
-                        {
-
-                        }
-                    }).ContinueWith(antecedant =>
-                    {
-                        _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
-                        {
-                            PART_LbBackgroundImages.ItemsSource = null;
-                            PART_LbBackgroundImages.ItemsSource = EditedImages;
-                        });
-                    });
+                    WaitProgressAndRefreshList(ProgressDownload);
                 }
             }
             catch (Exception ex)
@@ -278,11 +802,46 @@ namespace BackgroundChanger.Views
                     }
                     else
                     {
+                        UpdatePreviewDecodePixelHeight();
                         PART_BackgroundImage.Source = filePath;
                         PART_Video.Source = null;
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Sets <see cref="CommonPluginsShared.Controls.ImageAsync.DecodePixelHeight"/> from the preview panel size
+        /// so <c>Parameter="0"</c> uses a resolution bucket matching the display area (avoids the default 200 px stretch blur).
+        /// </summary>
+        private void UpdatePreviewDecodePixelHeight()
+        {
+            if (PART_BackgroundImage == null)
+            {
+                return;
+            }
+
+            double displayHeight = PART_BackgroundImage.ActualHeight;
+            if (double.IsNaN(displayHeight) || displayHeight <= 0)
+            {
+                displayHeight = PART_BackgroundImage.RenderSize.Height;
+            }
+
+            if (displayHeight <= 0)
+            {
+                FrameworkElement parent = PART_BackgroundImage.Parent as FrameworkElement;
+                if (parent != null)
+                {
+                    displayHeight = parent.ActualHeight;
+                }
+            }
+
+            if (displayHeight <= 0)
+            {
+                return;
+            }
+
+            PART_BackgroundImage.DecodePixelHeight = Math.Max(256, Math.Round(displayHeight));
         }
 
 
@@ -344,6 +903,11 @@ namespace BackgroundChanger.Views
         {
             int index = int.Parse(((TextBlock)sender).Tag.ToString());
 
+            if (!EditedImages[index].Exist)
+            {
+                return;
+            }
+
             bool newValue = !EditedImages[index].IsFavorite;
             EditedImages.ForEach(c => c.IsFavorite = false);
             EditedImages[index].IsFavorite = newValue;
@@ -352,106 +916,6 @@ namespace BackgroundChanger.Views
             PART_LbBackgroundImages.ItemsSource = EditedImages;
         }
 
-
-        private string ExtractAnimatedImageAndConvert(string filePath)
-        {
-            string videoPath = string.Empty;
-
-            FileSystem.CreateDirectory(PluginDatabase.Paths.PluginCachePath, true);
-
-            try
-            {
-                if (filePath != null && filePath != string.Empty)
-                {
-                    if (Path.GetExtension(filePath).IsEqual(".webp"))
-                    {
-                        WebpAnim webPAnim = new WebpAnim();
-                        webPAnim.Load(filePath);
-
-                        string fileName = Path.GetFileNameWithoutExtension(filePath);
-                        int actualFrame = 0;
-                        while (actualFrame < webPAnim.FramesCount())
-                        {
-                            string pathTemp = Path.Combine(PluginDatabase.Paths.PluginCachePath, $"FileName_{actualFrame:D4}.png");
-
-                            System.Drawing.Image img = System.Drawing.Image.FromStream(webPAnim.GetFrameStream(actualFrame));
-                            img.Save(pathTemp, ImageFormat.Png);
-
-                            actualFrame++;
-                        }
-
-
-                        double width = webPAnim.GetFrameBitmapSource(0).Width;
-                        double height = webPAnim.GetFrameBitmapSource(0).Height;
-
-                        string ffmpeg = $"-r 25 -f "
-                            + $"image2 -s {width}x{height} -i \"{PluginDatabase.Paths.PluginCachePath}\\FileName_%4d.png\" "
-                            + $"-vcodec libx264 -crf 25 -pix_fmt yuv420p \"{PluginDatabase.Paths.PluginCachePath}\\{fileName}.mp4\"";
-
-                        Process process = new Process();
-                        process.StartInfo.FileName = PluginDatabase.PluginSettings.Settings.ffmpegFile;
-                        process.StartInfo.Arguments = ffmpeg;
-                        _ = process.Start();
-                        process.WaitForExit();
-
-
-                        videoPath = $"{PluginDatabase.Paths.PluginCachePath}\\{fileName}.mp4";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginDatabase.PluginName);
-            }
-
-            return videoPath;
-        }
-
-        private void PART_BtConvert_Click(object sender, RoutedEventArgs e)
-        {
-            int index = int.Parse(((Button)sender).Tag.ToString());
-            string filePath = EditedImages[index].FullPath;
-            string videoPath = string.Empty;
-
-            GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(ResourceProvider.GetString("LOCCommonConverting"))
-            {
-                Cancelable = false,
-                IsIndeterminate = true
-            };
-
-            GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
-            {
-                try
-                {
-                    if (File.Exists(PluginDatabase.PluginSettings.Settings.ffmpegFile))
-                    {
-                        videoPath = ExtractAnimatedImageAndConvert(filePath);
-                    }
-                    else
-                    {
-                        API.Instance.Dialogs.ShowErrorMessage(ResourceProvider.GetString("LOCBcFfmpegNotFound"), PluginDatabase.PluginName);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Common.LogError(ex, false, true, PluginDatabase.PluginName);
-                }
-            }, globalProgressOptions);
-
-
-            if (!videoPath.IsNullOrEmpty() && File.Exists(videoPath))
-            {
-                PART_BtDelete_Click(sender, e);
-
-                EditedImages.Add(new ItemImage
-                {
-                    Name = videoPath
-                });
-
-                PART_LbBackgroundImages.ItemsSource = null;
-                PART_LbBackgroundImages.ItemsSource = EditedImages;
-            }
-        }
 
         private void PART_BtDefault_Click(object sender, RoutedEventArgs e)
         {
@@ -485,15 +949,19 @@ namespace BackgroundChanger.Views
 
                     GlobalProgressResult ProgressDownload = API.Instance.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
                     {
+                        bool ffmpegErrorShown = false;
+                        bool ffmpegOutdatedShown = false;
+                        bool conversionFailedShown = false;
                         viewExtension.GoogleImageResults.ForEach(x =>
                         {
                             try
                             {
                                 string cachedFile = HttpFileCache.GetWebFile(x.ImageUrl);
-                                EditedImages.Add(new ItemImage
-                                {
-                                    Name = cachedFile
-                                });
+                                TryAddImportedItem(
+                                    cachedFile,
+                                    ref ffmpegErrorShown,
+                                    ref ffmpegOutdatedShown,
+                                    ref conversionFailedShown);
                             }
                             catch (Exception ex)
                             {
@@ -503,20 +971,7 @@ namespace BackgroundChanger.Views
                     }, globalProgressOptions);
 
 
-                    _ = Task.Run(() =>
-                    {
-                        while (!(bool)ProgressDownload.Result)
-                        {
-
-                        }
-                    }).ContinueWith(antecedant =>
-                    {
-                        _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
-                        {
-                            PART_LbBackgroundImages.ItemsSource = null;
-                            PART_LbBackgroundImages.ItemsSource = EditedImages;
-                        });
-                    });
+                    WaitProgressAndRefreshList(ProgressDownload);
                 }
             }
             catch (Exception ex)
@@ -560,23 +1015,26 @@ namespace BackgroundChanger.Views
                     try
                     {
                         string cachedFile = HttpFileCache.GetWebFile(urlSelection.SelectedString);
-                        if (!cachedFile.IsNullOrEmpty())
+                        if (cachedFile.IsNullOrEmpty())
                         {
-                            List<string> validImageExtensions = new List<string> { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp" };
-                            string extension = Path.GetExtension(cachedFile).ToLower();
-
-                            if (validImageExtensions.Contains(extension))
-                            {
-                                EditedImages.Add(new ItemImage
-                                {
-                                    Name = cachedFile
-                                });
-                            }
-                            else
-                            {
-                                Logger.Warn($"The file {cachedFile} is not a valid image.");
-                            }
+                            return;
                         }
+
+                        string extension = Path.GetExtension(cachedFile).ToLower();
+                        if (!_mediaImportService.IsValidImportExtension(extension))
+                        {
+                            Logger.Warn($"The file {cachedFile} is not a valid image.");
+                            return;
+                        }
+
+                        bool ffmpegErrorShown = false;
+                        bool ffmpegOutdatedShown = false;
+                        bool conversionFailedShown = false;
+                        TryAddImportedItem(
+                            cachedFile,
+                            ref ffmpegErrorShown,
+                            ref ffmpegOutdatedShown,
+                            ref conversionFailedShown);
                     }
                     catch (Exception ex)
                     {
@@ -585,83 +1043,12 @@ namespace BackgroundChanger.Views
                 }, globalProgressOptions);
 
 
-                _ = Task.Run(() =>
-                {
-                    while (!(bool)ProgressDownload.Result)
-                    {
-
-                    }
-                }).ContinueWith(antecedant =>
-                {
-                    _ = API.Instance.MainView.UIDispatcher?.BeginInvoke((Action)delegate
-                    {
-                        PART_LbBackgroundImages.ItemsSource = null;
-                        PART_LbBackgroundImages.ItemsSource = EditedImages;
-                    });
-                });
+                WaitProgressAndRefreshList(ProgressDownload);
             }
             catch (Exception ex)
             {
                 Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
-        }
-    }
-
-    public class GetMediaTypeConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            try
-            {
-                if (value is string @string)
-                {
-                    if (Path.GetExtension(@string).IsEqual("mp4"))
-                    {
-                        return "\ueb13";
-                    }
-
-                    if (Path.GetExtension(@string).IsEqual("webp"))
-                    {
-                        return "\ueb16 \ueb13";
-                    }
-
-                    if (Path.GetExtension(@string).IsEqual("png"))
-                    {
-                        try
-                        {
-                            Png_Reader pngr = new Png_Reader();
-                            Dictionary<fcTL, MemoryStream> m_Apng;
-                            using (Stream fStream = FileSystem.OpenReadFileStreamSafe(@string))
-                            {
-                                m_Apng = pngr.Open(fStream).SpltAPng();
-                            }
-
-                            // Animated
-                            if (m_Apng.Count > 0)
-                            {
-                                return "\ueb16 \ueb13";
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Common.LogError(ex, true);
-                        }
-                    }
-
-                    return "\ueb16";
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, "BackgroundChanger");
-            }
-
-            return string.Empty;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotSupportedException();
         }
     }
 }
