@@ -99,16 +99,16 @@
     <sys:String x:Key="LOCBcBulkFuzzyThreshold">Name match threshold</sys:String>
     <sys:String x:Key="LOCBcBulkPromptLowFuzzy">Prompt when match is below threshold</sys:String>
     <sys:String x:Key="LOCBcBulkAllowAnimated">Allow animated SteamGridDB assets</sys:String>
-    <sys:String x:Key="LOCBcBulkPickMode">SteamGridDB selection</sys:String>
+    <sys:String x:Key="LOCBcBulkPickMode">Выбор SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcBulkPickRandom">Случайный</sys:String>
     <sys:String x:Key="LOCBcBulkPickBestScore">Best score</sys:String>
-    <sys:String x:Key="LOCBcBulkPickBestVotes">Best upvotes</sys:String>
+    <sys:String x:Key="LOCBcBulkPickBestVotes">Лучшие по голосам</sys:String>
     <sys:String x:Key="LOCBcBulkPickNewest">Новейшие (по id)</sys:String>
-    <sys:String x:Key="LOCBcBulkSteamGridFilters">SteamGridDB filters</sys:String>
+    <sys:String x:Key="LOCBcBulkSteamGridFilters">Фильтры SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcBulkSaveOptions">Параметры сохранения</sys:String>
     <sys:String x:Key="LOCBcBulkOptionsSaved">Bulk download options were saved.</sys:String>
     <sys:String x:Key="LOCBcBulkOptionsInvalid">Select at least one source and one media type.</sys:String>
-    <sys:String x:Key="LOCBcBulkFuzzyPrompt">Select the matching SteamGridDB game</sys:String>
+    <sys:String x:Key="LOCBcBulkFuzzyPrompt">Выберите соответствующую игру из SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcBulkDownloadSummary">Импортировано: {0} — Пропущено: {1} — Ошибки: {2}</sys:String>
     <sys:String x:Key="LOCBcBulkDownloadCancelled">Загрузка была отменена.</sys:String>
 
