@@ -76,7 +76,7 @@ FFmpeg と ffprobe を設定してください（通常は同じフォルダー�
     <sys:String x:Key="LOCBcMediaConversionCrfInvalid">メディア変換の CRF は 0 (既定値を継承) または 0～51 の範囲で指定する必要があります。既定の CRF は 0～51 の範囲で指定する必要があります。</sys:String>
     <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">メディア変換のフレームレートは 1～120 fps の範囲で指定する必要があります。</sys:String>
 
-    <sys:String x:Key="LOCBcFfmpegNotFound">FFmpeg or ffprobe not found</sys:String>
+    <sys:String x:Key="LOCBcFfmpegNotFound">FFmpeg または ffprobe が見つかりません</sys:String>
     <sys:String x:Key="LOCBcFfmpegOutdated">FFmpeg または ffprobe のバージョンが古すぎます</sys:String>
     <sys:String x:Key="LOCBcFfmpegPathNotConfigured">未設定</sys:String>
     <sys:String x:Key="LOCBcFfmpegStartupNotification">FFmpeg が設定されていないか、&quot;{0}&quot; に実行ファイルが見つかりません。プラグイン設定で FFmpeg を設定するまで、アニメーションメディアをインポートまたは変換できません。</sys:String>
