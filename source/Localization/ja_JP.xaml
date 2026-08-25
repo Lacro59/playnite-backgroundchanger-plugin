@@ -5,21 +5,21 @@
 
     <sys:String x:Key="LOCBc">BackgroundChanger</sys:String>
     
-    <sys:String x:Key="LOCBcManageBackground">背景画像の管理</sys:String>
-    <sys:String x:Key="LOCBcManageCover">バー画像の管</sys:String>
+    <sys:String x:Key="LOCBcManageBackground">背景画像を管理</sys:String>
+    <sys:String x:Key="LOCBcManageCover">カバー画像の管理</sys:String>
     <sys:String x:Key="LOCBcManageIcon">アイコンの管理</sys:String>
 
     <!-- BackgroundChangerSettingsView -->
 
     <sys:String x:Key="LOCBcSteamGridDbApiKey">SteamGridDB API キー</sys:String>
     
-    <sys:String x:Key="LOCBcEnableBackgroundImage">ラグインの背景画像を表示</sys:String>
-    <sys:String x:Key="LOCBcEnableCoverImage">ラグインのカバー画像を表示</sys:String>
+    <sys:String x:Key="LOCBcEnableBackgroundImage">プラグインの背景画像を表示</sys:String>
+    <sys:String x:Key="LOCBcEnableCoverImage">プラグインのカバー画像を表示</sys:String>
     <sys:String x:Key="LOCBcEnableIconImage">プラグインのアイコンを表示</sys:String>
 
     <sys:String x:Key="LOCBcBackgroundSameSettings">プラグインのゲーム背景をテーマ背景と同じ設定にした *。</sys:String>
 
-    <sys:String x:Key="LOCBcEnableRandomSelect">ダム選択を有効にする</sys:String>
+    <sys:String x:Key="LOCBcEnableRandomSelect">ランダム選択を有効にする</sys:String>
     <sys:String x:Key="LOCBcSelectionMode">選択モード</sys:String>
     <sys:String x:Key="LOCBcModeDefault">お気に入りが設定されている場合はそれを使用し、それ以外は Playnite の既定を使用</sys:String>
     <sys:String x:Key="LOCBcRandomOnStart">Only on Playnite start</sys:String>
@@ -41,7 +41,7 @@
     <sys:String x:Key="LOCBcSteamGet">Steam から取得</sys:String>
     <sys:String x:Key="LOCBcSteamNoAppId">このゲームの Steam App ID が見つかりませんでした。</sys:String>
     <sys:String x:Key="LOCBcSteamNoAssets">このゲームの公式 Steam メディアが見つかりませんでした。</sys:String>
-    <sys:String x:Key="LOCBcSteamGridDbSelect">SteamGridDBから選択</sys:String>
+    <sys:String x:Key="LOCBcSteamGridDbSelect">SteamGridDB から選択</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbAnimated">アニメーション</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbMimes">MIME タイプ</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbApiKeyMissingNotification">アートワークを検索してダウンロードするには、プラグイン設定で SteamGridDB API キーを設定してください。</sys:String>
@@ -50,7 +50,7 @@
     <sys:String x:Key="LOCBcSteamGridDbRateLimitNotification">SteamGridDB のレート制限に達しました（429）。しばらく待ってからもう一度お試しください。</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbParseErrorNotification">SteamGridDB から予期しない応答が返されました。もう一度試すか、プラグイン設定で API キーを確認してください。</sys:String>
     <sys:String x:Key="LOCBcSteamGridDbGenericErrorNotification">SteamGridDB へのリクエストに失敗しました。詳細は extensions.log を確認してください。</sys:String>
-    <sys:String x:Key="LOCBcGoogleImageSelect">グーグル画像から選択</sys:String>
+    <sys:String x:Key="LOCBcGoogleImageSelect">Google 画像から選択</sys:String>
     <sys:String x:Key="LOCBcAddFromUrl">URL から追加</sys:String>
     <sys:String x:Key="LOCBcAddFromUrlDescription">画像の URL を入力してください</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg ファイル</sys:String>
@@ -76,7 +76,7 @@ FFmpeg と ffprobe を設定してください（通常は同じフォルダー�
     <sys:String x:Key="LOCBcMediaConversionCrfInvalid">メディア変換の CRF は 0 (既定値を継承) または 0～51 の範囲で指定する必要があります。既定の CRF は 0～51 の範囲で指定する必要があります。</sys:String>
     <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">メディア変換のフレームレートは 1～120 fps の範囲で指定する必要があります。</sys:String>
 
-    <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
+    <sys:String x:Key="LOCBcFfmpegNotFound">FFmpeg または ffprobe が見つかりません</sys:String>
     <sys:String x:Key="LOCBcFfmpegOutdated">FFmpeg または ffprobe のバージョンが古すぎます</sys:String>
     <sys:String x:Key="LOCBcFfmpegPathNotConfigured">未設定</sys:String>
     <sys:String x:Key="LOCBcFfmpegStartupNotification">FFmpeg が設定されていないか、&quot;{0}&quot; に実行ファイルが見つかりません。プラグイン設定で FFmpeg を設定するまで、アニメーションメディアをインポートまたは変換できません。</sys:String>
