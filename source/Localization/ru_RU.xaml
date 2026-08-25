@@ -55,24 +55,24 @@
     <sys:String x:Key="LOCBcAddFromUrlDescription">Введите URL к изображению</sys:String>
     <sys:String x:Key="LOCBcFfmpegFile">ffmpeg файл</sys:String>
     <sys:String x:Key="LOCBcFfprobeFile">ffprobe файл</sys:String>
-    <sys:String x:Key="LOCBcFfmpegFileDescription">Required to import animated media (WebP, WebM, APNG, GIF). Configure FFmpeg and ffprobe (usually in the same folder). Files are automatically converted to MP4 at import and on startup.</sys:String>
+    <sys:String x:Key="LOCBcFfmpegFileDescription">Необходимо для импорта анимированных медиа файлов (WebP, WebM, APNG, GIF). Настройте FFmpeg и ffprobe (обычно находятся в одной папке). Файлы автоматически конвертируются в MP4 при импорте и запуске.</sys:String>
 
     <sys:String x:Key="LOCBcMediaConversionSection">Преобразование медиа</sys:String>
     <sys:String x:Key="LOCBcMediaConversionDefaultsCrf">CRF по умолчанию (качество)</sys:String>
     <sys:String x:Key="LOCBcMediaConversionCrf">CRF (0 = использовать по умолчанию)</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionCrfToolTip">H.264 constant rate factor (0–51). Lower values yield higher quality and larger files. Set 0 to use the default CRF above.</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionCrfDescription">The CRF sets the trade-off between MP4 quality and file size: a lower value improves image quality (larger file), a higher value reduces file size (lower quality). 23 is a good starting point for most users.</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionAlphaNote">Output uses H.264 yuv420p, which does not preserve transparency. This is acceptable for most animated backgrounds and covers, which rarely rely on alpha.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfToolTip">Фактор постоянного качества H.264 (CRF, от 0 до 51). Меньшие значения повышают качество, но увеличивают размер файлов. Установите 0, чтобы использовать CRF по умолчанию, указанный выше.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfDescription">CRF определяет баланс между качеством MP4 и размером файла: меньшее значение улучшает качество изображения (увеличивая файл), а большее — уменьшает размер файла (снижая качество). Значение 23 — хорошая отправная точка для большинства пользователей.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionAlphaNote">На выходе используется формат H.264 yuv420p, не поддерживающий прозрачность. Это приемлемо для большинства анимированных фонов и обложек, так как они редко используют альфа-канал.</sys:String>
     <sys:String x:Key="LOCBcMediaConversionAnimatedWebp">Анимированный WebP</sys:String>
     <sys:String x:Key="LOCBcMediaConversionWebm">WebM</sys:String>
     <sys:String x:Key="LOCBcMediaConversionApng">Анимированный PNG (APNG)</sys:String>
     <sys:String x:Key="LOCBcMediaConversionGif">Анимированный GIF</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionUseAutoFramerate">Use source frame timing</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionUseAutoFramerate">Использовать скорость анимации источника</sys:String>
     <sys:String x:Key="LOCBcMediaConversionFixedFramerate">Фиксированная частота кадров (fps)</sys:String>
     <sys:String x:Key="LOCBcMediaConversionForceReencode">Всегда перекодировать в H.264</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionForceReencodeToolTip">When disabled, FFmpeg attempts to copy the video stream when the WebM is already H.264 compatible.</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionCrfInvalid">Media conversion CRF must be 0 (inherit default) or between 0 and 51. Default CRF must be between 0 and 51.</sys:String>
-    <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">Media conversion frame rate must be between 1 and 120 fps.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionForceReencodeToolTip">Если отключено, FFmpeg попытается скопировать видеопоток без перекодирования, если файл WebM уже совместим с H.264.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionCrfInvalid">Значение CRF для конвертации медиа должно быть 0 (наследовать дефолтное) или от 0 до 51. Значение CRF по умолчанию должно быть в диапазоне от 0 до 51.</sys:String>
+    <sys:String x:Key="LOCBcMediaConversionFramerateInvalid">Частота кадров при конвертации медиа должна быть от 1 до 120 кадров/с (fps).</sys:String>
 
     <sys:String x:Key="LOCBcFfmpegNotFound">Ffmpeg not found</sys:String>
     <sys:String x:Key="LOCBcFfmpegOutdated">Версия ffmpeg или ffprobe слишком устарела</sys:String>
@@ -92,7 +92,7 @@
     <sys:String x:Key="LOCBcBulkSourceSteam">Официальный Steam</sys:String>
     <sys:String x:Key="LOCBcBulkSourceSteamGridDb">SteamGridDB</sys:String>
     <sys:String x:Key="LOCBcBulkMediaKinds">Типы медиа</sys:String>
-    <sys:String x:Key="LOCBcBulkOnlyMissing">Skip existing plugin media per type (Background/Cover/Icon)</sys:String>
+    <sys:String x:Key="LOCBcBulkOnlyMissing">Не обрабатывать уже имеющиеся медиафайлы плагина для каждого типа (Фон/Обложка/Иконка)</sys:String>
     <sys:String x:Key="LOCBcBulkOnlyGamesWithoutData">Только игры без изображений плагина</sys:String>
     <sys:String x:Key="LOCBcBulkQuantity">Количество (общее по каждому типу медиа)</sys:String>
     <sys:String x:Key="LOCBcBulkDownloadAll">Скачать всё</sys:String>
